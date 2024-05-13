@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Monitoring and Evaluation','none')"></head>
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Monitoring and Evaluation
+                                </h6>
+
+                                <!-- Title -->
+                                <h1 class="header-title text-truncate">
+                                    [[${pageTitle}]]
+                                </h1>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Navigation (button group) -->
+                                <div class="nav btn-group d-inline-flex d-none" role="tablist">
+                                    <button aria-controls="dealsListPane" aria-selected="true"
+                                            class="btn btn-white active"
+                                            data-bs-target="#dealsListPane" data-bs-toggle="tab" id="dealsListTab"
+                                            role="tab">
+                                        <span class="fe fe-list"></span>
+                                    </button>
+                                    <button aria-controls="dealsCardsPane" aria-selected="false" class="btn btn-white"
+                                            data-bs-target="#dealsCardsPane" data-bs-toggle="tab" id="dealsCardsTab"
+                                            role="tab">
+                                        <span class="fe fe-sidebar"></span>
+                                    </button>
+                                </div> <!-- / .nav -->
+
+                                <!-- Buttons -->
+                                <a class="btn btn-primary ms-2" th:href="@{/me-indicators/submissions}">
+                                    All Submissions
+                                </a>
+
+                            </div>
+                        </div> <!-- / .row -->
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Nav -->
+                                <ul class="nav nav-tabs nav-overflow header-tabs">
+                                    <li class="nav-item d-none">
+                                        <a class="nav-link text-nowrap active" href="#!">
+                                            Total <span
+                                                class="badge rounded-pill bg-secondary-soft"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form method="post"
+                      th:action="@{/me-indicators/save}"
+                      th:object="${meIndicator}">
+                    <input id="id" th:field="*{id}" type="hidden"/>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Member Institution
+                                </label>
+
+                                <!-- Input -->
+                                <select class="form-select mb-3" data-choices required="required"
+                                        th:field="*{memberInstitution}">
+                                    <option value="">Select...</option>
+                                    <th:block th:each="vh : ${memberInstitutionList}">
+                                        <option th:selected="(${vh.id} == ${meIndicator.memberInstitution})"
+                                                th:value="${vh.id}">
+                                            [[${vh}]]
+                                        </option>
+                                    </th:block>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-3">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Period
+                                </label>
+
+                                <!-- Input -->
+                                <select class="form-select mb-3" required th:field="*{submissionPeriod}">
+                                </select>
+                            </div>
+
+                        </div>
+                    </div> <!-- / .row -->
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Skilled Deliveries
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" required
+                                       step="0.01"
+                                       th:field="*{skilledDeliveries}" type="number">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Maternal Deaths
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" required
+                                       step="0.01"
+                                       th:field="*{maternalDeaths}" type="number">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Malaria Incidence
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" step="0.01"
+                                       th:field="*{malariaIncidence}"
+                                       type="number">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Under One - Fully Immunised (%)
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" maxlength="3"
+                                       min="0" placeholder="XXXX"
+                                       step="0.01"
+                                       th:field="*{percentUnderOneFullyImmunised}" type="number">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Neoplasm
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" step="0.01"
+                                       th:field="*{neoplasm}"
+                                       type="number">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Hypertension
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" step="0.01"
+                                       th:field="*{hypertension}"
+                                       type="number">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Diabetes
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" step="0.01"
+                                       th:field="*{diabetes}"
+                                       type="number">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    In-Patients
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" required
+                                       step="0.01"
+                                       th:field="*{inPatients}" type="number">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Out-Patients
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" required
+                                       step="0.01"
+                                       th:field="*{outPatients}" type="number">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Government Grants
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" required
+                                       step="0.01"
+                                       th:field="*{governmentGrants}" type="number">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-4">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Technical Support Visits - CHAZ
+                                </label>
+
+                                <!-- Input -->
+                                <input class="form-control" min="0"
+                                       placeholder="XXXX" required
+                                       step="0.01"
+                                       th:field="*{tssChaz}" type="number">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6" sec:authorize="hasAnyAuthority('MonEvaluation','Admin')">
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                        <button class="btn btn-secondary" id="btnCancel" type="button">Cancel</button>
+                    </div>
+
+                </form>
+
+                <br><br>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+</div><!-- / .main-content -->
+<div th:replace="fragments/modal_fragment :: modal_dialog"></div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script type="text/javascript">
+    moduleURL = "[[@{/}]]";
+    MAX_FILE_SIZE = 2502400; // 2502.4KB
+
+    let submissionPeriodDropdown = document.getElementById('submissionPeriod');
+    let currentYear = new Date().getFullYear();
+    let earliestYear = 1970;
+
+    while (currentYear >= earliestYear) {
+        let dateOption = document.createElement('option');
+        dateOption.text = currentYear;
+        dateOption.value = currentYear;
+        submissionPeriodDropdown.add(dateOption);
+        currentYear -= 1;
+    }
+
+    function checkIndicatorUnique(form) {
+        url = "[[@{/me-indicators/rest/check-indicator}]]";
+        indicatorId = $("#id").val();
+        memberId = $("#memberInstitution").val();
+        submissionPeriod = $("#submissionPeriod").val();
+        csrfValue = $("input[name='_csrf']").val();
+
+        params = {
+            id: indicatorId,
+            memberId: memberId,
+            submissionPeriod: submissionPeriod,
+            _csrf: csrfValue
+        };
+
+        $.post(url, params, function (response) {
+            if (response === "OK") {
+                form.submit();
+            } else if (response === "Duplicated") {
+                showWarningModal("It seems you have already submitted data for the year.");
+            } else {
+                showErrorModal("Unknown response from server");
+            }
+        }).fail(function () {
+            showErrorModal("Could not connect to the server");
+        });
+
+        return false;
+    }
+
+
+</script>
+<script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
+</body>
+
+</html>

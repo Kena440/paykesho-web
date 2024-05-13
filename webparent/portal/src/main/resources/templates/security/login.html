@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/sign-in.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:05:06 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Login','none')"></head>
+
+<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary">
+
+<!-- CONTENT
+================================================== -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-5 col-xl-4 my-5">
+
+            <!-- Heading -->
+            <h1 class="display-4 text-center mb-3">
+                CHAZ Membership
+            </h1>
+
+            <!-- Subheading -->
+            <p class="text-muted text-center mb-5">
+                Portal
+            </p>
+
+            <!-- Form -->
+            <form method="post" th:action="@{/login}">
+                <div class="position-relative mb-4">
+                    <div class="alert alert-warning" role="alert" th:if="${param.error}">
+                        [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
+                    </div>
+                    <div class="alert alert-success" role="alert" th:if="${param.logout}">
+                        You have been logged out
+                    </div>
+                    <div class="alert alert-info" role="alert" th:if="${forgotPasswordMessage != null}">
+                        [[${forgotPasswordMessage}]]
+                    </div>
+                </div>
+                <!-- Email address -->
+                <div class="form-group d-none">
+                    <div class="mb-2 text-center">
+                        <a class="btn btn-sm btn-dark"
+                           style="background-color: #ffffff; width: 100%; color: green"
+                           th:href="@{/oauth2/authorization/google}">
+                            <img alt="..." class="navbar-brand-img mx-auto" style="height: 150px; width: 150px"
+                                 th:src="@{/assets/img/google.svg}">
+                            &nbsp; Continue with Google</a>
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <!-- Label -->
+                    <label class="form-label">
+                        Email Address
+                    </label>
+
+                    <!-- Input -->
+                    <input class="form-control" id="email" name="email" placeholder="name@chaz.org.zm" type="email">
+
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+
+                            <!-- Label -->
+                            <label class="form-label">
+                                Password
+                            </label>
+
+                        </div>
+                        <div class="col-auto">
+
+                            <!-- Help text -->
+                            <a class="form-text small text-muted" data-bs-target="#modalPasswordReset"
+                               data-bs-toggle="modal"
+                               href="#modalPasswordReset">
+                                Forgot password?
+                            </a>
+
+
+                        </div>
+                    </div> <!-- / .row -->
+
+                    <!-- Input group -->
+                    <div class="input-group input-group-merge">
+
+                        <!-- Input -->
+                        <input class="form-control" id="password" name="password" placeholder="Enter your password"
+                               type="password">
+
+                        <!-- Icon -->
+                        <span class="input-group-text">
+                  <i class="fe fe-eye"></i>
+                </span>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input is-invalid" id="loginRemember" name="remember-me" type="checkbox"
+                               value="">
+                        <label class="form-check-label" for="loginRemember">
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button class="btn btn-lg w-100 btn-primary mb-3">
+                    Sign in
+                </button>
+
+                <!-- Link -->
+
+            </form>
+
+        </div>
+    </div> <!-- / .row -->
+</div> <!-- / .container -->
+
+<div aria-hidden="true" class="modal fade" id="modalPasswordReset" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-card card" data-list='{"valueNames": ["name"]}'>
+                <div class="card-header">
+                    <!-- Title -->
+                    <h4 class="card-header-title" id="exampleModalCenterTitle">
+                        Forgot Password?
+                    </h4>
+                    <!-- Close -->
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+
+                <div class="card-body">
+                    <!-- List group -->
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-10 col-xl-8 my-2">
+                            <form method="post" th:action="@{/forgot-password}">
+
+                                <!-- Subheading -->
+                                <p class="text-muted text-center mb-2">
+                                    Enter your email to get a password reset link.
+                                </p>
+
+                                <!-- Form -->
+
+                                <!-- Email address -->
+                                <div class="form-group">
+
+                                    <!-- Label -->
+                                    <label class="form-label">
+                                        Email Address
+                                    </label>
+
+                                    <!-- Input -->
+                                    <input class="form-control" id="modalPasswordResetEmail"
+                                           name="modalPasswordResetEmail" placeholder="Email Address *"
+                                           required type="email">
+                                </div>
+
+                                <!-- Submit -->
+                                <button class="btn btn-lg w-100 btn-primary mb-3" type="submit">
+                                    Reset Password
+                                </button>
+
+                                <!-- Link -->
+                                <div class="text-center">
+                                    <small class="text-muted text-center">
+                                        Remember your password? <a th:href="@{/}">Log in</a>.
+                                    </small>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+
+</html>

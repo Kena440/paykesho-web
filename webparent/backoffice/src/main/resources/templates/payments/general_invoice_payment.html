@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Invoice Payment','none')"></head>
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header mt-md-5">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Payments
+                                </h6>
+
+                                <!-- Title -->
+                                <h1 class="header-title">
+                                    Invoice #[[${generalInvoice.serial}]] to
+                                    <strong class="text-body">[[${generalInvoice.recipientName}]]</strong>
+
+                                </h1>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Buttons -->
+                                <a class="btn btn-white lift d-none" href="#!">
+                                    Download
+                                </a>
+                                <a class="btn btn-primary ms-2 lift d-none" href="#!">
+                                    Pay
+                                </a>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="card card-body p-5">
+                    <div class="row">
+                        <div class="col text-end">
+
+                            <!-- Badge -->
+
+
+                            <th:block th:if="${generalInvoice.paid == true}">
+                                <div class="badge bg-success">
+                                    Paid
+                                </div>
+                            </th:block>
+                            <th:block th:if="${generalInvoice.paid == false}">
+                                <div class="badge bg-danger">
+                                    Pending Payment
+                                </div>
+                            </th:block>
+
+                        </div>
+                    </div> <!-- / .row -->
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <!-- Heading -->
+                            <h6 class="text-uppercase text-muted">
+                                Due date
+                            </h6>
+
+                            <!-- Text -->
+                            <p class="mb-4">
+                                <time datetime="2018-04-23"
+                                      th:replace="fragments/fragments :: format_date(${generalInvoice.invoiceDueDate})"></time>
+                            </p>
+
+                        </div>
+                    </div> <!-- / .row -->
+                    <div class="row">
+                        <div class="col-6 col-md-6">
+
+                            <!-- Heading -->
+                            <h6 class="text-uppercase text-muted">
+                                Invoice Items
+                            </h6>
+                        </div>
+                        <div class="col-6 col-md-6">
+
+                            <!-- Heading -->
+                            <h6 class="text-uppercase text-muted">
+                                Payment History
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+
+                            <!-- Table -->
+                            <div class="table-responsive">
+                                <table class="table my-4">
+                                    <thead>
+                                    <tr>
+                                        <th class="px-0 bg-transparent border-top-0">
+                                            <span class="h6">Item</span>
+                                        </th>
+                                        <th class="px-0 bg-transparent border-top-0">
+                                            <span class="h6">Description</span>
+                                        </th>
+                                        <th class="px-0 bg-transparent border-top-0 text-end">
+                                            <span class="h6">Amount</span>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="invoice, invoiceStat : ${generalInvoice.invoiceItems}">
+                                        <td class="px-0">
+                                            [[${invoiceStat.count}]]
+                                        </td>
+                                        <td class="px-0">
+                                            [[${invoice.description}]]
+                                        </td>
+                                        <td class="px-0 text-end">
+                                            <span class="h3"
+                                                  th:replace="fragments/fragments :: format_currency(${invoice.amount})"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-0 border-top border-top-2">
+                                            <strong>Net Amount</strong>
+                                        </td>
+                                        <td class="px-0 text-end border-top border-top-2" colspan="2">
+                                            <span class="h3"
+                                                  th:replace="fragments/fragments :: format_currency(${generalInvoice.netAmount})"></span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-6" th:if="${generalPayment != null}">
+
+                            <!-- Table -->
+                            <div class="table-responsive">
+                                <table class="table my-4">
+                                    <thead>
+                                    <tr>
+                                        <th class="px-0 bg-transparent border-top-0">
+                                            <span class="h6">Item</span>
+                                        </th>
+                                        <th class="px-0 bg-transparent border-top-0">
+                                            <span class="h6">Description</span>
+                                        </th>
+                                        <th class="px-0 bg-transparent border-top-0 text-end">
+                                            <span class="h6">Amount</span>
+                                        </th>
+                                        <th class="px-0 bg-transparent border-top-0 text-end">
+                                            <span class="h6">Date</span>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="payment, paymentStat : ${generalPayment.paymentItems}">
+                                        <td class="px-0">
+                                            [[${paymentStat.count}]]
+                                        </td>
+                                        <td class="px-0">
+                                            [[${payment.description}]]
+                                        </td>
+                                        <td class="px-0 text-end">
+                                            <span class="h3"
+                                                  th:replace="fragments/fragments :: format_currency(${payment.amount})"></span>
+                                        </td>
+                                        <td>
+                                            <time datetime="2018-04-23"
+                                                  th:replace="fragments/fragments :: format_date(${payment.updatedDate})"></time>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div> <!-- / .row -->
+
+                    <div class="card-footer-boxed">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Buttons -->
+                                <a class="btn btn-secondary lift" href="#!">
+                                    Cancel
+                                </a>
+                                <button class="btn btn-primary ms-2 lift" data-bs-target="#modalAllRecordPayment"
+                                        data-bs-toggle="modal"
+                                        th:if="${generalInvoice.paid == false}">
+                                    Record Payment
+                                </button>
+                                <!--     <a class="btn btn-primary ms-2 lift"
+                                        title="View Receipt"
+                                        th:href="@{'/payments/receipt/'+${generalPayment.id}}">
+                                     </a>-->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+    <div aria-hidden="true" class="modal fade" id="modalAllRecordPayment" role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-card card">
+                    <div class="card-header">
+
+                        <!-- Title -->
+                        <h4 class="card-header-title" id="exampleModalCenterTitle">
+                            Record Payment
+                        </h4>
+
+                        <!-- Close -->
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+
+                    </div>
+                    <div class="card-header">
+
+                        <h4 class="card-header-title">
+                            Invoice #[[${generalInvoice.serial}]] to
+                            <strong class="text-body">[[${generalInvoice.recipientName}]]</strong>
+
+                        </h4>
+                    </div>
+                    <form method="post"
+                          th:action="@{/general-payments/save}"
+                          th:object="${paymentItemDto}">
+                        <div class="card-body">
+                            <!-- Form -->
+
+                            <input id="id" th:field="*{id}" type="hidden"/>
+                            <input id="paymentId" name="paymentId"
+                                   th:if="${generalPayment != null}" th:value="${generalPayment.id}"
+                                   type="hidden"/>
+                            <input id="invoiceId"
+                                   name="invoiceId" th:value="${generalInvoice.id}"
+                                   type="hidden"/>
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+
+                                        <!-- Label -->
+                                        <label class="form-label">
+                                            Description
+                                        </label>
+
+                                        <!-- Input -->
+                                        <input class="form-control" maxlength="45"
+                                               minlength="2" placeholder="XXXX"
+                                               th:field="*{description}"
+                                               type="text">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+
+                                        <!-- Label -->
+                                        <label class="form-label">
+                                            Amount Paid
+                                        </label>
+
+                                        <!-- Input -->
+                                        <input class="form-control" maxlength="45"
+                                               min="1" minlength="1"
+                                               placeholder="XXXX"
+                                               step="0.01"
+                                               th:field="*{amount}"
+                                               type="number">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="card-footer-boxed">
+                            <div class="row align-items-center">
+                                <div class="col">
+
+
+                                </div>
+                                <div class="col-auto">
+
+                                    <!-- Buttons -->
+                                    <button aria-label="Close" class="btn btn-secondary lift"
+                                            data-bs-dismiss="modal" type="button">
+                                        Cancel
+                                    </button>
+                                    <button class="btn btn-primary ms-2 lift" type="submit">
+                                        Save
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</div><!-- / .main-content -->
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script type="text/javascript">
+    contextPath = "[[@{/}]]";
+    const csrfHeaderName = "[[${_csrf.headerName}]]";
+    let csrfValue = "[[${_csrf.token}]]";
+
+    currencySymbol = "[[${CURRENCY_SYMBOL}]]";
+    thousandPointType = "[[${THOUSAND_POINT_TYPE == 'COMMA' ? ',' : '.'}]]";
+    decimalPointType = "[[${DECIMAL_POINT_TYPE == 'COMMA' ? ',' : '.'}]]";
+    currencySymbolPosition = "[[${CURRENCY_SYMBOL_POSITION}]]";
+    decimalDigits = "[[${DECIMAL_DIGITS}]]";
+
+    prefixCurrencySymbol = currencySymbolPosition === 'before price' ? currencySymbol : '';
+    suffixCurrencySymbol = currencySymbolPosition === 'after price' ? currencySymbol : '';
+
+</script>
+</body>
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:49 GMT -->
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+>
+<body>
+<div th:fragment="content" th:remove="tag">
+    <div style="width: 100%; margin: 0 auto">
+        <div class="form-group row">
+            <div class="col-8">
+                <div class="form-group">
+                    <p class="text-gray-500">
+                        Use this page to manage countries which will be
+                        displayed in the memberAdmin registration.
+                        <br>
+                        Click 'Load Country list' first
+                    </p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <button class="btn btn-primary mr-1" id="buttonLoadCountries" type="submit">Load Country list
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-8">
+                <div class="form-group">
+                    <select class="form-control" id="dropDownCountries" size="3" style="height: 200px"></select>
+                </div>
+            </div>
+        </div>
+        <form id="formCountry">
+            <div class="form-group row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="fieldCountryName" id="lblCountryName">Country Name</label>
+                        <input class="form-control form-control-xs"
+                               id="fieldCountryName"
+                               maxlength="256"
+                               minlength="3"
+                               name="countryName"
+                               placeholder="Country Name"
+                               required
+                               type="text">
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="fieldCountryCode" id="lblCountryCode">Country Code</label>
+                        <input class="form-control form-control-xs"
+                               id="fieldCountryCode"
+                               maxlength="256"
+                               minlength="3"
+                               name="countryName"
+                               placeholder="Country Code"
+                               required
+                               type="text">
+                    </div>
+                </div>
+                <div class="col-6 mt-1"><label for="fieldCountryCode">Actions</label>
+                    <div class="text-left">
+                        <button class="btn btn-primary mr-1 btn-xs" id="btnAddCountry" type="button">New</button>
+                        <button class="btn btn-primary mr-1 btn-xs" disabled="disabled" id="btnUpdateCountry"
+                                type="button"> Update
+                        </button>
+                        <button class="btn btn-secondary btn-xs" disabled="disabled" id="btnDeleteCountry"
+                                type="button">Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

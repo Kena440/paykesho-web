@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="modal fade text-center" id="modalDialog" th:fragment="modal_dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalTitle">Warning</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+
+            </div>
+            <div class="modal-body">
+                <span id="modalBody">
+
+                </span>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-center" id="confirmModal" th:fragment="confirm_modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Confirmation</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+
+            </div>
+            <div class="modal-body">
+                <span id="confirmText">
+
+                </span>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-success" href="" id="yesButton">Yes</a>
+                <button class="btn btn-danger" data-bs-dismiss="modal" type="button">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-center" id="confirmPaymentModal" th:fragment="confirm_payment_modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Payment Confirmation</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+
+            </div>
+            <div class="modal-body">
+                <span id="confirmPaymentText">
+
+                </span>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-success" href="" id="yesPaymentButton">Yes</a>
+                <button class="btn btn-danger" data-bs-dismiss="modal" type="button">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-center" id="reviewIndicatorModal" th:fragment="review_indicators_modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Monitoring & Evaluation</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+
+            </div>
+            <div class="modal-body">
+                <span id="reviewIndicatorText">
+
+                </span>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-success" href="" id="yesReviewIndicatorButton">Yes</a>
+                <button class="btn btn-danger" data-bs-dismiss="modal" type="button">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-center" id="removeMemberModal" th:fragment="remove_member_modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Initiatives</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+
+            </div>
+            <div class="modal-body">
+                <span id="removeMemberText">
+
+                </span>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-success" href="" id="yesRemoveMemberButton">Yes</a>
+                <button class="btn btn-danger" data-bs-dismiss="modal" type="button">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

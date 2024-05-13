@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="divInvoiceItemDetails" th:fragment="content">
+    <th:block th:each="detail, status : ${generalInvoice.invoiceItems}">
+        <div class="row" th:id="'divDetail' + ${status.index}">
+            <input name="detailIDs" th:value="${detail.id}" type="hidden">
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Type
+                    </label>
+                    <select class="form-select mb-3" data-choices name="paymentType">
+                        <option value="">Select...</option>
+                        <th:block th:each="vh : ${paymentTypeList}">
+                            <option th:selected="(${vh.id} == ${detail.paymentType.id})"
+                                    th:value="${vh.id}">
+                                [[${vh.name}]]
+                            </option>
+                        </th:block>
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Description
+                    </label>
+                    <input class="form-control" name="description" th:value="${detail.description}"
+                           type="text">
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Amount
+                    </label>
+                    <input class="form-control" min="0" name="amount" required
+                           step="0.01" th:value="${detail.amount}"
+                           type="number">
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Action
+                    </label>
+                    <br>
+                    <button class="btn fe fe-delete fa-3x icon-dark float-right"
+                            name="linkRemoveDetail"
+                            title="Remove this detail"
+                            type="button">
+                        Remove
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        <hr>
+    </th:block>
+
+    <div class="row" th:id="'divDetail' + ${#lists.size(generalInvoice.invoiceItems)}">
+        <input name="detailIDs" type="hidden" value="0">
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label class="form-label">
+                    Type
+                </label>
+                <select class="form-select mb-3" data-choices name="paymentType">
+                    <option value="">Select...</option>
+                    <th:block th:each="vh : ${paymentTypeList}">
+                        <option th:value="${vh.id}">
+                            [[${vh.name}]]
+                        </option>
+                    </th:block>
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label class="form-label">
+                    Description
+                </label>
+                <input class="form-control" name="description" type="text">
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label class="form-label">
+                    Amount
+                </label>
+                <input class="form-control" name="amount" type="number">
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

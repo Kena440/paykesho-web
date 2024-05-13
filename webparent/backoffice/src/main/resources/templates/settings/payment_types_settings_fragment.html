@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+>
+<body>
+<div th:fragment="content" th:remove="tag">
+    <div style="width: 100%; margin: 0 auto">
+        <div class="form-group row">
+            <div class="col-8">
+                <div class="form-group">
+                    <p class="text-gray-500">
+                        Use this page to manage Payment Types which will be
+                        displayed in the system
+                        <br>
+                        Click 'Load Payment Types list' first
+                    </p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <button class="btn btn-primary mr-1" id="buttonLoadPaymentTypes" type="submit">Load Payment Types
+                        list
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-8">
+                <div class="form-group">
+                    <select class="form-control" id="dropDownPaymentTypes" size="3" style="height: 200px"></select>
+                </div>
+            </div>
+        </div>
+        <form id="formPaymentType">
+            <div class="form-group row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="fieldPaymentTypeName" id="lblPaymentTypeName">Type Name</label>
+                        <input class="form-control form-control-xs"
+                               id="fieldPaymentTypeName"
+                               maxlength="256"
+                               minlength="3"
+                               name="paymentTypeName"
+                               placeholder="Type Name"
+                               required
+                               type="text">
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="fieldPaymentTypeCode" id="lblPaymentTypeCode">Type Code</label>
+                        <input class="form-control form-control-xs"
+                               id="fieldPaymentTypeCode"
+                               maxlength="256"
+                               minlength="3"
+                               name="paymentTypeCode"
+                               placeholder="Type Code"
+                               required
+                               type="text">
+                    </div>
+                </div>
+                <div class="col-6 mt-1"><label for="fieldPaymentTypeName">Actions</label>
+                    <div class="text-left">
+                        <button class="btn btn-primary mr-1 btn-xs" id="btnAddPaymentType" type="button">New</button>
+                        <button class="btn btn-primary mr-1 btn-xs" disabled="disabled" id="btnUpdatePaymentType"
+                                type="button"> Update
+                        </button>
+                        <button class="btn btn-secondary btn-xs" disabled="disabled" id="btnDeletePaymentType"
+                                type="button">Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

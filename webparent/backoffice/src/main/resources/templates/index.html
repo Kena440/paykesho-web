@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Dashboard','none')"></head>
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="container-fluid">
+
+            <!-- Body -->
+            <div class="header-body">
+                <div class="row align-items-end">
+                    <div class="col">
+
+                        <!-- Pretitle -->
+                        <h6 class="header-pretitle">
+                            [[${country}]]
+                        </h6>
+
+                        <!-- Title -->
+                        <h1 class="header-title">
+                            Dashboard
+                        </h1>
+
+                    </div>
+                    <div class="col-auto">
+
+                        <!-- Button -->
+                        <th:block sec:authorize="isAuthenticated()">
+                            <a class="lift mr-2" sec:authentication="principal.username" th:href="@{/account}"></a>
+                        </th:block>
+
+                    </div>
+                </div> <!-- / .row -->
+            </div> <!-- / .header-body -->
+
+        </div>
+    </div> <!-- / .header -->
+
+    <!-- CARDS -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-6 col-xl">
+
+                <!-- Exit -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center gx-0">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h6 class="text-uppercase text-muted mb-2">
+                                    Representative Churches
+                                </h6>
+
+                                <span class="h2 mb-0">17</span>
+                                <!--       <span th:if="${denominationCount != null}" class="h2 mb-0"
+                                             th:replace="fragments/fragments :: format_number(${denominationCount})"></span>-->
+
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Icon -->
+                                <a class="link-all-denominations h2 fe fe-home text-muted mb-0"
+                                   th:href="@{'/denominations/all-denominations'}"></a>
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-12 col-lg-6 col-xl" sec:authorize="hasAnyAuthority('Finance')">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center gx-0">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h6 class="text-uppercase text-muted mb-2">
+                                    Due for Payment
+                                </h6>
+
+                                <!-- Heading -->
+                                <span class="h2 mb-0" th:if="${countUnpaidInvoices != null}"
+                                      th:replace="fragments/fragments :: format_number(${countUnpaidInvoices})"></span>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Icon -->
+                                <span class="h2 fe fe-file text-muted mb-0"></span>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl" sec:authorize="hasAnyAuthority('MicroFin')">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center gx-0">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h6 class="text-uppercase text-muted mb-2">
+                                    Total Owing (IGA)
+                                </h6>
+
+                                <!-- Heading -->
+                                <span class="h2 mb-0" th:if="${totalOwing != null}"
+                                      th:replace="fragments/fragments :: format_currency(${totalOwing})"></span>
+                                (<span class="h2 mb-0" th:if="${totalLoans != null}"
+                                       th:replace="fragments/fragments :: format_number(${totalOwingLoans})"></span>)
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Icon -->
+                                <span class="h2 fe fe-hash text-muted mb-0"></span>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl">
+
+                <!-- Time -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center gx-0">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h6 class="text-uppercase text-muted mb-2">
+                                    Total Donations
+                                </h6>
+
+                                <span class="h2 mb-0" th:if="${countTotalDonations != null}"
+                                      th:replace="fragments/fragments :: format_number(${countTotalDonations})"></span>
+
+
+                            </div>
+                            <div class="col-auto">
+
+                                <span class="h2 fe fe-gift text-muted mb-0"></span>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+        <div class="row">
+            <div class="col-12 col-xl-4">
+
+                <!-- Traffic -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center gx-0">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h6 class="text-uppercase text-muted mb-2">
+                                    Membership
+                                </h6>
+
+                                <!-- Heading -->
+                                <span class="h2 mb-0" th:if="${memberInstitutionCount != null}"
+                                      th:replace="fragments/fragments :: format_number(${memberInstitutionCount})"></span>
+
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Icon -->
+                                <span class="h2 fe fe-file-text text-muted mb-0"></span>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center gx-0">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h6 class="text-uppercase text-muted mb-2">
+                                    Catchment Population
+                                </h6>
+
+                                <!-- Heading -->
+                                <span class="h2 mb-0" th:if="${memberInstitutionCatchment != null}"
+                                      th:replace="fragments/fragments :: format_number(${memberInstitutionCatchment})"></span>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Icon -->
+                                <span class="h2 fe fe-globe text-muted mb-0"></span>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+                <th:block th:if="${upcomingEvents.size() > 0}">
+                    <div class="card">
+                        <div class="card-header">
+
+                            <!-- Title -->
+                            <h4 class="card-header-title">
+                                Upcoming Events
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive"
+                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
+                                <table class="table table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
+                                        </th>
+                                        <th scope="col">
+                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Info</a>
+                                        </th>
+                                        <th scope="col">
+                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Date</a>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="list">
+                                    <tr th:each="event, eventStat : ${upcomingEvents}">
+                                        <th class="tables-row" scope="row">[[${eventStat.count}]]</th>
+                                        <td class="tables-first">
+                                            <a th:href="@{'/events/view/'+${event.id}}"
+                                               title="Event View">
+                                                [[${event.name}]]
+                                            </a>
+                                        </td>
+                                        <td class="tables-last">
+                                            <time datetime="2018-04-23"
+                                                  th:replace="fragments/fragments :: format_date(${event.eventDate})"></time>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </th:block>
+                <div class="card">
+                    <div class="card-header">
+
+                        <!-- Title -->
+                        <h4 class="card-header-title">
+                            Membership Types
+                        </h4>
+
+
+                    </div>
+                    <div class="card-body">
+                        <canvas class="chart-canvas" id="memberTypeChart" style="width:100%;max-width:600px"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-8">
+
+                <!-- Traffic -->
+                <div class="card">
+                    <div class="card-header">
+
+                        <!-- Title -->
+                        <h4 class="card-header-title">
+                            Membership Map
+                        </h4>
+
+
+                    </div>
+                    <div class="card-body">
+
+                        <div id='map' style='width: 100%; height: 500px'></div>
+
+                    </div>
+                </div>
+            </div>
+        </div> <!-- / .row -->
+        <div class="row">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Membership Count
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <div class="col-12 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-header">
+
+                                            <!-- Title -->
+                                            <h4 class="card-header-title">
+                                                Membership Count (Denominations)
+                                            </h4>
+
+
+                                        </div>
+                                        <div class="card-body">
+
+                                            <div class="table-responsive"
+                                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                    <tr>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
+                                                        </th>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Name</a>
+                                                        </th>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Total</a>
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody class="list">
+                                                    <tr th:each="member, memberCountByDenominationStat : ${memberCountByDenomination}">
+                                                        <th class="tables-row" scope="row">[[${memberCountByDenominationStat.count}]]</th>
+                                                        <td class="tables-first">[[${member.name}]]</td>
+                                                        <td class="tables-last">[[${member.total}]]</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-header">
+
+                                            <!-- Title -->
+                                            <h4 class="card-header-title">
+                                                Membership Count (Provinces)
+                                            </h4>
+
+
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive"
+                                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                    <tr>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
+                                                        </th>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Name</a>
+                                                        </th>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Total</a>
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody class="list">
+                                                    <tr th:each="member, memberCountByProvinceStat : ${memberCountByProvince}">
+                                                        <th class="tables-row" scope="row">[[${memberCountByProvinceStat.count}]]</th>
+                                                        <td class="tables-first">[[${member.name}]]</td>
+                                                        <td class="tables-last">[[${member.total}]]</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-header">
+
+                                            <!-- Title -->
+                                            <h4 class="card-header-title">
+                                                Membership Count (Level of Care)
+                                            </h4>
+
+
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive"
+                                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                    <tr>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
+                                                        </th>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Name</a>
+                                                        </th>
+                                                        <th scope="col">
+                                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Total</a>
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody class="list">
+                                                    <tr th:each="member, memberCountByLevelOfCareStat : ${memberCountByLevelOfCare}">
+                                                        <th class="tables-row" scope="row">[[${memberCountByLevelOfCareStat.count}]]</th>
+                                                        <td class="tables-first">[[${member.name}]]</td>
+                                                        <td class="tables-last">[[${member.total}]]</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div> <!-- / .row -->
+    </div>
+</div><!-- / .main-content -->
+
+<div aria-hidden="true" class="modal fade" id="modalInvoiceDuePayment" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+<div aria-hidden="true" class="modal fade" id="modalAllDenominations" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+<script type="text/javascript">
+    let currYearTripData = [];
+    let lastYearTripData = [];
+    let memberTypes = [];
+    let monthLabels = [];
+    let memberTypesData = [];
+    let memberGPSData = [];
+    let memberGPSMapFeatures = [];
+    contextPath = "[[@{/}]]";
+
+    $(document).ready(function () {
+
+        const memberTypesDataRequestUrl = contextPath + "member-institutions/rest/get-member-types-data/true";
+        const memberGPSDataRequestUrl = contextPath + "member-institutions/rest/get-member-gps-data/true";
+
+        $.get(memberTypesDataRequestUrl, function (responseJSON) {
+            $.each(responseJSON, function (index, reportItem) {
+                memberTypes.push(reportItem.identifier);
+                memberTypesData.push(reportItem.itemCount);
+            });
+
+            generateMembersTypeChart();
+        });
+
+        $.get(memberGPSDataRequestUrl, function (responseJSON) {
+            $.each(responseJSON, function (index, reportItem) {
+                memberGPSData.push(reportItem);
+            });
+
+            $.each(memberGPSData, function (index, item) {
+                var element = {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [item.longitude, item.latitude]
+                    },
+                    'properties': {
+                        'title': item.title
+                    }
+                }
+
+                memberGPSMapFeatures.push(element);
+            })
+
+            generateMembersGPSMap();
+        });
+
+    });
+
+    $(".link-due-payment").on("click", function (e) {
+        e.preventDefault();
+        const linkDetailURL = $(this).attr("href");
+        $("#modalInvoiceDuePayment").modal("show").find(".modal-content").load(linkDetailURL);
+    });
+
+    $(".link-all-denominations").on("click", function (e) {
+        e.preventDefault();
+        const linkDetailURL = $(this).attr("href");
+        $("#modalAllDenominations").modal("show").find(".modal-content").load(linkDetailURL);
+    });
+
+    function generateMembersTypeChart() {
+        var barColors = [
+            "#b91d47",
+            "#00aba9",
+            "#2b5797",
+            "#e8c3b9"
+        ];
+
+        new Chart("memberTypeChart", {
+            type: "doughnut",
+            data: {
+                labels: memberTypes,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: memberTypesData
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Legend"
+                }
+            }
+        });
+    }
+
+    function generateMembersGPSMap() {
+        mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            zoom: 5.0,
+            center: [28.5589884, -13.1189121]
+        });
+
+        map.on('load', () => {
+            map.loadImage(
+                contextPath + 'assets/img/marker.png',
+                (error, image) => {
+                    if (error) throw error;
+                    map.addImage('custom-marker', image);
+                    map.addSource('points', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'FeatureCollection',
+                            'features': memberGPSMapFeatures
+                        }
+                    });
+
+                    map.addLayer({
+                        'id': 'points',
+                        'type': 'symbol',
+                        'source': 'points',
+                        'layout': {
+                            'icon-image': 'custom-marker',
+                            'text-field': [
+                                'format',
+                                ['downcase', ['get', 'title']],
+                                {'font-scale': 0.6},
+                            ],
+                            'text-font': [
+                                'Open Sans Semibold',
+                                'Arial Unicode MS Bold'
+                            ],
+                            'text-offset': [0, 0.60],
+                            'text-anchor': 'top'
+                        },
+                        'paint': {
+                            "text-color": "#000"
+                        }
+                    });
+                }
+            );
+        });
+        map.addControl(new mapboxgl.FullscreenControl());
+    }
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content" th:remove="tag">
+    <form enctype="multipart/form-data" method="post" style="width: 100%; margin: 0 auto"
+          th:action="@{/settings/save-payment}">
+
+        <div class="form-group row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="sitePAYPAL_API_BASE_URLInput">PAYPAL_API_BASE_URL</label>
+                    <input class="form-control form-control-xs"
+                           id="sitePAYPAL_API_BASE_URLInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="PAYPAL_API_BASE_URL"
+                           placeholder="PAYPAL_API_BASE_URL"
+                           required
+                           th:value="${PAYPAL_API_BASE_URL}"
+                           type="text">
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="sitePAYPAL_API_CLIENT_IDInput">PAYPAL_API_CLIENT_ID</label>
+                    <input class="form-control form-control-xs"
+                           id="sitePAYPAL_API_CLIENT_IDInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="PAYPAL_API_CLIENT_ID"
+                           placeholder="PAYPAL_API_CLIENT_ID"
+                           required
+                           th:value="${PAYPAL_API_CLIENT_ID}"
+                           type="text">
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="sitePAYPAL_API_CLIENT_SECRETInput">PAYPAL_API_CLIENT_SECRET</label>
+                    <input class="form-control form-control-xs"
+                           id="sitePAYPAL_API_CLIENT_SECRETInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="PAYPAL_API_CLIENT_SECRET"
+                           placeholder="PAYPAL_API_CLIENT_SECRET"
+                           required
+                           th:value="${PAYPAL_API_CLIENT_SECRET}"
+                           type="text">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-left">
+            <button class="btn btn-primary mr-1" type="submit">Save</button>
+            <button class="btn btn-secondary" id="btnCancel" type="button">Cancel</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Monitoring & Evaluation','none')"></head>
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+
+    <div class="header">
+
+        <!-- Image -->
+        <img alt="..." class="header-img-top" style="height: 120px!important;"
+             th:src="@{/assets/img/covers/profile-cover-1.jpg}">
+
+        <div class="container-fluid">
+            <!-- Body -->
+            <div class="header-body mt-n5 mt-md-n6">
+                <div class="row align-items-end">
+                    <div class="col-auto">
+
+                        <!-- Avatar -->
+                        <div class="avatar avatar-xxl header-avatar-top">
+                            <img alt="..." class="avatar-img rounded-circle border border-4 border-body"
+                                 th:src="@{/images/chazlogo.png}">
+                        </div>
+
+                    </div>
+                    <div class="col mb-3 ms-n3 ms-md-n2">
+
+                        <!-- Pretitle -->
+                        <h6 class="header-pretitle">
+                            M & E
+                        </h6>
+
+                        <!-- Title -->
+                        <h1 class="header-title">
+                            [[${splitName}]]
+                        </h1>
+
+                    </div>
+                    <div class="col-12 col-md-auto mt-2 mt-md-0 mb-md-3">
+
+
+                    </div>
+                </div> <!-- / .row -->
+                <div class="row align-items-center">
+                    <div class="col">
+
+                        <!-- Nav -->
+                        <ul class="nav nav-tabs nav-overflow header-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#dateTab">
+                                    By Year
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#categoryTab">
+                                    By Member
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#productTab">
+                                    By Province
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div> <!-- / .header-body -->
+
+        </div>
+    </div>
+
+    <!-- Nav -->
+    <!-- Content -->
+    <div class="container-fluid">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="dateTab">
+                <div class="row">
+                    <div th:replace="me/data_chart_fragment :: content('-year', ${varName})"></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="categoryTab">
+                <div class="row">
+                    <div th:replace="me/data_chart_fragment :: content('-member', ${varName})"></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="productTab">
+                <div class="row">
+                    <div th:replace="me/data_chart_fragment :: content('-province', ${varName})"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="fragments/modal_fragment :: confirm_modal"></footer>
+<script th:src="@{https://www.gstatic.com/charts/loader.js}" type="text/javascript"></script>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
+<script>
+    moduleURL = "[[@{/me-indicators}]]";
+    contextPath = "[[@{/}]]";
+    currencySymbol = "[[${CURRENCY_SYMBOL}]]";
+    thousandPointType = "[[${THOUSAND_POINT_TYPE == 'COMMA' ? ',' : '.'}]]";
+    decimalPointType = "[[${DECIMAL_POINT_TYPE == 'COMMA' ? ',' : '.'}]]";
+    currencySymbolPosition = "[[${CURRENCY_SYMBOL_POSITION}]]";
+    decimalDigits = "[[${DECIMAL_DIGITS}]]";
+
+    prefixCurrencySymbol = currencySymbolPosition === 'before price' ? currencySymbol : '';
+    suffixCurrencySymbol = currencySymbolPosition === 'after price' ? currencySymbol : '';
+
+    $(document).ready(function () {
+        google.charts.load('current', {'packages': ['corechart', 'table']});
+        google.charts.setOnLoadCallback(loadDataReportByYear);
+    })
+
+    let fromYearDropdown = document.getElementById('fromYear' + $("#reportType"));
+    let toYearDropdown = document.getElementById('toYear' + $("#reportType"));
+    let currentYear = new Date().getFullYear();
+    let earliestYear = 1970;
+
+    while (currentYear >= earliestYear) {
+        let dateOption = document.createElement('option');
+        dateOption.text = currentYear;
+        dateOption.value = currentYear;
+        fromYearDropdown.add(dateOption);
+        toYearDropdown.add(dateOption);
+        currentYear -= 1;
+    }
+</script>
+<script th:src="@{/assets/js/me/data_chart_by_year.js}" type="text/javascript"></script>
+<script th:src="@{/assets/js/me/data_chart_by_member.js}" type="text/javascript"></script>
+<script th:src="@{/assets/js/me/data_chart_by_province.js}" type="text/javascript"></script>
+<script th:src="@{/assets/js/me/data_chart_common.js}" type="text/javascript"></script>
+</body>
+
+</html>

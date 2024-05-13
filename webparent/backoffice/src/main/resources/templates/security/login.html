@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/sign-in.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:05:06 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Login','none')"></head>
+
+<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary">
+
+<!-- CONTENT
+================================================== -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-5 col-xl-4 my-5">
+
+            <!-- Heading -->
+            <h1 class="display-4 text-center mb-3">
+                CHAZ - Membership Management
+            </h1>
+
+            <!-- Subheading -->
+            <p class="text-muted text-center mb-5">
+                Admin Back Office
+            </p>
+
+            <!-- Form -->
+            <form method="post" th:action="@{/login}">
+                <div class="position-relative mb-4">
+                    <div class="alert alert-warning" role="alert" th:if="${param.error}">
+                        [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
+                    </div>
+                    <div class="alert alert-success" role="alert" th:if="${param.logout}">
+                        You have been logged out
+                    </div>
+                </div>
+                <!-- Email address -->
+                <div class="form-group">
+
+                    <!-- Label -->
+                    <label class="form-label">
+                        Email Address
+                    </label>
+
+                    <!-- Input -->
+                    <input class="form-control" id="email" name="email" placeholder="name@address.com" type="email">
+
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+
+                            <!-- Label -->
+                            <label class="form-label">
+                                Password
+                            </label>
+
+                        </div>
+                        <div class="col-auto">
+
+                            <!-- Help text -->
+                            <a class="form-text small text-muted" href="password-reset-cover.html">
+                                Forgot password?
+                            </a>
+
+                        </div>
+                    </div> <!-- / .row -->
+
+                    <!-- Input group -->
+                    <div class="input-group input-group-merge">
+
+                        <!-- Input -->
+                        <input class="form-control" id="password" name="password" placeholder="Enter your password"
+                               type="password">
+
+                        <!-- Icon -->
+                        <span class="input-group-text">
+                  <i class="fe fe-eye"></i>
+                </span>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input is-invalid" id="loginRemember" name="remember-me" type="checkbox"
+                               value="">
+                        <label class="form-check-label" for="loginRemember">
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button class="btn btn-lg w-100 btn-primary mb-3" style="background-color: green!important;">
+                    Sign in
+                </button>
+
+                <!-- Link -->
+
+            </form>
+
+        </div>
+    </div> <!-- / .row -->
+</div> <!-- / .container -->
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+
+<!-- Mirrored from dashkit.goodthemes.co/sign-in.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:05:06 GMT -->
+</html>

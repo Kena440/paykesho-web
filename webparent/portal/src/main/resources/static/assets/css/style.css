@@ -1,0 +1,54 @@
+body {
+    font-family: 'Montserrat', sans-serif; /* Apply Montserrat to the entire body */
+}
+
+.icon-dark {
+    color: grey;
+}
+
+.icon-green {
+    color: green;
+}
+
+.btn-primary {
+    background-color: green !important;
+    border-color: white !important;
+    color: #fff !important
+}
+
+@media screen and (max-width: 768px) {
+    /*small screen*/
+    div.full-details {
+        display: none
+    }
+
+    div.less-details {
+        display: block;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    /*medium screen*/
+    div.full-details {
+        display: block;
+    }
+
+    div.less-details {
+        display: none;
+    }
+
+    .hideable-column {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    /*medium screen*/
+    div.less-details {
+        display: none;
+    }
+
+    .hideable-column {
+        display: table-cell;
+    }
+}

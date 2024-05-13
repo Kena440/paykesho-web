@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content" th:remove="tag">
+    <div class="col-12 col-xl-4">
+
+        <!-- Card -->
+        <div class="card">
+            <div class="card-body">
+
+                <!-- List group -->
+                <div class="list-group list-group-flush my-n3">
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Type
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.memberType}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    District
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.district}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Province
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.province}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+
+                <!-- List group -->
+                <div class="list-group list-group-flush my-n3">
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Level of Care
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.levelOfCare}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Catchment
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.catchmentPopulation}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Number of Beds
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.numberOfBeds}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Services
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.servicesOffered}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-4">
+
+        <!-- Card -->
+        <div class="card">
+            <div class="card-body">
+
+                <!-- List group -->
+                <div class="list-group list-group-flush my-n3">
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Denomination
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.denomination}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+
+                <!-- List group -->
+                <div class="list-group list-group-flush my-n3">
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Email
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.email}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Phone Number
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.phoneNumber}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Title -->
+                                <h5 class="mb-0">
+                                    Postal Address
+                                </h5>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Time -->
+                                <time class="small text-muted" datetime="1988-10-24">
+                                    [[${facility.postalAddress}]], [[${facility.postalCode}]]
+                                </time>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-12 col-xl-4">
+
+        <!-- Card -->
+        <div class="card">
+            <div class="card-header">
+
+                <!-- Title -->
+                <h4 class="card-header-title">
+                    Map
+                </h4>
+
+            </div>
+            <div class="card-body">
+
+                <!-- List group -->
+                <div id="map" style='width: 100%; height: 400px'></div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html> 

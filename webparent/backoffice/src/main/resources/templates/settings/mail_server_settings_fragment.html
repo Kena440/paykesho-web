@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content" th:remove="tag">
+    <form method="post" style="width: 100%; margin: 0 auto" th:action="@{/settings/save-mail-server}">
+
+        <div class="form-group row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">MAIL_HOST</label>
+                    <input class="form-control form-control-xs"
+                           id="siteNameInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="MAIL_HOST"
+                           placeholder="MAIL_HOST"
+                           required
+                           th:value="${MAIL_HOST}"
+                           type="text">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">MAIL_PORT</label>
+                    <input class="form-control form-control-xs"
+                           id="siteCopyrightInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="MAIL_PORT"
+                           placeholder="Site Copyright"
+                           required
+                           th:value="${MAIL_PORT}"
+                           type="text">
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">MAIL_USERNAME</label>
+                    <input class="form-control form-control-xs"
+                           id="siteMAIL_USERNAMEInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="MAIL_USERNAME"
+                           placeholder="MAIL_HOST"
+                           required
+                           th:value="${MAIL_USERNAME}"
+                           type="text">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">MAIL_PASSWORD</label>
+                    <input class="form-control form-control-xs"
+                           id="siteMAIL_PASSWORDInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="MAIL_PASSWORD"
+                           placeholder="Site Copyright"
+                           required
+                           th:value="${MAIL_PASSWORD}"
+                           type="password">
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">SMTP_AUTH</label>
+                    <select class="custom-select form-control form-control-xs"
+                            name="SMTP_AUTH"
+                            style="resize: vertical; height: auto">
+                        <option th:selected="(${SMTP_AUTH} == 'true')" value="true">True</option>
+                        <option th:selected="(${SMTP_AUTH} == 'false')" value="false">False</option>
+                    </select>
+
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">SMTP_SECURED</label>
+                    <select class="custom-select form-control form-control-xs"
+                            name="SMTP_SECURED"
+                            style="resize: vertical; height: auto">
+                        <option th:selected="(${SMTP_SECURED} == 'true')" value="true">True</option>
+                        <option th:selected="(${SMTP_SECURED} == 'false')" value="false">False</option>
+                    </select>
+
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">MAIL_FROM</label>
+                    <input class="form-control form-control-xs"
+                           id="siteMMAIL_FROMEInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="MAIL_FROM"
+                           placeholder="MAIL_FROM"
+                           required
+                           th:value="${MAIL_FROM}"
+                           type="email">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="siteNameInput">MAIL_SENDER_NAME</label>
+                    <input class="form-control form-control-xs"
+                           id="siteMMAIL_SENDER_NAMEEInput"
+                           maxlength="256"
+                           minlength="3"
+                           name="MAIL_SENDER_NAME"
+                           placeholder="MAIL_SENDER_NAME"
+                           required
+                           th:value="${MAIL_SENDER_NAME}"
+                           type="text">
+                </div>
+            </div>
+        </div>
+
+        <div class="text-right">
+            <button class="btn btn-primary mr-1" type="submit">Save</button>
+            <button class="btn btn-secondary" id="btnCancel" type="button">Cancel</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
