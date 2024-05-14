@@ -25,12 +25,12 @@
     </div>
     <div class="row" th:if="${assessmentFeedbacks.size() > 0}">
         <div class="col-6 d-none">
-            <input class="form-control" id="searchAttendeeAttendanceInput" placeholder="Search..." type="text">
+            <input class="form-control" id="searchFeedbackInput" placeholder="Search..." type="text">
         </div>
 
         <div class="col-12 col-md-6">
             <div class="table-responsive">
-                <table class="table table-sm table-bordered my-4" id="attendeeAttendanceTable">
+                <table class="table table-sm table-bordered my-4" id="feedbackTable">
                     <thead>
                     <tr>
                         <th class="px-0 bg-transparent border-top-0">
@@ -69,6 +69,27 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let currentIndex = 0;
+
+            document.querySelector('#searchFeedbackInput').addEventListener('input', function () {
+                var searchQuery = this.value.toLowerCase();
+                currentIndex = 0;
+                var rows = document.querySelectorAll('#feedbackTable tbody tr');
+                rows.forEach(function (row) {
+                    var rowData = row.textContent.toLowerCase();
+                    if (rowData.includes(searchQuery)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+    </script>
 
 </div>
 </body>

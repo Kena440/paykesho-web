@@ -2,11 +2,13 @@ package org.chaz.backoffice.assessments.service;
 
 import org.chaz.backoffice.assessments.repository.AssessmentAssessorsRepository;
 import org.chaz.backoffice.assessments.repository.AssessmentFeedbackRepository;
+import org.chaz.backoffice.assessments.repository.AssessmentQuestionsRepository;
 import org.chaz.backoffice.assessments.repository.AssessmentsRepository;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
 import org.commons.entity.assessment.Assessment;
 import org.commons.entity.assessment.AssessmentAssessor;
 import org.commons.entity.assessment.AssessmentFeedback;
+import org.commons.entity.assessment.AssessmentQuestion;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,19 +28,37 @@ public class AssessmentsService {
     private AssessmentAssessorsRepository assessmentAssessorsRepository;
     @Autowired
     private AssessmentFeedbackRepository assessmentFeedbackRepository;
+    @Autowired
+    private AssessmentQuestionsRepository assessmentQuestionsRepository;
 
     /**
      * +
-     * This method saves event submitted from the event
+     * This method saves assessment submitted from the assessment
      *
-     * @param event
+     * @param assessment
      */
-    public Assessment save(Assessment event) {
-        if (event == null) {
+    public Assessment save(Assessment assessment) {
+        if (assessment == null) {
             return null;
         }
 
-        return assessmentsRepository.save(event);
+        return assessmentsRepository.save(assessment);
+    }
+
+    public AssessmentAssessor saveAssessor(AssessmentAssessor assessmentAssessor) throws AssessmentToolError {
+        if (assessmentAssessor == null) {
+            throw new AssessmentToolError("Null parameter Assessor");
+        }
+
+        return assessmentAssessorsRepository.save(assessmentAssessor);
+    }
+
+    public AssessmentQuestion saveQuestion(AssessmentQuestion assessmentQuestion) throws AssessmentToolError {
+        if (assessmentQuestion == null) {
+            throw new AssessmentToolError("Null parameter Question");
+        }
+
+        return assessmentQuestionsRepository.save(assessmentQuestion);
     }
 
     /**
@@ -53,15 +73,15 @@ public class AssessmentsService {
         if (name == null) {
             return false;
         }
-        Assessment event = assessmentsRepository.getAssessmentByName(name);
+        Assessment assessment = assessmentsRepository.getAssessmentByName(name);
 
-        if (event == null) return true;
+        if (assessment == null) return true;
         boolean isCreatingNew = (id == null);
 
         if (isCreatingNew) {
-            if (event != null) return false;
+            if (assessment != null) return false;
         } else {
-            if (event.getId() != id) {
+            if (assessment.getId() != id) {
                 return false;
             }
         }
@@ -121,7 +141,7 @@ public class AssessmentsService {
 
     public List<AssessmentFeedback> getAssessmentFeedback(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
-            throw new AssessmentToolError("Null parameter event");
+            throw new AssessmentToolError("Null parameter assessment");
         }
 
         return assessmentFeedbackRepository.findByAssessment(assessment.getId());
@@ -129,9 +149,17 @@ public class AssessmentsService {
 
     public List<AssessmentAssessor> getAssessmentAssessors(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
-            throw new AssessmentToolError("Null parameter event");
+            throw new AssessmentToolError("Null parameter assessment");
         }
 
         return assessmentAssessorsRepository.findByAssessment(assessment.getId());
+    }
+
+    public List<AssessmentQuestion> getAssessmentQuestions(Assessment assessment) throws AssessmentToolError {
+        if (assessment == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentQuestionsRepository.findByAssessment(assessment.getId());
     }
 }

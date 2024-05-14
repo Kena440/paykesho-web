@@ -12,7 +12,7 @@
             </h6>
         </div>
         <div class="col-12 col-md-6 text-md-end">
-            <button class="btn btn-primary" data-bs-target="#vendorModal" data-bs-toggle="modal"
+            <button class="btn btn-primary" data-bs-target="#questionModal" data-bs-toggle="modal"
                     type="button">
                 <span class="fe fe-file-plus"></span>
                 Add
@@ -23,27 +23,33 @@
             </a>
         </div>
     </div>
-    <div class="row" th:if="${assessmentFeedbacks.size() > 0}">
-        <div class="col-6 d-none">
-            <input class="form-control" id="searchAttendeeAttendanceInput" placeholder="Search..." type="text">
+    <div class="row" th:if="${assessmentQuestions.size() > 0}">
+        <div class="col-6">
+            <input class="form-control" id="searchQuestionsInput" placeholder="Search..." type="text">
         </div>
 
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-12">
             <div class="table-responsive">
-                <table class="table table-sm table-bordered my-4" id="attendeeAttendanceTable">
+                <table class="table table-sm table-bordered my-4" id="questionsTable">
                     <thead>
                     <tr>
                         <th class="px-0 bg-transparent border-top-0">
                             <span class="h6">#</span>
                         </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Name</span>
+                        <th class="px-0 bg-transparent border-top-0 text-start">
+                            <span class="h6">Question</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Day</span>
+                            <span class="h6">Question Type</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Date/Time</span>
+                            <span class="h6">Skippable</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Response Type</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Date</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Action</span>
@@ -51,15 +57,53 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="attendee, eventStat : ${assessmentFeedbacks}">
+                    <tr th:each="question, questionStat : ${assessmentQuestions}">
 
                         <td class="px-0">
-                            <small>##</small>
+                            <small>[[${questionStat.count}]]</small>
+                        </td>
+                        <td class="px-0 text-start">
+                            <small>[[${question.question}]]</small>
                         </td>
                         <td class="px-0 text-center">
-                            <small>##</small>
+                            <small>[[${question.questionType}]]</small>
                         </td>
-
+                        <td class="px-0 text-center">
+                            <small>
+                                <th:block th:if="${question.skippable == true}">
+                                    <div class="badge bg-success">
+                                        Skippable
+                                    </div>
+                                </th:block>
+                                <th:block th:if="${question.skippable == false}">
+                                    <div class="badge bg-danger">
+                                        Not Skippable
+                                    </div>
+                                </th:block>
+                            </small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small> </small>
+                        </td>
+                        <td class="px-0 text-sm-center">
+                            <small>
+                                <time datetime="2018-04-23"
+                                      th:replace="fragments/fragments :: format_date(${question.createdDate})"></time>
+                            </small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                <a class="fe fe-edit" th:href="@{'/assessments/question/edit/'+${question.id}}"
+                                   title="Edit">
+                                </a>
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
+                                <a class="fe fe-trash" th:href="@{'/assessments/question/delete/'+${question.id}}"
+                                   title="Delete">
+                                </a>
+                            </th:block>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -69,6 +113,27 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let currentIndex = 0;
+
+            document.querySelector('#searchQuestionsInput').addEventListener('input', function () {
+                var searchQuery = this.value.toLowerCase();
+                currentIndex = 0;
+                var rows = document.querySelectorAll('#questionsTable tbody tr');
+                rows.forEach(function (row) {
+                    var rowData = row.textContent.toLowerCase();
+                    if (rowData.includes(searchQuery)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+    </script>
 
 </div>
 </body>
