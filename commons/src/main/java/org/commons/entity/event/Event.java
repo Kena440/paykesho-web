@@ -1,9 +1,9 @@
-package org.membershipcommons.entity.event;
+package org.commons.entity.event;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.membershipcommons.constants.Constants;
-import org.membershipcommons.entity.IdBasedEntity;
+import org.commons.constants.Constants;
+import org.commons.entity.IdBasedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

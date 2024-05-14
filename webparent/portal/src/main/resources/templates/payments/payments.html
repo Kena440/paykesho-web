@@ -161,7 +161,7 @@
                                     <tr th:each="payment, paymentStat : ${paymentList}">
                                         <td class="hideable-column">[[${paymentStat.count}]]</td>
                                         <td>[[${payment.serial}]]</td>
-                                        <td>[[${payment.memberInstitutionInvoice.memberInstitution}]]</td>
+                                        <td>[[${payment.memberInstitutionInvoice.facility}]]</td>
                                         <td>[[${payment.memberInstitutionInvoice.currency.code}]]</td>
                                         <td>[[${payment.amount}]]</td>
                                         <td>

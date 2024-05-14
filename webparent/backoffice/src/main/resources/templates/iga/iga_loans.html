@@ -143,7 +143,7 @@
                                         </th>
                                         <th class="list-sort text-muted" scope="col"
                                             style="width: 15%"
-                                            th:replace="fragments/fragments :: column_Link('memberInstitution', 'Institution','none')">
+                                            th:replace="fragments/fragments :: column_Link('facility', 'Institution','none')">
                                         </th>
                                         <th scope="col"
                                             th:replace="fragments/fragments :: column_Link('currency', 'Currency', 'none')">
@@ -169,7 +169,7 @@
                                     <tr th:each="iga, igaStat : ${igaList}">
                                         <td class="hideable-column">[[${igaStat.count}]]</td>
                                         <td>[[${iga.serial}]]</td>
-                                        <td>[[${iga.memberInstitution}]]</td>
+                                        <td>[[${iga.facility}]]</td>
                                         <td>[[${iga.currency.code}]]</td>
                                         <td>[[${iga.principalAmount}]]</td>
                                         <td>[[${iga.loanPurpose}]]</td>

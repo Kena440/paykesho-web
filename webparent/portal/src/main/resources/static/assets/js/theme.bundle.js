@@ -426,7 +426,7 @@
                 data: {
                     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                     datasets: [{
-                        label: "Customers",
+                        label: "Assessors",
                         data: [0, 10, 5, 15, 10, 20, 15, 25, 20, 30, 25, 40],
                         yAxisID: "yAxisOne"
                     }, {

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
       xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
-<head th:replace="fragments/fragments :: page_head('Member Institution Mgt','tag')"></head>
+<head th:replace="fragments/fragments :: page_head('f Mgt','tag')"></head>
 
 <body>
 
@@ -45,7 +45,7 @@
 
                         <!-- Pretitle -->
                         <h6 class="header-pretitle">
-                            Member Institutions
+                            Facility
                         </h6>
 
                         <!-- Title -->
@@ -54,22 +54,11 @@
                         </h1>
 
                     </div>
-                    <div class="col-12 col-md-auto mt-2 mt-md-0 mb-md-3" sec:authorize="hasAnyAuthority('Membership')">
-                        <th:block th:if="${memberInstitutionBalance != null}">
-                            <th:block th:if="${memberInstitutionBalance.balance != null}">
-                                <th:block th:if="${memberInstitutionBalance.balance == 0}">
-                                    <span class="badge rounded-pill bg-success">Full Paid</span>
-                                </th:block>
-                                <th:block th:if="${memberInstitutionBalance.balance > 0}">
-                                    <span class="badge rounded-pill bg-warning">Owing <span class="h2"
-                                                                                            th:replace="fragments/fragments :: format_currency(${memberInstitutionBalance.balance})"></span></span>
-                                </th:block>
-                            </th:block>
-                        </th:block>
+                    <div class="col-12 col-md-auto mt-2 mt-md-0 mb-md-3" sec:authorize="hasAnyAuthority('Admin')">
 
                         <!-- Button -->
                         <a class="btn btn-primary d-block d-md-inline-block lift"
-                           th:href="@{'/member-institutions/edit/' + ${facility.id}}">
+                           th:href="@{'/facilities/edit/' + ${facility.id}}">
                             Edit
                         </a>
 
@@ -86,35 +75,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#adminTab">
-                                    Admin Information
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#needsTab">
-                                    Needs
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#donationsTab">
-                                    Donations
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#projectsTab">
-                                    Projects
-                                </a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link" data-toggle="tab" href="#filesTab">
                                     Files
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#paymentsTab">
-                                    Membership Balance
-                                </a>
-                            </li>
+
                         </ul>
 
                     </div>
@@ -132,34 +97,9 @@
                     <div th:replace="facilities/view_tabs/info :: content"></div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="adminTab">
-                <div class="row">
-                    <div th:replace="facilities/view_tabs/admin :: content"></div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="needsTab">
-                <div class="row">
-                    <div th:replace="facilities/view_tabs/needs :: content"></div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="donationsTab">
-                <div class="row">
-                    <div th:replace="facilities/view_tabs/donations :: content"></div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="projectsTab">
-                <div class="row">
-                    <div th:replace="facilities/view_tabs/projects :: content"></div>
-                </div>
-            </div>
             <div class="tab-pane fade" id="filesTab">
                 <div class="row">
                     <div th:replace="facilities/view_tabs/files :: content"></div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="paymentsTab">
-                <div class="row">
-                    <div th:replace="facilities/view_tabs/payments :: content"></div>
                 </div>
             </div>
 

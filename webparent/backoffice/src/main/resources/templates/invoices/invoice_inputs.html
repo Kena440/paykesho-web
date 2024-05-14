@@ -96,24 +96,24 @@
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Member Institution
+                                    Facility
                                 </label>
 
                                 <!-- Input -->
                                 <select class="form-select mb-3"
-                                        data-choices required="required" th:field="*{memberInstitution}"
-                                        th:if="${memberInstitutionInvoice.memberInstitution == null}">
+                                        data-choices required="required" th:field="*{facility}"
+                                        th:if="${memberInstitutionInvoice.facility == null}">
                                     <option value="">Select...</option>
-                                    <th:block th:each="vh : ${memberInstitutionList}">
-                                        <option th:selected="(${vh.id} == ${memberInstitutionInvoice.memberInstitution})"
+                                    <th:block th:each="vh : ${facilityList}">
+                                        <option th:selected="(${vh.id} == ${memberInstitutionInvoice.facility})"
                                                 th:value="${vh.id}">
                                             [[${vh}]]
                                         </option>
                                     </th:block>
                                 </select>
                                 <input class="form-control" readonly="readonly"
-                                       th:unless="${memberInstitutionInvoice.memberInstitution == null}"
-                                       th:value="${memberInstitutionInvoice.memberInstitution}"
+                                       th:unless="${memberInstitutionInvoice.facility == null}"
+                                       th:value="${memberInstitutionInvoice.facility}"
                                        type="text">
 
                             </div>
@@ -292,7 +292,7 @@
     function checkInvoiceUnique(form) {
         url = "[[@{/invoices/rest/check-invoice}]]";
         invoiceId = $("#id").val();
-        memberId = $("#memberInstitution").val();
+        memberId = $("#facility").val();
         invoiceSerial = $("#serial").val();
         csrfValue = $("input[name='_csrf']").val();
 

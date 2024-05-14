@@ -1,4 +1,4 @@
-package org.chaz.backoffice.memberinstitution.dto;
+package org.chaz.backoffice.facilities.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

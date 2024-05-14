@@ -1,8 +1,8 @@
-package org.chaz.membershipsite.config;
+package org.chaz.portal.config;
 
-import org.chaz.membershipsite.security.oauth.MemberAdminOAuth2User;
-import org.chaz.membershipsite.settings.currency.CurrencySettingBag;
-import org.chaz.membershipsite.settings.email.EmailSettingBag;
+import org.chaz.portal.security.oauth.AssessorOAuth2User;
+import org.chaz.portal.settings.currency.CurrencySettingBag;
+import org.chaz.portal.settings.email.EmailSettingBag;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +35,7 @@ public class Utility {
         return mailSender;
     }
 
-    public static String getEmailOfAuthenticatedMemberAdmin(HttpServletRequest request) {
+    public static String getEmailOfAuthenticatedAssessor(HttpServletRequest request) {
         Object principal = request.getUserPrincipal();
         if (principal == null) return null;
 
@@ -45,8 +45,8 @@ public class Utility {
             customerEmail = request.getUserPrincipal().getName();
         } else if (principal instanceof OAuth2AuthenticationToken) {
             OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) principal;
-            MemberAdminOAuth2User memberAdminOAuth2User = (MemberAdminOAuth2User) oAuth2AuthenticationToken.getPrincipal();
-            customerEmail = memberAdminOAuth2User.getEmail();
+            AssessorOAuth2User assessorOAuth2User = (AssessorOAuth2User) oAuth2AuthenticationToken.getPrincipal();
+            customerEmail = assessorOAuth2User.getEmail();
         }
 
         return customerEmail;

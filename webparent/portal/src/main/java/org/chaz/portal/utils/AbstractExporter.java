@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.utils;
+package org.chaz.portal.utils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package org.membershipcommons.enums;
+package org.commons.enums;
 
 public enum MaritalStatus {
 

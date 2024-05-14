@@ -139,7 +139,7 @@
                                         </th>
                                         <th class="list-sort text-muted" scope="col"
                                             style="width: 15%"
-                                            th:replace="fragments/fragments :: column_Link('memberInstitution', 'Institution','none')">
+                                            th:replace="fragments/fragments :: column_Link('facility', 'Institution','none')">
                                         </th>
                                         <th scope="col"
                                             th:replace="fragments/fragments :: column_Link('donor', 'Donor', 'none')">
@@ -161,7 +161,7 @@
                                     <tbody class="list fs-base">
                                     <tr th:each="donation, donationStat : ${donationList}">
                                         <td class="hideable-column">[[${donationStat.count}]]</td>
-                                        <td>[[${donation.memberInstitution}]]</td>
+                                        <td>[[${donation.facility}]]</td>
                                         <td>[[${donation.donor}]]</td>
                                         <td>[[${donation.comments}]]</td>
                                         <td>[[${donation.donationDate}]]</td>

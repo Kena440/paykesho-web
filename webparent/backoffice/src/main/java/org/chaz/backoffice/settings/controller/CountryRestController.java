@@ -1,7 +1,7 @@
 package org.chaz.backoffice.settings.controller;
 
 import org.chaz.backoffice.settings.repository.CountryRepository;
-import org.membershipcommons.entity.settings.Country;
+import org.commons.entity.settings.Country;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

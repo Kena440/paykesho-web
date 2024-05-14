@@ -2,7 +2,7 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
       xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
-<head th:replace="fragments/fragments :: page_head('Member Institution Mgt','none')"></head>
+<head th:replace="fragments/fragments :: page_head('Facility Mgt','none')"></head>
 
 <body>
 
@@ -31,7 +31,7 @@
 
                                 <!-- Pretitle -->
                                 <h6 class="header-pretitle">
-                                    Member Institution Management
+                                    Facility Management
                                 </h6>
 
                                 <!-- Title -->
@@ -58,8 +58,8 @@
                                 </div> <!-- / .nav -->
 
                                 <!-- Buttons -->
-                                <a class="btn btn-primary ms-2" th:href="@{/member-institutions}">
-                                    Member Institutions
+                                <a class="btn btn-primary ms-2" th:href="@{/facilities}">
+                                    Facility
                                 </a>
 
                             </div>
@@ -86,7 +86,7 @@
                 <form enctype="multipart/form-data"
                       method="post"
                       onsubmit="return checkInstitutionUnique(this)"
-                      th:action="@{/member-institutions/save}"
+                      th:action="@{/facilities/save}"
                       th:object="${facility}">
                     <input id="id" th:field="*{id}" type="hidden"/>
                     <input id="longitude" th:field="*{longitude}" type="hidden"/>
@@ -494,7 +494,7 @@
     MAX_FILE_SIZE = 2502400; // 2502.4KB
 
     function checkInstitutionUnique(form) {
-        url = "[[@{/member-institutions/rest/check-member}]]";
+        url = "[[@{/facilities/rest/check-member}]]";
         memberName = $("#nameInput").val();
         memberType = $("#memberType").val();
         provinceId = $("#province").val();

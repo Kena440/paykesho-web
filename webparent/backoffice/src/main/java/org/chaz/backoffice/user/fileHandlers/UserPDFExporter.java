@@ -6,7 +6,7 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import org.chaz.backoffice.utils.AbstractExporter;
-import org.membershipcommons.entity.User;
+import org.commons.entity.User;
 
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;

@@ -218,7 +218,7 @@
                                                         <option value="">Select...</option>
 
                                                         <th:block
-                                                                th:each="ps : ${T(org.membershipcommons.enums.PaymentMethod).values()}">
+                                                                th:each="ps : ${T(org.commons.enums.PaymentMethod).values()}">
                                                             <option th:defaultDescription="${ps.name()}"
                                                                     th:text="${ps}"
                                                                     th:value="${ps}">

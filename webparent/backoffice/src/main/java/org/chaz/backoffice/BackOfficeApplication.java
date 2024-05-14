@@ -7,10 +7,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EntityScan({"org.membershipcommons.entity", "org.chaz.membershipbackoffice.user"})
-//@ComponentScan(basePackages = {"org.chaz.membershipbackoffice.security","org.chaz.membershipbackoffice.user"})
-public class MembershipBackOfficeApplication {
+@EntityScan({"org.commons.entity", "org.chaz.backoffice.user"})
+//@ComponentScan(basePackages = {"org.chaz.backoffice.security","org.chaz.backoffice.user"})
+public class BackOfficeApplication {
     public static void main(String[] args) {
-        SpringApplication.run(MembershipBackOfficeApplication.class, args);
+        SpringApplication.run(BackOfficeApplication.class, args);
     }
 }

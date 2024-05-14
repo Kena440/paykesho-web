@@ -96,15 +96,15 @@
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Member Institution
+                                    Facility
                                 </label>
 
                                 <!-- Input -->
                                 <select class="form-select mb-3" data-choices required="required"
-                                        th:field="*{memberInstitution}">
+                                        th:field="*{facility}">
                                     <option value="">Select...</option>
-                                    <th:block th:each="vh : ${memberInstitutionList}">
-                                        <option th:selected="(${vh.id} == ${meIndicator.memberInstitution})"
+                                    <th:block th:each="vh : ${facilityList}">
+                                        <option th:selected="(${vh.id} == ${meIndicator.facility})"
                                                 th:value="${vh.id}">
                                             [[${vh}]]
                                         </option>
@@ -373,7 +373,7 @@
     function checkIndicatorUnique(form) {
         url = "[[@{/me-indicators/rest/check-indicator}]]";
         indicatorId = $("#id").val();
-        memberId = $("#memberInstitution").val();
+        memberId = $("#facility").val();
         submissionPeriod = $("#submissionPeriod").val();
         csrfValue = $("input[name='_csrf']").val();
 

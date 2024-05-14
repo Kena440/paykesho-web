@@ -1,6 +1,6 @@
-package org.chaz.membershipsite.settings.repository;
+package org.chaz.portal.settings.repository;
 
-import org.membershipcommons.entity.settings.NeedType;
+import org.commons.entity.settings.NeedType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

@@ -1,13 +1,13 @@
 package org.chaz.portal.assessors.controller;
 
-import org.chaz.membershipsite.config.Utility;
-import org.chaz.membershipsite.memberadmins.service.AssessorService;
-import org.chaz.membershipsite.security.AssessorUserDetails;
-import org.chaz.membershipsite.security.oauth.AssessorOAuth2User;
-import org.chaz.membershipsite.settings.service.SettingService;
-import org.membershipcommons.entity.Assessor;
-import org.membershipcommons.entity.settings.Country;
-import org.membershipcommons.utils.AssessmentToolError;
+import org.chaz.portal.assessors.service.AssessorService;
+import org.chaz.portal.config.Utility;
+import org.chaz.portal.security.AssessorUserDetails;
+import org.chaz.portal.security.oauth.AssessorOAuth2User;
+import org.chaz.portal.settings.service.SettingService;
+import org.commons.entity.Assessor;
+import org.commons.entity.settings.Country;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
@@ -47,7 +47,7 @@ public class AssessorController {
     public String signUpAssessor(Assessor assessor,
                                     RedirectAttributes redirectAttributes,
                                     Model model,
-                                    HttpServletRequest request) throws IOException, AssessmentToolError, MessagingException {
+                                    HttpServletRequest request) {
         assessorService.registerAssessor(assessor);
         //sendVerificationEmail(request, assessor);
 

@@ -1,9 +1,9 @@
 package org.chaz.backoffice.assessors.controller;
 
 
+import org.chaz.backoffice.assessors.enums.Constants;
 import org.chaz.backoffice.assessors.repository.AssessorRepository;
 import org.chaz.backoffice.assessors.service.AssessorService;
-import org.chaz.backoffice.memberadmin.enums.Constants;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
 import org.chaz.backoffice.paging.PagingAndSortingParam;
 import org.commons.entity.Assessor;
@@ -24,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Controller
-@RequestMapping("/member-admins")
+@RequestMapping("/assessors")
 public class AssessorController {
     @Autowired
     private AssessorRepository assessorRepository;
@@ -33,7 +33,7 @@ public class AssessorController {
 
     @GetMapping("")
     public String listFirstPage(Model model) {
-        return Constants.REDIRECT_CUSTOMERS_PAGE_WITHOUT_KEYWORD;
+        return Constants.REDIRECT_ASSESSORS_PAGE_1_SORT_FIELD_FIRST_NAME_SORT_DIR_ASC;
     }
 
     @GetMapping("/page/{pageNum}")
@@ -41,39 +41,39 @@ public class AssessorController {
 
         assessorService.listByPage(pageNum, helper);
 
-        return "customers/customers";
+        return "assessors/assessors";
     }
 
     @GetMapping("/{id}/enabled/{status}")
-    public String updateCustomerEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws AssessmentToolError {
+    public String updateAssessorEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes) throws AssessmentToolError {
 
-        Assessor assessor = assessorRepository.get(id);
-        assessorService.updateCustomerEnabledStatus(id, enabled);
+        Assessor assessor = assessorService.get(id);
+        assessorService.updateAssessorEnabledStatus(id, enabled);
         String status = enabled ? "enabled" : "has been disabled";
         String operationMSG = assessor.getFullName() + " has been " + status;
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
-        return Constants.REDIRECT_CUSTOMERS;
+        return Constants.REDIRECT_ASSESSORS;
 
     }
 
     @GetMapping("/details/{id}")
-    public String viewCustomer(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) throws AssessmentToolError {
+    public String viewAssessor(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
             Assessor assessor = assessorService.get(id);
             model.addAttribute("customer", assessor);
-            return "customers/customer_details_modal";
+            return "assessors/assessor_details_modal";
         } catch (AssessmentToolError fleetMgtError) {
             redirectAttributes.addFlashAttribute("message", fleetMgtError.getMessage());
-            return Constants.REDIRECT_CUSTOMERS;
+            return Constants.REDIRECT_ASSESSORS;
         }
     }
 
     @GetMapping("/edit/{id}")
-    public String editCustomer(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws AssessmentToolError {
+    public String editAssessor(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) {
         if (id == null) {
-            return Constants.REDIRECT_CUSTOMERS;
+            return Constants.REDIRECT_ASSESSORS;
         }
-        String pageTitle = "Edit Customer";
+        String pageTitle = "Edit Assessor";
 
         try {
             Assessor assessor = assessorService.get(id);
@@ -83,30 +83,29 @@ public class AssessorController {
             model.addAttribute("countryList", countryList);
             model.addAttribute("pageTitle", pageTitle);
 
-            return "customers/customer_form";
+            return "assessors/assessor_form";
         } catch (AssessmentToolError membershipMgtError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
-            return Constants.REDIRECT_CUSTOMERS;
+            return Constants.REDIRECT_ASSESSORS;
         }
 
     }
 
     @PostMapping("/save")
-    public String saveAdmin(Assessor assessor, HttpServletRequest request, RedirectAttributes redirectAttributes) throws AssessmentToolError, MessagingException, UnsupportedEncodingException {
+    public String saveAdmin(Assessor assessor, HttpServletRequest request, RedirectAttributes redirectAttributes) throws MessagingException, UnsupportedEncodingException {
 
-            assessor.setAccountNonLocked(true);
-            assessor.setFailedAttempt(0);
-            Assessor admin = assessorService.save(request, assessor);
+        assessor.setAccountNonLocked(true);
+        assessor.setFailedAttempt(0);
+        Assessor admin = assessorService.save(request, assessor);
 
-
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Admin Operation Successful: " + assessor.getFullName());
-        return org.chaz.backoffice.assessors.enums.Constants.REDIRECT_TO_MEMBER + assessor.getId();
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Admin Operation Successful: " + admin.getFullName());
+        return Constants.REDIRECT_ASSESSORS;
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCustomer(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws AssessmentToolError {
+    public String deleteAssessor(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {
         if (id == null) {
-            return Constants.REDIRECT_CUSTOMERS;
+            return Constants.REDIRECT_ASSESSORS;
         }
 
         try {
@@ -115,7 +114,7 @@ public class AssessorController {
         } catch (AssessmentToolError membershipMgtError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
         }
-        return Constants.REDIRECT_CUSTOMERS;
+        return Constants.REDIRECT_ASSESSORS;
     }
 
 }

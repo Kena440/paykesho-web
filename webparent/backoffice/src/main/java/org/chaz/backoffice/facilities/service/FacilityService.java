@@ -1,13 +1,14 @@
 package org.chaz.backoffice.facilities.service;
 
-import org.chaz.membershipbackoffice.memberinstitution.dto.DataItem;
-import org.chaz.membershipbackoffice.memberinstitution.dto.GPSDataItem;
-import org.chaz.membershipbackoffice.memberinstitution.repository.MemberInstitutionRepository;
-import org.chaz.membershipbackoffice.paging.PagingAndSortingHelper;
-import org.membershipcommons.dto.GeneralStatsDto;
-import org.membershipcommons.entity.members.MemberInstitution;
-import org.membershipcommons.enums.MemberType;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.chaz.backoffice.facilities.dto.DataItem;
+import org.chaz.backoffice.facilities.dto.GPSDataItem;
+import org.chaz.backoffice.facilities.repository.FacilityRepository;
+import org.chaz.backoffice.paging.PagingAndSortingHelper;
+import org.chaz.backoffice.settings.service.SettingService;
+import org.commons.dto.GeneralStatsDto;
+import org.commons.entity.facilities.Facility;
+import org.commons.entity.facilities.LevelOfCare;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,39 +25,41 @@ import java.util.Objects;
 
 @Service
 @Transactional
-public class MemberInstitutionService {
+public class FacilityService {
 
     public static final int MEMBERS_PER_PAGE = 20;
     protected DateFormat dateFormat;
     @Autowired
-    private MemberInstitutionRepository memberInstitutionRepository;
+    private FacilityRepository facilityRepository;
+    @Autowired
+    private SettingService settingService;
 
-    public List<MemberInstitution> listAll() {
-        return (List<MemberInstitution>) memberInstitutionRepository.findAll(Sort.by("name").ascending());
+    public List<Facility> listAll() {
+        return (List<Facility>) facilityRepository.findAll(Sort.by("name").ascending());
     }
 
-    public List<MemberInstitution> findMemberInstitutionsByLevelOfCareIdAndEnabled(Integer id, boolean enabled) {
-        return memberInstitutionRepository.findMemberInstitutionsByLevelOfCareIdAndEnabled(id, enabled);
+    public List<Facility> findFacilitysByLevelOfCareIdAndEnabled(Integer id, boolean enabled) {
+        return facilityRepository.findFacilitysByLevelOfCareIdAndEnabled(id, enabled);
     }
 
-    public void listByPage(int pageNum, PagingAndSortingHelper helper) throws MembershipMgtError {
-        helper.listEntities(pageNum, MEMBERS_PER_PAGE, memberInstitutionRepository);
+    public void listByPage(int pageNum, PagingAndSortingHelper helper) throws AssessmentToolError {
+        helper.listEntities(pageNum, MEMBERS_PER_PAGE, facilityRepository);
     }
 
     @Transactional(rollbackOn = {Exception.class})
-    public MemberInstitution save(MemberInstitution memberInstitution) {
+    public Facility save(Facility memberInstitution) {
         if (memberInstitution == null) {
             return null;
         }
 
-        return memberInstitutionRepository.save(memberInstitution);
+        return facilityRepository.save(memberInstitution);
     }
 
     public boolean isEmailUnique(Integer id, String email) {
         if (email == null) {
             return false;
         }
-        MemberInstitution institution = memberInstitutionRepository.getMemberInstitutionByEmail(email);
+        Facility institution = facilityRepository.getFacilityByEmail(email);
 
         if (institution == null) return true;
         boolean isCreatingNew = (id == null);
@@ -76,7 +79,7 @@ public class MemberInstitutionService {
         if (email == null) {
             return false;
         }
-        MemberInstitution institution = memberInstitutionRepository.getMemberInstitutionByName(email);
+        Facility institution = facilityRepository.getFacilityByName(email);
 
         if (institution == null) return true;
         boolean isCreatingNew = (id == null);
@@ -92,67 +95,67 @@ public class MemberInstitutionService {
         return true;
     }
 
-    public MemberInstitution getMemberInstitutionById(Integer id) throws MembershipMgtError {
+    public Facility getFacilityById(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         try {
-            return memberInstitutionRepository.findById(id).get();
+            return facilityRepository.findById(id).get();
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any member");
+            throw new AssessmentToolError("Could not find any member");
         }
     }
 
     @Transactional(rollbackOn = {Exception.class})
-    public void delete(Integer id) throws MembershipMgtError {
+    public void delete(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
-        Long countById = memberInstitutionRepository.countById(id);
+        Long countById = facilityRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any member");
+            throw new AssessmentToolError("Could not find any member");
         }
 
-        MemberInstitution memberInstitution = getMemberInstitutionById(id);
-        if (memberInstitution.getId() == null) throw new MembershipMgtError("Could not find any driver");
+        Facility memberInstitution = getFacilityById(id);
+        if (memberInstitution.getId() == null) throw new AssessmentToolError("Could not find any facility");
         memberInstitution.setDeleted(true);
         save(memberInstitution);
         // userRepository.deleteById(id);
     }
 
     @Transactional(rollbackOn = {Exception.class})
-    public void updateMemberInstitutionStatus(Integer id, boolean enabled) throws MembershipMgtError {
+    public void updateFacilityStatus(Integer id, boolean enabled) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
-        Long countById = memberInstitutionRepository.countById(id);
+        Long countById = facilityRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any member");
+            throw new AssessmentToolError("Could not find any member");
         }
 
-        memberInstitutionRepository.updateEnableStatus(id, enabled);
+        facilityRepository.updateEnableStatus(id, enabled);
     }
 
-    public MemberInstitution getMemberInstitutionByEmail(String email) throws MembershipMgtError {
+    public Facility getFacilityByEmail(String email) throws AssessmentToolError {
         if (email == null) {
-            throw new MembershipMgtError("Null parameter email");
+            throw new AssessmentToolError("Null parameter email");
         }
 
         try {
-            return memberInstitutionRepository.getMemberInstitutionByEmail(email);
+            return facilityRepository.getFacilityByEmail(email);
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any user");
+            throw new AssessmentToolError("Could not find any user");
         }
     }
 
-    public boolean isMemberUnique(Integer id, Integer provinceId, String memberName, String memberType) {
-        if (provinceId == null || memberName == null || memberType == null) {
+    public boolean isFacilityUnique(Integer id, Integer provinceId, String facilityName, Integer levelOfCareId) {
+        if (provinceId == null || facilityName == null || levelOfCareId == null) {
             return false;
         }
-        MemberInstitution institution = memberInstitutionRepository.getMemberInstitutionByIdAndProvinceAndNameAndMemberType(id, provinceId, memberName, MemberType.valueOf(memberType));
+        Facility institution = facilityRepository.getFacilityByIdAndProvinceAndNameAndLevelOfCare(id, provinceId, facilityName, levelOfCareId);
 
         if (institution == null) return true;
         boolean isCreatingNew = (id == null);
@@ -164,13 +167,14 @@ public class MemberInstitutionService {
         }
     }
 
-    public List<DataItem> getMemberTypesDataEnabled(boolean enabled) {
-        List<MemberInstitution> memberInstitutions = memberInstitutionRepository.findMemberTypesEnabled(enabled);
+    public List<DataItem> getFacilityTypesDataEnabled(boolean enabled) {
+        List<Facility> memberInstitutions = facilityRepository.findFacilityTypesEnabled(enabled);
 
         List<DataItem> dataItemList = new ArrayList<>();
 
-        for (MemberInstitution detail : memberInstitutions) {
-            String identifier = detail.getMemberType().defaultDescription();
+        for (Facility detail : memberInstitutions) {
+            LevelOfCare levelOfCare = settingService.findLevelOfCareById(detail.getLevelOfCare().getId());
+            String identifier = levelOfCare.getName();
 
             DataItem dataItem = new DataItem(identifier);
 
@@ -187,19 +191,15 @@ public class MemberInstitutionService {
     }
 
     public Long countInstitutions() {
-        return memberInstitutionRepository.count();
+        return facilityRepository.count();
     }
 
-    public Long getTotalCatchmentMembers(boolean enabled) {
-        return memberInstitutionRepository.getTotalCatchmentMembers(enabled);
-    }
-
-    public List<GPSDataItem> getMemberGPSDataEnabled(boolean enabled) {
-        List<MemberInstitution> memberInstitutions = memberInstitutionRepository.findMemberTypesEnabled(enabled);
+    public List<GPSDataItem> getFacilityGPSDataEnabled(boolean enabled) {
+        List<Facility> memberInstitutions = facilityRepository.findFacilityTypesEnabled(enabled);
 
         List<GPSDataItem> dataItemList = new ArrayList<>();
 
-        for (MemberInstitution detail : memberInstitutions) {
+        for (Facility detail : memberInstitutions) {
             String title = detail.getName();
             float lng = detail.getLongitude();
             float lat = detail.getLatitude();
@@ -210,28 +210,24 @@ public class MemberInstitutionService {
         return dataItemList;
     }
 
-    public Page<MemberInstitution> listForMemberByPage(int pageNum, String sortField, String sortDir, String keyword) {
+    public Page<Facility> listForFacilityByPage(int pageNum, String sortField, String sortDir, String keyword) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
 
         Pageable pageable = PageRequest.of(pageNum - 1, 200, sort);
 
         if (keyword != null) {
-            return memberInstitutionRepository.findAll(keyword, pageable);
+            return facilityRepository.findAll(keyword, pageable);
         }
-        return memberInstitutionRepository.findAll(pageable);
+        return facilityRepository.findAll(pageable);
     }
 
-    public List<GeneralStatsDto> getMembersCountByProvince(Integer countryId, boolean enabled) {
-        return memberInstitutionRepository.getMembersCountByProvince(countryId, enabled);
+    public List<GeneralStatsDto> getFacilitysCountByProvince(Integer countryId, boolean enabled) {
+        return facilityRepository.getFacilitysCountByProvince(countryId, enabled);
     }
 
-    public List<GeneralStatsDto> getMembersCountByDenomination(Integer countryId, boolean enabled) {
-        return memberInstitutionRepository.getMembersCountByDenomination(countryId, enabled);
-    }
-
-    public List<GeneralStatsDto> getMembersCountByLevelOfCare(Integer countryId, boolean enabled) {
-        return memberInstitutionRepository.getMembersCountByLevelOfCare(countryId, enabled);
+    public List<GeneralStatsDto> getFacilitysCountByLevelOfCare(Integer countryId, boolean enabled) {
+        return facilityRepository.getFacilitysCountByLevelOfCare(countryId, enabled);
     }
 
 }

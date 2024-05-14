@@ -1,7 +1,7 @@
 package org.chaz.backoffice.user.fileHandlers;
 
 import org.chaz.backoffice.utils.AbstractExporter;
-import org.membershipcommons.entity.User;
+import org.commons.entity.User;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;

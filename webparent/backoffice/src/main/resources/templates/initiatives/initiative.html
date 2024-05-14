@@ -172,7 +172,7 @@
                                             [[${initStat.count}]]
                                         </td>
                                         <td class="px-0">
-                                            [[${init.memberInstitution.name}]]
+                                            [[${init.facility.name}]]
                                         </td>
                                         <td class="px-0">
                                              <span class="h3"
@@ -188,7 +188,7 @@
                                         </td>
                                         <td class="px-0">
                                             <a class="fe fe-eye"
-                                               th:href="@{'/initiatives/view-member/' + ${initiative.id} +'/'+${init.memberInstitution.id}}"
+                                               th:href="@{'/initiatives/view-member/' + ${initiative.id} +'/'+${init.facility.id}}"
                                                title="View Institution">
                                             </a>
                                             &nbsp;
@@ -245,9 +245,9 @@
                                     <label class="form-label">
                                         Member
                                     </label>
-                                    <select class="form-select mb-3" data-choices name="memberInstitution" required>
+                                    <select class="form-select mb-3" data-choices name="facility" required>
                                         <option value="">Select...</option>
-                                        <th:block th:each="vh : ${memberInstitutionList}">
+                                        <th:block th:each="vh : ${facilityList}">
                                             <option th:value="${vh.id}">
                                                 [[${vh}]]
                                             </option>

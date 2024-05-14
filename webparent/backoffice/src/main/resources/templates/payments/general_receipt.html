@@ -195,7 +195,7 @@
                                     <!-- ${#lists.sort(myList, 'name')}-->
                                     <!--<tr th:each="invoice, invoiceStat : ${generalInvoice.invoiceItems}">-->
                                     <tr style="border: 1px solid black; padding: 8px;"
-                                        th:each="payment, paymentStat : ${#lists.sort(generalPayment.paymentItems,  T(org.chaz.membershipbackoffice.finance.utils.PaymentItemComparator).byItemNo())}">
+                                        th:each="payment, paymentStat : ${#lists.sort(generalPayment.paymentItems,  T(org.chaz.backoffice.finance.utils.PaymentItemComparator).byItemNo())}">
                                         <td class="text-center" style="border: 1px solid black; padding: 8px;">
                                             [[${paymentStat.count}]]
                                         </td>

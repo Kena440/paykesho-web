@@ -1,9 +1,9 @@
-package org.membershipcommons.entity;
+package org.commons.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.membershipcommons.entity.settings.Country;
+import org.commons.entity.settings.Country;
 
 import javax.persistence.*;
 

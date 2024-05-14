@@ -1,7 +1,7 @@
-package org.membershipcommons.entity;
+package org.commons.entity;
 
 import lombok.Data;
-import org.membershipcommons.entity.settings.Country;
+import org.commons.entity.settings.Country;
 
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;

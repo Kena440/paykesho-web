@@ -1,8 +1,8 @@
 package org.chaz.backoffice.settings.email;
 
 
-import org.membershipcommons.entity.settings.Setting;
-import org.membershipcommons.entity.settings.SettingBag;
+import org.commons.entity.settings.Setting;
+import org.commons.entity.settings.SettingBag;
 
 import java.util.List;
 
@@ -43,11 +43,11 @@ public class EmailSettingBag extends SettingBag {
         return super.getValue("MAIL_SENDER_NAME");
     }
 
-    public String getMemberAdminCreationSubject() {
+    public String getAssessorCreationSubject() {
         return super.getValue("MEMBER_ADMIN_CREATION_SUBJECT");
     }
 
-    public String getMemberAdminCreationContent() {
+    public String getAssessorCreationContent() {
         return super.getValue("MEMBER_ADMIN_CREATION_CONTENT");
     }
 

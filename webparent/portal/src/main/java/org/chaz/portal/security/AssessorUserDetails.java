@@ -1,16 +1,16 @@
 package org.chaz.portal.security;
 
-import org.commons.entity.MemberAdmin;
+import org.commons.entity.Assessor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-public class MemberAdminUserDetails implements UserDetails {
-    private MemberAdmin memberAdmin;
+public class AssessorUserDetails implements UserDetails {
+    private Assessor assessor;
 
-    public MemberAdminUserDetails(MemberAdmin memberAdmin) {
-        this.memberAdmin = memberAdmin;
+    public AssessorUserDetails(Assessor assessor) {
+        this.assessor = assessor;
     }
 
     @Override
@@ -20,12 +20,12 @@ public class MemberAdminUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return memberAdmin.getPassword();
+        return assessor.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return memberAdmin.getEmail();
+        return assessor.getEmail();
     }
 
     @Override
@@ -35,7 +35,7 @@ public class MemberAdminUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return memberAdmin.isAccountNonLocked();
+        return assessor.isAccountNonLocked();
     }
 
     @Override
@@ -45,15 +45,15 @@ public class MemberAdminUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return memberAdmin.isEnabled();
+        return assessor.isEnabled();
     }
 
     public String getFullName() {
-        return memberAdmin.getTitle() + " " + memberAdmin.getName();
+        return assessor.getTitle() + " " + assessor.getName();
     }
 
-    public MemberAdmin getMemberAdmin() {
-        return memberAdmin;
+    public Assessor getAssessor() {
+        return assessor;
     }
 
 }

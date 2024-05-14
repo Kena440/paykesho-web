@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.commons.enums.AuthenticationType;
 import org.commons.enums.GenderType;
 import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
@@ -14,8 +15,8 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @Entity
-@Table(name = "member_admins")
-public class MemberAdmin extends IdBasedEntity {
+@Table(name = "assessors")
+public class Assessor extends IdBasedEntity {
     @Column(length = 15, nullable = false, name = "phone_number")
     protected String phoneNumber;
     @Column(length = 64, nullable = false)
@@ -48,14 +49,14 @@ public class MemberAdmin extends IdBasedEntity {
     @Column(name = "lock_time")
     private Date lockTime;
 
-    public MemberAdmin() {
+    public Assessor() {
     }
 
-    public MemberAdmin(Integer id) {
+    public Assessor(Integer id) {
         this.id = id;
     }
 
-    public MemberAdmin(String title, String name) {
+    public Assessor(String title, String name) {
         this.title = title;
         this.name = name;
     }
@@ -64,8 +65,8 @@ public class MemberAdmin extends IdBasedEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        MemberAdmin memberAdmin = (MemberAdmin) o;
-        return id != null && Objects.equals(id, memberAdmin.id);
+        Assessor assessor = (Assessor) o;
+        return id != null && Objects.equals(id, assessor.id);
     }
 
     @Override

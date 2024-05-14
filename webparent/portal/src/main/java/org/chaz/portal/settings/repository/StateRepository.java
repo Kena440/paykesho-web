@@ -1,7 +1,7 @@
-package org.chaz.membershipsite.settings.repository;
+package org.chaz.portal.settings.repository;
 
-import org.membershipcommons.entity.State;
-import org.membershipcommons.entity.settings.Country;
+import org.commons.entity.State;
+import org.commons.entity.settings.Country;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

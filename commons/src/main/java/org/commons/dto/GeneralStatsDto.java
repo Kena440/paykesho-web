@@ -1,4 +1,4 @@
-package org.membershipcommons.dto;
+package org.commons.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

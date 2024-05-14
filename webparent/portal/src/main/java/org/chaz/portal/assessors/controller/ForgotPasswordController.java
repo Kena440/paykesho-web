@@ -1,11 +1,11 @@
-package org.chaz.membershipsite.memberadmins.controller;
+package org.chaz.portal.assessors.controller;
 
-import org.chaz.membershipsite.config.Utility;
-import org.chaz.membershipsite.memberadmins.service.MemberAdminService;
-import org.chaz.membershipsite.settings.email.EmailSettingBag;
-import org.chaz.membershipsite.settings.service.SettingService;
-import org.membershipcommons.entity.members.MemberAdmin;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.chaz.portal.assessors.service.AssessorService;
+import org.chaz.portal.config.Utility;
+import org.chaz.portal.settings.email.EmailSettingBag;
+import org.chaz.portal.settings.service.SettingService;
+import org.commons.entity.Assessor;
+import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +28,17 @@ public class ForgotPasswordController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgotPasswordController.class);
     @Autowired
-    private MemberAdminService memberAdminService;
+    private AssessorService assessorService;
     @Autowired
     private SettingService settingService;
 
     @PostMapping(value = "/forgot-password")
     public String forgotPasswordForm(
             Model model,
-            HttpServletRequest request) throws MembershipMgtError {
+            HttpServletRequest request) throws AssessmentToolError {
         String email = request.getParameter("modalPasswordResetEmail");
         try {
-            String token = memberAdminService.updateMemberAdminResetToken(email);
+            String token = assessorService.updateAssessorResetToken(email);
             String verifyURL = Utility.getSiteUrl(request) + "/reset-password?token=" + token;
 
             new Thread(() -> {
@@ -51,7 +51,7 @@ public class ForgotPasswordController {
 
             model.addAttribute("forgotPasswordMessage", "Reset link has been sent. Kindly check email");
 
-        } catch (MembershipMgtError e) {
+        } catch (AssessmentToolError e) {
             model.addAttribute("forgotPasswordMessage", e.getMessage());
         }
 
@@ -60,9 +60,9 @@ public class ForgotPasswordController {
 
     @GetMapping("/reset-password")
     public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
-        MemberAdmin memberAdmin = memberAdminService.getMemberAdminByResetToken(token);
+        Assessor assessor = assessorService.getAssessorByResetToken(token);
 
-        if (memberAdmin != null) {
+        if (assessor != null) {
             model.addAttribute("token", token);
             model.addAttribute("pageTitle", "Password Reset");
 
@@ -81,20 +81,20 @@ public class ForgotPasswordController {
     public String resetPasswordAction(
             RedirectAttributes redirectAttributes,
             Model model,
-            HttpServletRequest request) throws MembershipMgtError {
+            HttpServletRequest request) throws AssessmentToolError {
 
         String token = request.getParameter("token");
         String password = request.getParameter("password");
 
         try {
-            memberAdminService.updatePassword(token, password);
+            assessorService.updatePassword(token, password);
 
             model.addAttribute("message", "You have successfully updated your password");
             model.addAttribute("pageTitle", "Password reset successful");
             model.addAttribute("emoji", "128540");
             return "register/password_reset_message";
 
-        } catch (MembershipMgtError e) {
+        } catch (AssessmentToolError e) {
             model.addAttribute("message", "Invalid token. Member Admin not found");
             model.addAttribute("pageTitle", "Password Reset Failed");
             model.addAttribute("emoji", "128529");

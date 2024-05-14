@@ -97,14 +97,14 @@
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Member Institution
+                                    Facility
                                 </label>
 
                                 <!-- Input -->
-                                <select class="form-select mb-3" data-choices th:field="*{memberInstitution}">
+                                <select class="form-select mb-3" data-choices th:field="*{facility}">
                                     <option value="">Select...</option>
-                                    <th:block th:each="vh : ${memberInstitutionList}">
-                                        <option th:selected="(${vh.id} == ${memberInstitutionDonation.memberInstitution})"
+                                    <th:block th:each="vh : ${facilityList}">
+                                        <option th:selected="(${vh.id} == ${memberInstitutionDonation.facility})"
                                                 th:value="${vh.id}">
                                             [[${vh}]]
                                         </option>
@@ -214,7 +214,7 @@
     function checkDonationUnique(form) {
         url = "[[@{/donations/rest/check-donation}]]";
         donationId = $("#id").val();
-        memberId = $("#memberInstitution").val();
+        memberId = $("#facility").val();
         donationSerial = $("#serial").val();
         csrfValue = $("input[name='_csrf']").val();
 

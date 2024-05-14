@@ -1,8 +1,8 @@
-package org.chaz.membershipsite.security.oauth;
+package org.chaz.portal.security.oauth;
 
-import org.chaz.membershipsite.memberadmins.service.MemberAdminService;
-import org.membershipcommons.entity.members.MemberAdmin;
-import org.membershipcommons.enums.AuthenticationType;
+import org.chaz.portal.assessors.service.AssessorService;
+import org.commons.entity.Assessor;
+import org.commons.enums.AuthenticationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -17,12 +17,12 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     @Autowired
-    private MemberAdminService memberAdminService;
+    private AssessorService assessorService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        MemberAdminOAuth2User oAuth2User = (MemberAdminOAuth2User) authentication.getPrincipal();
+        AssessorOAuth2User oAuth2User = (AssessorOAuth2User) authentication.getPrincipal();
 
         String name = oAuth2User.getName();
         String email = oAuth2User.getEmail();
@@ -31,13 +31,13 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         AuthenticationType authenticationType = getAuthenticationType(clientName);
 
-        MemberAdmin memberAdmin = memberAdminService.getMemberAdminByEmail(email);
+        Assessor assessor = assessorService.getAssessorByEmail(email);
 
-        if (memberAdmin == null) {
-            memberAdminService.addNewMemberAdminUponOAuthLogin(name, email, countryCode, authenticationType);
+        if (assessor == null) {
+            assessorService.addNewAssessorUponOAuthLogin(name, email, countryCode, authenticationType);
         } else {
-            oAuth2User.setFullName(memberAdmin.getFullName());
-            memberAdminService.updateAuthenticationType(memberAdmin, authenticationType);
+            oAuth2User.setFullName(assessor.getFullName());
+            assessorService.updateAuthenticationType(assessor, authenticationType);
         }
 
         super.onAuthenticationSuccess(request, response, authentication);

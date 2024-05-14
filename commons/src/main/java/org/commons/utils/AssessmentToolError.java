@@ -1,8 +1,8 @@
 package org.commons.utils;
 
-public class MembershipMgtError extends Exception {
+public class AssessmentToolError extends Exception {
 
-    public MembershipMgtError(String message) {
+    public AssessmentToolError(String message) {
         super(message);
     }
 

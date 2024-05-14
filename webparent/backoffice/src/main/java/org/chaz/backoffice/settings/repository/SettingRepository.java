@@ -1,7 +1,7 @@
 package org.chaz.backoffice.settings.repository;
 
-import org.membershipcommons.entity.settings.Setting;
-import org.membershipcommons.enums.SettingCategory;
+import org.commons.entity.settings.Setting;
+import org.commons.enums.SettingCategory;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

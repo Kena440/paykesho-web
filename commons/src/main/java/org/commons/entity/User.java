@@ -1,9 +1,9 @@
-package org.membershipcommons.entity;
+package org.commons.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.membershipcommons.constants.Constants;
-import org.membershipcommons.enums.GenderType;
+import org.commons.constants.Constants;
+import org.commons.enums.GenderType;
 
 import javax.persistence.*;
 import java.util.Date;

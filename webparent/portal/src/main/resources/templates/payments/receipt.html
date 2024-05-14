@@ -166,11 +166,11 @@
 
                             <!-- Text -->
                             <p class=" mb-4">
-                                <strong class="text-body">[[${memberInstitutionInvoice.memberInstitution.name}]]</strong>
+                                <strong class="text-body">[[${memberInstitutionInvoice.facility.name}]]</strong>
                                 <br>
-                                [[${memberInstitutionInvoice.memberInstitution.postalAddress}]] <br>
-                                [[${memberInstitutionInvoice.memberInstitution.district}]]<br>
-                                [[${memberInstitutionInvoice.memberInstitution.province}]]
+                                [[${memberInstitutionInvoice.facility.postalAddress}]] <br>
+                                [[${memberInstitutionInvoice.facility.district}]]<br>
+                                [[${memberInstitutionInvoice.facility.province}]]
                             </p>
                         </div>
                     </div> <!-- / .row -->
@@ -197,7 +197,7 @@
                                     <!-- ${#lists.sort(myList, 'name')}-->
                                     <!--<tr th:each="invoice, invoiceStat : ${memberInstitutionInvoice.invoiceItems}">-->
                                     <tr style="border: 1px solid black; padding: 8px;"
-                                        th:each="payment, paymentStat : ${#lists.sort(memberInstitutionPayment.paymentItems,  T(org.chaz.membershipsite.finance.utils.PaymentItemComparator).byItemNo())}">
+                                        th:each="payment, paymentStat : ${#lists.sort(memberInstitutionPayment.paymentItems,  T(org.chaz.portal.finance.utils.PaymentItemComparator).byItemNo())}">
                                         <td class="text-center" style="border: 1px solid black; padding: 8px;">
                                             [[${paymentStat.count}]]
                                         </td>

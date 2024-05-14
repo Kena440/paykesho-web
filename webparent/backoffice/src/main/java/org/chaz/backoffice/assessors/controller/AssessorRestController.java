@@ -1,6 +1,6 @@
-package org.chaz.backoffice.memberadmin.controller;
+package org.chaz.backoffice.assessors.controller;
 
-import org.chaz.backoffice.memberadmin.service.AssessorService;
+import org.chaz.backoffice.assessors.service.AssessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +14,7 @@ public class AssessorRestController {
     private AssessorService assessorService;
 
     @PostMapping("/check-email")
-    public String checkCustomerEmail(@RequestParam("id") Integer id, @RequestParam("email") String email) {
+    public String checkAssessorEmail(@RequestParam("id") Integer id, @RequestParam("email") String email) {
         if (email == null) {
             return "redirect:/customers";
         }

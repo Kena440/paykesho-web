@@ -178,13 +178,13 @@
                                         <td class="hideable-column">[[${invoiceStat.count}]]</td>
                                         <td>
                                             <th:block
-                                                    th:if="${invoice.invoiceType == T(org.membershipcommons.enums.InvoiceType).SINGLE}">
+                                                    th:if="${invoice.invoiceType == T(org.commons.enums.InvoiceType).SINGLE}">
                                                 <div class="badge bg-info">
                                                     Single
                                                 </div>
                                             </th:block>
                                             <th:block
-                                                    th:if="${invoice.invoiceType == T(org.membershipcommons.enums.InvoiceType).BULK}">
+                                                    th:if="${invoice.invoiceType == T(org.commons.enums.InvoiceType).BULK}">
                                                 <div class="badge bg-secondary">
                                                     Bulk
                                                 </div>

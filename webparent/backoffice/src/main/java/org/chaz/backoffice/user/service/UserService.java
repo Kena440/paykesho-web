@@ -3,9 +3,9 @@ package org.chaz.backoffice.user.service;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
 import org.chaz.backoffice.user.repository.RoleRepository;
 import org.chaz.backoffice.user.repository.UserRepository;
-import org.membershipcommons.entity.Role;
-import org.membershipcommons.entity.User;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.commons.entity.Role;
+import org.commons.entity.User;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +46,7 @@ public class UserService {
      *
      * @return
      */
-    public void listByPage(int pageNum, PagingAndSortingHelper helper) throws MembershipMgtError {
+    public void listByPage(int pageNum, PagingAndSortingHelper helper) throws AssessmentToolError {
         helper.listEntities(pageNum, USERS_PER_PAGE, userRepository);
 
     }
@@ -136,17 +136,17 @@ public class UserService {
      *
      * @param id
      * @return
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
-    public User getUserById(Integer id) throws MembershipMgtError {
+    public User getUserById(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         try {
             return userRepository.findById(id).get();
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any user");
+            throw new AssessmentToolError("Could not find any user");
         }
     }
 
@@ -155,21 +155,21 @@ public class UserService {
      * This method deletes a user based on ID produced
      *
      * @param id
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
     @Transactional(rollbackOn = {Exception.class})
-    public void delete(Integer id) throws MembershipMgtError {
+    public void delete(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         Long countById = userRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any user");
+            throw new AssessmentToolError("Could not find any user");
         }
 
         User user = getUserById(id);
-        if (user.getId() == null) throw new MembershipMgtError("Could not find any driver");
+        if (user.getId() == null) throw new AssessmentToolError("Could not find any driver");
         user.setDeleted(true);
         save(user);
         // userRepository.deleteById(id);
@@ -181,16 +181,16 @@ public class UserService {
      *
      * @param id
      * @param enabled
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
-    public void updateUserStatus(Integer id, boolean enabled) throws MembershipMgtError {
+    public void updateUserStatus(Integer id, boolean enabled) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         Long countById = userRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any user");
+            throw new AssessmentToolError("Could not find any user");
         }
 
         userRepository.updateEnableStatus(id, enabled);
@@ -202,21 +202,21 @@ public class UserService {
      *
      * @param email
      * @return
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
-    public User getUserByEmail(String email) throws MembershipMgtError {
+    public User getUserByEmail(String email) throws AssessmentToolError {
         if (email == null) {
-            throw new MembershipMgtError("Null parameter email");
+            throw new AssessmentToolError("Null parameter email");
         }
 
         try {
             return userRepository.getUserByEmail(email);
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any user");
+            throw new AssessmentToolError("Could not find any user");
         }
     }
 
-    public User updateAccount(User userInForm) throws MembershipMgtError {
+    public User updateAccount(User userInForm) throws AssessmentToolError {
         if (userInForm == null) {
             return null;
         }
@@ -237,7 +237,7 @@ public class UserService {
 
             return userRepository.save(userInDB);
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any user");
+            throw new AssessmentToolError("Could not find any user");
         }
 
     }

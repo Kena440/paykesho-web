@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.events.enums;
+package org.chaz.portal.events.enums;
 
 public class Constants {
     public static final String REDIRECT_TO_Events = "redirect:/events";

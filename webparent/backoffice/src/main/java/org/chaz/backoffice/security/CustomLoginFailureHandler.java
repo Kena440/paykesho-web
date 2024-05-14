@@ -1,8 +1,8 @@
 package org.chaz.backoffice.security;
 
 import org.chaz.backoffice.user.service.UserService;
-import org.membershipcommons.entity.User;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.commons.entity.User;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
@@ -27,7 +27,7 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
         User user = null;
         try {
             user = userService.getUserByEmail(email);
-        } catch (MembershipMgtError e) {
+        } catch (AssessmentToolError e) {
             e.printStackTrace();
         }
 

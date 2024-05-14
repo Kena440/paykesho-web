@@ -1,6 +1,6 @@
 package org.chaz.backoffice.settings.repository;
 
-import org.membershipcommons.entity.members.LevelOfCare;
+import org.commons.entity.facilities.LevelOfCare;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

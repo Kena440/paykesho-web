@@ -1,9 +1,9 @@
 package org.chaz.backoffice.settings.controller;
 
 import org.chaz.backoffice.settings.repository.StateRepository;
-import org.membershipcommons.dto.StateDto;
-import org.membershipcommons.entity.State;
-import org.membershipcommons.entity.settings.Country;
+import org.commons.dto.StateDto;
+import org.commons.entity.State;
+import org.commons.entity.settings.Country;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

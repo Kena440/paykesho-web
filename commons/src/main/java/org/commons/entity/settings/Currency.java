@@ -1,8 +1,8 @@
-package org.membershipcommons.entity.settings;
+package org.commons.entity.settings;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.membershipcommons.entity.IdBasedEntity;
+import org.commons.entity.IdBasedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,4 +1,4 @@
-package org.membershipcommons.entity;
+package org.commons.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

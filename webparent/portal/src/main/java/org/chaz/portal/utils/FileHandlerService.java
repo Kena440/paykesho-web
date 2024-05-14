@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.utils;
+package org.chaz.portal.utils;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,4 +1,4 @@
-package org.commons.entity.members;
+package org.commons.entity.facilities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

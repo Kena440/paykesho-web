@@ -1,7 +1,7 @@
-package org.chaz.membershipsite.security;
+package org.chaz.portal.security;
 
-import org.chaz.membershipsite.security.oauth.MemberAdminOAuth2UserService;
-import org.chaz.membershipsite.security.oauth.OAuth2LoginSuccessHandler;
+import org.chaz.portal.security.oauth.AssessorOAuth2UserService;
+import org.chaz.portal.security.oauth.OAuth2LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private MemberAdminOAuth2UserService oAuth2UserService;
+    private AssessorOAuth2UserService oAuth2UserService;
     @Autowired
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     @Autowired
@@ -72,7 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new MemberAdminUserDetailsService();
+        return new AssessorUserDetailsService();
     }
 
     public DaoAuthenticationProvider authenticationProvider() {

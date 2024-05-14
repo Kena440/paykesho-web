@@ -2,14 +2,13 @@ package org.chaz.backoffice.settings.service;
 
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.repository.*;
-import org.membershipcommons.entity.State;
-import org.membershipcommons.entity.finance.PaymentAccount;
-import org.membershipcommons.entity.finance.PaymentType;
-import org.membershipcommons.entity.members.Denomination;
-import org.membershipcommons.entity.members.LevelOfCare;
-import org.membershipcommons.entity.settings.*;
-import org.membershipcommons.enums.PaymentClass;
-import org.membershipcommons.enums.SettingCategory;
+import org.commons.entity.State;
+import org.commons.entity.facilities.LevelOfCare;
+import org.commons.entity.settings.Country;
+import org.commons.entity.settings.Currency;
+import org.commons.entity.settings.GeneralSettingBag;
+import org.commons.entity.settings.Setting;
+import org.commons.enums.SettingCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,21 +22,11 @@ public class SettingService {
     @Autowired
     private CurrencyRepository currencyRepository;
     @Autowired
-    private DenominationRepository denominationRepository;
-    @Autowired
     private StateRepository stateRepository;
     @Autowired
     private CountryRepository countryRepository;
     @Autowired
-    private PaymentTypesRepository paymentTypesRepository;
-    @Autowired
-    private PaymentAccountsRepository paymentAccountsRepository;
-    @Autowired
     private LevelOfCareRepository levelOfCareRepository;
-    @Autowired
-    private NeedTypesRepository needTypesRepository;
-    @Autowired
-    private FundingProjectRepository fundingProjectRepository;
 
     public List<Setting> settingsList() {
         return (List<Setting>) settingRepository.findAll();
@@ -87,51 +76,14 @@ public class SettingService {
         return currency.getCode();
     }
 
-    public List<Denomination> denominationList() {
-        return denominationRepository.findAllByOrderByNameAsc();
-    }
+
 
     public List<LevelOfCare> levelOfCareList() {
         return levelOfCareRepository.findAllByOrderByNameAsc();
     }
 
-    public List<NeedType> needTypeList() {
-        return needTypesRepository.findAllByOrderByNameAsc();
-    }
-
-    public List<PaymentType> paymentTypeList() {
-        return paymentTypesRepository.findAllByOrderByNameAsc();
-    }
-
-    public List<PaymentType> paymentTypeList(PaymentClass paymentClass) {
-        return paymentTypesRepository.findAllByPaymentClassOrderByNameAsc(paymentClass);
-    }
-
-    public PaymentType findPaymentTypeById(Integer id) {
-        return paymentTypesRepository.findById(id).get();
-    }
-    public PaymentType getPaymentTypeByName(String name) {
-        return paymentTypesRepository.getPaymentTypeByName(name);
-    }
-
-    public List<FundingProject> fundingProjectList() {
-        return fundingProjectRepository.findAllByOrderByProjectNameAsc();
-    }
-
-    public FundingProject findFundingProjectById(Integer id) {
-        return fundingProjectRepository.findById(id).get();
-    }
-
-    public NeedType findNeedTypeById(Integer id) {
-        return needTypesRepository.findById(id).get();
-    }
-
     public LevelOfCare findLevelOfCareById(Integer id) {
         return levelOfCareRepository.findById(id).get();
-    }
-
-    public List<PaymentAccount> paymentAccountList() {
-        return paymentAccountsRepository.findAllByOrderByAccountNoAsc();
     }
 
     public List<Currency> currencyList() {
@@ -152,10 +104,6 @@ public class SettingService {
             return null;
         }
         return countryInDb;
-    }
-
-    public Long countDenominations() {
-        return denominationRepository.count();
     }
 
     public State getProvinceByName(String attendeeProvince) {

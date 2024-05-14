@@ -1,8 +1,8 @@
-package org.chaz.membershipsite.settings.service;
+package org.chaz.portal.settings.service;
 
-import org.chaz.membershipsite.settings.repository.NeedTypesRepository;
-import org.membershipcommons.entity.settings.NeedType;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.chaz.portal.settings.repository.NeedTypesRepository;
+import org.commons.entity.settings.NeedType;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -47,11 +47,11 @@ public class NeedsService {
         return needTypesRepository.save(category);
     }
 
-    public NeedType get(Integer id) throws MembershipMgtError {
+    public NeedType get(Integer id) throws AssessmentToolError {
         try {
             return needTypesRepository.findById(id).get();
         } catch (NoSuchElementException ex) {
-            throw new MembershipMgtError("no category");
+            throw new AssessmentToolError("no category");
         }
     }
 
@@ -82,16 +82,16 @@ public class NeedsService {
      *
      * @param id
      * @param enabled
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
-    public void updateNeedTypeStatus(Integer id, boolean enabled) throws MembershipMgtError {
+    public void updateNeedTypeStatus(Integer id, boolean enabled) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         Long countById = needTypesRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any category");
+            throw new AssessmentToolError("Could not find any category");
         }
 
         needTypesRepository.updateEnableStatus(id, enabled);
@@ -102,16 +102,16 @@ public class NeedsService {
      * This method deletes a Store based on ID produced
      *
      * @param id
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
-    public void delete(Integer id) throws MembershipMgtError {
+    public void delete(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         Long countById = needTypesRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any NeedType");
+            throw new AssessmentToolError("Could not find any NeedType");
         }
 
         needTypesRepository.deleteById(id);

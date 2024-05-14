@@ -1,10 +1,8 @@
 package org.chaz.portal.facilities.service;
 
-import org.chaz.membershipsite.memberinstitution.repository.MemberInstitutionRepository;
-import org.membershipcommons.entity.members.MemberAdmin;
-import org.membershipcommons.entity.members.MemberInstitution;
-import org.membershipcommons.enums.MemberType;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.chaz.portal.facilities.repository.FacilityRepository;
+import org.commons.entity.facilities.Facility;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,34 +12,34 @@ import java.util.NoSuchElementException;
 
 @Service
 @Transactional
-public class MemberInstitutionService {
+public class FacilityService {
 
     public static final int MEMBERS_PER_PAGE = 10;
     protected DateFormat dateFormat;
     @Autowired
-    private MemberInstitutionRepository memberInstitutionRepository;
+    private FacilityRepository facilityRepository;
 
-    public MemberInstitution save(MemberInstitution memberInstitution) {
-        if (memberInstitution == null) {
+    public Facility save(Facility facility) {
+        if (facility == null) {
             return null;
         }
 
-        return memberInstitutionRepository.save(memberInstitution);
+        return facilityRepository.save(facility);
     }
 
     public boolean isEmailUnique(Integer id, String email) {
         if (email == null) {
             return false;
         }
-        MemberInstitution institution = memberInstitutionRepository.getMemberInstitutionByEmail(email);
+        Facility facility = facilityRepository.getFacilityByEmail(email);
 
-        if (institution == null) return true;
+        if (facility == null) return true;
         boolean isCreatingNew = (id == null);
 
         if (isCreatingNew) {
-            if (institution != null) return false;
+            if (facility != null) return false;
         } else {
-            if (institution.getId() != id) {
+            if (facility.getId() != id) {
                 return false;
             }
         }
@@ -53,15 +51,15 @@ public class MemberInstitutionService {
         if (email == null) {
             return false;
         }
-        MemberInstitution institution = memberInstitutionRepository.getMemberInstitutionByName(email);
+        Facility facility = facilityRepository.getFacilityByName(email);
 
-        if (institution == null) return true;
+        if (facility == null) return true;
         boolean isCreatingNew = (id == null);
 
         if (isCreatingNew) {
-            if (institution != null) return false;
+            if (facility != null) return false;
         } else {
-            if (institution.getId() != id) {
+            if (facility.getId() != id) {
                 return false;
             }
         }
@@ -69,57 +67,57 @@ public class MemberInstitutionService {
         return true;
     }
 
-    public MemberInstitution getMemberInstitutionById(Integer id) throws MembershipMgtError {
+    public Facility getFacilityById(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         try {
-            return memberInstitutionRepository.findById(id).get();
+            return facilityRepository.findById(id).get();
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any member");
+            throw new AssessmentToolError("Could not find any member");
         }
     }
 
-    public void delete(Integer id) throws MembershipMgtError {
+    public void delete(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
-        Long countById = memberInstitutionRepository.countById(id);
+        Long countById = facilityRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any member");
+            throw new AssessmentToolError("Could not find any member");
         }
 
-        MemberInstitution memberInstitution = getMemberInstitutionById(id);
-        if (memberInstitution.getId() == null) throw new MembershipMgtError("Could not find any driver");
-        memberInstitution.setDeleted(true);
-        save(memberInstitution);
+        Facility facility = getFacilityById(id);
+        if (facility.getId() == null) throw new AssessmentToolError("Could not find any driver");
+        facility.setDeleted(true);
+        save(facility);
         // userRepository.deleteById(id);
     }
 
-    public void updateMemberInstitutionStatus(Integer id, boolean enabled) throws MembershipMgtError {
+    public void updateFacilityStatus(Integer id, boolean enabled) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
-        Long countById = memberInstitutionRepository.countById(id);
+        Long countById = facilityRepository.countById(id);
         if (countById == null || countById == 0) {
-            throw new MembershipMgtError("Could not find any member");
+            throw new AssessmentToolError("Could not find any member");
         }
 
-        memberInstitutionRepository.updateEnableStatus(id, enabled);
+        facilityRepository.updateEnableStatus(id, enabled);
     }
 
-    public MemberInstitution getMemberInstitutionByEmail(String email) throws MembershipMgtError {
+    public Facility getFacilityByEmail(String email) throws AssessmentToolError {
         if (email == null) {
-            throw new MembershipMgtError("Null parameter email");
+            throw new AssessmentToolError("Null parameter email");
         }
 
         try {
-            return memberInstitutionRepository.getMemberInstitutionByEmail(email);
+            return facilityRepository.getFacilityByEmail(email);
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any user");
+            throw new AssessmentToolError("Could not find any user");
         }
     }
 
@@ -127,15 +125,15 @@ public class MemberInstitutionService {
         if (provinceId == null || memberName == null || memberType == null) {
             return false;
         }
-        MemberInstitution institution = memberInstitutionRepository.getMemberInstitutionByIdAndProvinceAndNameAndMemberTypeAndEmail(id, provinceId, memberName, MemberType.valueOf(memberType), email);
+        Facility facility = facilityRepository.getFacilityByIdAndProvinceAndNameAndMemberTypeAndEmail(id, provinceId, memberName, email);
 
-        if (institution == null) return true;
+        if (facility == null) return true;
         boolean isCreatingNew = (id == null);
 
         if (isCreatingNew) {
-            if (institution != null) return false;
+            if (facility != null) return false;
         } else {
-            if (institution.getId() != id) {
+            if (facility.getId() != id) {
                 return false;
             }
         }
@@ -144,14 +142,7 @@ public class MemberInstitutionService {
     }
 
     public Long countInstitutions() {
-        return memberInstitutionRepository.count();
+        return facilityRepository.count();
     }
 
-    public Long getTotalCatchmentMembers(boolean enabled) {
-        return memberInstitutionRepository.getTotalCatchmentMembers(enabled);
-    }
-
-    public MemberInstitution getMemberInstitutionByMemberAdmin(MemberAdmin memberAdmin) {
-        return memberInstitutionRepository.getMemberInstitutionByContactPerson(memberAdmin.getId());
-    }
 }

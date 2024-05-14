@@ -1,7 +1,7 @@
 package org.chaz.backoffice.paging;
 
 import lombok.Data;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -60,9 +60,9 @@ public class PagingAndSortingHelper {
 
     }
 
-    public void listEntities(int pageNum, int pageSize, SearchRepository<?, Integer> repository) throws MembershipMgtError {
+    public void listEntities(int pageNum, int pageSize, SearchRepository<?, Integer> repository) throws AssessmentToolError {
         if (pageNum == 0) {
-            throw new MembershipMgtError("invalid page");
+            throw new AssessmentToolError("invalid page");
         }
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("desc") ? sort.descending() : sort.ascending();

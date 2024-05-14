@@ -1,16 +1,11 @@
 package org.chaz.backoffice;
 
 import org.chaz.backoffice.config.Utility;
-import org.chaz.backoffice.donations.service.DonationService;
 import org.chaz.backoffice.events.service.EventsService;
-import org.chaz.backoffice.finance.service.InvoiceService;
-import org.chaz.backoffice.iga.service.IGAService;
-import org.chaz.backoffice.memberadmin.service.MemberAdminService;
-import org.chaz.backoffice.memberinstitution.service.MemberInstitutionService;
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.service.SettingService;
-import org.membershipcommons.entity.settings.Country;
-import org.membershipcommons.entity.settings.Setting;
+import org.commons.entity.settings.Country;
+import org.commons.entity.settings.Setting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +29,6 @@ public class MainController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
     @Autowired
-    private MemberAdminService memberAdminService;
-    @Autowired
-    private InvoiceService invoiceService;
-    @Autowired
-    private DonationService donationService;
-    @Autowired
-    private MemberInstitutionService memberInstitutionService;
-    @Autowired
-    private IGAService igaService;
-    @Autowired
     private SettingService settingService;
     @Autowired
     private EventsService eventsService;
@@ -52,30 +37,10 @@ public class MainController {
     public String viewHomePage(Model model, HttpServletRequest request) {
         Country country = settingService.getCountryByName("Zambia");
 
-        long totalLoans = igaService.getTotalMemberIGALoans();
-        long totalOwingLoans = igaService.getCountOwingMemberIGALoans(false);
-        Double totalOwing = igaService.getTotalOwingMemberIGALoans(false);
 
-        loadCurrencySetting(request);
 
-        model.addAttribute("totalOwing", totalOwing);
-        model.addAttribute("totalOwingLoans", totalOwingLoans);
-        model.addAttribute("totalLoans", totalLoans);
-        model.addAttribute("countUnpaidInvoices", invoiceService.getCountMemberInstitutionsInvoice(true, false));
-        model.addAttribute("countUnconfirmedDonations", donationService.getCountMemberInstitutionsDonation(true, false));
-        model.addAttribute("countTotalDonations", donationService.getCount());
-        model.addAttribute("memberAdminCount", memberAdminService.countAdmins());
-        model.addAttribute("denominationCount", settingService.countDenominations());
-        model.addAttribute("memberInstitutionCount", memberInstitutionService.countInstitutions());
-        model.addAttribute("memberInstitutionCatchment", memberInstitutionService.getTotalCatchmentMembers(true));
         model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
         if (country != null) model.addAttribute("country", country);
-        if (country != null)
-            model.addAttribute("memberCountByProvince", memberInstitutionService.getMembersCountByProvince(country.getId(), true));
-        if (country != null)
-            model.addAttribute("memberCountByDenomination", memberInstitutionService.getMembersCountByDenomination(country.getId(), true));
-        if (country != null)
-            model.addAttribute("memberCountByLevelOfCare", memberInstitutionService.getMembersCountByLevelOfCare(country.getId(), true));
         return "index";
     }
 
@@ -108,8 +73,8 @@ public class MainController {
         mailSender.setDefaultEncoding("utf-8");
 
         String toAddress = "mwamba.kaenga@chaz.org.zm";
-        String subject = emailSettingBag.getMemberAdminCreationSubject();
-        String content = emailSettingBag.getMemberAdminCreationContent();
+        String subject = emailSettingBag.getAssessorCreationSubject();
+        String content = emailSettingBag.getAssessorCreationContent();
         String systemURL = Utility.getSiteUrl(request);
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();

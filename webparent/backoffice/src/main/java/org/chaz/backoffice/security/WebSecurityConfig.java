@@ -52,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/events/registration/**", "/events/generateQRCode", "/general-invoices/view/**").permitAll().antMatchers("/member-institutions/save").hasAnyAuthority(ROLE_ADMIN, ROLE_MEMBERSHIP, ROLE_SUPERADMIN).antMatchers("/iga/save-repayment-record", "/iga/save").hasAnyAuthority(ROLE_ADMIN, ROLE_MEMBERSHIP, ROLE_MICROFIN, ROLE_SUPERADMIN).anyRequest().authenticated().and().formLogin().loginPage("/login").usernameParameter("email")
+        http.authorizeRequests().antMatchers("/events/registration/**", "/events/generateQRCode", "/general-invoices/view/**").permitAll().antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_MEMBERSHIP, ROLE_SUPERADMIN).antMatchers("/iga/save-repayment-record", "/iga/save").hasAnyAuthority(ROLE_ADMIN, ROLE_MEMBERSHIP, ROLE_MICROFIN, ROLE_SUPERADMIN).anyRequest().authenticated().and().formLogin().loginPage("/login").usernameParameter("email")
 //                .failureHandler(loginFailureHandler)
                 .permitAll().and().logout().permitAll().and().rememberMe().key("AbcDefgHijklmnOpqrs_1234567890").tokenValiditySeconds(7 * 24 * 60 * 60);
         http.headers().frameOptions().sameOrigin();

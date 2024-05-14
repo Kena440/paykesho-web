@@ -1,14 +1,9 @@
-package org.chaz.membershipsite.events.service;
+package org.chaz.portal.events.service;
 
-import org.chaz.membershipsite.events.repository.EventsAccomodationOptionsRepository;
-import org.chaz.membershipsite.events.repository.EventsAttendeesRepository;
-import org.chaz.membershipsite.events.repository.EventsRepository;
-import org.chaz.membershipsite.paging.PagingAndSortingHelper;
-import org.membershipcommons.entity.event.Event;
-import org.membershipcommons.entity.event.EventAccomodationOption;
-import org.membershipcommons.entity.event.EventAttendeeRegistration;
-import org.membershipcommons.entity.members.MemberInstitution;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.chaz.portal.events.repository.EventsRepository;
+import org.chaz.portal.paging.PagingAndSortingHelper;
+import org.commons.entity.event.Event;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,10 +22,6 @@ public class EventsService {
     private static final int EVENTS_PER_PAGE = 10;
     @Autowired
     private EventsRepository eventsRepository;
-    @Autowired
-    private EventsAttendeesRepository eventsAttendeesRepository;
-    @Autowired
-    private EventsAccomodationOptionsRepository eventsAccomodationOptionsRepository;
 
     /**
      * +
@@ -42,7 +33,7 @@ public class EventsService {
         return (List<Event>) eventsRepository.findAll(Sort.by("name").ascending());
     }
 
-    public void listByPage(int pageNum, PagingAndSortingHelper helper) throws MembershipMgtError {
+    public void listByPage(int pageNum, PagingAndSortingHelper helper) throws AssessmentToolError {
         helper.listEntities(pageNum, EVENTS_PER_PAGE, eventsRepository);
     }
 
@@ -73,17 +64,17 @@ public class EventsService {
      *
      * @param id
      * @return
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
-    public Event getEventById(Integer id) throws MembershipMgtError {
+    public Event getEventById(Integer id) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("Null parameter id");
+            throw new AssessmentToolError("Null parameter id");
         }
 
         try {
             return eventsRepository.findById(id).get();
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any Event");
+            throw new AssessmentToolError("Could not find any Event");
         }
     }
 
@@ -94,41 +85,18 @@ public class EventsService {
      *
      * @param name
      * @return
-     * @throws MembershipMgtError
+     * @throws AssessmentToolError
      */
-    public Event getEventByName(String name) throws MembershipMgtError {
+    public Event getEventByName(String name) throws AssessmentToolError {
         if (name == null) {
-            throw new MembershipMgtError("Null parameter storeName");
+            throw new AssessmentToolError("Null parameter storeName");
         }
 
         try {
             return eventsRepository.getEventByName(name);
         } catch (NoSuchElementException exception) {
-            throw new MembershipMgtError("Could not find any Event");
+            throw new AssessmentToolError("Could not find any Event");
         }
     }
 
-    public List<EventAttendeeRegistration> getEventAttendeesByMemberInstitution(MemberInstitution memberInstitution, Event event) throws MembershipMgtError {
-        if (memberInstitution == null) {
-            throw new MembershipMgtError("Null parameter member Institution");
-        }
-
-        return eventsAttendeesRepository.findByMemberAndEvent(memberInstitution.getId(), event.getId());
-    }
-
-    public EventAttendeeRegistration saveAttendee(EventAttendeeRegistration eventAttendeeRegistration) throws MembershipMgtError {
-        if (eventAttendeeRegistration == null) {
-            throw new MembershipMgtError("Null parameter eventAttendeeRegistration");
-        }
-
-        return eventsAttendeesRepository.save(eventAttendeeRegistration);
-    }
-
-    public List<EventAccomodationOption> getEventAccomodationOptions() {
-        return eventsAccomodationOptionsRepository.getEventAccomodationOptions();
-    }
-
-    public EventAccomodationOption getEventAccomodationOptionById(Integer accomodationOption) {
-        return eventsAccomodationOptionsRepository.findById(accomodationOption).get();
-    }
 }

@@ -91,14 +91,14 @@
 
                             <!-- Label -->
                             <label class="form-label">
-                                Member Institution
+                                Facility
                             </label>
 
                             <!-- Input -->
-                            <select class="form-select mb-3" data-choices id="memberInstitution"
-                                    name="memberInstitution">
+                            <select class="form-select mb-3" data-choices id="facility"
+                                    name="facility">
                                 <option value="">Select...</option>
-                                <th:block th:each="vh : ${memberInstitutionList}">
+                                <th:block th:each="vh : ${facilityList}">
                                     <option th:value="${vh.id}">
                                         [[${vh}]]
                                     </option>
@@ -149,18 +149,18 @@
 <script type="text/javascript">
     moduleURL = "[[@{/}]]";
     MAX_FILE_SIZE = 2502400; // 2502.4KB
-    let memberInstitution;
+    let facility;
     let invoiceDiv;
     let invoiceTable;
     let memberInstitutionInvoices = [];
 
     $(document).ready(function () {
-        memberInstitution = $("#memberInstitution");
+        facility = $("#facility");
         invoiceDiv = $("#invoiceDiv");
         invoiceTable = $("#invoiceTable");
         invoiceDiv.hide();
 
-        memberInstitution.on("change", function (e) {
+        facility.on("change", function (e) {
             e.preventDefault();
             /*    invoiceDiv.hide();
 
@@ -177,7 +177,7 @@
     });
 
     function loadInvoicesForInstitutions() {
-        let selectedInstitution = $("#memberInstitution option:selected");
+        let selectedInstitution = $("#facility option:selected");
         let memberInstitutionId = selectedInstitution.val();
         let url = moduleURL + "invoices/rest/list-by-institution/" + memberInstitutionId;
 

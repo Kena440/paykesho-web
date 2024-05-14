@@ -86,7 +86,7 @@
 
                             <!-- Text -->
                             <p class="text-muted mb-4">
-                                <strong class="text-body">[[${memberInstitution}]]</strong>
+                                <strong class="text-body">[[${facility}]]</strong>
                             </p>
 
                         </div>
@@ -190,7 +190,7 @@
                       th:action="@{/initiatives/save-member-payment}">
                     <input id="initiativeId" name="initiativeId" th:value="${initiative.id}"
                            type="hidden"/>
-                    <input id="memberInstitution" name="memberInstitution" th:value="${memberInstitution.id}"
+                    <input id="facility" name="facility" th:value="${facility.id}"
                            type="hidden"/>
                     <div class="modal-body">
                         <div class="row">

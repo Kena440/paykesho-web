@@ -1,8 +1,8 @@
-package org.chaz.membershipsite.settings.filter;
+package org.chaz.portal.settings.filter;
 
-import org.chaz.membershipsite.settings.service.SettingService;
-import org.membershipcommons.constants.Constants;
-import org.membershipcommons.entity.settings.Setting;
+import org.chaz.portal.settings.service.SettingService;
+import org.commons.constants.Constants;
+import org.commons.entity.settings.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

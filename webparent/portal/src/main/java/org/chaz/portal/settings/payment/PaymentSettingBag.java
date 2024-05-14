@@ -1,7 +1,7 @@
-package org.chaz.membershipsite.settings.payment;
+package org.chaz.portal.settings.payment;
 
-import org.membershipcommons.entity.settings.Setting;
-import org.membershipcommons.entity.settings.SettingBag;
+import org.commons.entity.settings.Setting;
+import org.commons.entity.settings.SettingBag;
 
 import java.util.List;
 

@@ -8,9 +8,9 @@ import org.chaz.backoffice.user.fileHandlers.UserExcelExporter;
 import org.chaz.backoffice.user.fileHandlers.UserPDFExporter;
 import org.chaz.backoffice.user.service.UserService;
 import org.chaz.backoffice.utils.AmazonS3Util;
-import org.membershipcommons.entity.Role;
-import org.membershipcommons.entity.User;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.commons.entity.Role;
+import org.commons.entity.User;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,7 +40,7 @@ public class UserController {
     public String listAllUsersByPage(
             @PagingAndSortingParam(listName = "userList", moduleURL = "/users") PagingAndSortingHelper helper,
             @PathVariable("pageNum") int pageNum,
-            Model model) throws MembershipMgtError {
+            Model model) throws AssessmentToolError {
         userService.listByPage(pageNum, helper);
 
         return "users/users";
@@ -66,7 +66,7 @@ public class UserController {
     @PostMapping("/save")
     public String saveUser(User user,
                            RedirectAttributes redirectAttributes,
-                           @RequestParam("image") MultipartFile multipartFile) throws IOException, MembershipMgtError {
+                           @RequestParam("image") MultipartFile multipartFile) throws IOException, AssessmentToolError {
         if (!multipartFile.isEmpty()) {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
             user.setPhotos(fileName);
@@ -89,9 +89,9 @@ public class UserController {
     }
 
 
-    private String getRedirectURLtoAffectedUser(User user) throws MembershipMgtError {
+    private String getRedirectURLtoAffectedUser(User user) throws AssessmentToolError {
         if (user == null) {
-            throw new MembershipMgtError("no user provided");
+            throw new AssessmentToolError("no user provided");
         }
         String firstPartOfEmail = user.getEmail().split("@")[0];
         return Constants.REDIRECT_TO_USERS_KEYWORD + firstPartOfEmail;
@@ -100,7 +100,7 @@ public class UserController {
     @GetMapping("/edit/{id}")
     public String editUser(@PathVariable(name = "id") Integer id,
                            RedirectAttributes redirectAttributes,
-                           Model model) throws MembershipMgtError {
+                           Model model) throws AssessmentToolError {
         if (id == null) {
             return Constants.REDIRECT_TO_USERS;
         }
@@ -115,7 +115,7 @@ public class UserController {
             model.addAttribute("pageTitle", pageTitle);
 
             return "users/user_form";
-        } catch (MembershipMgtError membershipMgtError) {
+        } catch (AssessmentToolError membershipMgtError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
             return Constants.REDIRECT_TO_USERS;
         }
@@ -125,9 +125,9 @@ public class UserController {
     @GetMapping("delete/{id}")
     public String deleteUser(@PathVariable(name = "id") Integer id,
                              RedirectAttributes redirectAttributes,
-                             Model model) throws MembershipMgtError {
+                             Model model) throws AssessmentToolError {
         if (id == null) {
-            throw new MembershipMgtError("no parameter id");
+            throw new AssessmentToolError("no parameter id");
         }
 
         try {
@@ -136,7 +136,7 @@ public class UserController {
             String userPhotosDir = "user_photos/" + id;
             AmazonS3Util.removeFolder(userPhotosDir);
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "User deleted successfully");
-        } catch (MembershipMgtError membershipMgtError) {
+        } catch (AssessmentToolError membershipMgtError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
         }
         return Constants.REDIRECT_TO_USERS;
@@ -146,10 +146,10 @@ public class UserController {
     public String updateUserEnabledStatus(@PathVariable(name = "id") Integer id,
                                           @PathVariable(name = "status") boolean enabled,
                                           RedirectAttributes redirectAttributes,
-                                          Model model) throws MembershipMgtError {
+                                          Model model) throws AssessmentToolError {
 
         if (id == null) {
-            throw new MembershipMgtError("no parameter id");
+            throw new AssessmentToolError("no parameter id");
         }
 
         try {
@@ -158,7 +158,7 @@ public class UserController {
             String status = enabled ? "enabled" : "has been disabled";
             String operationMSG = user.getFirstName() + " has been " + status;
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
-        } catch (MembershipMgtError membershipMgtError) {
+        } catch (AssessmentToolError membershipMgtError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
         }
         return Constants.REDIRECT_TO_USERS;
@@ -168,7 +168,7 @@ public class UserController {
     @GetMapping("/details/{id}")
     public String viewUserDetails(@PathVariable("id") Integer id,
                                   Model model,
-                                  RedirectAttributes redirectAttributes) throws MembershipMgtError {
+                                  RedirectAttributes redirectAttributes) throws AssessmentToolError {
 
         User user = userService.getUserById(id);
         model.addAttribute("user", user);
@@ -177,7 +177,7 @@ public class UserController {
     }
 
     @GetMapping("/export/{format}")
-    public void exportUsersByFormat(@PathVariable(name = "format") String format, HttpServletResponse response) throws MembershipMgtError, IOException {
+    public void exportUsersByFormat(@PathVariable(name = "format") String format, HttpServletResponse response) throws AssessmentToolError, IOException {
         switch (format) {
             case "csv":
                 exportToCSV(response);
@@ -189,7 +189,7 @@ public class UserController {
                 exportToPDF(response);
                 break;
             default:
-                throw new MembershipMgtError("no format provided");
+                throw new AssessmentToolError("no format provided");
         }
     }
 

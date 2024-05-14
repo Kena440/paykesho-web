@@ -1,9 +1,9 @@
-package org.chaz.membershipsite.settings.controller;
+package org.chaz.portal.settings.controller;
 
-import org.chaz.membershipsite.settings.repository.StateRepository;
-import org.membershipcommons.dto.StateDto;
-import org.membershipcommons.entity.State;
-import org.membershipcommons.entity.settings.Country;
+import org.chaz.portal.settings.repository.StateRepository;
+import org.commons.dto.StateDto;
+import org.commons.entity.State;
+import org.commons.entity.settings.Country;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

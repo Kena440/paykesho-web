@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.paging;
+package org.chaz.portal.paging;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

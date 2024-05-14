@@ -1,18 +1,18 @@
-package org.chaz.membershipsite.settings.service;
+package org.chaz.portal.settings.service;
 
-import org.chaz.membershipsite.settings.currency.CurrencySettingBag;
-import org.chaz.membershipsite.settings.email.EmailSettingBag;
-import org.chaz.membershipsite.settings.payment.PaymentSettingBag;
-import org.chaz.membershipsite.settings.repository.CurrencyRepository;
-import org.chaz.membershipsite.settings.repository.NeedTypesRepository;
-import org.chaz.membershipsite.settings.repository.SettingRepository;
-import org.chaz.membershipsite.settings.repository.StateRepository;
-import org.membershipcommons.entity.State;
-import org.membershipcommons.entity.settings.Country;
-import org.membershipcommons.entity.settings.Currency;
-import org.membershipcommons.entity.settings.NeedType;
-import org.membershipcommons.entity.settings.Setting;
-import org.membershipcommons.enums.SettingCategory;
+import org.chaz.portal.settings.currency.CurrencySettingBag;
+import org.chaz.portal.settings.email.EmailSettingBag;
+import org.chaz.portal.settings.payment.PaymentSettingBag;
+import org.chaz.portal.settings.repository.CurrencyRepository;
+import org.chaz.portal.settings.repository.NeedTypesRepository;
+import org.chaz.portal.settings.repository.SettingRepository;
+import org.chaz.portal.settings.repository.StateRepository;
+import org.commons.entity.State;
+import org.commons.entity.settings.Country;
+import org.commons.entity.settings.Currency;
+import org.commons.entity.settings.NeedType;
+import org.commons.entity.settings.Setting;
+import org.commons.enums.SettingCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

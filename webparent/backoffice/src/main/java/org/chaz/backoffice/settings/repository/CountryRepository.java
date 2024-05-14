@@ -1,6 +1,6 @@
 package org.chaz.backoffice.settings.repository;
 
-import org.membershipcommons.entity.settings.Country;
+import org.commons.entity.settings.Country;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

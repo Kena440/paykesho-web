@@ -3,7 +3,7 @@ package org.chaz.backoffice.user.fileHandlers;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.xssf.usermodel.*;
 import org.chaz.backoffice.utils.AbstractExporter;
-import org.membershipcommons.entity.User;
+import org.commons.entity.User;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;

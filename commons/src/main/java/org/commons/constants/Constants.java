@@ -1,4 +1,4 @@
-package org.membershipcommons.constants;
+package org.commons.constants;
 
 public class Constants {
     public static final String S3_BASE_URI;

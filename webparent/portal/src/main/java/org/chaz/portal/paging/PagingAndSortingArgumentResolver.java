@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.paging;
+package org.chaz.portal.paging;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;

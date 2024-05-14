@@ -1,7 +1,7 @@
 package org.chaz.backoffice.events.repository;
 
 import org.chaz.backoffice.paging.SearchRepository;
-import org.membershipcommons.entity.event.Event;
+import org.commons.entity.event.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;

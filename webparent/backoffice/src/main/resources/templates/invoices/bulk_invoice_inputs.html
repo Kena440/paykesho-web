@@ -260,7 +260,7 @@
     function checkInvoiceUnique(form) {
         url = "[[@{/invoices/rest/check-invoice}]]";
         invoiceId = $("#id").val();
-        memberId = $("#memberInstitution").val();
+        memberId = $("#facility").val();
         invoiceSerial = $("#serial").val();
         csrfValue = $("input[name='_csrf']").val();
 

@@ -54,8 +54,8 @@
     </div> <!-- / .header -->
     <div class="container-fluid">
 
-        <input id="longitude" th:value="${memberInstitution.longitude}" type="hidden"/>
-        <input id="latitude" th:value="${memberInstitution.latitude}" type="hidden"/>
+        <input id="longitude" th:value="${facility.longitude}" type="hidden"/>
+        <input id="latitude" th:value="${facility.latitude}" type="hidden"/>
 
         <div class="row">
             <div class="col-12 col-lg-6 col-xl">
@@ -73,7 +73,7 @@
 
                                 <!-- Heading -->
                                 <span class="h2 mb-0">
-                     [[${memberInstitution.name}]]
+                     [[${facility.name}]]
                     </span>
 
 
@@ -221,7 +221,7 @@
                         <!-- List group -->
                         <div class="list-group list-group-flush my-n3">
                             <div class="row alert alert-danger text-center"
-                                 th:if="${memberInstitution.memberNeeds.size() == 0 }">
+                                 th:if="${facility.memberNeeds.size() == 0 }">
                                 No needs information found. Please add a data
                             </div>
                             <div class="list-group-item">
@@ -245,7 +245,7 @@
                                     </div>
                                 </div> <!-- / .row -->
                             </div>
-                            <th:block th:unless="${memberInstitution.memberNeeds.size() == 0  }">
+                            <th:block th:unless="${facility.memberNeeds.size() == 0  }">
                                 <div class="list-group-item">
                                     <div class="row align-items-center">
                                         <div class="col">
@@ -255,7 +255,7 @@
                                         <div class="col-auto">
 
                                             <!-- Time -->
-                                            <th:block th:each="need : ${memberInstitution.memberNeeds}">
+                                            <th:block th:each="need : ${facility.memberNeeds}">
                                                 <span class="badge bg-secondary" th:text="${need.name}"></span>
                                             </th:block>
                                         </div>
@@ -282,7 +282,7 @@
                                 <form method="post"
                                       th:action="@{/member-needs/save}">
                                     <input id="memberInstitutionId" name="memberInstitutionId"
-                                           th:value="${memberInstitution.id}"
+                                           th:value="${facility.id}"
                                            type="hidden"/>
 
                                     <div class="modal-body">
@@ -299,7 +299,7 @@
                                                             name="memberNeeds"
                                                             required
                                                             style="resize: vertical; height: 200px"
-                                                            th:field="*{memberInstitution.memberNeeds}">
+                                                            th:field="*{facility.memberNeeds}">
                                                         <option disabled value="0">Select type</option>
                                                         <th:block th:each="need : ${needTypeList}">
                                                             <option th:value="${need.id}">

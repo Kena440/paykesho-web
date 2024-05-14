@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "facilities")
-public class MemberInstitution extends IdBasedEntity {
+public class Facility extends IdBasedEntity {
 
     @Column(name = "name", length = 245, nullable = false, unique = true)
     private String name;

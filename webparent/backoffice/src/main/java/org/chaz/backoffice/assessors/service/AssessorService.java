@@ -1,12 +1,16 @@
 package org.chaz.backoffice.assessors.service;
 
 import net.bytebuddy.utility.RandomString;
+import org.chaz.backoffice.assessors.repository.AssessorRepository;
 import org.chaz.backoffice.config.Utility;
-import org.chaz.backoffice.memberadmin.repository.AssessorRepository;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.repository.CountryRepository;
 import org.chaz.backoffice.settings.service.SettingService;
+import org.commons.entity.Assessor;
+import org.commons.entity.settings.Country;
+import org.commons.enums.AuthenticationType;
+import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +45,7 @@ public class AssessorService {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, assessorRepository);
     }
 
-    public void updateCustomerEnabledStatus(Integer id, boolean enabled) {
+    public void updateAssessorEnabledStatus(Integer id, boolean enabled) {
         assessorRepository.updateEnabledStatus(id, enabled);
     }
 

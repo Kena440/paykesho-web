@@ -134,7 +134,7 @@
                                         </th>
                                         <th class="list-sort text-muted" scope="col"
                                             style="width: 15%"
-                                            th:replace="fragments/fragments :: column_Link('memberInstitution', 'Institution','none')">
+                                            th:replace="fragments/fragments :: column_Link('facility', 'Institution','none')">
                                         </th>
                                         <th class="list-sort text-muted" scope="col"
                                             style="width: 15%"
@@ -187,7 +187,7 @@
                                     <tbody class="list fs-base">
                                     <tr th:each="meIndicator, meIndicatorStat : ${meIndicatorList}">
                                         <td class="hideable-column">[[${meIndicatorStat.count}]]</td>
-                                        <td>[[${meIndicator.memberInstitution.name}]]</td>
+                                        <td>[[${meIndicator.facility.name}]]</td>
                                         <td>[[${meIndicator.submissionPeriod}]]</td>
                                         <td>[[${meIndicator.skilledDeliveries}]]</td>
                                         <td>[[${meIndicator.maternalDeaths}]]</td>

@@ -1,25 +1,23 @@
-package org.chaz.membershipsite.security;
+package org.chaz.portal.security;
 
-import org.chaz.membershipsite.memberadmins.service.MemberAdminService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DatabaseLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-    @Autowired
-    private MemberAdminService memberAdminService;
-/*
+/*    @Autowired
+    private AssessorService assessorService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
 
-        MemberAdminUserDetails memberAdminUserDetails = (MemberAdminUserDetails) authentication.getPrincipal();
-        MemberAdmin memberAdmin = memberAdminUserDetails.getMemberAdmin();
+        AssessorUserDetails assessorUserDetails = (AssessorUserDetails) authentication.getPrincipal();
+        Assessor assessor = assessorUserDetails.getAssessor();
 
-        memberAdminService.updateAuthenticationType(memberAdmin, AuthenticationType.DATABASE);
-        if (memberAdmin.getFailedAttempt() > 0) {
-            memberAdminService.resetFailedAttempts(memberAdmin.getEmail());
+        assessorService.updateAuthenticationType(assessor, AuthenticationType.DATABASE);
+        if (assessor.getFailedAttempt() > 0) {
+            assessorService.resetFailedAttempts(assessor.getEmail());
         }
         super.onAuthenticationSuccess(request, response, authentication);
     }*/

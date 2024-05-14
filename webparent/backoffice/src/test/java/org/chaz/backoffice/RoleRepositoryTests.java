@@ -1,7 +1,7 @@
 package org.chaz.backoffice;
 
 import org.chaz.backoffice.user.repository.RoleRepository;
-import org.membershipcommons.entity.Role;
+import org.commons.entity.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

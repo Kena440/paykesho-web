@@ -2,7 +2,7 @@ package org.chaz.backoffice.security;
 
 
 import org.chaz.backoffice.user.repository.UserRepository;
-import org.membershipcommons.entity.User;
+import org.commons.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

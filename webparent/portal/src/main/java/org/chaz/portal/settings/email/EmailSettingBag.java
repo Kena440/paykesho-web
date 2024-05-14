@@ -1,7 +1,7 @@
-package org.chaz.membershipsite.settings.email;
+package org.chaz.portal.settings.email;
 
-import org.membershipcommons.entity.settings.Setting;
-import org.membershipcommons.entity.settings.SettingBag;
+import org.commons.entity.settings.Setting;
+import org.commons.entity.settings.SettingBag;
 
 import java.util.List;
 
@@ -42,11 +42,11 @@ public class EmailSettingBag extends SettingBag {
         return super.getValue("MAIL_SENDER_NAME");
     }
 
-    public String getCustomerVerificationSubject() {
+    public String getAssessorVerificationSubject() {
         return super.getValue("CUSTOMER_VERIFY_SUBJECT");
     }
 
-    public String getCustomerVerificationContent() {
+    public String getAssessorVerificationContent() {
         return super.getValue("CUSTOMER_VERIFY_CONTENT");
     }
 }

@@ -4,8 +4,8 @@ import org.chaz.backoffice.security.MembershipMgtUserDetails;
 import org.chaz.backoffice.user.enums.Constants;
 import org.chaz.backoffice.user.service.UserService;
 import org.chaz.backoffice.utils.AmazonS3Util;
-import org.membershipcommons.entity.User;
-import org.membershipcommons.utils.MembershipMgtError;
+import org.commons.entity.User;
+import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -29,10 +29,10 @@ public class AccountController {
     private UserService userService;
 
     @GetMapping("")
-    public String viewDetails(@AuthenticationPrincipal MembershipMgtUserDetails loggedInUser, Model model) throws MembershipMgtError {
+    public String viewDetails(@AuthenticationPrincipal MembershipMgtUserDetails loggedInUser, Model model) throws AssessmentToolError {
         String email = loggedInUser.getUsername();
         if (email == null) {
-            throw new MembershipMgtError("Null parameter email");
+            throw new AssessmentToolError("Null parameter email");
         }
         User user = userService.getUserByEmail(email);
         String pageTitle = "My Account";
@@ -47,7 +47,7 @@ public class AccountController {
     public String saveDetails(User user,
                               RedirectAttributes redirectAttributes,
                               @AuthenticationPrincipal MembershipMgtUserDetails loggedUser,
-                              @RequestParam("image") MultipartFile multipartFile) throws IOException, MembershipMgtError {
+                              @RequestParam("image") MultipartFile multipartFile) throws IOException, AssessmentToolError {
         if (!multipartFile.isEmpty()) {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
             user.setPhotos(fileName);

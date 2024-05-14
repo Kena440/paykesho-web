@@ -57,120 +57,7 @@
 
     <!-- CARDS -->
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-12 col-lg-6 col-xl">
 
-                <!-- Exit -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Representative Churches
-                                </h6>
-
-                                <span class="h2 mb-0">17</span>
-                                <!--       <span th:if="${denominationCount != null}" class="h2 mb-0"
-                                             th:replace="fragments/fragments :: format_number(${denominationCount})"></span>-->
-
-
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <a class="link-all-denominations h2 fe fe-home text-muted mb-0"
-                                   th:href="@{'/denominations/all-denominations'}"></a>
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-12 col-lg-6 col-xl" sec:authorize="hasAnyAuthority('Finance')">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Due for Payment
-                                </h6>
-
-                                <!-- Heading -->
-                                <span class="h2 mb-0" th:if="${countUnpaidInvoices != null}"
-                                      th:replace="fragments/fragments :: format_number(${countUnpaidInvoices})"></span>
-
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <span class="h2 fe fe-file text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-6 col-xl" sec:authorize="hasAnyAuthority('MicroFin')">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Total Owing (IGA)
-                                </h6>
-
-                                <!-- Heading -->
-                                <span class="h2 mb-0" th:if="${totalOwing != null}"
-                                      th:replace="fragments/fragments :: format_currency(${totalOwing})"></span>
-                                (<span class="h2 mb-0" th:if="${totalLoans != null}"
-                                       th:replace="fragments/fragments :: format_number(${totalOwingLoans})"></span>)
-
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <span class="h2 fe fe-hash text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-6 col-xl">
-
-                <!-- Time -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Total Donations
-                                </h6>
-
-                                <span class="h2 mb-0" th:if="${countTotalDonations != null}"
-                                      th:replace="fragments/fragments :: format_number(${countTotalDonations})"></span>
-
-
-                            </div>
-                            <div class="col-auto">
-
-                                <span class="h2 fe fe-gift text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-
-            </div>
-        </div> <!-- / .row -->
         <div class="row">
             <div class="col-12 col-xl-4">
 
@@ -182,7 +69,7 @@
 
                                 <!-- Title -->
                                 <h6 class="text-uppercase text-muted mb-2">
-                                    Membership
+                                    Facility
                                 </h6>
 
                                 <!-- Heading -->
@@ -195,30 +82,6 @@
 
                                 <!-- Icon -->
                                 <span class="h2 fe fe-file-text text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Catchment Population
-                                </h6>
-
-                                <!-- Heading -->
-                                <span class="h2 mb-0" th:if="${memberInstitutionCatchment != null}"
-                                      th:replace="fragments/fragments :: format_number(${memberInstitutionCatchment})"></span>
-
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <span class="h2 fe fe-globe text-muted mb-0"></span>
 
                             </div>
                         </div> <!-- / .row -->
@@ -276,7 +139,7 @@
 
                         <!-- Title -->
                         <h4 class="card-header-title">
-                            Membership Types
+                            Facility Types
                         </h4>
 
 
@@ -294,7 +157,7 @@
 
                         <!-- Title -->
                         <h4 class="card-header-title">
-                            Membership Map
+                            Facility Map
                         </h4>
 
 
@@ -307,171 +170,8 @@
                 </div>
             </div>
         </div> <!-- / .row -->
-        <div class="row">
-            <div class="accordion" id="accordionExample">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            Membership Count
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                            <div class="row">
-                                <div class="col-12 col-xl-4">
-                                    <div class="card">
-                                        <div class="card-header">
-
-                                            <!-- Title -->
-                                            <h4 class="card-header-title">
-                                                Membership Count (Denominations)
-                                            </h4>
-
-
-                                        </div>
-                                        <div class="card-body">
-
-                                            <div class="table-responsive"
-                                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
-                                                <table class="table table-sm">
-                                                    <thead>
-                                                    <tr>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
-                                                        </th>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Name</a>
-                                                        </th>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Total</a>
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody class="list">
-                                                    <tr th:each="member, memberCountByDenominationStat : ${memberCountByDenomination}">
-                                                        <th class="tables-row" scope="row">[[${memberCountByDenominationStat.count}]]</th>
-                                                        <td class="tables-first">[[${member.name}]]</td>
-                                                        <td class="tables-last">[[${member.total}]]</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="col-12 col-xl-4">
-                                    <div class="card">
-                                        <div class="card-header">
-
-                                            <!-- Title -->
-                                            <h4 class="card-header-title">
-                                                Membership Count (Provinces)
-                                            </h4>
-
-
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive"
-                                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
-                                                <table class="table table-sm">
-                                                    <thead>
-                                                    <tr>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
-                                                        </th>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Name</a>
-                                                        </th>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Total</a>
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody class="list">
-                                                    <tr th:each="member, memberCountByProvinceStat : ${memberCountByProvince}">
-                                                        <th class="tables-row" scope="row">[[${memberCountByProvinceStat.count}]]</th>
-                                                        <td class="tables-first">[[${member.name}]]</td>
-                                                        <td class="tables-last">[[${member.total}]]</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="col-12 col-xl-4">
-                                    <div class="card">
-                                        <div class="card-header">
-
-                                            <!-- Title -->
-                                            <h4 class="card-header-title">
-                                                Membership Count (Level of Care)
-                                            </h4>
-
-
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive"
-                                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
-                                                <table class="table table-sm">
-                                                    <thead>
-                                                    <tr>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
-                                                        </th>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Name</a>
-                                                        </th>
-                                                        <th scope="col">
-                                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Total</a>
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody class="list">
-                                                    <tr th:each="member, memberCountByLevelOfCareStat : ${memberCountByLevelOfCare}">
-                                                        <th class="tables-row" scope="row">[[${memberCountByLevelOfCareStat.count}]]</th>
-                                                        <td class="tables-first">[[${member.name}]]</td>
-                                                        <td class="tables-last">[[${member.total}]]</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div> <!-- / .row -->
     </div>
 </div><!-- / .main-content -->
-
-<div aria-hidden="true" class="modal fade" id="modalInvoiceDuePayment" role="dialog" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-
-        </div>
-    </div>
-</div>
-<div aria-hidden="true" class="modal fade" id="modalAllDenominations" role="dialog" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-
-        </div>
-    </div>
-</div>
-
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
@@ -488,8 +188,8 @@
 
     $(document).ready(function () {
 
-        const memberTypesDataRequestUrl = contextPath + "member-institutions/rest/get-member-types-data/true";
-        const memberGPSDataRequestUrl = contextPath + "member-institutions/rest/get-member-gps-data/true";
+        const memberTypesDataRequestUrl = contextPath + "facilties/rest/get-member-types-data/true";
+        const memberGPSDataRequestUrl = contextPath + "facilties/rest/get-member-gps-data/true";
 
         $.get(memberTypesDataRequestUrl, function (responseJSON) {
             $.each(responseJSON, function (index, reportItem) {
@@ -523,18 +223,6 @@
             generateMembersGPSMap();
         });
 
-    });
-
-    $(".link-due-payment").on("click", function (e) {
-        e.preventDefault();
-        const linkDetailURL = $(this).attr("href");
-        $("#modalInvoiceDuePayment").modal("show").find(".modal-content").load(linkDetailURL);
-    });
-
-    $(".link-all-denominations").on("click", function (e) {
-        e.preventDefault();
-        const linkDetailURL = $(this).attr("href");
-        $("#modalAllDenominations").modal("show").find(".modal-content").load(linkDetailURL);
     });
 
     function generateMembersTypeChart() {

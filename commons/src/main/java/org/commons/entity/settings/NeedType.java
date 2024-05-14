@@ -1,11 +1,11 @@
-package org.membershipcommons.entity.settings;
+package org.commons.entity.settings;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.commons.entity.IdBasedEntity;
 import org.hibernate.Hibernate;
-import org.membershipcommons.entity.IdBasedEntity;
 
 import javax.persistence.*;
 import java.util.HashSet;

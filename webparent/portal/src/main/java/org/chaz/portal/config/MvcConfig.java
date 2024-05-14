@@ -1,6 +1,6 @@
-package org.chaz.membershipsite.config;
+package org.chaz.portal.config;
 
-import org.chaz.membershipsite.paging.PagingAndSortingArgumentResolver;
+import org.chaz.portal.paging.PagingAndSortingArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

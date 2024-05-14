@@ -1,7 +1,7 @@
-package org.chaz.membershipsite.events.repository;
+package org.chaz.portal.events.repository;
 
-import org.chaz.membershipsite.paging.SearchRepository;
-import org.membershipcommons.entity.event.Event;
+import org.chaz.portal.paging.SearchRepository;
+import org.commons.entity.event.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

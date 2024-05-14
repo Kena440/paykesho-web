@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.events.service;
+package org.chaz.portal.events.service;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

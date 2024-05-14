@@ -5,7 +5,7 @@ server:
 spring:
   datasource:
     password: p@ssw0rd
-    url: jdbc:mysql://localhost:3306/chaz_membership_db
+    url: jdbc:mysql://localhost:3306/chaz_assessment_tool_db
     username: root
     hikari:
       minimum-idle: 0

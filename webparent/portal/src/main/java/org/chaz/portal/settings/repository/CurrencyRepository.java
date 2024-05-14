@@ -1,6 +1,6 @@
-package org.chaz.membershipsite.settings.repository;
+package org.chaz.portal.settings.repository;
 
-import org.membershipcommons.entity.settings.Currency;
+import org.commons.entity.settings.Currency;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

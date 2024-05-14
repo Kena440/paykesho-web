@@ -1,9 +1,6 @@
-package org.chaz.membershipsite.security;
+package org.chaz.portal.security;
 
-import org.chaz.membershipsite.memberadmins.service.MemberAdminService;
-import org.membershipcommons.entity.members.MemberAdmin;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.LockedException;
+
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -16,29 +13,29 @@ import java.io.IOException;
 @Component
 public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    @Autowired
-    private MemberAdminService memberAdminService;
+/*    @Autowired
+    private AssessorService assessorService;*/
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-        String email = request.getParameter("email");
-        MemberAdmin memberAdmin = memberAdminService.getMemberAdminByEmail(email);
+/*        String email = request.getParameter("email");
+        Assessor assessor = assessorService.getAssessorByEmail(email);
 
-        if (memberAdmin != null) {
-            if (memberAdmin.isEnabled() && memberAdmin.isAccountNonLocked()) {
-                if (memberAdmin.getFailedAttempt() < MemberAdminService.MAX_FAILED_ATTEMPTS - 1) {
-                    memberAdminService.increaseFailedAttempts(memberAdmin);
+        if (assessor != null) {
+            if (assessor.isEnabled() && assessor.isAccountNonLocked()) {
+                if (assessor.getFailedAttempt() < AssessorService.MAX_FAILED_ATTEMPTS - 1) {
+                    assessorService.increaseFailedAttempts(assessor);
 
                     //todo code for email to user on failed login
                 } else {
-                    memberAdminService.lock(memberAdmin);
+                    assessorService.lock(assessor);
                     exception = new LockedException("Your account has been locked due to 3 failed attempts."
                             + " It will be unlocked after 24 hours.");
                     //todo code for email to user on failed login
                 }
-            } else if (!memberAdmin.isAccountNonLocked()) {
-                if (memberAdminService.unlockWhenTimeExpired(memberAdmin)) {
+            } else if (!assessor.isAccountNonLocked()) {
+                if (assessorService.unlockWhenTimeExpired(assessor)) {
                     exception = new LockedException("Your account has been unlocked. Please try to login again.");
                     //todo code for email to user on failed login
                 }
@@ -47,7 +44,7 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
         }
 
         super.setDefaultFailureUrl("/login?error");
-        super.onAuthenticationFailure(request, response, exception);
+        super.onAuthenticationFailure(request, response, exception);*/
     }
 
 }

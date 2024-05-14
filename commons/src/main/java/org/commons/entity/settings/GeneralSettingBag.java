@@ -1,4 +1,4 @@
-package org.membershipcommons.entity.settings;
+package org.commons.entity.settings;
 
 import java.util.List;
 

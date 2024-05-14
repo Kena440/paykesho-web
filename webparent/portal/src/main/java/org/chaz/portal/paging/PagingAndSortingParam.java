@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.paging;
+package org.chaz.portal.paging;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

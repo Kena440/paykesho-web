@@ -1,6 +1,6 @@
-package org.chaz.membershipsite.settings.repository;
+package org.chaz.portal.settings.repository;
 
-import org.membershipcommons.entity.settings.FundingProject;
+import org.commons.entity.settings.FundingProject;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

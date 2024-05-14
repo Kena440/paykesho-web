@@ -1,4 +1,4 @@
-package org.chaz.membershipsite.utils;
+package org.chaz.portal.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

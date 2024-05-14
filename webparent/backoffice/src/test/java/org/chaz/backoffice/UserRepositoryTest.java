@@ -1,9 +1,9 @@
 package org.chaz.backoffice;
 
 import org.chaz.backoffice.user.repository.UserRepository;
-import org.membershipcommons.entity.Role;
-import org.membershipcommons.entity.User;
-import org.membershipcommons.enums.GenderType;
+import org.commons.entity.Role;
+import org.commons.entity.User;
+import org.commons.enums.GenderType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
