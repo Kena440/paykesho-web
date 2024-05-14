@@ -14,9 +14,9 @@ public class AssessorRestController {
     private AssessorService assessorService;
 
     @PostMapping("/check-email")
-    public String checkAssessorEmail(@RequestParam("id") Integer id, @RequestParam("email") String email) {
+    public String checkAssessorEmail(Integer id, String email) {
         if (email == null) {
-            return "redirect:/customers";
+            return "redirect:/assessors";
         }
         return assessorService.isEmailUnique(id, email) ? "OK" : "Duplicated";
     }

@@ -138,7 +138,7 @@ public class AssessorService {
         helper.setSubject(subject);
 
         content = content.replace("[[name]]", assessor.getFullName());
-        content = content.replace("[[link]]", "https://member.chaz.domains/");
+        content = content.replace("[[link]]", "https://assessment.chaz.domains/");
         content = content.replace("[[email]]", assessor.getEmail());
         content = content.replace("[[password]]", passwordCode);
 

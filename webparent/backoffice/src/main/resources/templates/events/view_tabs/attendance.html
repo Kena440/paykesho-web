@@ -70,7 +70,7 @@
                             </small>
                         </td>
                         <td class="px-0 text-center">
-                            <th:block sec:authorize="hasAnyAuthority('Membership')">
+                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                 <a class="fe fe-trash" th:href="@{'/events/attendee-attendance/delete/'+${attendee.id}}"
                                    title="Delete">
                                 </a>

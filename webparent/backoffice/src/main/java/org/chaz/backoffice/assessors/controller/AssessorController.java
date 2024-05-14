@@ -27,8 +27,6 @@ import java.util.List;
 @RequestMapping("/assessors")
 public class AssessorController {
     @Autowired
-    private AssessorRepository assessorRepository;
-    @Autowired
     private AssessorService assessorService;
 
     @GetMapping("")
@@ -37,7 +35,7 @@ public class AssessorController {
     }
 
     @GetMapping("/page/{pageNum}")
-    public String listByPage(Model model, @PathVariable(name = "pageNum") int pageNum, @PagingAndSortingParam(listName = "customerList", moduleURL = "/customers") PagingAndSortingHelper helper) throws AssessmentToolError {
+    public String listByPage(Model model, @PathVariable(name = "pageNum") int pageNum, @PagingAndSortingParam(listName = "assessorList", moduleURL = "/assessors") PagingAndSortingHelper helper) throws AssessmentToolError {
 
         assessorService.listByPage(pageNum, helper);
 
@@ -98,7 +96,7 @@ public class AssessorController {
         assessor.setFailedAttempt(0);
         Assessor admin = assessorService.save(request, assessor);
 
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Admin Operation Successful: " + admin.getFullName());
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "assessor Operation Successful: " + admin.getFullName());
         return Constants.REDIRECT_ASSESSORS;
     }
 
@@ -110,11 +108,20 @@ public class AssessorController {
 
         try {
             assessorService.delete(id);
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "CUSTOMER deleted successfully");
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "assessor deleted successfully");
         } catch (AssessmentToolError membershipMgtError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
         }
         return Constants.REDIRECT_ASSESSORS;
     }
 
+    @GetMapping("/new")
+    public String newAssessor(Model model) {
+        String pageTitle = "New Assessor";
+        Assessor assessor = new Assessor();
+        assessor.setEnabled(true);
+        model.addAttribute("assessor", assessor);
+        model.addAttribute("pageTitle", pageTitle);
+        return "assessors/assessor_form";
+    }
 }

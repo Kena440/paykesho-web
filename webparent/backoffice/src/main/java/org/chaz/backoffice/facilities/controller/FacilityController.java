@@ -39,7 +39,7 @@ public class FacilityController {
     }
 
     @GetMapping("/page/{pageNum}")
-    public String listAllFacilitysByPage(@PagingAndSortingParam(listName = "memberList", moduleURL = "/facilities") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum) throws AssessmentToolError {
+    public String listAllFacilitysByPage(@PagingAndSortingParam(listName = "facilityList", moduleURL = "/facilities") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum) throws AssessmentToolError {
         facilityService.listByPage(pageNum, helper);
 
         return "facilities/facilities";
@@ -64,7 +64,6 @@ public class FacilityController {
     @PostMapping("/save")
     public String saveFacility(Facility facility, RedirectAttributes redirectAttributes) throws AssessmentToolError {
         facilityService.save(facility);
-
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Facility Operation Successful: " + facility.getEmail());
         return getRedirectURLtoAffectedFacility(facility);
     }

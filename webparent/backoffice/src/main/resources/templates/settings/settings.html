@@ -93,26 +93,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#denominationsTab">
-                                Denominations
-                            </a>
-                        </li>
-                        <li class="nav-item d-none">
-                            <a class="nav-link" data-toggle="tab" href="#paymentTab">
-                                Payment Types
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#departmentsTab">
-                                Departments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#fundingProjectsTab">
-                                Funding Projects
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#countriesTab">
                                 Countries
                             </a>
@@ -161,27 +141,6 @@
                                 <div th:replace="settings/mail_templates/mail_template_fragment :: content"></div>
                             </div>
                         </div>
-                        <div class="tab-pane fade d-none" id="paymentTab">
-                            <div class="row justify-content-left py-9">
-                                <div th:replace="settings/payment_types_settings_fragment :: content"></div>
-
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="fundingProjectsTab">
-                            <div class="row justify-content-left py-9">
-                                <div th:replace="settings/funding_projects_settings_fragment :: content"></div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="departmentsTab">
-                            <div class="row justify-content-left py-9">
-                                <div th:replace="settings/departments_settings_fragment :: content"></div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="denominationsTab">
-                            <div class="row justify-content-left py-9">
-                                <div th:replace="settings/denominations_settings_fragment :: content"></div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -205,10 +164,6 @@
 <script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
 <script th:src="@{/assets/js/country/country_setting.js}" type="text/javascript"></script>
 <script th:src="@{/assets/js/country/state_setting.js}" type="text/javascript"></script>
-<script th:src="@{/assets/js/funding_project/funding_project_setting.js}" type="text/javascript"></script>
-<script th:src="@{/assets/js/department/department_setting.js}" type="text/javascript"></script>
-<script th:src="@{/assets/js/denomination/denomination_setting.js}" type="text/javascript"></script>
-<script th:src="@{/assets/js/paymenttypes/payment_type_setting.js}" type="text/javascript"></script>
 </body>
 
 <!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:49 GMT -->

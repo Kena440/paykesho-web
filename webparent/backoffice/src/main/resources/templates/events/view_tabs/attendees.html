@@ -132,7 +132,7 @@
                                 <div class="badge bg-warning">
                                     Pending
                                 </div>
-                                <th:block sec:authorize="hasAnyAuthority('Membership')">
+                                <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                     &nbsp;
                                     <a class="fe fe-check-circle"
                                        th:href="@{'/events/accommodation-assigned/'+${attendee.id}}"
@@ -161,7 +161,7 @@
                             </th:block>
                         </td>
                         <td class="px-0 text-center">
-                            <th:block sec:authorize="hasAnyAuthority('Membership')">
+                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                 <a class="fe fe-credit-card" th:href="@{'/events/attendee/print-id/'+${attendee.id}}"
                                    title="Print ID">
                                 </a>

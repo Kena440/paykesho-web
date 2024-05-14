@@ -1,7 +1,9 @@
 package org.chaz.backoffice;
 
+import org.chaz.backoffice.assessments.service.AssessmentsService;
 import org.chaz.backoffice.config.Utility;
 import org.chaz.backoffice.events.service.EventsService;
+import org.chaz.backoffice.facilities.service.FacilityService;
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.service.SettingService;
 import org.commons.entity.settings.Country;
@@ -32,14 +34,19 @@ public class MainController {
     private SettingService settingService;
     @Autowired
     private EventsService eventsService;
+    @Autowired
+    private AssessmentsService assessmentsService;
+    @Autowired
+    private FacilityService facilityService;
 
     @GetMapping("")
     public String viewHomePage(Model model, HttpServletRequest request) {
         Country country = settingService.getCountryByName("Zambia");
+        loadCurrencySetting(request);
 
-
-
+        model.addAttribute("facilityCount", facilityService.countInstitutions());
         model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
+        model.addAttribute("upcomingAssessments", assessmentsService.getUpcomingAssessments(30));
         if (country != null) model.addAttribute("country", country);
         return "index";
     }

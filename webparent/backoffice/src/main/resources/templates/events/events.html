@@ -59,7 +59,7 @@
                                 </div> <!-- / .nav -->
 
                                 <!-- Buttons -->
-                                <a class="btn btn-primary ms-2" sec:authorize="hasAnyAuthority('Membership')"
+                                <a class="btn btn-primary ms-2" sec:authorize="hasAnyAuthority('General', 'Admin')"
                                    th:href="@{/events/new}">
                                     Add Event
                                 </a>
@@ -184,7 +184,7 @@
                                         </td>
                                         <td>[[${event.eventDays}]]</td>
                                         <td>
-                                            <th:block sec:authorize="hasAnyAuthority('Membership')">
+                                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                                 <div th:replace="fragments/fragments :: status(${event.enabled}, 'event', '/events/' + ${event.id})"></div>
                                             </th:block>
                                         </td>
@@ -195,7 +195,7 @@
                                                 View
                                             </a>
                                             &nbsp;
-                                            <th:block sec:authorize="hasAnyAuthority('Membership')">
+                                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                                 <div th:replace="fragments/fragments :: edit('event', '/events/edit/' + ${event.id})"></div>
                                                 &nbsp;
                                                 <div th:replace="fragments/fragments :: delete(${event.id}, 'event', '/events/delete/' + ${event.id}, true)"></div>

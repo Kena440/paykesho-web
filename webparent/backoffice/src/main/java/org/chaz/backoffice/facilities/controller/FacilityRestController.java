@@ -16,16 +16,16 @@ public class FacilityRestController {
     private FacilityService facilityService;
 
     @PostMapping("/check-facility")
-    public String checkDuplicateFacility(Integer id, Integer provinceId, String memberName, Integer levelOfCareId) {
-        return facilityService.isFacilityUnique(id, provinceId, memberName, levelOfCareId) ? "OK" : "Duplicated";
+    public String checkDuplicateFacility(Integer id, Integer provinceId, String facilityName, Integer levelOfCareId) {
+        return facilityService.isFacilityUnique(id, provinceId, facilityName, levelOfCareId) ? "OK" : "Duplicated";
     }
 
-    @GetMapping("/get-member-types-data/{enabled}")
+    @GetMapping("/get-facility-types-data/{enabled}")
     public List<DataItem> getFacilityTypesData(@PathVariable("enabled") boolean enabled) {
         return facilityService.getFacilityTypesDataEnabled(enabled);
     }
 
-    @GetMapping("/get-member-gps-data/{enabled}")
+    @GetMapping("/get-facility-gps-data/{enabled}")
     public List<GPSDataItem> getFacilityGPSData(@PathVariable("enabled") boolean enabled) {
         return facilityService.getFacilityGPSDataEnabled(enabled);
     }

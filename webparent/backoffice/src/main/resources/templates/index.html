@@ -73,8 +73,8 @@
                                 </h6>
 
                                 <!-- Heading -->
-                                <span class="h2 mb-0" th:if="${memberInstitutionCount != null}"
-                                      th:replace="fragments/fragments :: format_number(${memberInstitutionCount})"></span>
+                                <span class="h2 mb-0" th:if="${facilityCount != null}"
+                                      th:replace="fragments/fragments :: format_number(${facilityCount})"></span>
 
 
                             </div>
@@ -134,6 +134,53 @@
                         </div>
                     </div>
                 </th:block>
+                <th:block th:if="${upcomingAssessments.size() > 0}">
+                    <div class="card">
+                        <div class="card-header">
+
+                            <!-- Title -->
+                            <h4 class="card-header-title">
+                                Upcoming Assessments
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive"
+                                 data-list='{"valueNames": ["tables-row", "tables-first", "tables-last"]}'>
+                                <table class="table table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <a class="text-muted list-sort" data-sort="tables-row" href="#">#</a>
+                                        </th>
+                                        <th scope="col">
+                                            <a class="text-muted list-sort" data-sort="tables-first" href="#">Info</a>
+                                        </th>
+                                        <th scope="col">
+                                            <a class="text-muted list-sort" data-sort="tables-last" href="#">Date</a>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="list">
+                                    <tr th:each="assessment, assessmentStat : ${upcomingAssessments}">
+                                        <th class="tables-row" scope="row">[[${assessmentStat.count}]]</th>
+                                        <td class="tables-first">
+                                            <a th:href="@{'/assessment/view/'+${assessment.id}}"
+                                               title="Assessment View">
+                                                [[${assessment.name}]]
+                                            </a>
+                                        </td>
+                                        <td class="tables-last">
+                                            <time datetime="2018-04-23"
+                                                  th:replace="fragments/fragments :: format_date(${assessment.assessmentDate})"></time>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </th:block>
                 <div class="card">
                     <div class="card-header">
 
@@ -145,7 +192,7 @@
 
                     </div>
                     <div class="card-body">
-                        <canvas class="chart-canvas" id="memberTypeChart" style="width:100%;max-width:600px"></canvas>
+                        <canvas class="chart-canvas" id="facilityTypeChart" style="width:100%;max-width:600px"></canvas>
                     </div>
                 </div>
             </div>
@@ -179,33 +226,33 @@
 <script type="text/javascript">
     let currYearTripData = [];
     let lastYearTripData = [];
-    let memberTypes = [];
+    let facilityTypes = [];
     let monthLabels = [];
-    let memberTypesData = [];
-    let memberGPSData = [];
-    let memberGPSMapFeatures = [];
+    let facilityTypesData = [];
+    let facilityGPSData = [];
+    let facilityGPSMapFeatures = [];
     contextPath = "[[@{/}]]";
 
     $(document).ready(function () {
 
-        const memberTypesDataRequestUrl = contextPath + "facilties/rest/get-member-types-data/true";
-        const memberGPSDataRequestUrl = contextPath + "facilties/rest/get-member-gps-data/true";
+        const facilityTypesDataRequestUrl = contextPath + "facilities/rest/get-facility-types-data/true";
+        const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-facility-gps-data/true";
 
-        $.get(memberTypesDataRequestUrl, function (responseJSON) {
+        $.get(facilityTypesDataRequestUrl, function (responseJSON) {
             $.each(responseJSON, function (index, reportItem) {
-                memberTypes.push(reportItem.identifier);
-                memberTypesData.push(reportItem.itemCount);
+                facilityTypes.push(reportItem.identifier);
+                facilityTypesData.push(reportItem.itemCount);
             });
 
-            generateMembersTypeChart();
+            generateFacilityTypeChart();
         });
 
-        $.get(memberGPSDataRequestUrl, function (responseJSON) {
+        $.get(facilityGPSDataRequestUrl, function (responseJSON) {
             $.each(responseJSON, function (index, reportItem) {
-                memberGPSData.push(reportItem);
+                facilityGPSData.push(reportItem);
             });
 
-            $.each(memberGPSData, function (index, item) {
+            $.each(facilityGPSData, function (index, item) {
                 var element = {
                     'type': 'Feature',
                     'geometry': {
@@ -217,15 +264,15 @@
                     }
                 }
 
-                memberGPSMapFeatures.push(element);
+                facilityGPSMapFeatures.push(element);
             })
 
-            generateMembersGPSMap();
+            generateFacilityGPSMap();
         });
 
     });
 
-    function generateMembersTypeChart() {
+    function generateFacilityTypeChart() {
         var barColors = [
             "#b91d47",
             "#00aba9",
@@ -233,13 +280,13 @@
             "#e8c3b9"
         ];
 
-        new Chart("memberTypeChart", {
+        new Chart("facilityTypeChart", {
             type: "doughnut",
             data: {
-                labels: memberTypes,
+                labels: facilityTypes,
                 datasets: [{
                     backgroundColor: barColors,
-                    data: memberTypesData
+                    data: facilityTypesData
                 }]
             },
             options: {
@@ -251,7 +298,7 @@
         });
     }
 
-    function generateMembersGPSMap() {
+    function generateFacilityGPSMap() {
         mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
         var map = new mapboxgl.Map({
             container: 'map',
@@ -270,7 +317,7 @@
                         'type': 'geojson',
                         'data': {
                             'type': 'FeatureCollection',
-                            'features': memberGPSMapFeatures
+                            'features': facilityGPSMapFeatures
                         }
                     });
 

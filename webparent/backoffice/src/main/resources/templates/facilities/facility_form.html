@@ -91,81 +91,7 @@
                     <input id="id" th:field="*{id}" type="hidden"/>
                     <input id="longitude" th:field="*{longitude}" type="hidden"/>
                     <input id="latitude" th:field="*{latitude}" type="hidden"/>
-                    <input id="contactPerson" th:field="*{contactPerson}" type="hidden"/>
-                    <input id="assessor" name="assessor" th:value="${assessor}" type="hidden"/>
-
-                    <div class="row justify-content-between align-items-center">
-                        <div class="col">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-
-                                    <!-- Avatar -->
-                                    <div class="avatar">
-                                        <img alt="..." class="avatar-img rounded-circle"
-                                             id="thumbnail" th:src="@{${facility.photosImagePath}}">
-                                    </div>
-
-                                </div>
-                                <div class="col ms-n2">
-
-                                    <!-- Heading -->
-                                    <h4 class="mb-1">
-                                        image
-                                    </h4>
-
-                                    <!-- Text -->
-                                    <small class="text-muted">
-                                        <p class="font-size-xs text-muted" id="fileImageName"
-                                           th:if="${facility.photos == null}">
-                                        <p class="font-size-xs text-muted"
-                                           id="fileImageName"
-                                           th:if="${facility.photos != null}"
-                                           th:text="${facility.photos}">
-                                        </p>
-                                    </small>
-
-                                </div>
-                            </div> <!-- / .row -->
-                        </div>
-                        <div class="col-auto">
-
-                            <input th:field="*{photos}" type="hidden">
-                            <input accept="image/png, image/jpeg" capture="user" class="m-2 form-control" id="fileImage"
-                                   name="image" type="file">
-
-                        </div>
-                    </div> <!-- / .row -->
-
-                    <!-- Divider -->
-                    <hr class="my-5">
-
                     <div class="row">
-                        <div class="col-12 col-md-6">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Member Type
-                                </label>
-
-                                <!-- Input -->
-                                <select class="form-select mb-3" data-choices id="memberType" th:field="*{memberType}">
-                                    <option value="">Select...</option>
-
-                                    <th:block
-                                            th:each="ps : ${T(org.commons.enums.MemberType).values()}">
-                                        <option th:defaultDescription="${ps.name()}"
-                                                th:selected="${ps == facility.memberType}"
-                                                th:text="${ps}"
-                                                th:value="${ps}">
-                                        </option>
-                                    </th:block>
-                                </select>
-                            </div>
-
-                        </div>
                         <div class="col-12 col-md-6">
 
                             <!-- First name -->
@@ -225,7 +151,7 @@
                             </div>
 
                         </div>
-                        <div class="col-12 col-md-3">
+                        <div class="col-12 col-md-6">
 
                             <!-- First name -->
                             <div class="form-group">
@@ -248,102 +174,7 @@
                             </div>
 
                         </div>
-                        <div class="col-12 col-md-3">
 
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Catchment Population
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" id="catchmentPopulation" maxlength="20"
-                                       minlength="1" placeholder="X" required
-                                       step="1"
-                                       th:field="*{catchmentPopulation}"
-                                       type="number">
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-6">
-
-                            <!-- Last name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Denomination
-                                </label>
-
-                                <!-- Input -->
-                                <select class="form-select mb-3" data-choices th:field="*{denomination}">
-                                    <option value="">Select...</option>
-                                    <th:block th:each="vh : ${denominationList}">
-                                        <option th:selected="(${vh.id} == ${facility.denomination})"
-                                                th:value="${vh.id}">
-                                            [[${vh.name}]]
-                                        </option>
-                                    </th:block>
-                                </select>
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-3">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Year Opened
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" id="yearOpened" required th:field="*{yOOnForm}" type="date">
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-3">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Number of Beds
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" id="numberOfBeds" maxlength="5"
-                                       minlength="1" placeholder="X" required
-                                       step="1"
-                                       th:field="*{numberOfBeds}"
-                                       type="number">
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-6">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Services Offered
-                                </label>
-
-                                <!-- Input -->
-                                <textarea class="form-control" id="servicesOffered" maxlength="256"
-                                          minlength="2"
-                                          placeholder="XXX"
-                                          rows="3"
-                                          th:field="*{servicesOffered}" type="text">
-                                </textarea>
-                            </div>
-
-                        </div>
                         <hr>
                         <div class="col-12 col-md-6">
 
@@ -352,7 +183,7 @@
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Institution Email
+                                    Facility Email
                                 </label>
 
                                 <!-- Input -->
@@ -362,57 +193,8 @@
                             </div>
 
                         </div>
-                        <div class="col-12 col-md-6">
 
-                            <!-- First name -->
-                            <div class="form-group">
 
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Institution Phone Number
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" id="phoneNumber" maxlength="20" minlength="2"
-                                       placeholder="XXX"
-                                       th:field="*{phoneNumber}" type="tel">
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-6">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Postal Address
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" id="postalAddress" maxlength="40" minlength="2"
-                                       placeholder="XXX"
-                                       th:field="*{postalAddress}" type="text">
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-6">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Postal Code
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" id="postalCode" maxlength="10" minlength="2"
-                                       placeholder="XXX"
-                                       th:field="*{postalCode}" type="text">
-                            </div>
-
-                        </div>
                         <hr>
                         <div class="col-12 col-md-12">
 
@@ -448,35 +230,13 @@
                             </div>
 
                         </div>
-                        <div class="col-12 col-md-6">
 
-                            <!-- Birthday -->
-                            <div class="form-group">
 
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Admin Account
-                                </label>
-
-                                <!-- Input -->
-                                <div class="text-danger" th:if="${facility.contactPerson == null}">
-                                    Kindly note that you can add a contact person (admin account) after saving this form
-                                </div>
-                                <div class="text-danger" th:unless="${facility.contactPerson == null}">
-                                    [[${facility.contactPerson.fullName}]]
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div> <!-- / .row -->
-
-                    <div class="col-12 col-md-6" sec:authorize="hasAnyAuthority('Membership')">
+                    </div>
+                    <div class="col-12 col-md-6" sec:authorize="hasAnyAuthority('General', 'Admin')">
                         <button class="btn btn-primary" type="submit">Submit</button>
                         <button class="btn btn-secondary" id="btnCancel" type="button">Cancel</button>
                     </div>
-
-
                 </form>
 
                 <br><br>
@@ -494,9 +254,9 @@
     MAX_FILE_SIZE = 2502400; // 2502.4KB
 
     function checkInstitutionUnique(form) {
-        url = "[[@{/facilities/rest/check-member}]]";
-        memberName = $("#nameInput").val();
-        memberType = $("#memberType").val();
+        url = "[[@{/facilities/rest/check-facility}]]";
+        facilityName = $("#nameInput").val();
+        levelOfCare = $("#levelOfCare").val();
         provinceId = $("#province").val();
         memberId = $("#id").val();
         csrfValue = $("input[name='_csrf']").val();
@@ -504,8 +264,8 @@
         params = {
             id: memberId,
             provinceId: provinceId,
-            memberName: memberName,
-            memberType: memberType,
+            facilityName: facilityName,
+            levelOfCare: levelOfCare,
             _csrf: csrfValue
         };
 
@@ -513,7 +273,7 @@
             if (response === "OK") {
                 form.submit();
             } else if (response === "Duplicated") {
-                showWarningModal("There is another member having the provided details");
+                showWarningModal("There is another facility having the provided details");
             } else {
                 showErrorModal("Unknown response from server");
             }

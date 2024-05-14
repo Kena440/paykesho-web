@@ -1187,6 +1187,37 @@
                         </ul>
                     </div>
                 </li>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('General', 'Admin')">
+                    <a aria-controls="sidebarAssessorsMgt" aria-expanded="false" class="nav-link"
+                       data-bs-toggle="collapse"
+                       href="#sidebarAssessorsMgt" role="button">
+                        <i class="fe fe-file-text"></i> Assessments
+                    </a>
+                    <div class="collapse" id="sidebarAssessorsMgt">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item" sec:authorize="hasAnyAuthority('General','Admin')">
+                                <a class="nav-link" th:href="@{/assessments/new}">
+                                    New Assessment
+                                </a>
+                            </li>
+                            <li class="nav-item" sec:authorize="hasAnyAuthority('General','Admin')">
+                                <a class="nav-link" th:href="@{/assessments}">
+                                    All Assessments
+                                </a>
+                            </li>
+                            <li class="nav-item" sec:authorize="hasAnyAuthority('General','Admin')">
+                                <a class="nav-link" th:href="@{/assessors/new}">
+                                    New Assessor
+                                </a>
+                            </li>
+                            <li class="nav-item" sec:authorize="hasAnyAuthority('General','Admin')">
+                                <a class="nav-link" th:href="@{/assessors}">
+                                    All Assessors
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
                 <li class="nav-item" sec:authorize="hasAnyAuthority('Admin','General')">
                     <a aria-controls="sidebarEventsMgt" aria-expanded="false" class="nav-link" data-bs-toggle="collapse"
                        href="#sidebarEventsMgt" role="button">
@@ -1226,7 +1257,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link " th:href="@{/settings}">
-                                    <i class="fe fe-settings"></i> Settings
+                                    Settings
                                 </a>
                             </li>
                         </ul>

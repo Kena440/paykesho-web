@@ -129,7 +129,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-sm table-hover table-nowrap card-table"
-                                       th:if="${memberList.size() > 0}">
+                                       th:if="${facilityList.size() > 0}">
                                     <thead>
                                     <tr>
                                         <th class="list-sort text-muted" scope="col">
@@ -143,15 +143,12 @@
                                             th:replace="fragments/fragments :: column_Link('levelOfCare', 'Level of Care', 'none')">
                                         </th>
                                         <th scope="col"
-                                            th:replace="fragments/fragments :: column_Link('denomination', 'Denomination', 'none')">
-                                        </th>
-                                        <th scope="col"
                                             th:replace="fragments/fragments :: column_Link('district', 'District', 'none')">
                                         </th>
                                         <th scope="col"
                                             th:replace="fragments/fragments :: column_Link('province', 'Province', 'none')">
                                         </th>
-                                        <th:block sec:authorize="hasAnyAuthority('Membership')">
+                                        <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                             <th scope="col"
                                                 th:replace="fragments/fragments :: column_Link('enabled', 'Enabled', 'none')">
                                             </th>
@@ -162,33 +159,32 @@
                                     </tr>
                                     </thead>
                                     <tbody class="list fs-base">
-                                    <tr th:each="member, memberStat : ${memberList}">
-                                        <td class="hideable-column">[[${memberStat.count}]]</td>
+                                    <tr th:each="facility, facilityStat : ${facilityList}">
+                                        <td class="hideable-column">[[${facilityStat.count}]]</td>
                                         <td class="hideable-column">
-                                            <a th:href="@{'/facilities/view/'+${member.id}}"
+                                            <a th:href="@{'/facilities/view/'+${facility.id}}"
                                                title="View Institution">
-                                                [[${member.name}]]
+                                                [[${facility.name}]]
                                             </a>
                                         </td>
-                                        <td>[[${member.levelOfCare}]]</td>
-                                        <td>[[${member.denomination}]]</td>
-                                        <td>[[${member.district}]]</td>
-                                        <td>[[${member.province}]]</td>
-                                        <th:block sec:authorize="hasAnyAuthority('Membership')">
+                                        <td>[[${facility.levelOfCare}]]</td>
+                                        <td>[[${facility.district}]]</td>
+                                        <td>[[${facility.province}]]</td>
+                                        <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                             <td>
-                                                <div th:replace="fragments/fragments :: status(${member.enabled}, 'member', '/facilities/' + ${member.id})"></div>
+                                                <div th:replace="fragments/fragments :: status(${facility.enabled}, 'facility', '/facilities/' + ${facility.id})"></div>
                                             </td>
                                         </th:block>
                                         <td>
                                             <a class="fe fe-eye"
-                                               th:href="@{'/facilities/view/'+${member.id}}"
+                                               th:href="@{'/facilities/view/'+${facility.id}}"
                                                title="View Institution">
                                             </a>
-                                            <th:block sec:authorize="hasAnyAuthority('Membership')">
+                                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                                 &nbsp;
-                                                <div th:replace="fragments/fragments :: edit('member', '/facilities/edit/' + ${member.id})"></div>
+                                                <div th:replace="fragments/fragments :: edit('facility', '/facilities/edit/' + ${facility.id})"></div>
                                                 &nbsp;
-                                                <!--<div th:replace="fragments/fragments :: delete(${member.id}, 'member', '/facilities/delete/' + ${member.id}, true)"></div>-->
+                                                <!--<div th:replace="fragments/fragments :: delete(${facility.id}, 'facility', '/facilities/delete/' + ${facility.id}, true)"></div>-->
                                             </th:block>
                                         </td>
                                     </tr>
@@ -218,7 +214,7 @@
     $(document).ready(function () {
         $(".link-delete").on("click", function (e) {
             e.preventDefault();
-            showDeleteConfirmModal($(this), 'member');
+            showDeleteConfirmModal($(this), 'facility');
         });
     });
 </script>

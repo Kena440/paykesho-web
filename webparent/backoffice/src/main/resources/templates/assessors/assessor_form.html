@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
-      xmlns:th="http://www.thymeleaf.org">
-<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
-<head th:replace="fragments/fragments :: page_head('IGA','none')"></head>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Staff Member Mgt','none')"></head>
 
 <body>
 
@@ -31,7 +33,7 @@
 
                                 <!-- Pretitle -->
                                 <h6 class="header-pretitle">
-                                    Income Generating Activities - Revolving Fund
+                                    Assessor Management
                                 </h6>
 
                                 <!-- Title -->
@@ -44,22 +46,21 @@
 
                                 <!-- Navigation (button group) -->
                                 <div class="nav btn-group d-inline-flex d-none" role="tablist">
-                                    <button aria-controls="dealsListPane" aria-selected="true"
-                                            class="btn btn-white active"
-                                            data-bs-target="#dealsListPane" data-bs-toggle="tab" id="dealsListTab"
-                                            role="tab">
+                                    <button class="btn btn-white active" id="dealsListTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsListPane" role="tab" aria-controls="dealsListPane"
+                                            aria-selected="true">
                                         <span class="fe fe-list"></span>
                                     </button>
-                                    <button aria-controls="dealsCardsPane" aria-selected="false" class="btn btn-white"
-                                            data-bs-target="#dealsCardsPane" data-bs-toggle="tab" id="dealsCardsTab"
-                                            role="tab">
+                                    <button class="btn btn-white" id="dealsCardsTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsCardsPane" role="tab" aria-controls="dealsCardsPane"
+                                            aria-selected="false">
                                         <span class="fe fe-sidebar"></span>
                                     </button>
                                 </div> <!-- / .nav -->
 
                                 <!-- Buttons -->
-                                <a class="btn btn-primary ms-2" th:href="@{/iga}">
-                                    All IGA Loans
+                                <a th:href="@{/assessors}" class="btn btn-primary ms-2">
+                                    Assessors
                                 </a>
 
                             </div>
@@ -70,7 +71,7 @@
                                 <!-- Nav -->
                                 <ul class="nav nav-tabs nav-overflow header-tabs">
                                     <li class="nav-item d-none">
-                                        <a class="nav-link text-nowrap active" href="#!">
+                                        <a href="#!" class="nav-link text-nowrap active">
                                             Total <span
                                                 class="badge rounded-pill bg-secondary-soft"></span>
                                         </a>
@@ -83,30 +84,69 @@
                 </div>
 
                 <!-- Form -->
-                <form method="post"
-                      onsubmit="return checkLoanUnique(this)"
-                      th:action="@{/iga/save}"
-                      th:object="${igaLoan}">
-                    <input id="id" th:field="*{id}" type="hidden"/>
+                <form th:action="@{/assessors/save}"
+                      method="post"
+                      th:object="${assessor}"
+                      onsubmit="return checkEmailUnique(this)">
+                    <input type="hidden" th:field="*{id}" id="id"/>
 
-                    <div class="row">
+                    <div class="row justify-content-between align-items-center">
                         <div class="col-12 col-md-6">
 
-                            <!-- Last name -->
+                            <!-- First name -->
                             <div class="form-group">
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Facility
+                                    Title
                                 </label>
 
                                 <!-- Input -->
-                                <select class="form-select mb-3" data-choices required th:field="*{facility}">
+                                <input type="text" class="form-control" id="title"
+                                       placeholder=" Title" th:field="*{title}" required
+                                       minlength="2"
+                                       maxlength="45">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-6">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Name
+                                </label>
+
+                                <!-- Input -->
+                                <input type="text" class="form-control" id="fnameInput"
+                                       placeholder=" Name" th:field="*{name}" required
+                                       minlength="2"
+                                       maxlength="45">
+                            </div>
+
+                        </div>
+
+                        <div class="col-12 col-md-6">
+
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Gender
+                                </label>
+
+                                <!-- Input -->
+                                <select class="form-select mb-3" data-choices th:field="*{genderType}">
                                     <option value="">Select...</option>
-                                    <th:block th:each="vh : ${facilityList}">
-                                        <option th:selected="(${vh.id} == ${igaLoan.facility})"
-                                                th:value="${vh.id}">
-                                            [[${vh}]]
+                                    <th:block
+                                            th:each="ps : ${T(org.commons.enums.GenderType).values()}">
+                                        <option th:value="${ps}" th:text="${ps}"
+                                                th:selected="${ps == assessor.genderType}"
+                                                class="track-status-text"
+                                                th:defaultDescription="${ps.name()}">
                                         </option>
                                     </th:block>
                                 </select>
@@ -115,137 +155,89 @@
                         </div>
                         <div class="col-12 col-md-6">
 
-                            <!-- Last name -->
+                            <!-- First name -->
                             <div class="form-group">
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Currency
+                                    Auth
                                 </label>
 
                                 <!-- Input -->
-                                <select class="form-select mb-3" data-choices required th:field="*{currency}">
+                                <select class="form-select mb-3" data-choices th:field="*{authenticationType}">
                                     <option value="">Select...</option>
-                                    <th:block th:each="vh : ${currencyList}">
-                                        <option th:selected="(${vh.id} == ${igaLoan.currency})"
-                                                th:value="${vh.id}">
-                                            [[${vh}]]
+                                    <th:block
+                                            th:each="ps : ${T(org.commons.enums.AuthenticationType).values()}">
+                                        <option th:value="${ps}" th:text="${ps}"
+                                                th:selected="${ps == assessor.authenticationType}"
+                                                class="track-status-text"
+                                                th:defaultDescription="${ps.name()}">
                                         </option>
                                     </th:block>
                                 </select>
                             </div>
 
                         </div>
+
                         <div class="col-12 col-md-6">
 
-                            <!-- First name -->
+                            <!-- Email address -->
                             <div class="form-group">
 
                                 <!-- Label -->
-                                <label class="form-label">
-                                    Principal Amount
+                                <label class="mb-1">
+                                    Email address
                                 </label>
 
                                 <!-- Input -->
-                                <input class="form-control" min="0"
-                                       placeholder="XXXX" required
-                                       th:field="*{principalAmount}" type="number">
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-3">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Interest (%)
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" placeholder="XXXX" step="0.01"
-                                       th:field="*{interestPercent}" type="number">
-
-                            </div>
-
-                        </div>
-                        <div class="col-12 col-md-3">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Period (In Months)
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" max="120"
-                                       min="0" placeholder="XXXX"
-                                       required step="1" th:field="*{period}" type="number">
+                                <input type="email" class="form-control"
+                                       id="email"
+                                       placeholder="Email address" th:field="*{email}"
+                                       minlength="8"
+                                       maxlength="128">
                             </div>
 
                         </div>
                         <div class="col-12 col-md-6">
 
-                            <!-- Last name -->
+                            <!-- Phone -->
                             <div class="form-group">
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Purpose
+                                    Phone Number
                                 </label>
 
                                 <!-- Input -->
-                                <input class="form-control" maxlength="45"
-                                       minlength="2" placeholder="XXXX"
-                                       required
-                                       th:field="*{loanPurpose}" type="text">
+                                <input type="text" th:field="*{phoneNumber}" class="form-control mb-3"
+                                       placeholder="(___)___-____" data-inputmask="'mask': '(999)999-9999'">
+
                             </div>
 
                         </div>
-                        <div class="col-12 col-md-6">
 
-                            <!-- First name -->
+                        <div class="col-12 col-md-2">
+
+                            <!-- Birthday -->
                             <div class="form-group">
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Serial
+                                    Enabled
                                 </label>
 
                                 <!-- Input -->
-                                <input class="form-control" maxlength="45"
-                                       minlength="2" placeholder="XXXX"
-                                       th:field="*{serial}"
-                                       type="text">
+                                <input type="checkbox" class="form-check-input is-invalid" id="enabledInput"
+                                       th:field="*{enabled}">
                             </div>
 
                         </div>
-                        <div class="col-12 col-md-3">
-
-                            <!-- First name -->
-                            <div class="form-group">
-
-                                <!-- Label -->
-                                <label class="form-label">
-                                    Loan Date
-                                </label>
-
-                                <!-- Input -->
-                                <input class="form-control" required th:field="*{ldOnForm}" type="date">
-                            </div>
-
-                        </div>
-
 
                     </div> <!-- / .row -->
 
-
-                    <div class="col-12 col-md-6" sec:authorize="hasAnyAuthority('MicroFin')">
-                        <button class="btn btn-primary" type="submit">Submit</button>
-                        <button class="btn btn-secondary" id="btnCancel" type="button">Cancel</button>
+                    <div class="col-12 col-md-6">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" id="btnCancel">Cancel</button>
                     </div>
 
 
@@ -263,27 +255,21 @@
 <footer th:replace="fragments/fragments :: js_code"></footer>
 <script type="text/javascript">
     moduleURL = "[[@{/}]]";
-    MAX_FILE_SIZE = 2502400; // 2502.4KB
+    MAX_FILE_SIZE = 502400; // 500KB
 
-    function checkLoanUnique(form) {
-        url = "[[@{/iga/rest/check-loan}]]";
-        loanId = $("#id").val();
-        memberId = $("#facility").val();
-        loanSerial = $("#serial").val();
+    function checkEmailUnique(form) {
+        url = "[[@{/assessors/rest/check-email}]]";
+        userEmail = $("#email").val();
+        userId = $("#id").val();
         csrfValue = $("input[name='_csrf']").val();
 
-        params = {
-            id: loanId,
-            memberId: memberId,
-            serial: loanSerial,
-            _csrf: csrfValue
-        };
+        params = {id: userId, email: userEmail, _csrf: csrfValue};
 
         $.post(url, params, function (response) {
             if (response === "OK") {
                 form.submit();
             } else if (response === "Duplicated") {
-                showWarningModal("There is another loan having the provided details");
+                showWarningModal("There is another user having the email " + userEmail);
             } else {
                 showErrorModal("Unknown response from server");
             }
@@ -293,9 +279,10 @@
 
         return false;
     }
-
 </script>
-<script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
+<script type="text/javascript" th:src="@{/assets/js/common_form.js}"></script>
+
 </body>
+
 
 </html>
