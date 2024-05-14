@@ -5,7 +5,7 @@ import net.bytebuddy.utility.RandomString;
 import org.chaz.portal.assessors.repository.AssessorRepository;
 import org.chaz.portal.config.Utility;
 import org.chaz.portal.settings.repository.CountryRepository;
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.utils.AssessmentToolError;

@@ -1,8 +1,12 @@
 package org.chaz.backoffice.assessments.service;
 
+import org.chaz.backoffice.assessments.repository.AssessmentAssessorsRepository;
+import org.chaz.backoffice.assessments.repository.AssessmentFeedbackRepository;
 import org.chaz.backoffice.assessments.repository.AssessmentsRepository;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
-import org.commons.entity.Assessment;
+import org.commons.entity.assessment.Assessment;
+import org.commons.entity.assessment.AssessmentAssessor;
+import org.commons.entity.assessment.AssessmentFeedback;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,10 @@ public class AssessmentsService {
     private static final int EVENTS_PER_PAGE = 20;
     @Autowired
     private AssessmentsRepository assessmentsRepository;
+    @Autowired
+    private AssessmentAssessorsRepository assessmentAssessorsRepository;
+    @Autowired
+    private AssessmentFeedbackRepository assessmentFeedbackRepository;
 
     /**
      * +
@@ -109,5 +117,21 @@ public class AssessmentsService {
         } else {
             return assessmentsRepository.findUpcomingAssessments(30);
         }
+    }
+
+    public List<AssessmentFeedback> getAssessmentFeedback(Assessment assessment) throws AssessmentToolError {
+        if (assessment == null) {
+            throw new AssessmentToolError("Null parameter event");
+        }
+
+        return assessmentFeedbackRepository.findByAssessment(assessment.getId());
+    }
+
+    public List<AssessmentAssessor> getAssessmentAssessors(Assessment assessment) throws AssessmentToolError {
+        if (assessment == null) {
+            throw new AssessmentToolError("Null parameter event");
+        }
+
+        return assessmentAssessorsRepository.findByAssessment(assessment.getId());
     }
 }

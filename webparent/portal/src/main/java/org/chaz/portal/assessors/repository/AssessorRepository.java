@@ -1,6 +1,6 @@
 package org.chaz.portal.assessors.repository;
 
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.commons.enums.AuthenticationType;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

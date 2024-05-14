@@ -2,11 +2,13 @@ package org.chaz.backoffice.assessors.repository;
 
 
 import org.chaz.backoffice.paging.SearchRepository;
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface AssessorRepository extends SearchRepository<Assessor, Integer> {
 
@@ -21,6 +23,9 @@ public interface AssessorRepository extends SearchRepository<Assessor, Integer> 
     public Assessor findByEmail(String email);
 
     public Long countById(Integer id);
+
+    @Query("select a from Assessor a where a.enabled = true")
+    public List<Assessor> getAssessorsByEnabled();
 
 }
 

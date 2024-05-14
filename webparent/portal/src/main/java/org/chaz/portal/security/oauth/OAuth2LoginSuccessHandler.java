@@ -1,7 +1,7 @@
 package org.chaz.portal.security.oauth;
 
 import org.chaz.portal.assessors.service.AssessorService;
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.commons.enums.AuthenticationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

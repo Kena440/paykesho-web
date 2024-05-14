@@ -2,12 +2,10 @@ package org.chaz.backoffice.assessors.controller;
 
 
 import org.chaz.backoffice.assessors.enums.Constants;
-import org.chaz.backoffice.assessors.repository.AssessorRepository;
 import org.chaz.backoffice.assessors.service.AssessorService;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
 import org.chaz.backoffice.paging.PagingAndSortingParam;
-import org.commons.entity.Assessor;
-import org.commons.entity.settings.Country;
+import org.commons.entity.assessment.Assessor;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,7 +19,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 @Controller
 @RequestMapping("/assessors")
@@ -75,10 +72,8 @@ public class AssessorController {
 
         try {
             Assessor assessor = assessorService.get(id);
-            List<Country> countryList = assessorService.countryList();
 
-            model.addAttribute("customer", assessor);
-            model.addAttribute("countryList", countryList);
+            model.addAttribute("assessor", assessor);
             model.addAttribute("pageTitle", pageTitle);
 
             return "assessors/assessor_form";

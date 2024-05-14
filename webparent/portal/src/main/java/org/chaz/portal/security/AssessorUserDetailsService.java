@@ -1,7 +1,7 @@
 package org.chaz.portal.security;
 
 import org.chaz.portal.assessors.repository.AssessorRepository;
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -18,10 +18,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String ROLE_ADMIN = "Admin";
     private static final String ROLE_SUPERADMIN = "SuperAdmin";
-    private static final String ROLE_MEMBERSHIP = "Membership";
-    private static final String ROLE_MICROFIN = "MicroFin";
-    private static final String ROLE_FINANCE = "Finance";
-    private static final String ROLE_ME = "MonEvaluation";
     private static final String ROLE_GENERAL = "General";
 
 //    @Autowired
@@ -52,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/events/registration/**", "/events/generateQRCode", "/general-invoices/view/**").permitAll().antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_MEMBERSHIP, ROLE_SUPERADMIN).antMatchers("/iga/save-repayment-record", "/iga/save").hasAnyAuthority(ROLE_ADMIN, ROLE_MEMBERSHIP, ROLE_MICROFIN, ROLE_SUPERADMIN).anyRequest().authenticated().and().formLogin().loginPage("/login").usernameParameter("email")
+        http.authorizeRequests().antMatchers("/events/registration/**", "/events/generateQRCode", "/assessments/registration/**", "/assessments/generateQRCode").permitAll().antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN).anyRequest().authenticated().and().formLogin().loginPage("/login").usernameParameter("email")
 //                .failureHandler(loginFailureHandler)
                 .permitAll().and().logout().permitAll().and().rememberMe().key("AbcDefgHijklmnOpqrs_1234567890").tokenValiditySeconds(7 * 24 * 60 * 60);
         http.headers().frameOptions().sameOrigin();

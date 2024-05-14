@@ -4,7 +4,7 @@ import org.chaz.portal.assessors.service.AssessorService;
 import org.chaz.portal.config.Utility;
 import org.chaz.portal.settings.email.EmailSettingBag;
 import org.chaz.portal.settings.service.SettingService;
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
 package org.chaz.portal.security;
 
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

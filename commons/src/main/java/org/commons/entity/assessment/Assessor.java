@@ -1,8 +1,9 @@
-package org.commons.entity;
+package org.commons.entity.assessment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.commons.entity.IdBasedEntity;
 import org.commons.enums.AuthenticationType;
 import org.commons.enums.GenderType;
 import org.hibernate.Hibernate;

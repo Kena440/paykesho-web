@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content" th:remove="tag">
+    <div class="row">
+        <div class="col text-center">
+
+            <!-- Title -->
+            <h2 class="mb-2">
+                <a th:href="@{'/assessments/view/'+${assessment.id}}">
+                    [[${assessment.name}]]
+                </a>
+            </h2>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 col-md-4">
+
+            <!-- Heading -->
+            <h6 class="text-uppercase text-muted">
+                Name
+            </h6>
+
+            <!-- Text -->
+            <p class="text-muted mb-4">
+                <strong class="text-body">[[${assessment.name}]]</strong>
+            </p>
+
+            <a class="fe fe-link" th:href="@{${assessmentLink}}"
+               title="Go to link">
+                [[${assessmentLink}]]
+            </a>
+
+        </div>
+        <div class="col-12 col-md-4 text-center">
+
+            <img alt="..." class="img-fluid mb-4" style="max-width: 8.5rem;"
+                 th:src="@{${qrCodeContent}}">
+        </div>
+        <div class="col-12 col-md-4 text-md-end">
+            <!-- Heading -->
+            <h6 class="text-uppercase text-muted">
+                Details
+            </h6>
+
+            <!-- Text -->
+            <p class="text-muted mb-4">
+                <strong class="text-body">[[${assessment.details}]]</strong>
+            </p>
+            <!-- Text -->
+            <p class="mb-4">
+                <time datetime="2018-04-23"
+                      th:replace="fragments/fragments :: format_date(${assessment.assessmentDate})"></time>
+            </p>
+
+            <p>
+                <strong class="text-body">[[${assessment.assessmentDays}]] Day(s)</strong>
+            </p>
+
+
+        </div>
+    </div>
+    <br>
+</div>
+</body>
+</html> 

@@ -7,7 +7,7 @@ import org.chaz.backoffice.paging.PagingAndSortingHelper;
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.repository.CountryRepository;
 import org.chaz.backoffice.settings.service.SettingService;
-import org.commons.entity.Assessor;
+import org.commons.entity.assessment.Assessor;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.utils.AssessmentToolError;
@@ -57,8 +57,8 @@ public class AssessorService {
         }
     }
 
-    public List<Country> countryList() {
-        return countryRepository.findAllByOrderByNameDesc();
+    public List<Assessor> assessorList() {
+        return assessorRepository.getAssessorsByEnabled();
     }
 
     public boolean isEmailUnique(Integer id, String email) {

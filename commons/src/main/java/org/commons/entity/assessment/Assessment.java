@@ -1,8 +1,9 @@
-package org.commons.entity;
+package org.commons.entity.assessment;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.constants.Constants;
+import org.commons.entity.IdBasedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,7 +31,7 @@ public class Assessment extends IdBasedEntity {
     private boolean deleted;
 
     @Column(name = "assessment_days")
-    private Integer eventDays;
+    private Integer assessmentDays;
 
     @Transient
     public String getUpdatedTimeOnForm() {

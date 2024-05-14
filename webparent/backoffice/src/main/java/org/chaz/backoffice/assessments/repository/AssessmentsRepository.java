@@ -1,7 +1,7 @@
 package org.chaz.backoffice.assessments.repository;
 
 import org.chaz.backoffice.paging.SearchRepository;
-import org.commons.entity.Assessment;
+import org.commons.entity.assessment.Assessment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;

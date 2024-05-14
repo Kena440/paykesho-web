@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Assessments Mgt','none')"></head>
+
+<!--<style>
+    /* Add borders to the table and its cells */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    th {
+        background-color: #000000;
+    }
+
+</style>-->
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12">
+
+                <!-- Header -->
+                <div class="header mt-md-5">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Assessments
+                                </h6>
+
+                                <div class="badge bg-warning">
+                                    <h3 id="countdown"></h3>
+                                </div>
+
+                            </div>
+                            <div class="col-auto">
+                                <h2 class="mb-2">
+                                    <a th:href="@{'/assessments/view/'+${assessment.id}}">
+                                        [[${assessment.name}]]
+                                    </a>
+                                </h2>
+                            </div>
+                            <div class="col-auto">
+
+
+                                <button class="btn btn-primary" data-bs-target="#assessmentUpdateModal"
+                                        data-bs-toggle="modal"
+                                        type="button">
+                                    <span class="fe fe-message-square"></span>
+                                    Send Update
+                                </button>
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="card card-body p-5">
+                    <div class="row">
+                        <div class="col text-end">
+
+                            <!-- Badge -->
+
+                            <th:block th:if="${assessment.enabled == true}">
+                                <div class="badge bg-success">
+                                    Enabled
+                                </div>
+                            </th:block>
+                            <th:block th:if="${assessment.enabled == false}">
+                                <div class="badge bg-danger">
+                                    Not enabled
+                                </div>
+                            </th:block>
+                        </div>
+                    </div> <!-- / .row -->
+
+                    <div class="row">
+                        <div class="header">
+                            <div class="container-fluid">
+                                <div class="header-body mt-n5 mt-md-n6">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <ul class="nav nav-tabs nav-overflow header-tabs">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" data-toggle="tab"
+                                                       href="#infoTab">
+                                                        Info
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-toggle="tab"
+                                                       href="#assessorsTab">
+                                                        Assessors
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-toggle="tab" href="#questionsTab">
+                                                        Questions
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-toggle="tab" href="#feedbackTab">
+                                                        Feedback
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-toggle="tab" href="#reportsTab">
+                                                        Reports
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-toggle="tab" href="#miscTab">
+                                                        Miscellaneous
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="infoTab">
+                                    <div class="row">
+                                        <div th:replace="assessments/view_tabs/info :: content"></div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="assessorsTab">
+                                    <div class="row">
+                                        <div th:replace="assessments/view_tabs/assessors :: content"></div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="questionsTab">
+                                    <div class="row">
+                                        <div th:replace="assessments/view_tabs/questions :: content"></div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="feedbackTab">
+                                    <div class="row">
+                                        <div th:replace="assessments/view_tabs/feedback :: content"></div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="reportsTab">
+                                    <div class="row">
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="miscTab">
+                                    <div class="row">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- / .row -->
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="assessorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Attendee Record</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+
+                <form method="post"
+                      th:action="@{/assessments/save-assessor}">
+                    <input id="assessmentId" name="assessmentId" th:value="${assessment.id}"
+                           type="hidden"/>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Assessor
+                                    </label>
+                                    <select class="form-select" data-choices name="assessmentAssessor">
+                                        <option value="">Select...</option>
+                                        <th:block th:each="vh : ${assessorList}">
+                                            <option th:value="${vh.id}">
+                                                [[${vh.name}]] ([[${vh.email}]])
+                                            </option>
+                                        </th:block>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="assessmentUpdateModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="">Send Assessment Update</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+
+                <form method="post"
+                      th:action="@{/assessments/assessors/send-reminder}">
+                    <input name="assessmentId" th:value="${assessment.id}"
+                           type="hidden"/>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Message
+                                    </label>
+                                    <textarea class="form-control form-control-xs"
+                                              id="assessmentUpdateMessage"
+                                              maxlength="256"
+                                              minlength="3"
+                                              name="assessmentUpdateMessage"
+                                              placeholder="Assessment Update"
+                                              required
+                                              rows="5"
+                                              type="text">
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div><!-- / .main-content -->
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script type="text/javascript">
+    contextPath = "[[@{/}]]";
+
+    $(document).ready(function () {
+        $("#assessmentUpdateMessage").richText();
+    })
+
+    const inactivityTimeout = 1000; // in seconds
+    let countdownValue = inactivityTimeout;
+
+    function refreshPage() {
+        location.reload(true);
+    }
+
+    function updateCountdown() {
+        document.getElementById('countdown').textContent = `Refreshing in ${countdownValue} seconds`;
+    }
+
+    function resetTimer() {
+        clearTimeout(inactivityTimer);
+        countdownValue = inactivityTimeout;
+        updateCountdown();
+        inactivityTimer = setTimeout(refreshPage, inactivityTimeout * 1000);
+    }
+
+    document.addEventListener('mousemove', resetTimer);
+    document.addEventListener('keydown', resetTimer);
+
+    let inactivityTimer = setTimeout(refreshPage, inactivityTimeout * 1000);
+
+    // Update countdown every second
+    setInterval(function () {
+        countdownValue -= 1;
+        if (countdownValue >= 0) {
+            updateCountdown();
+        }
+    }, 1000);
+
+</script>
+
+</body>
+
+</html>

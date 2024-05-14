@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content" th:remove="tag">
+    <div class="row">
+        <div class="col-12 col-md-6">
+
+            <!-- Heading -->
+            <h6 class="text-uppercase">
+                Registered Assessors : [[${assessmentAssessors.size()}]]
+            </h6>
+        </div>
+        <div class="col-12 col-md-6 text-md-end">
+            <button class="btn btn-primary" data-bs-target="#assessorModal" data-bs-toggle="modal"
+                    type="button">
+                <span class="fe fe-file-plus"></span>
+                Assessor
+            </button>
+            <a class="btn btn-primary" th:href="@{'/events/export/excel/attendees/' + ${assessment.id}}">
+                <span class="fe fe-printer"></span>
+                Export
+            </a>
+        </div>
+    </div>
+    <div class="row" th:if="${assessmentAssessors.size() > 0}">
+        <div class="col-6">
+            <input class="form-control" id="searchAttendeeInput" placeholder="Search..." type="text">
+        </div>
+        <div class="col-12">
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered my-4" id="attendeeTable">
+                    <thead>
+                    <tr>
+                        <th class="px-0 bg-transparent border-top-0 d-none">
+                            <span class="h6">Event Reg</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Pack #</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Title</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Name</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Phone</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Email</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Organization/Facility</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">District</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Date</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Type</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Accommodation</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Choice</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Sharing</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Action</span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="attendee, eventStat : ${assessmentAssessors}">
+                        <td class="px-0 text-center d-none">
+                            <th:block th:if="${attendee.qrCode != null}">
+                                <img alt="QR Code" style="max-width: 100%; height: auto;" th:src="${attendee.qrCode}"/>
+                                <br>
+                                <small>[[${attendee.eventRegId}]]</small>
+                            </th:block>
+                            <th:block th:unless="${attendee.qrCode != null}">
+                                <span class="fe fe-loader"></span>
+                            </th:block>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${attendee.packNumber}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${attendee.titlePosition}]]</small>
+                        </td>
+                        <td class="px-0 text-center" style="width: auto;">
+                            <small>[[${attendee.name}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${attendee.phoneNumber}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${attendee.email}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${attendee.organization}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${attendee.district}]], [[${attendee.province}]]</small>
+                        </td>
+                        <td class="px-0 text-sm-center">
+                            <small>
+                                <time datetime="2018-04-23"
+                                      th:replace="fragments/fragments :: format_date(${attendee.registrationDate})"></time>
+                            </small>
+                        </td>
+                        <td class="px-0 text-sm-center">
+                            <div class="badge bg-success">
+                                [[${attendee.attendeeType}]]
+                            </div>
+                        </td>
+                        <td class="px-0 text-sm-center">
+                            <th:block th:if="${attendee.approved == true}">
+                                <div class="badge bg-success">
+                                    Allocated
+                                </div>
+                            </th:block>
+                            <th:block th:if="${attendee.approved == false}">
+                                <div class="badge bg-warning">
+                                    Pending
+                                </div>
+                                <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                    &nbsp;
+                                    <a class="fe fe-check-circle"
+                                       th:href="@{'/events/accommodation-assigned/'+${attendee.id}}"
+                                       title="Assigned">
+                                    </a>
+                                </th:block>
+                            </th:block>
+                        </td>
+                        <td class="px-0 text-center">
+                            <th:block th:if="${attendee.eventAccomodationOption != null}">
+                                <small>[[${attendee.eventAccomodationOption}]]</small>
+                            </th:block>
+                        </td>
+                        <td class="px-0 text-center">
+                            <th:block th:if="${attendee.accomodationSharing != null}">
+                                <th:block th:if="${attendee.accomodationSharing == true}">
+                                    <div class="badge bg-success">
+                                        Yes
+                                    </div>
+                                </th:block>
+                                <th:block th:if="${attendee.accomodationSharing == false}">
+                                    <div class="badge bg-danger">
+                                        No
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </td>
+                        <td class="px-0 text-center">
+                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                <a class="fe fe-credit-card" th:href="@{'/events/attendee/print-id/'+${attendee.id}}"
+                                   title="Print ID">
+                                </a>
+                                &nbsp;
+                                <a class="fe fe-edit" th:href="@{'/events/attendee/edit/'+${attendee.id}}"
+                                   title="Edit">
+                                </a>
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
+                                <a class="fe fe-trash" th:href="@{'/events/attendee/delete/'+${attendee.id}}"
+                                   title="Delete">
+                                </a>
+                            </th:block>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <button class="btn btn-primary" id="showMoreBtn">Show More</button>
+                <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let currentIndex = 0;
+
+            document.querySelector('#searchAttendeeInput').addEventListener('input', function () {
+                var searchQuery = this.value.toLowerCase();
+                currentIndex = 0;
+                var rows = document.querySelectorAll('#attendeeTable tbody tr');
+                rows.forEach(function (row) {
+                    var rowData = row.textContent.toLowerCase();
+                    if (rowData.includes(searchQuery)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleQRCodeBtn = document.getElementById("toggleQRCodeBtn");
+            const qrCodeContainer = document.getElementById("qrCodeContainer");
+
+            toggleQRCodeBtn.addEventListener("click", function () {
+                if (qrCodeContainer.style.display === "none") {
+                    qrCodeContainer.style.display = "block";
+                } else {
+                    qrCodeContainer.style.display = "none";
+                }
+            });
+        });
+    </script>
+
+</div>
+</body>
+</html> 
