@@ -12,15 +12,80 @@
             </h6>
         </div>
         <div class="col-12 col-md-6 text-md-end">
-            <button class="btn btn-primary" data-bs-target="#questionModal" data-bs-toggle="modal"
+            <button class="btn btn-primary" data-bs-target="#formModal" data-bs-toggle="modal"
                     type="button">
                 <span class="fe fe-file-plus"></span>
-                Add
+                Add Form
+            </button>
+            <button class="btn btn-primary" data-bs-target="#questionModal" data-bs-toggle="modal"
+                    type="button" th:if="${assessmentForms.size() > 0}">
+                <span class="fe fe-file-plus"></span>
+                Add Question
             </button>
             <a class="btn btn-primary" th:href="@{'/assessments/export/excel/feedback/' + ${assessment.id}}">
                 <span class="fe fe-printer"></span>
                 Export
             </a>
+        </div>
+    </div>
+    <div class="row" th:if="${assessmentForms.size() > 0}">
+        <div class="col-6">
+            <input class="form-control" id="searchFormsInput" placeholder="Search..." type="text">
+        </div>
+
+        <div class="col-12 col-md-12">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered my-4" id="formsTable">
+                    <thead>
+                    <tr>
+                        <th class="px-0 bg-transparent border-top-0">
+                            <span class="h6">#</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-start">
+                            <span class="h6">Name</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Date</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Action</span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="form, formStat : ${assessmentForms}">
+
+                        <td class="px-0">
+                            <small>[[${formStat.count}]]</small>
+                        </td>
+                        <td class="px-0 text-start">
+                            <small>[[${form.formName}]]</small>
+                        </td>
+                        <td class="px-0 text-sm-center">
+                            <small>
+                                <time datetime="2018-04-23"
+                                      th:replace="fragments/fragments :: format_date(${form.createdDate})"></time>
+                            </small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                <a class="fe fe-edit" th:href="@{'/assessments/form/edit/'+${question.id}}"
+                                   title="Edit">
+                                </a>
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
+                                <a class="fe fe-trash" th:href="@{'/assessments/form/delete/'+${question.id}}"
+                                   title="Delete">
+                                </a>
+                            </th:block>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
+            </div>
         </div>
     </div>
     <div class="row" th:if="${assessmentQuestions.size() > 0}">
@@ -133,6 +198,23 @@
             });
         });
 
+        document.addEventListener("DOMContentLoaded", function () {
+            let currentIndex = 0;
+
+            document.querySelector('#searchFormsInput').addEventListener('input', function () {
+                var searchQuery = this.value.toLowerCase();
+                currentIndex = 0;
+                var rows = document.querySelectorAll('#formsTable tbody tr');
+                rows.forEach(function (row) {
+                    var rowData = row.textContent.toLowerCase();
+                    if (rowData.includes(searchQuery)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
     </script>
 
 </div>

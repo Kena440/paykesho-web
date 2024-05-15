@@ -23,7 +23,6 @@ public class Assessment extends IdBasedEntity {
     private String name;
     @Column(length = 255, nullable = false)
     private String details;
-
     @Column(name = "assessment_date", length = 245, nullable = false)
     private Date assessmentDate;
 

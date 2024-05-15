@@ -289,6 +289,21 @@
                             <div class="col-12 col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">
+                                        Assessment Form
+                                    </label>
+                                    <select class="form-select" data-choices name="assessmentForm" required>
+                                        <option value="">Select...</option>
+                                        <th:block th:each="vh : ${assessmentForms}">
+                                            <option th:value="${vh.id}">
+                                                [[${vh.formName}]]
+                                            </option>
+                                        </th:block>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
                                         Type
                                     </label>
 
@@ -326,6 +341,39 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="formModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Form</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+
+                <form method="post"
+                      th:action="@{/assessments/save-form}">
+                    <input name="assessmentId" th:value="${assessment.id}"
+                           type="hidden"/>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Question
+                                    </label>
+                                    <textarea class="form-control" name="formName" rows="3" required></textarea>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                     <div class="modal-footer">

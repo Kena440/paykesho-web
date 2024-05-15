@@ -20,6 +20,6 @@ public class AssessmentAssessor extends IdBasedEntity {
     private Assessor assessor;
     @Column(name = "created_date")
     private Date createdDate;
-    @Column(name = "event_reg_id", length = 245)
+    @Column(name = "assessment_reg_id", length = 245)
     private String assessmentRegId;
 }

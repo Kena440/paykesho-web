@@ -154,11 +154,13 @@ public class AssessmentsController {
             List<AssessmentAssessor> assessmentAssessors = assessmentsService.getAssessmentAssessors(assessment);
             List<AssessmentFeedback> assessmentFeedbacks = assessmentsService.getAssessmentFeedback(assessment);
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+            List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
             List<Assessor> assessorList = assessorService.assessorList();
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentAssessors", assessmentAssessors);
             model.addAttribute("assessmentFeedbacks", assessmentFeedbacks);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
+            model.addAttribute("assessmentForms", assessmentForms);
             model.addAttribute("assessorList", assessorList);
             model.addAttribute("assessmentLink", "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
             model.addAttribute("qrCodeContent", "/events/generateQRCode?qrContent=" + "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
@@ -219,19 +221,19 @@ public class AssessmentsController {
     @PostMapping("/save-question")
     public String saveAssessmentQuestion(RedirectAttributes redirectAttributes, HttpServletRequest request) throws AssessmentToolError {
 
-        Assessment assessment = assessmentsService.getAssessmentById(Integer.valueOf(request.getParameter("assessmentId")));
+        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(Integer.valueOf(request.getParameter("assessmentFormId")));
 
-        if (assessment == null) {
-            throw new AssessmentToolError("No assessment");
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("No assessmentForm");
         }
 
-        if (assessment.isEnabled()) {
+        if (assessmentForm.getAssessment().isEnabled()) {
             String questionType = request.getParameter("questionType");
             String questionFromReq = request.getParameter("question");
             String questionSkippable = request.getParameter("questionSkippable");
 
             AssessmentQuestion question = new AssessmentQuestion();
-            question.setAssessment(assessment);
+            question.setAssessmentForm(assessmentForm);
             question.setQuestionType(QuestionType.valueOf(questionType));
             question.setQuestion(questionFromReq);
             question.setSkippable(Boolean.parseBoolean(questionSkippable));
@@ -239,12 +241,37 @@ public class AssessmentsController {
 
             AssessmentQuestion savedAssessmentQuestion = assessmentsService.saveQuestion(question);
 
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Assessment Operation Successful: " + savedAssessmentQuestion.getAssessment().getName());
-            return Constants.REDIRECT_TO_Assessment_ID + assessment.getId();
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Assessment Operation Successful: " + savedAssessmentQuestion.getAssessmentForm().getAssessment().getName());
+            return Constants.REDIRECT_TO_Assessment_ID + savedAssessmentQuestion.getAssessmentForm().getAssessment().getId();
         } else {
             return Constants.REDIRECT_TO_Assessments;
         }
 
+    }
+
+    @PostMapping("/save-form")
+    public String saveAssessmentForm(RedirectAttributes redirectAttributes, HttpServletRequest request) throws AssessmentToolError {
+        Assessment assessment = assessmentsService.getAssessmentById(Integer.valueOf(request.getParameter("assessmentId")));
+
+        if (assessment == null) {
+            throw new AssessmentToolError("No assessment");
+        }
+
+        if (assessment.isEnabled()) {
+            String formName = request.getParameter("formName");
+
+            AssessmentForm question = new AssessmentForm();
+            question.setAssessment(assessment);
+            question.setFormName(formName);
+            question.setCreatedDate(new Date());
+
+            AssessmentForm savedAssessmentForm = assessmentsService.saveForm(question);
+
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Assessment Operation Successful: " + savedAssessmentForm.getAssessment().getName());
+            return Constants.REDIRECT_TO_Assessment_ID + savedAssessmentForm.getAssessment().getId();
+        } else {
+            return Constants.REDIRECT_TO_Assessments;
+        }
     }
 
     private void sendEmailToContactPersonThread(AssessmentAssessor assessmentAssessor) {

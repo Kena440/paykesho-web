@@ -1,14 +1,8 @@
 package org.chaz.backoffice.assessments.service;
 
-import org.chaz.backoffice.assessments.repository.AssessmentAssessorsRepository;
-import org.chaz.backoffice.assessments.repository.AssessmentFeedbackRepository;
-import org.chaz.backoffice.assessments.repository.AssessmentQuestionsRepository;
-import org.chaz.backoffice.assessments.repository.AssessmentsRepository;
+import org.chaz.backoffice.assessments.repository.*;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
-import org.commons.entity.assessment.Assessment;
-import org.commons.entity.assessment.AssessmentAssessor;
-import org.commons.entity.assessment.AssessmentFeedback;
-import org.commons.entity.assessment.AssessmentQuestion;
+import org.commons.entity.assessment.*;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +24,8 @@ public class AssessmentsService {
     private AssessmentFeedbackRepository assessmentFeedbackRepository;
     @Autowired
     private AssessmentQuestionsRepository assessmentQuestionsRepository;
+    @Autowired
+    private AssessmentFormsRepository assessmentFormsRepository;
 
     /**
      * +
@@ -59,6 +55,14 @@ public class AssessmentsService {
         }
 
         return assessmentQuestionsRepository.save(assessmentQuestion);
+    }
+
+    public AssessmentForm saveForm(AssessmentForm assessmentForm) throws AssessmentToolError {
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("Null parameter Form");
+        }
+
+        return assessmentFormsRepository.save(assessmentForm);
     }
 
     /**
@@ -100,6 +104,18 @@ public class AssessmentsService {
 
         try {
             return assessmentsRepository.findById(id).get();
+        } catch (NoSuchElementException exception) {
+            throw new AssessmentToolError("Could not find any Assessment");
+        }
+    }
+
+    public AssessmentForm getAssessmentFormById(Integer id) throws AssessmentToolError {
+        if (id == null) {
+            throw new AssessmentToolError("Null parameter id");
+        }
+
+        try {
+            return assessmentFormsRepository.findById(id).get();
         } catch (NoSuchElementException exception) {
             throw new AssessmentToolError("Could not find any Assessment");
         }
@@ -161,5 +177,13 @@ public class AssessmentsService {
         }
 
         return assessmentQuestionsRepository.findByAssessment(assessment.getId());
+    }
+
+    public List<AssessmentForm> getAssessmentForms(Assessment assessment) throws AssessmentToolError {
+        if (assessment == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentFormsRepository.findByAssessment(assessment.getId());
     }
 }
