@@ -221,7 +221,7 @@ public class AssessmentsController {
     @PostMapping("/save-question")
     public String saveAssessmentQuestion(RedirectAttributes redirectAttributes, HttpServletRequest request) throws AssessmentToolError {
 
-        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(Integer.valueOf(request.getParameter("assessmentFormId")));
+        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(Integer.valueOf(request.getParameter("assessmentForm")));
 
         if (assessmentForm == null) {
             throw new AssessmentToolError("No assessmentForm");

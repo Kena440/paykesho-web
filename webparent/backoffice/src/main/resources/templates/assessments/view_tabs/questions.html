@@ -69,13 +69,13 @@
                         </td>
                         <td class="px-0 text-center">
                             <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                <a class="fe fe-edit" th:href="@{'/assessments/form/edit/'+${question.id}}"
+                                <a class="fe fe-edit" th:href="@{'/assessments/form/edit/'+${form.id}}"
                                    title="Edit">
                                 </a>
                                 &nbsp;
                                 &nbsp;
                                 &nbsp;
-                                <a class="fe fe-trash" th:href="@{'/assessments/form/delete/'+${question.id}}"
+                                <a class="fe fe-trash" th:href="@{'/assessments/form/delete/'+${form.id}}"
                                    title="Delete">
                                 </a>
                             </th:block>
@@ -111,7 +111,7 @@
                             <span class="h6">Skippable</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Response Type</span>
+                            <span class="h6">Form</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Date</span>
@@ -148,7 +148,7 @@
                             </small>
                         </td>
                         <td class="px-0 text-center">
-                            <small> </small>
+                            <small>[[${question.assessmentForm.formName}]] </small>
                         </td>
                         <td class="px-0 text-sm-center">
                             <small>
