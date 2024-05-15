@@ -25,6 +25,8 @@ public class AssessmentsService {
     private AssessmentQuestionsRepository assessmentQuestionsRepository;
     @Autowired
     private AssessmentInterviewsRepository assessmentInterviewsRepository;
+    @Autowired
+    private AssessmentFormsRepository assessmentFormsRepository;
 
     /**
      * +
@@ -52,6 +54,18 @@ public class AssessmentsService {
         }
     }
 
+    public AssessmentForm getAssessmentFormById(Integer id) throws AssessmentToolError {
+        if (id == null) {
+            throw new AssessmentToolError("Null parameter id");
+        }
+
+        try {
+            return assessmentFormsRepository.findById(id).get();
+        } catch (NoSuchElementException exception) {
+            throw new AssessmentToolError("Could not find any form");
+        }
+    }
+
     public List<AssessmentQuestion> getAssessmentQuestions(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
             throw new AssessmentToolError("Null parameter assessment");
@@ -60,12 +74,28 @@ public class AssessmentsService {
         return assessmentQuestionsRepository.findByAssessment(assessment.getId());
     }
 
+    public List<AssessmentQuestion> getAssessmentQuestionsByForm(AssessmentForm assessmentForm) throws AssessmentToolError {
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("Null parameter assessmentForm");
+        }
+
+        return assessmentQuestionsRepository.findByAssessment(assessmentForm.getId());
+    }
+
     public List<AssessmentInterview> getAssessmentInterviews(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
             throw new AssessmentToolError("Null parameter assessment");
         }
 
         return assessmentInterviewsRepository.findByAssessment(assessment.getId());
+    }
+
+    public List<AssessmentForm> getAssessmentForms(Assessment assessment) throws AssessmentToolError {
+        if (assessment == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentFormsRepository.findByAssessment(assessment.getId());
     }
 
     public Page<Assessment> listForAssessorByPage(Assessor assessor, int pageNum, String sortField, String sortDir, String assessmentKeyword) {

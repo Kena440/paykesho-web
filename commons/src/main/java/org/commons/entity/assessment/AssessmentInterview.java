@@ -14,8 +14,8 @@ import java.util.Date;
 @Table(name = "assessment_interviews")
 public class AssessmentInterview extends IdBasedEntity {
     @ManyToOne
-    @JoinColumn(name = "assessment_assessor_id")
-    private AssessmentAssessor assessmentAssessor;
+    @JoinColumn(name = "assessment_form_id")
+    private AssessmentForm assessmentForm;
     @ManyToOne
     @JoinColumn(name = "facility_id")
     private Facility facility;

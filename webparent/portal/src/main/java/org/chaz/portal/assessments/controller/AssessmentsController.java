@@ -4,10 +4,7 @@ import org.chaz.portal.assessments.service.AssessmentCodeService;
 import org.chaz.portal.assessments.service.AssessmentsService;
 import org.chaz.portal.assessors.service.AssessorService;
 import org.chaz.portal.settings.service.SettingService;
-import org.commons.entity.assessment.Assessment;
-import org.commons.entity.assessment.AssessmentInterview;
-import org.commons.entity.assessment.AssessmentQuestion;
-import org.commons.entity.assessment.Assessor;
+import org.commons.entity.assessment.*;
 import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -93,10 +90,12 @@ public class AssessmentsController {
         try {
             Assessment assessment = assessmentsService.getAssessmentById(id);
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+            List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("assessmentInterviews", assessmentInterviews);
+            model.addAttribute("assessmentForms", assessmentForms);
             model.addAttribute("assessmentLink", "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
             model.addAttribute("qrCodeContent", "/events/generateQRCode?qrContent=" + "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
 
@@ -107,13 +106,17 @@ public class AssessmentsController {
         }
     }
 
-    @GetMapping("/start/{id}")
+    @GetMapping("/form/start/{id}")
     public String startAssessment(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            Assessment assessment = assessmentsService.getAssessmentById(id);
-            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+            AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(id);
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentForm);
+            AssessmentInterview assessmentInterview = new AssessmentInterview();
+            assessmentInterview.setAssessmentForm(assessmentForm);
+            assessmentInterview.setCreatedDate(new Date());
 
-            model.addAttribute("assessment", assessment);
+            model.addAttribute("assessmentForm", assessmentForm);
+            model.addAttribute("assessmentInterview", assessmentInterview);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
 
             return "assessments/assessment_form";
