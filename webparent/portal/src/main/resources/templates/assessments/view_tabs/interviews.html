@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content" th:remove="tag">
+    <div class="row">
+        <div class="col-12 col-md-6">
+
+            <!-- Heading -->
+            <h6 class="text-uppercase ">
+                Assessment Interviews
+            </h6>
+        </div>
+        <div class="col-12 col-md-6 text-md-end">
+            <button class="btn btn-primary" data-bs-target="#vendorModal" data-bs-toggle="modal"
+                    type="button">
+                <span class="fe fe-file-plus"></span>
+                Record
+            </button>
+            <a class="btn btn-primary" th:href="@{'/assessments/export/excel/feedback/' + ${assessment.id}}">
+                <span class="fe fe-printer"></span>
+                Export
+            </a>
+        </div>
+    </div>
+    <div class="row" th:if="${assessmentInterviews.size() > 0}">
+        <div class="col-6 d-none">
+            <input class="form-control" id="searchFeedbackInput" placeholder="Search..." type="text">
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered my-4" id="feedbackTable">
+                    <thead>
+                    <tr>
+                        <th class="px-0 bg-transparent border-top-0">
+                            <span class="h6">#</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Name</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Day</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Date/Time</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Action</span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="attendee, eventStat : ${assessmentFeedbacks}">
+
+                        <td class="px-0">
+                            <small>##</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>##</small>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <button class="btn btn-primary" id="showMoreBtn">Show More</button>
+                <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let currentIndex = 0;
+
+            document.querySelector('#searchFeedbackInput').addEventListener('input', function () {
+                var searchQuery = this.value.toLowerCase();
+                currentIndex = 0;
+                var rows = document.querySelectorAll('#feedbackTable tbody tr');
+                rows.forEach(function (row) {
+                    var rowData = row.textContent.toLowerCase();
+                    if (rowData.includes(searchQuery)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+    </script>
+
+</div>
+</body>
+</html> 

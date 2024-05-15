@@ -30,6 +30,7 @@ public class AssessorService {
     private CountryRepository countryRepository;
     @Autowired
     private AssessorRepository assessorRepository;
+
     @Autowired
 
     public List<Country> countryList() {
@@ -123,6 +124,7 @@ public class AssessorService {
             assessorInForm.setPassword(assessorInDB.getPassword());
         }
 
+        assessorInForm.setTitle(assessorInDB.getTitle());
         assessorInForm.setEnabled(assessorInDB.isEnabled());
         assessorInForm.setCreatedTime(assessorInDB.getCreatedTime());
         assessorInForm.setVerificationCode(assessorInDB.getVerificationCode());

@@ -29,6 +29,12 @@ public class MainController {
     public String viewHomePage(Model model, HttpServletRequest request) throws AssessmentToolError {
         Assessor assessor = assessorService.getAuthenticatedAssessor(request);
 
+        int countTotalInterviews = 0;
+        int countTotalAssessments = 0;
+
+        model.addAttribute("countTotalInterviews", countTotalInterviews);
+        model.addAttribute("countTotalAssessments", countTotalAssessments);
+
         return "index";
     }
 

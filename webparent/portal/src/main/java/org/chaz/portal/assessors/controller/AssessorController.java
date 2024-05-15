@@ -52,7 +52,7 @@ public class AssessorController {
         return "register/register_success";
     }
 
-    @PostMapping(value = "/customers/update-account")
+    @PostMapping(value = "/assessors/update-account")
     public String updateAccount(Assessor assessor,
                                 RedirectAttributes redirectAttributes,
                                 HttpServletRequest request) {

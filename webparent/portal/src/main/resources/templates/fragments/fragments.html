@@ -408,63 +408,24 @@
                         <i class="fe fe-home"></i> Dashboard
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a aria-controls="sidebarFinanceMgt" aria-expanded="false" class="nav-link"
+                    <a aria-controls="sidebarAssessmentMgt" aria-expanded="false" class="nav-link"
                        data-bs-toggle="collapse"
-                       href="#sidebarFinanceMgt" role="button">
-                        <i class="fe fe-hash"></i> Finance
+                       href="#sidebarAssessmentMgt" role="button">
+                        <i class="fe fe-folder"></i> Assessment Mgt
                     </a>
-                    <div class="collapse" id="sidebarFinanceMgt">
+                    <div class="collapse" id="sidebarAssessmentMgt">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a class="nav-link" th:href="@{/invoices}">
-                                    All Invoices
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/payments}">
-                                    All Payments
+                                <a class="nav-link" th:href="@{/assessments}">
+                                    All Assessments
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a aria-controls="sidebarDonationMgt" aria-expanded="false" class="nav-link"
-                       data-bs-toggle="collapse"
-                       href="#sidebarDonationMgt" role="button">
-                        <i class="fe fe-gift"></i> Donation Mgt
-                    </a>
-                    <div class="collapse" id="sidebarDonationMgt">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/donations}">
-                                    All Donations
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a aria-controls="sidebarTripMgt" aria-expanded="false" class="nav-link" data-bs-toggle="collapse"
-                       href="#sidebarMEMgt" role="button">
-                        <i class="fe fe-pie-chart"></i> M&E
-                    </a>
-                    <div class="collapse" id="sidebarMEMgt">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/me-indicators/inputs}">
-                                    Submit
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/me-indicators/submissions}">
-                                    Submissions
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+
                 <li class="nav-item">
                     <a aria-controls="sidebarEventsMgt" aria-expanded="false" class="nav-link" data-bs-toggle="collapse"
                        href="#sidebarEventsMgt" role="button">
@@ -475,43 +436,6 @@
                             <li class="nav-item">
                                 <a class="nav-link" th:href="@{/events}">
                                     All Events
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <hr class="navbar-divider my-3">
-                <li class="nav-item">
-                    <a aria-controls="sidebarIGAMgt" aria-expanded="false" class="nav-link" data-bs-toggle="collapse"
-                       href="#sidebarIGAMgt" role="button">
-                        <i class="fe fe-briefcase"></i> IGA Revolving Fund
-                    </a>
-                    <div class="collapse" id="sidebarIGAMgt">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/iga}">
-                                    Loans
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/iga/summary}">
-                                    Summary
-                                </a>
-                            </li>
-
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a aria-controls="sidebarIGAMgt" aria-expanded="false" class="nav-link" data-bs-toggle="collapse"
-                       href="#sidebarInitiativesMgt" role="button">
-                        <i class="fe fe-grid"></i> Initiatives
-                    </a>
-                    <div class="collapse" id="sidebarInitiativesMgt">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/initiatives}">
-                                    Initiatives
                                 </a>
                             </li>
                         </ul>

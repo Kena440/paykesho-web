@@ -54,9 +54,6 @@
     </div> <!-- / .header -->
     <div class="container-fluid">
 
-        <input id="longitude" th:value="${facility.longitude}" type="hidden"/>
-        <input id="latitude" th:value="${facility.latitude}" type="hidden"/>
-
         <div class="row">
             <div class="col-12 col-lg-6 col-xl">
 
@@ -68,83 +65,11 @@
 
                                 <!-- Title -->
                                 <h6 class="text-uppercase text-muted mb-2">
-
+                                    Total Assessments
                                 </h6>
 
-                                <!-- Heading -->
-                                <span class="h2 mb-0">
-                     [[${facility.name}]]
-                    </span>
-
-
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <span class="h2 fe fe-home text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-12 col-lg-6 col-xl">
-
-                <!-- Value  -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Member Balance
-                                </h6>
-
-                                <!-- Heading -->
-                                <span class="h2 mb-0" th:if="${memberInstitutionBalance != null}"
-                                      th:replace="fragments/fragments :: format_currency(${memberInstitutionBalance})"></span>
-                                <br>
-                                <th:block th:if="${memberInstitutionBalance != null}">
-                                    <th:block th:if="${memberInstitutionBalance != null}">
-                                        <th:block th:if="${memberInstitutionBalance == 0}">
-                                            <span class="badge rounded-pill bg-success">Full Paid</span>
-                                        </th:block>
-                                        <th:block th:if="${memberInstitutionBalance > 0}">
-                                    <span class="badge rounded-pill bg-warning">Owing <span class="h2"
-                                                                                            th:replace="fragments/fragments :: format_currency(${memberInstitutionBalance})"></span></span>
-                                        </th:block>
-                                    </th:block>
-                                </th:block>
-
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <span class="h2 fe fe-hash text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-12 col-lg-6 col-xl">
-
-                <!-- Value  -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Unpaid Invoices
-                                </h6>
-
-                                <span class="h2 mb-0" th:if="${countUnpaidInvoices != null}"
-                                      th:replace="fragments/fragments :: format_number(${countUnpaidInvoices})"></span>
+                                <span class="h2 mb-0" th:if="${countTotalAssessments != null}"
+                                      th:replace="fragments/fragments :: format_number(${countTotalAssessments})"></span>
                             </div>
                             <div class="col-auto">
 
@@ -167,16 +92,16 @@
 
                                 <!-- Title -->
                                 <h6 class="text-uppercase text-muted mb-2">
-                                    Total Donations
+                                    Total Interviews
                                 </h6>
 
-                                <span class="h2 mb-0" th:if="${countTotalDonations != null}"
-                                      th:replace="fragments/fragments :: format_number(${countTotalDonations})"></span>
+                                <span class="h2 mb-0" th:if="${countTotalInterviews != null}"
+                                      th:replace="fragments/fragments :: format_number(${countTotalInterviews})"></span>
                             </div>
                             <div class="col-auto">
 
                                 <!-- Icon -->
-                                <span class="h2 fe fe-gift text-muted mb-0"></span>
+                                <span class="h2 fe fe-folder text-muted mb-0"></span>
 
                             </div>
                         </div> <!-- / .row -->
@@ -184,234 +109,15 @@
                 </div>
 
             </div>
-
         </div> <!-- / .row -->
-        <div class="row">
-            <div class="col-12 col-lg-6 col-xl">
 
-                <!-- Value  -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Total Loans (IGA)
-                                </h6>
-
-                                <span class="h2 mb-0" th:if="${totalLoans != null}"
-                                      th:replace="fragments/fragments :: format_number(${totalLoans})"></span>
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <span class="h2 fe fe-hash text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-
-
-                <!-- Card -->
-                <div class="card">
-                    <div class="card-body">
-
-                        <!-- List group -->
-                        <div class="list-group list-group-flush my-n3">
-                            <div class="row alert alert-danger text-center"
-                                 th:if="${facility.memberNeeds.size() == 0 }">
-                                No needs information found. Please add a data
-                            </div>
-                            <div class="list-group-item">
-                                <div class="row align-items-center">
-                                    <div class="col">
-
-                                        <!-- Title -->
-                                        <h5 class="mb-0">
-                                            Member Needs
-                                        </h5>
-
-                                    </div>
-                                    <div class="col-auto">
-
-                                        <!-- Time -->
-                                        <button class="btn btn-sm btn-success" data-bs-target="#modalMemberNeeds"
-                                                data-bs-toggle="modal">
-                                            Add Info
-                                        </button>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </div>
-                            <th:block th:unless="${facility.memberNeeds.size() == 0  }">
-                                <div class="list-group-item">
-                                    <div class="row align-items-center">
-                                        <div class="col">
-
-
-                                        </div>
-                                        <div class="col-auto">
-
-                                            <!-- Time -->
-                                            <th:block th:each="need : ${facility.memberNeeds}">
-                                                <span class="badge bg-secondary" th:text="${need.name}"></span>
-                                            </th:block>
-                                        </div>
-                                    </div> <!-- / .row -->
-                                </div>
-                            </th:block>
-                        </div>
-                    </div>
-                </div>
-
-                <div aria-hidden="true" class="modal fade" id="modalMemberNeeds" role="dialog" tabindex="-1">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-card card" data-list='{"valueNames": ["name"]}'>
-                                <div class="modal-header">
-                                    <!-- Title -->
-                                    <h4 class="card-header-title" id="exampleModalCenterTitle">
-                                        Needs Form
-                                    </h4>
-                                    <!-- Close -->
-                                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
-                                            type="button"></button>
-                                </div>
-                                <form method="post"
-                                      th:action="@{/member-needs/save}">
-                                    <input id="memberInstitutionId" name="memberInstitutionId"
-                                           th:value="${facility.id}"
-                                           type="hidden"/>
-
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-12 col-md-6">
-                                                <div class="form-group">
-                                                    <label class="form-label">
-                                                        Needs
-                                                    </label>
-
-                                                    <select class="custom-select form-control form-control-xs"
-                                                            id="memberNeeds"
-                                                            multiple
-                                                            name="memberNeeds"
-                                                            required
-                                                            style="resize: vertical; height: 200px"
-                                                            th:field="*{facility.memberNeeds}">
-                                                        <option disabled value="0">Select type</option>
-                                                        <th:block th:each="need : ${needTypeList}">
-                                                            <option th:value="${need.id}">
-                                                                [[${need.name}]]
-                                                            </option>
-                                                        </th:block>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 col-md-6">
-                                                <div class="form-group">
-                                                    <label class="form-label">
-                                                        Need item not listed? enter below
-                                                    </label>
-                                                    <input class="form-control" id="memberNeedsOther"
-                                                           name="memberNeedsOther"
-                                                           type="text"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-sm btn-success" type="submit">
-                                            Save
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-12 col-lg-6 col-xl">
-
-                <!-- Value  -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center gx-0">
-                            <div class="col">
-
-                                <!-- Title -->
-                                <h6 class="text-uppercase text-muted mb-2">
-                                    Total Owing (IGA)
-                                </h6>
-
-                                <!-- Heading -->
-                                <span class="h2 mb-0" th:if="${totalOwing != null}"
-                                      th:replace="fragments/fragments :: format_currency(${totalOwing})"></span>
-
-                            </div>
-                            <div class="col-auto">
-
-                                <!-- Icon -->
-                                <span class="h2 fe fe-hash text-muted mb-0"></span>
-
-                            </div>
-                        </div> <!-- / .row -->
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-12 col-xl-6">
-
-                <!-- Traffic -->
-                <div class="card">
-                    <div class="card-header">
-
-                        <!-- Title -->
-                        <h4 class="card-header-title">
-                            Member Map
-                        </h4>
-
-
-                    </div>
-                    <div class="card-body">
-
-                        <div id='map' style='width: 100%; height: 400px'></div>
-
-                    </div>
-                </div>
-            </div>
-
-        </div> <!-- / .row -->
     </div>
 
 
 </div><!-- / .main-content -->
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
-<script type="text/javascript">
-    contextPath = "[[@{/}]]";
 
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        zoom: 15,
-        center: [$("#longitude").val(), $("#latitude").val()]
-    });
-
-    const marker1 = new mapboxgl.Marker()
-        .setLngLat([$("#longitude").val(), $("#latitude").val()])
-        .addTo(map);
-
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
-</script>
 
 </body>
 

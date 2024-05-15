@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
-<!-- Added by HTTrack -->
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
-<head th:replace="fragments/fragments :: page_head('Finance Mgt','none')"></head>
+<head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
 
 <body>
 
@@ -34,12 +32,12 @@
 
                                 <!-- Pretitle -->
                                 <h6 class="header-pretitle">
-                                    Finance
+                                    Assessment Management
                                 </h6>
 
                                 <!-- Title -->
                                 <h1 class="header-title text-truncate">
-                                    Payments
+                                    Assessments
                                 </h1>
 
                             </div>
@@ -59,8 +57,6 @@
                                         <span class="fe fe-sidebar"></span>
                                     </button>
                                 </div> <!-- / .nav -->
-
-                                <!-- Buttons -->
 
                             </div>
                         </div> <!-- / .row -->
@@ -129,7 +125,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-sm table-hover table-nowrap card-table"
-                                       th:if="${paymentList.size() > 0}">
+                                       th:if="${assessmentList.size() > 0}">
                                     <thead>
                                     <tr>
                                         <th class="list-sort text-muted" scope="col">
@@ -137,20 +133,16 @@
                                         </th>
                                         <th class="list-sort text-muted" scope="col"
                                             style="width: 15%"
-                                            th:replace="fragments/fragments :: column_Link('serial', 'Serial','none')">
-                                        </th>
-                                        <th class="list-sort text-muted" scope="col"
-                                            style="width: 15%"
-                                            th:replace="fragments/fragments :: column_Link('memberInstitutionInvoice', 'Invoice','none')">
+                                            th:replace="fragments/fragments :: column_Link('name', 'Name','none')">
                                         </th>
                                         <th scope="col"
-                                            th:replace="fragments/fragments :: column_Link('currency', 'Currency', 'none')">
+                                            th:replace="fragments/fragments :: column_Link('details', 'Details', 'none')">
                                         </th>
                                         <th scope="col"
-                                            th:replace="fragments/fragments :: column_Link('netAmount', 'Net Amount', 'none')">
+                                            th:replace="fragments/fragments :: column_Link('assessmentDate', 'Date', 'none')">
                                         </th>
                                         <th scope="col"
-                                            th:replace="fragments/fragments :: column_Link('paymentDate', 'Date', 'none')">
+                                            th:replace="fragments/fragments :: column_Link('assessmentDays', 'Days', 'none')">
                                         </th>
                                         <th class="list-sort text-muted" scope="col">
                                             <a class="disabled" href="#">Action</a>
@@ -158,30 +150,37 @@
                                     </tr>
                                     </thead>
                                     <tbody class="list fs-base">
-                                    <tr th:each="payment, paymentStat : ${paymentList}">
-                                        <td class="hideable-column">[[${paymentStat.count}]]</td>
-                                        <td>[[${payment.serial}]]</td>
-                                        <td>[[${payment.memberInstitutionInvoice.facility}]]</td>
-                                        <td>[[${payment.memberInstitutionInvoice.currency.code}]]</td>
-                                        <td>[[${payment.amount}]]</td>
+                                    <tr th:each="assessment, assessmentStat : ${assessmentList}">
+                                        <td class="hideable-column">[[${assessmentStat.count}]]</td>
+                                        <td class="hideable-column">
+                                            <a th:href="@{'/assessments/view/'+${assessment.id}}"
+                                               title="Assessment View">
+                                                [[${assessment.name}]]
+                                            </a>
+                                        </td>
+                                        <td>[[${assessment.details}]]</td>
                                         <td>
                                             <time datetime="2018-04-23"
-                                                  th:replace="fragments/fragments :: format_date(${payment.paymentDate})"></time>
+                                                  th:replace="fragments/fragments :: format_date(${assessment.assessmentDate})"></time>
+                                        </td>
+                                        <td>[[${assessment.assessmentDays}]]</td>
+                                        <td>
+                                            <th:block th:if="${assessment.enabled == true}">
+                                                <div class="badge bg-success">
+                                                    Enabled
+                                                </div>
+                                            </th:block>
+                                            <th:block th:if="${assessment.enabled == false}">
+                                                <div class="badge bg-danger">
+                                                    Not enabled
+                                                </div>
+                                            </th:block>
                                         </td>
                                         <td>
                                             <a class="fe fe-file"
-                                               th:href="@{'/invoices/view/'+${payment.memberInstitutionInvoice.id}}"
-                                               title="View Invoice">
-                                            </a>
-                                            &nbsp;
-                                            <a class="fe fe-eye"
-                                               th:href="@{'/payments/invoice-payment/'+${payment.memberInstitutionInvoice.id}}"
-                                               title="View Payment">
-                                            </a>
-                                            &nbsp;
-                                            <a class="fe fe-file-text"
-                                               th:href="@{'/payments/receipt/'+${payment.id}}"
-                                               title="View Receipt">
+                                               th:href="@{'/assessments/view/'+${assessment.id}}"
+                                               title="Assessment View">
+                                                View
                                             </a>
                                         </td>
                                     </tr>
@@ -190,7 +189,7 @@
                             </div>
                             <div class="card-footer d-flex justify-content-between">
 
-                                <div th:replace="fragments/fragments :: pagnation('payments')"></div>
+                                <div th:replace="fragments/fragments :: pagnation('assessments')"></div>
 
                             </div>
                         </div>
@@ -207,14 +206,15 @@
 <footer th:replace="fragments/fragments :: js_code"></footer>
 <script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
 <script>
-    moduleURL = "[[@{/payments}]]";
+    moduleURL = "[[@{/assessments}]]";
     $(document).ready(function () {
         $(".link-delete").on("click", function (e) {
             e.preventDefault();
-            showDeleteConfirmModal($(this), 'payment');
+            showDeleteConfirmModal($(this), 'assessment');
         });
     });
 </script>
 </body>
+
 
 </html>
