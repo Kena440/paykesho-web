@@ -115,8 +115,8 @@ public class UserController {
             model.addAttribute("pageTitle", pageTitle);
 
             return "users/user_form";
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, assessmentToolError.getMessage());
             return Constants.REDIRECT_TO_USERS;
         }
 
@@ -136,8 +136,8 @@ public class UserController {
             String userPhotosDir = "user_photos/" + id;
             AmazonS3Util.removeFolder(userPhotosDir);
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "User deleted successfully");
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, assessmentToolError.getMessage());
         }
         return Constants.REDIRECT_TO_USERS;
     }
@@ -158,8 +158,8 @@ public class UserController {
             String status = enabled ? "enabled" : "has been disabled";
             String operationMSG = user.getFirstName() + " has been " + status;
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, assessmentToolError.getMessage());
         }
         return Constants.REDIRECT_TO_USERS;
 

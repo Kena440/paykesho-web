@@ -77,8 +77,8 @@ public class AssessorController {
             model.addAttribute("pageTitle", pageTitle);
 
             return "assessors/assessor_form";
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, assessmentToolError.getMessage());
             return Constants.REDIRECT_ASSESSORS;
         }
 
@@ -104,8 +104,8 @@ public class AssessorController {
         try {
             assessorService.delete(id);
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "assessor deleted successfully");
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, assessmentToolError.getMessage());
         }
         return Constants.REDIRECT_ASSESSORS;
     }

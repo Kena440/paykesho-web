@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Assessment Management
+                                </h6>
+
+                                <!-- Title -->
+                                <h1 class="header-title text-truncate">
+                                    [[${pageTitle}]]
+                                </h1>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Navigation (button group) -->
+                                <div class="nav btn-group d-inline-flex d-none" role="tablist">
+                                    <button class="btn btn-white active" id="dealsListTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsListPane" role="tab" aria-controls="dealsListPane"
+                                            aria-selected="true">
+                                        <span class="fe fe-list"></span>
+                                    </button>
+                                    <button class="btn btn-white" id="dealsCardsTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsCardsPane" role="tab" aria-controls="dealsCardsPane"
+                                            aria-selected="false">
+                                        <span class="fe fe-sidebar"></span>
+                                    </button>
+                                </div> <!-- / .nav -->
+
+                                <!-- Buttons -->
+                                <a th:href="@{/assessments}" class="btn btn-primary ms-2">
+                                    Assessments
+                                </a>
+
+                            </div>
+                        </div> <!-- / .row -->
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Nav -->
+                                <ul class="nav nav-tabs nav-overflow header-tabs">
+                                    <li class="nav-item d-none">
+                                        <a href="#!" class="nav-link text-nowrap active">
+                                            Total <span
+                                                class="badge rounded-pill bg-secondary-soft"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div id="accordion">
+
+                    <!-- Header -->
+                    <div class="header mt-md-5">
+                        <div class="header-body">
+
+                            <!-- Title -->
+                            <h1 class="header-title">
+                                eLMIS capacity utilisation Assessment Tool - Health facility level
+                            </h1>
+
+                            <!-- Subtitle -->
+                            <p class="header-subtitle">
+                                The purpose of this activity is to evaluate the current utilisation of Electronic
+                                Logistics Management Information System (eLMIS) in Zambian Health Facilities. The
+                                assessment will focus on System Adoption and Integration, User Training and Capacity
+                                Building, Data Accuracy and Timeliness, System Performance and Reliability and
+                                Stakeholder Collaboration. We would like to find out a little more about your use of the
+                                eLMIS Facility Edition. </p>
+
+                        </div>
+                    </div>
+
+                    <!-- Accordion -->
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Accordion Item #1
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                                 data-bs-parent="#accordionExample" style="">
+                                <div class="accordion-body">
+                                    <strong>This is the first item's accordion body.</strong> It is shown by default,
+                                    until the collapse plugin adds the appropriate classes that we use to style each
+                                    element. These classes control the overall appearance, as well as the showing and
+                                    hiding via CSS transitions. You can modify any of this with custom CSS or overriding
+                                    our default variables. It's also worth noting that just about any HTML can go within
+                                    the <code>.accordion-body</code>, though the transition does limit overflow.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Accordion Item #2
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                                 data-bs-parent="#accordionExample" style="">
+                                <div class="accordion-body">
+                                    <strong>This is the second item's accordion body.</strong> It is hidden by default,
+                                    until the collapse plugin adds the appropriate classes that we use to style each
+                                    element. These classes control the overall appearance, as well as the showing and
+                                    hiding via CSS transitions. You can modify any of this with custom CSS or overriding
+                                    our default variables. It's also worth noting that just about any HTML can go within
+                                    the <code>.accordion-body</code>, though the transition does limit overflow.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseThree" aria-expanded="false"
+                                        aria-controls="collapseThree">
+                                    Accordion Item #3
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                                 data-bs-parent="#accordionExample" style="">
+                                <div class="accordion-body">
+                                    <strong>This is the third item's accordion body.</strong> It is hidden by default,
+                                    until the collapse plugin adds the appropriate classes that we use to style each
+                                    element. These classes control the overall appearance, as well as the showing and
+                                    hiding via CSS transitions. You can modify any of this with custom CSS or overriding
+                                    our default variables. It's also worth noting that just about any HTML can go within
+                                    the <code>.accordion-body</code>, though the transition does limit overflow.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br><br>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+</div><!-- / .main-content -->
+<div th:replace="fragments/modal_fragment :: modal_dialog"></div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script type="text/javascript">
+    moduleURL = "[[@{/}]]";
+    MAX_FILE_SIZE = 502400; // 500KB
+
+    function checkEmailUnique(form) {
+        url = "[[@{/assessors/rest/check-email}]]";
+        userEmail = $("#email").val();
+        userId = $("#id").val();
+        csrfValue = $("input[name='_csrf']").val();
+
+        params = {id: userId, email: userEmail, _csrf: csrfValue};
+
+        $.post(url, params, function (response) {
+            if (response === "OK") {
+                form.submit();
+            } else if (response === "Duplicated") {
+                showWarningModal("There is another user having the email " + userEmail);
+            } else {
+                showErrorModal("Unknown response from server");
+            }
+        }).fail(function () {
+            showErrorModal("Could not connect to the server");
+        });
+
+        return false;
+    }
+</script>
+<script type="text/javascript" th:src="@{/assets/js/common_form.js}"></script>
+
+</body>
+
+
+</html>

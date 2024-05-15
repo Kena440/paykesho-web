@@ -164,8 +164,8 @@ public class AssessmentsController {
             model.addAttribute("qrCodeContent", "/events/generateQRCode?qrContent=" + "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
 
             return "assessments/assessment_view";
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute("message", membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/assessments";
         }
     }

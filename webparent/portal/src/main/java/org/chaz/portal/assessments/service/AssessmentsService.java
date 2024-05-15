@@ -1,9 +1,6 @@
 package org.chaz.portal.assessments.service;
 
-import org.chaz.portal.assessments.repository.AssessmentAssessorsRepository;
-import org.chaz.portal.assessments.repository.AssessmentFeedbackRepository;
-import org.chaz.portal.assessments.repository.AssessmentQuestionsRepository;
-import org.chaz.portal.assessments.repository.AssessmentsRepository;
+import org.chaz.portal.assessments.repository.*;
 import org.chaz.portal.paging.PagingAndSortingHelper;
 import org.commons.entity.assessment.*;
 import org.commons.utils.AssessmentToolError;
@@ -22,15 +19,12 @@ import java.util.NoSuchElementException;
 @Transactional
 public class AssessmentsService {
 
-    private static final int EVENTS_PER_PAGE = 20;
     @Autowired
     private AssessmentsRepository assessmentsRepository;
     @Autowired
-    private AssessmentAssessorsRepository assessmentAssessorsRepository;
-    @Autowired
-    private AssessmentFeedbackRepository assessmentFeedbackRepository;
-    @Autowired
     private AssessmentQuestionsRepository assessmentQuestionsRepository;
+    @Autowired
+    private AssessmentInterviewsRepository assessmentInterviewsRepository;
 
     /**
      * +
@@ -64,6 +58,14 @@ public class AssessmentsService {
         }
 
         return assessmentQuestionsRepository.findByAssessment(assessment.getId());
+    }
+
+    public List<AssessmentInterview> getAssessmentInterviews(Assessment assessment) throws AssessmentToolError {
+        if (assessment == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentInterviewsRepository.findByAssessment(assessment.getId());
     }
 
     public Page<Assessment> listForAssessorByPage(Assessor assessor, int pageNum, String sortField, String sortDir, String assessmentKeyword) {

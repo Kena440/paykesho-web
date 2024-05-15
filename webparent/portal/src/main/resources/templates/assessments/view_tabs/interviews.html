@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+<html lang="en"
       xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="content" th:remove="tag">
@@ -12,11 +12,10 @@
             </h6>
         </div>
         <div class="col-12 col-md-6 text-md-end">
-            <button class="btn btn-primary" data-bs-target="#vendorModal" data-bs-toggle="modal"
-                    type="button">
+            <a class="btn btn-primary" th:href="@{'/assessments/start/' + ${assessment.id}}">
                 <span class="fe fe-file-plus"></span>
-                Record
-            </button>
+                Start
+            </a>
             <a class="btn btn-primary" th:href="@{'/assessments/export/excel/feedback/' + ${assessment.id}}">
                 <span class="fe fe-printer"></span>
                 Export
@@ -25,12 +24,12 @@
     </div>
     <div class="row" th:if="${assessmentInterviews.size() > 0}">
         <div class="col-6 d-none">
-            <input class="form-control" id="searchFeedbackInput" placeholder="Search..." type="text">
+            <input class="form-control" id="searchInterviewsInput" placeholder="Search..." type="text">
         </div>
 
         <div class="col-12 col-md-6">
             <div class="table-responsive">
-                <table class="table table-sm table-bordered my-4" id="feedbackTable">
+                <table class="table table-sm table-bordered my-4" id="interviewsTable">
                     <thead>
                     <tr>
                         <th class="px-0 bg-transparent border-top-0">
@@ -40,7 +39,10 @@
                             <span class="h6">Name</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Day</span>
+                            <span class="h6">Title</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Facility</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Date/Time</span>
@@ -51,15 +53,25 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="attendee, eventStat : ${assessmentFeedbacks}">
+                    <tr th:each="interview, interviewStat : ${assessmentInterviews}">
 
                         <td class="px-0">
-                            <small>##</small>
+                            <small>[[${interviewStat.count}]]</small>
                         </td>
-                        <td class="px-0 text-center">
-                            <small>##</small>
+                        <td class="px-0 text-start">
+                            <small>[[${interview.respondentName}]]</small>
                         </td>
+                        <td class="px-0 text-start">
+                            <small>[[${interview.respondentJobTitle}]]</small>
+                        </td>
+                        <td class="px-0 text-start">
+                            <time datetime="2018-04-23"
+                                  th:replace="fragments/fragments :: format_date(${interview.createdDate})"></time>
 
+                        </td>
+                        <td class="px-0 text-start">
+
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -74,10 +86,10 @@
         document.addEventListener("DOMContentLoaded", function () {
             let currentIndex = 0;
 
-            document.querySelector('#searchFeedbackInput').addEventListener('input', function () {
+            document.querySelector('#searchInterviewsInput').addEventListener('input', function () {
                 var searchQuery = this.value.toLowerCase();
                 currentIndex = 0;
-                var rows = document.querySelectorAll('#feedbackTable tbody tr');
+                var rows = document.querySelectorAll('#interviewsTable tbody tr');
                 rows.forEach(function (row) {
                     var rowData = row.textContent.toLowerCase();
                     if (rowData.includes(searchQuery)) {

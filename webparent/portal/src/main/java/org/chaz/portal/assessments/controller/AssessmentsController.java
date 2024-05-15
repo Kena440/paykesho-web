@@ -93,7 +93,7 @@ public class AssessmentsController {
         try {
             Assessment assessment = assessmentsService.getAssessmentById(id);
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
-            List<AssessmentInterview> assessmentInterviews = new ArrayList<>();
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("assessmentInterviews", assessmentInterviews);
@@ -101,10 +101,25 @@ public class AssessmentsController {
             model.addAttribute("qrCodeContent", "/events/generateQRCode?qrContent=" + "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
 
             return "assessments/assessment_view";
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute("message", membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/assessments";
         }
     }
 
+    @GetMapping("/start/{id}")
+    public String startAssessment(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            Assessment assessment = assessmentsService.getAssessmentById(id);
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+
+            model.addAttribute("assessment", assessment);
+            model.addAttribute("assessmentQuestions", assessmentQuestions);
+
+            return "assessments/assessment_form";
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
+            return "redirect:/assessments";
+        }
+    }
 }

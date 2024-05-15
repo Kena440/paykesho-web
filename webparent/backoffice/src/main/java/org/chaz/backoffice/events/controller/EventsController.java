@@ -164,8 +164,8 @@ public class EventsController {
             model.addAttribute("event", event);
 
             return "events/event_view";
-        } catch (AssessmentToolError membershipMgtError) {
-            redirectAttributes.addFlashAttribute("message", membershipMgtError.getMessage());
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/events";
         }
     }
