@@ -27,6 +27,9 @@ public class AssessmentsService {
     private AssessmentInterviewsRepository assessmentInterviewsRepository;
     @Autowired
     private AssessmentFormsRepository assessmentFormsRepository;
+    @Autowired
+    private AssessmentQuestionOptionRepository assessmentQuestionOptionRepository;
+
 
     /**
      * +
@@ -108,5 +111,9 @@ public class AssessmentsService {
             return assessmentsRepository.findAll(assessmentKeyword, assessor.getId(), pageable);
         }
         return assessmentsRepository.findAll(assessor.getId(), pageable);
+    }
+
+    public List<AssessmentQuestionOption> getOptionsByQuestion(AssessmentQuestion question) {
+        return assessmentQuestionOptionRepository.findByAssessmentQuestion(question.getId());
     }
 }

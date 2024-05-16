@@ -107,70 +107,229 @@
                         </div>
                     </div>
 
+
                     <!-- Accordion -->
-                    <div class="accordion" id="accordionExample">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingOne">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                    Accordion Item #1
-                                </button>
-                            </h2>
-                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
-                                 data-bs-parent="#accordionExample" style="">
-                                <div class="accordion-body">
-                                    <strong>This is the first item's accordion body.</strong> It is shown by default,
-                                    until the collapse plugin adds the appropriate classes that we use to style each
-                                    element. These classes control the overall appearance, as well as the showing and
-                                    hiding via CSS transitions. You can modify any of this with custom CSS or overriding
-                                    our default variables. It's also worth noting that just about any HTML can go within
-                                    the <code>.accordion-body</code>, though the transition does limit overflow.
+                    <div class="row">
+                        <div class="col-12 col-md-12">
+                            <form method="post"
+                                  th:action="@{/assessments/form/save-respondent-data}"
+                                  th:object="${assessmentInterview}">
+                                <input id="id" th:field="*{id}" type="hidden"/>
+                                <input id="formId" name="formId" th:value="${assessmentForm.id}"
+                                       type="hidden"/>
+
+                                <div class="accordion" id="accordionExample">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button collapsed" type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseOne" aria-expanded="false"
+                                                    aria-controls="collapseOne">
+                                                Respondent Particulars
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show"
+                                             aria-labelledby="headingOne"
+                                             data-bs-parent="#accordionExample" style="">
+                                            <div class="accordion-body">
+
+                                                <div class="row">
+                                                    <div class="col-12 col-md-12">
+
+                                                        <!-- First name -->
+                                                        <div class="form-group">
+
+                                                            <!-- Label -->
+                                                            <label class="form-label">
+                                                                Facility
+                                                            </label>
+
+                                                            <!-- Input -->
+                                                            <select class="form-select" data-choices
+                                                                    th:field="*{facility}">
+                                                                <option value="">Select...</option>
+                                                                <th:block th:each="vh : ${facilityList}">
+                                                                    <option th:value="${vh.id}">
+                                                                        [[${vh.name}]] ([[${vh.levelOfCare}]])
+                                                                    </option>
+                                                                </th:block>
+                                                            </select>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+
+                                                        <!-- First name -->
+                                                        <div class="form-group">
+
+                                                            <!-- Label -->
+                                                            <label class="form-label">
+                                                                Respondent Name
+                                                            </label>
+
+                                                            <!-- Input -->
+                                                            <input class="form-control" id="name" maxlength="45"
+                                                                   minlength="2" placeholder="Name" required
+                                                                   th:field="*{respondentName}"
+                                                                   type="text">
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+
+                                                        <!-- First name -->
+                                                        <div class="form-group">
+
+                                                            <!-- Label -->
+                                                            <label class="form-label">
+                                                                Respondent Phone Number
+                                                            </label>
+
+                                                            <!-- Input -->
+                                                            <input class="form-control" id="respondentPhoneNumber"
+                                                                   maxlength="45"
+                                                                   minlength="2" placeholder="Phone Number" required
+                                                                   th:field="*{respondentPhoneNumber}"
+                                                                   type="text">
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <!-- First name -->
+                                                        <div class="form-group">
+                                                            <!-- Label -->
+                                                            <label class="form-label">
+                                                                Respondent Job Title
+                                                            </label>
+
+                                                            <!-- Input -->
+                                                            <input class="form-control" id="respondentJobTitle"
+                                                                   maxlength="45"
+                                                                   minlength="2" placeholder="Job Title" required
+                                                                   th:field="*{respondentJobTitle}"
+                                                                   type="text">
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseTwo" aria-expanded="false"
+                                                    aria-controls="collapseTwo">
+                                                Questions
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse"
+                                             aria-labelledby="headingTwo"
+                                             data-bs-parent="#accordionExample" style="">
+                                            <div class="accordion-body">
+                                                <div th:each="question, iterStat : ${assessmentQuestions}"
+                                                     class="card question-item" style="display:none;">
+                                                    <div class="card-header">
+                                                        [[${iterStat.count}]].&nbsp;
+                                                        <h4 class="card-header-title"
+                                                            th:text="${question.question}"></h4>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div th:switch="${question.questionType.name}">
+                                                            <div th:case="'FREETEXT'">
+                                                                <textarea class="form-control" rows="3"></textarea>
+                                                            </div>
+                                                            <div th:case="'MULTIPLE_CHOICE'">
+                                                                <div th:each="option : ${question.options}">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="radio"
+                                                                               th:value="${option}"
+                                                                               th:name="'question_' + ${question.id}">
+                                                                        <label class="form-check-label"
+                                                                               th:text="${option}"></label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div th:case="'TRUE_FALSE'">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio"
+                                                                           th:value="true"
+                                                                           th:name="'question_' + ${question.id}">
+                                                                    <label class="form-check-label">True</label>
+                                                                </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio"
+                                                                           th:value="false"
+                                                                           th:name="'question_' + ${question.id}">
+                                                                    <label class="form-check-label">False</label>
+                                                                </div>
+                                                            </div>
+                                                            <div th:case="'CHECKBOX'">
+                                                                <!-- Assuming options are stored in question.options as List<String> -->
+                                                                <div th:each="option : ${question.options}">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox"
+                                                                               th:value="${option}"
+                                                                               th:name="'question_' + ${question.id}">
+                                                                        <label class="form-check-label"
+                                                                               th:text="${option}"></label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div th:case="'MATCHING'">
+                                                                <!-- Matching logic can be complex and might require custom implementation -->
+                                                                <p>Matching question type is not implemented.</p>
+                                                            </div>
+                                                            <div th:case="'SHORT_ANSWER'">
+                                                                <input type="text" class="form-control">
+                                                            </div>
+                                                            <div th:case="'ESSAY'">
+                                                                <textarea class="form-control" rows="5"></textarea>
+                                                            </div>
+                                                            <div th:case="*">
+                                                                <p>Unknown question type.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <th:block th:if="${question.skippable == true}">
+                                                            <div class="badge bg-success">
+                                                                Skippable
+                                                            </div>
+                                                        </th:block>
+                                                        <th:block th:if="${question.skippable == false}">
+                                                            <div class="badge bg-danger">
+                                                                Not Skippable
+                                                            </div>
+                                                        </th:block>
+                                                    </div>
+                                                </div>
+                                                <hr>
+
+                                                <button id="backButton" class="btn btn-secondary"
+                                                        style="display:none;">Back
+                                                </button>
+                                                <button class="btn btn-white" id="nextButton">
+                                                    Next
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingTwo">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    Accordion Item #2
-                                </button>
-                            </h2>
-                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                                 data-bs-parent="#accordionExample" style="">
-                                <div class="accordion-body">
-                                    <strong>This is the second item's accordion body.</strong> It is hidden by default,
-                                    until the collapse plugin adds the appropriate classes that we use to style each
-                                    element. These classes control the overall appearance, as well as the showing and
-                                    hiding via CSS transitions. You can modify any of this with custom CSS or overriding
-                                    our default variables. It's also worth noting that just about any HTML can go within
-                                    the <code>.accordion-body</code>, though the transition does limit overflow.
+
+                                <div class="col-12 col-md-6">
+                                    <br><br>
+                                    <button class="btn btn-primary" type="submit">Save</button>
+                                    <button class="btn btn-secondary" id="btnCancel" type="button">
+                                        Cancel
+                                    </button>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingThree">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseThree" aria-expanded="false"
-                                        aria-controls="collapseThree">
-                                    Accordion Item #3
-                                </button>
-                            </h2>
-                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                                 data-bs-parent="#accordionExample" style="">
-                                <div class="accordion-body">
-                                    <strong>This is the third item's accordion body.</strong> It is hidden by default,
-                                    until the collapse plugin adds the appropriate classes that we use to style each
-                                    element. These classes control the overall appearance, as well as the showing and
-                                    hiding via CSS transitions. You can modify any of this with custom CSS or overriding
-                                    our default variables. It's also worth noting that just about any HTML can go within
-                                    the <code>.accordion-body</code>, though the transition does limit overflow.
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
-
                 </div>
-                <br><br>
 
             </div>
         </div> <!-- / .row -->
@@ -209,6 +368,41 @@
 </script>
 <script type="text/javascript" th:src="@{/assets/js/common_form.js}"></script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentQuestionIndex = 0;
+        const questions = document.querySelectorAll('.question-item');
+        const totalQuestions = questions.length;
+        const nextButton = document.getElementById('nextButton');
+        const backButton = document.getElementById('backButton');
+
+        function showQuestion(index) {
+            console.log(totalQuestions)
+            questions.forEach((question, i) => {
+                question.style.display = i === index ? 'block' : 'none';
+            });
+            backButton.style.display = index === 0 ? 'none' : 'inline-block';
+            nextButton.style.display = index === totalQuestions - 1 ? 'none' : 'inline-block';
+        }
+
+        nextButton.addEventListener('click', function () {
+            if (currentQuestionIndex < totalQuestions - 1) {
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+            }
+        });
+
+        backButton.addEventListener('click', function () {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+            }
+        });
+
+        // Show the first question initially
+        showQuestion(currentQuestionIndex);
+    });
+</script>
 </body>
 
 

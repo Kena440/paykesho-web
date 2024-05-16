@@ -25,7 +25,7 @@ public interface FacilityRepository extends CrudRepository<Facility, Integer> {
     public Facility getFacilityByIdAndProvinceAndNameAndMemberTypeAndEmail(@Param("id") Integer id, @Param("provinceId") Integer provinceId, @Param("memberName") String memberName, @Param("email") String email);
 
     @Query("select m " + "from Facility m " + "where m.enabled = ?1 ")
-    List<Facility> findMemberTypesEnabled(boolean enabled);
+    List<Facility> findFacilityEnabled(boolean enabled);
 
 
 

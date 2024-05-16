@@ -6,7 +6,9 @@ import org.commons.entity.IdBasedEntity;
 import org.commons.entity.facilities.Facility;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -31,4 +33,9 @@ public class AssessmentInterview extends IdBasedEntity {
     private String endTime;
     @Column(name = "created_date")
     private Date createdDate;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "assessment_interview_id")
+    private List<AssessmentQuestionResponse> responses = new ArrayList<>();
+
 }

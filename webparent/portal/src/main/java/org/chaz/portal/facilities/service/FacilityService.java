@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.DateFormat;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -145,4 +146,7 @@ public class FacilityService {
         return facilityRepository.count();
     }
 
+    public List<Facility> getAssessmentFacilities(){
+        return facilityRepository.findFacilityEnabled(true);
+    }
 }

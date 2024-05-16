@@ -3,8 +3,10 @@ package org.chaz.portal.assessments.controller;
 import org.chaz.portal.assessments.service.AssessmentCodeService;
 import org.chaz.portal.assessments.service.AssessmentsService;
 import org.chaz.portal.assessors.service.AssessorService;
-import org.chaz.portal.settings.service.SettingService;
+import org.chaz.portal.facilities.service.FacilityService;
 import org.commons.entity.assessment.*;
+import org.commons.entity.facilities.Facility;
+import org.commons.enums.QuestionType;
 import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -33,7 +36,7 @@ public class AssessmentsController {
     @Autowired
     private AssessorService assessorService;
     @Autowired
-    private SettingService settingService;
+    private FacilityService facilityService;
 
     @GetMapping("")
     public String listFirstPage(Model model, HttpServletRequest request) throws AssessmentToolError {
@@ -111,11 +114,20 @@ public class AssessmentsController {
         try {
             AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(id);
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentForm);
+            List<Facility> facilityList = facilityService.getAssessmentFacilities();
             AssessmentInterview assessmentInterview = new AssessmentInterview();
             assessmentInterview.setAssessmentForm(assessmentForm);
             assessmentInterview.setCreatedDate(new Date());
 
+            for (AssessmentQuestion question : assessmentQuestions) {
+                if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE || question.getQuestionType() == QuestionType.CHECKBOX) {
+                    List<AssessmentQuestionOption> options = assessmentsService.getOptionsByQuestion(question);
+                    question.setOptions(options);
+                }
+            }
+
             model.addAttribute("assessmentForm", assessmentForm);
+            model.addAttribute("facilityList", facilityList);
             model.addAttribute("assessmentInterview", assessmentInterview);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
 
@@ -124,5 +136,11 @@ public class AssessmentsController {
             redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/assessments";
         }
+    }
+
+    @PostMapping("/form/save-respondent-data")
+    public String saveRespondentData() {
+
+        return null;
     }
 }

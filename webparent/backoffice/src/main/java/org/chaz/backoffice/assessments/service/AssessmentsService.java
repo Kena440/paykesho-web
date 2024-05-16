@@ -26,6 +26,9 @@ public class AssessmentsService {
     private AssessmentQuestionsRepository assessmentQuestionsRepository;
     @Autowired
     private AssessmentFormsRepository assessmentFormsRepository;
+    @Autowired
+    private AssessmentQuestionOptionRepository assessmentQuestionOptionRepository;
+
 
     /**
      * +
@@ -56,6 +59,15 @@ public class AssessmentsService {
 
         return assessmentQuestionsRepository.save(assessmentQuestion);
     }
+
+    public AssessmentQuestionOption saveQuestionOption(AssessmentQuestionOption assessmentQuestionOption) throws AssessmentToolError {
+        if (assessmentQuestionOption == null) {
+            throw new AssessmentToolError("Null parameter Question");
+        }
+
+        return assessmentQuestionOptionRepository.save(assessmentQuestionOption);
+    }
+
 
     public AssessmentForm saveForm(AssessmentForm assessmentForm) throws AssessmentToolError {
         if (assessmentForm == null) {

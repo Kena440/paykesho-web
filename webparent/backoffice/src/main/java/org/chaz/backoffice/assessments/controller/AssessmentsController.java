@@ -241,6 +241,18 @@ public class AssessmentsController {
 
             AssessmentQuestion savedAssessmentQuestion = assessmentsService.saveQuestion(question);
 
+            if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE || question.getQuestionType() == QuestionType.CHECKBOX) {
+                String[] options = request.getParameterValues("options");
+                if (options != null) {
+                    for (String optionText : options) {
+                        AssessmentQuestionOption option = new AssessmentQuestionOption();
+                        option.setQuestion(savedAssessmentQuestion);
+                        option.setOptionText(optionText);
+                        assessmentsService.saveQuestionOption(option);
+                    }
+                }
+            }
+
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Assessment Operation Successful: " + savedAssessmentQuestion.getAssessmentForm().getAssessment().getName());
             return Constants.REDIRECT_TO_Assessment_ID + savedAssessmentQuestion.getAssessmentForm().getAssessment().getId();
         } else {

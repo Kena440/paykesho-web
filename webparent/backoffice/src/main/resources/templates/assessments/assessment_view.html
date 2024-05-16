@@ -307,7 +307,7 @@
                                         Type
                                     </label>
 
-                                    <select class="form-select mb-3" data-choices name="questionType" required>
+                                    <select class="form-select mb-3" data-choices name="questionType" required onchange="showOptionsField()">
                                         <option value="">Select...</option>
 
                                         <th:block
@@ -339,6 +339,15 @@
                                         <option value="true">Yes</option>
                                         <option value="false">No</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12" id="optionsField" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Options</label>
+                                    <div id="optionsList">
+                                        <!-- This is where dynamically added options will be displayed -->
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="addOption()">Add Option</button>
                                 </div>
                             </div>
                         </div>
@@ -425,6 +434,30 @@
         }
     }, 1000);
 
+</script>
+<script>
+    function showOptionsField() {
+        var questionType = document.getElementsByName("questionType")[0].value;
+        var optionsField = document.getElementById("optionsField");
+        if (questionType === "MULTIPLE_CHOICE" || questionType === "CHECKBOX") {
+            optionsField.style.display = "block";
+        } else {
+            optionsField.style.display = "none";
+        }
+    }
+
+    function addOption() {
+        var optionsList = document.getElementById("optionsList");
+        var optionInput = document.createElement("input");
+        optionInput.setAttribute("type", "text");
+        optionInput.setAttribute("class", "form-control mb-2");
+        optionInput.setAttribute("name", "options");
+        optionInput.setAttribute("placeholder", "Enter option");
+        optionsList.appendChild(optionInput);
+    }
+
+    // Call showOptionsField initially to show/hide options field based on initial question type
+    showOptionsField();
 </script>
 
 </body>

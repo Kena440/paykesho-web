@@ -7,6 +7,7 @@ import org.commons.enums.QuestionType;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,5 +25,11 @@ public class AssessmentQuestion extends IdBasedEntity {
     private boolean skippable;
     @Column(name = "created_date")
     private Date createdDate;
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private List<AssessmentQuestionOption> options;
 
+    @Override
+    public String toString() {
+        return question;
+    }
 }
