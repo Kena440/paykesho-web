@@ -77,6 +77,18 @@ public class AssessmentsService {
         }
     }
 
+    public AssessmentInterview getAssessmentInterviewById(Integer id) throws AssessmentToolError {
+        if (id == null) {
+            throw new AssessmentToolError("Null parameter id");
+        }
+
+        try {
+            return assessmentInterviewsRepository.findById(id).get();
+        } catch (NoSuchElementException exception) {
+            throw new AssessmentToolError("Could not find any form");
+        }
+    }
+
     public List<AssessmentQuestion> getAssessmentQuestions(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
             throw new AssessmentToolError("Null parameter assessment");

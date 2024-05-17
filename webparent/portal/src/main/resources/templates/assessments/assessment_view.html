@@ -196,7 +196,7 @@
                                         <option value="">Select...</option>
                                         <th:block th:each="vh : ${assessmentForms}">
                                             <option th:value="${vh.id}">
-                                                [[${vh.name}]] ([[${vh.email}]])
+                                                [[${vh.formName}]] ([[${vh.assessment.name}]])
                                             </option>
                                         </th:block>
                                     </select>

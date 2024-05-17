@@ -92,82 +92,69 @@
 
                             <!-- Title -->
                             <h1 class="header-title">
-                                eLMIS capacity utilisation Assessment Tool - [[${assessmentForm.formName}]]
+                                [[${assessmentForm.assessment.name}]] -
                             </h1>
 
                             <!-- Subtitle -->
                             <p class="header-subtitle">
-                                The purpose of this activity is to evaluate the current utilisation of Electronic
-                                Logistics Management Information System (eLMIS) in Zambian Health Facilities. The
-                                assessment will focus on System Adoption and Integration, User Training and Capacity
-                                Building, Data Accuracy and Timeliness, System Performance and Reliability and
-                                Stakeholder Collaboration. We would like to find out a little more about your use of the
-                                eLMIS Facility Edition. </p>
+                                [[${assessmentForm.formName}]]</p>
 
                         </div>
                     </div>
 
-                    <!-- Accordion -->
                     <div class="row">
                         <div class="col-12 col-md-12">
+                            <!-- Existing question items -->
                             <div th:each="question, iterStat : ${assessmentQuestions}"
-                                 class="card question-item" style="display:none;">
+                                 class="card question-item"
+                                 th:attr="data-question-id=${question.id},style='display:none;'">
                                 <div class="card-header">
                                     [[${iterStat.count}]].&nbsp;
-                                    <h4 class="card-header-title"
-                                        th:text="${question.question}"></h4>
+                                    <h4 class="card-header-title" th:text="${question.question}"></h4>
                                 </div>
                                 <div class="card-body">
                                     <div th:switch="${question.questionType.name}">
                                         <div th:case="'FREETEXT'">
-                                            <textarea class="form-control" rows="3"></textarea>
+                                            <textarea class="form-control" rows="3" th:name="'question_' + ${question.id}"></textarea>
                                         </div>
                                         <div th:case="'MULTIPLE_CHOICE'">
                                             <div th:each="option : ${question.options}">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio"
-                                                           th:value="${option}"
+                                                    <input class="form-check-input" type="radio" th:value="${option}"
                                                            th:name="'question_' + ${question.id}">
-                                                    <label class="form-check-label"
-                                                           th:text="${option}"></label>
+                                                    <label class="form-check-label" th:text="${option}"></label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div th:case="'TRUE_FALSE'">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio"
-                                                       th:value="true"
+                                                <input class="form-check-input" type="radio" th:value="true"
                                                        th:name="'question_' + ${question.id}">
                                                 <label class="form-check-label">True</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio"
-                                                       th:value="false"
+                                                <input class="form-check-input" type="radio" th:value="false"
                                                        th:name="'question_' + ${question.id}">
                                                 <label class="form-check-label">False</label>
                                             </div>
                                         </div>
                                         <div th:case="'CHECKBOX'">
-                                            <!-- Assuming options are stored in question.options as List<String> -->
                                             <div th:each="option : ${question.options}">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox"
-                                                           th:value="${option}"
+                                                    <input class="form-check-input" type="checkbox" th:value="${option}"
                                                            th:name="'question_' + ${question.id}">
-                                                    <label class="form-check-label"
-                                                           th:text="${option}"></label>
+                                                    <label class="form-check-label" th:text="${option}"></label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div th:case="'MATCHING'">
-                                            <!-- Matching logic can be complex and might require custom implementation -->
                                             <p>Matching question type is not implemented.</p>
                                         </div>
                                         <div th:case="'SHORT_ANSWER'">
-                                            <input type="text" class="form-control">
+                                            <input type="text" class="form-control" th:name="'question_' + ${question.id}">
                                         </div>
                                         <div th:case="'ESSAY'">
-                                            <textarea class="form-control" rows="5"></textarea>
+                                            <textarea class="form-control" rows="5" th:name="'question_' + ${question.id}"></textarea>
                                         </div>
                                         <div th:case="*">
                                             <p>Unknown question type.</p>
@@ -176,27 +163,22 @@
                                 </div>
                                 <div class="card-footer">
                                     <th:block th:if="${question.skippable == true}">
-                                        <div class="badge bg-success">
-                                            Skippable
-                                        </div>
+                                        <div class="badge bg-success">Skippable</div>
                                     </th:block>
                                     <th:block th:if="${question.skippable == false}">
-                                        <div class="badge bg-danger">
-                                            Not Skippable
-                                        </div>
+                                        <div class="badge bg-danger">Not Skippable</div>
                                     </th:block>
                                 </div>
                             </div>
+
                             <hr>
 
-                            <button id="backButton" class="btn btn-secondary"
-                                    style="display:none;">Back
-                            </button>
-                            <button class="btn btn-white" id="nextButton">
-                                Next
-                            </button>
+                            <button id="backButton" class="btn btn-secondary" style="display:none;">Back</button>
+                            <button class="btn btn-white" id="nextButton">Next</button>
+                            <button class="btn btn-primary" id="submitButton" style="display:none;">Submit</button>
                         </div>
                     </div>
+
                 </div>
 
             </div>
@@ -235,7 +217,6 @@
     }
 </script>
 <script type="text/javascript" th:src="@{/assets/js/common_form.js}"></script>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let currentQuestionIndex = 0;
@@ -243,17 +224,40 @@
         const totalQuestions = questions.length;
         const nextButton = document.getElementById('nextButton');
         const backButton = document.getElementById('backButton');
+        const submitButton = document.createElement('button');
+        submitButton.innerText = 'Submit';
+        submitButton.className = 'btn btn-primary';
+        submitButton.style.display = 'none';
+        document.querySelector('.container-fluid .col-md-12').appendChild(submitButton);
 
         function showQuestion(index) {
-            console.log(totalQuestions)
             questions.forEach((question, i) => {
                 question.style.display = i === index ? 'block' : 'none';
             });
             backButton.style.display = index === 0 ? 'none' : 'inline-block';
             nextButton.style.display = index === totalQuestions - 1 ? 'none' : 'inline-block';
+            submitButton.style.display = index === totalQuestions - 1 ? 'inline-block' : 'none';
+        }
+
+        function isQuestionAnswered(question) {
+            const inputs = question.querySelectorAll('input, textarea');
+            return Array.from(inputs).some(input => input.checked || input.value.trim() !== '');
         }
 
         nextButton.addEventListener('click', function () {
+            const currentQuestion = questions[currentQuestionIndex];
+            const skippable = currentQuestion.querySelector('.badge.bg-success') !== null;
+            const answered = isQuestionAnswered(currentQuestion);
+
+            if (!skippable && !answered) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'This question is not skippable. Please provide an answer before proceeding.'
+                });
+                return;
+            }
+
             if (currentQuestionIndex < totalQuestions - 1) {
                 currentQuestionIndex++;
                 showQuestion(currentQuestionIndex);
@@ -267,10 +271,74 @@
             }
         });
 
-        // Show the first question initially
+        submitButton.addEventListener('click', function () {
+            const answers = {};
+            questions.forEach(question => {
+                const questionId = question.getAttribute('data-question-id'); // Retrieve the question ID from data attribute
+                const inputs = question.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    if (input.type === 'radio' || input.type === 'checkbox') {
+                        if (input.checked) {
+                            answers[questionId] = input.value;
+                        }
+                    } else {
+                        if (input.value.trim() !== '') {
+                            answers[questionId] = input.value;
+                        }
+                    }
+                });
+            });
+
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to edit your answers after submission!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, submit it!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/assessments/interview/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken  // Include the CSRF token in the request headers
+                        },
+                        body: JSON.stringify({responses: answers})
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            Swal.fire(
+                                'Submitted!',
+                                'Your answers have been submitted successfully.',
+                                'success'
+                            );
+                            console.log(data);
+                        })
+                        .catch(error => {
+                            Swal.fire(
+                                'Error!',
+                                'There was an error submitting your answers. Please try again.',
+                                'error'
+                            );
+                            console.error('Error:', error);
+                        });
+                }
+            });
+        });
+
         showQuestion(currentQuestionIndex);
     });
 </script>
+
+
 </body>
 
 

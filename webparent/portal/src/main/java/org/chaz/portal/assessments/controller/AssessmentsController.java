@@ -1,5 +1,6 @@
 package org.chaz.portal.assessments.controller;
 
+import org.chaz.portal.assessments.dto.AssessmentResponseDTO;
 import org.chaz.portal.assessments.service.AssessmentCodeService;
 import org.chaz.portal.assessments.service.AssessmentsService;
 import org.chaz.portal.assessors.service.AssessorService;
@@ -12,17 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/assessments")
@@ -37,6 +37,8 @@ public class AssessmentsController {
     private AssessorService assessorService;
     @Autowired
     private FacilityService facilityService;
+    private static final Logger logger = LoggerFactory.getLogger(AssessmentsController.class);
+
 
     @GetMapping("")
     public String listFirstPage(Model model, HttpServletRequest request) throws AssessmentToolError {
@@ -112,7 +114,7 @@ public class AssessmentsController {
     }
 
     @PostMapping("/interview/start")
-    public String saveRespondentData(HttpServletRequest request, Model model) throws AssessmentToolError {
+    public String startAssessmentInterview(HttpServletRequest request, Model model) throws AssessmentToolError {
         Assessment assessment = assessmentsService.getAssessmentById(Integer.valueOf(request.getParameter("assessmentId")));
         if (assessment == null) {
             throw new AssessmentToolError("No assessment");
@@ -146,6 +148,48 @@ public class AssessmentsController {
 
         AssessmentInterview savedAssessmentInterview = assessmentsService.saveInterview(assessmentInterview);
 
+        List<AssessmentQuestion> assessmentQuestions = getAssessmentQuestions(assessmentForm);
+
+        model.addAttribute("assessmentForm", assessmentForm);
+        model.addAttribute("assessmentInterview", savedAssessmentInterview);
+        model.addAttribute("assessmentQuestions", assessmentQuestions);
+        return "assessments/assessment_form";
+    }
+
+    @GetMapping("/interview/continue/{id}")
+    public String continueAssessmentInterview(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) throws AssessmentToolError {
+
+        AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(id);
+        if (assessmentInterview == null) {
+            throw new AssessmentToolError("No assessment Interview");
+        }
+
+        AssessmentForm assessmentForm = assessmentInterview.getAssessmentForm();
+
+        List<AssessmentQuestion> assessmentQuestions = getAssessmentQuestions(assessmentForm);
+
+        model.addAttribute("assessmentForm", assessmentForm);
+        model.addAttribute("assessmentInterview", assessmentInterview);
+        model.addAttribute("assessmentQuestions", assessmentQuestions);
+        return "assessments/assessment_form";
+    }
+
+    @PostMapping("/interview/submit")
+    public ResponseEntity<String> submitAssessment(@RequestBody AssessmentResponseDTO assessmentResponse) {
+        // Log the incoming request
+        logger.info("Received assessment submission: {}", assessmentResponse);
+
+        // Process the responses
+        Map<String, String> responses = assessmentResponse.getResponses();
+        responses.forEach((questionId, answer) -> {
+            logger.info("Question ID: {}, Answer: {}", questionId, answer);
+        });
+
+        // Return a success response
+        return ResponseEntity.ok("Assessment submitted successfully.");
+    }
+
+    private List<AssessmentQuestion> getAssessmentQuestions(AssessmentForm assessmentForm) throws AssessmentToolError {
         List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentForm);
         for (AssessmentQuestion question : assessmentQuestions) {
             if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE || question.getQuestionType() == QuestionType.CHECKBOX) {
@@ -153,9 +197,6 @@ public class AssessmentsController {
                 question.setOptions(options);
             }
         }
-
-        model.addAttribute("assessmentInterview", savedAssessmentInterview);
-        model.addAttribute("assessmentQuestions", assessmentQuestions);
-        return "assessments/assessment_form";
+        return assessmentQuestions;
     }
 }

@@ -24,16 +24,16 @@
         </div>
     </div>
     <div class="row" th:if="${assessmentInterviews.size() > 0}">
-        <div class="col-6 d-none">
+        <div class="col-6">
             <input class="form-control" id="searchInterviewsInput" placeholder="Search..." type="text">
         </div>
 
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-12">
             <div class="table-responsive">
                 <table class="table table-sm table-bordered my-4" id="interviewsTable">
                     <thead>
                     <tr>
-                        <th class="px-0 bg-transparent border-top-0">
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">#</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
@@ -49,6 +49,9 @@
                             <span class="h6">Date/Time</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Status</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Action</span>
                         </th>
                     </tr>
@@ -56,21 +59,24 @@
                     <tbody>
                     <tr th:each="interview, interviewStat : ${assessmentInterviews}">
 
-                        <td class="px-0">
+                        <td class="px-0 text-center">
                             <small>[[${interviewStat.count}]]</small>
                         </td>
-                        <td class="px-0 text-start">
+                        <td class="px-0 text-center">
                             <small>[[${interview.respondentName}]]</small>
                         </td>
-                        <td class="px-0 text-start">
+                        <td class="px-0 text-center">
                             <small>[[${interview.respondentJobTitle}]]</small>
                         </td>
-                        <td class="px-0 text-start">
+                        <td class="px-0 text-center">
+                            <small>[[${interview.facility.name}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
                             <time datetime="2018-04-23"
                                   th:replace="fragments/fragments :: format_date(${interview.createdDate})"></time>
 
                         </td>
-                        <td class="px-0 text-start">
+                        <td class="px-0 text-center">
                             <th:block th:if="${interview.completed == true}">
                                 <div class="badge bg-success">
                                     Done
@@ -80,7 +86,10 @@
                                 <div class="badge bg-danger">
                                     Pending Completion
                                 </div>
-                                &nbsp;
+                            </th:block>
+                        </td>
+                        <td class="px-0 text-center">
+                            <th:block th:if="${interview.completed == false}">
                                 <a class="btn btn-primary"
                                    th:href="@{'/assessments/interview/continue/' + ${interview.id}}">
                                     <span class="fe fe-play"></span>
