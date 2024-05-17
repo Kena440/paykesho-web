@@ -117,6 +117,8 @@ public class AssessmentsController {
 
     @PostMapping("/interview/start")
     public String startAssessmentInterview(HttpServletRequest request, Model model) throws AssessmentToolError {
+        Assessor assessor = assessorService.getAuthenticatedAssessor(request);
+
         Assessment assessment = assessmentsService.getAssessmentById(Integer.valueOf(request.getParameter("assessmentId")));
         if (assessment == null) {
             throw new AssessmentToolError("No assessment");
@@ -147,6 +149,7 @@ public class AssessmentsController {
         assessmentInterview.setEndTime("12:00");
         assessmentInterview.setStartTime("10:00");
         assessmentInterview.setCompleted(false);
+        assessmentInterview.setAssessor(assessor);
 
         AssessmentInterview savedAssessmentInterview = assessmentsService.saveInterview(assessmentInterview);
 

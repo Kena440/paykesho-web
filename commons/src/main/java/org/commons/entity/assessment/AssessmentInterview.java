@@ -34,6 +34,9 @@ public class AssessmentInterview extends IdBasedEntity {
     @Column(name = "created_date")
     private Date createdDate;
     private boolean completed;
+    @ManyToOne
+    @JoinColumn(name = "assessor_id")
+    private Assessor assessor;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "assessment_interview_id")

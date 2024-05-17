@@ -49,6 +49,12 @@
                             <span class="h6">Date/Time</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Form</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Assessor</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Status</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
@@ -75,6 +81,12 @@
                             <time datetime="2018-04-23"
                                   th:replace="fragments/fragments :: format_date(${interview.createdDate})"></time>
 
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${interview.assessmentForm.formName}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${interview.assessor.name}]]</small>
                         </td>
                         <td class="px-0 text-center">
                             <th:block th:if="${interview.completed == true}">

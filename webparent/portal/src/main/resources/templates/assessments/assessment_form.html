@@ -332,35 +332,31 @@
                     })
                         .then(response => {
                             if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            Swal.fire({
-                                title: 'Submitted!',
-                                text: 'Your answers have been submitted successfully.',
-                                icon: 'success',
-                                timer: 2000, // Set a timer to automatically close the alert after 2 seconds
-                                timerProgressBar: true, // Show a progress bar during the timer
-                                onClose: () => {
-                                    // Redirect to another page or perform any other action after the alert is closed
+                                // Handle error response
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'There was an error submitting answers. Please try again.',
+                                    icon: 'error',
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                });
+                            } else {
+                                // Handle successful response
+                                Swal.fire({
+                                    title: 'Submitted!',
+                                    text: 'Answers have been submitted successfully.',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                }).then((result) => {
+                                    console.log(result)
                                     window.location.href = '/assessments/view/' + assessmentId;
-                                }
-                            });
-                            console.log(data);
+
+                                });
+                            }
                         })
                         .catch(error => {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: 'There was an error submitting your answers. Please try again.',
-                                icon: 'error',
-                                timer: 2000, // Set a timer to automatically close the alert after 2 seconds
-                                timerProgressBar: true, // Show a progress bar during the timer
-                                onClose: () => {
-                                    // Perform any action after the alert is closed
-                                }
-                            });
+                            // Handle network errors or exceptions
                             console.error('Error:', error);
                         });
 
