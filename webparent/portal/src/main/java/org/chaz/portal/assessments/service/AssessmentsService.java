@@ -45,6 +45,14 @@ public class AssessmentsService {
         return assessmentsRepository.save(assessment);
     }
 
+    public AssessmentInterview saveInterview(AssessmentInterview assessmentInterview) {
+        if (assessmentInterview == null) {
+            return null;
+        }
+
+        return assessmentInterviewsRepository.save(assessmentInterview);
+    }
+
     public Assessment getAssessmentById(Integer id) throws AssessmentToolError {
         if (id == null) {
             throw new AssessmentToolError("Null parameter id");

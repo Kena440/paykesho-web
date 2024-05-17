@@ -33,6 +33,7 @@ public class AssessmentInterview extends IdBasedEntity {
     private String endTime;
     @Column(name = "created_date")
     private Date createdDate;
+    private boolean completed;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "assessment_interview_id")

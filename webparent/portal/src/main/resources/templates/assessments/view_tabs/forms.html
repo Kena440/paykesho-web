@@ -28,27 +28,24 @@
                 <table class="table table-sm table-bordered my-4" id="formsTable">
                     <thead>
                     <tr>
-                        <th class="px-0 bg-transparent border-top-0">
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">#</span>
                         </th>
-                        <th class="px-0 bg-transparent border-top-0 text-start">
-                            <span class="h6">Name</span>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Form</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Date</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Action</span>
                         </th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="form, formStat : ${assessmentForms}">
 
-                        <td class="px-0">
+                        <td class="px-0 text-center">
                             <small>[[${formStat.count}]]</small>
                         </td>
-                        <td class="px-0 text-start">
+                        <td class="px-0 text-center">
                             <small>[[${form.formName}]]</small>
                         </td>
                         <td class="px-0 text-sm-center">
@@ -56,12 +53,6 @@
                                 <time datetime="2018-04-23"
                                       th:replace="fragments/fragments :: format_date(${form.createdDate})"></time>
                             </small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <a class="fe fe-play" th:href="@{'/assessments/form/start/'+${form.id}}"
-                               title="Start">
-                                Start
-                            </a>
                         </td>
                     </tr>
                     </tbody>

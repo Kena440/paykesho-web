@@ -12,10 +12,11 @@
             </h6>
         </div>
         <div class="col-12 col-md-6 text-md-end">
-         <!--   <a class="btn btn-primary" th:href="@{'/assessments/start/' + ${assessment.id}}">
+            <button class="btn btn-primary" data-bs-target="#respondentModal" data-bs-toggle="modal"
+                    type="button">
                 <span class="fe fe-file-plus"></span>
-                Start
-            </a>-->
+                Start Interview
+            </button>
             <a class="btn btn-primary" th:href="@{'/assessments/export/excel/feedback/' + ${assessment.id}}">
                 <span class="fe fe-printer"></span>
                 Export
@@ -70,7 +71,22 @@
 
                         </td>
                         <td class="px-0 text-start">
-
+                            <th:block th:if="${interview.completed == true}">
+                                <div class="badge bg-success">
+                                    Done
+                                </div>
+                            </th:block>
+                            <th:block th:if="${interview.completed == false}">
+                                <div class="badge bg-danger">
+                                    Pending Completion
+                                </div>
+                                &nbsp;
+                                <a class="btn btn-primary"
+                                   th:href="@{'/assessments/interview/continue/' + ${interview.id}}">
+                                    <span class="fe fe-play"></span>
+                                    Continue
+                                </a>
+                            </th:block>
                         </td>
                     </tr>
                     </tbody>

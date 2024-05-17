@@ -71,8 +71,6 @@
                             <div class="col-auto">
 
 
-
-
                             </div>
                         </div> <!-- / .row -->
                     </div>
@@ -146,7 +144,7 @@
                                 </div>
                                 <div class="tab-pane fade" id="questionsTab">
                                     <div class="row">
-                                        <div th:replace="assessments/view_tabs/questions :: content"></div>
+                                        <div th:replace="assessments/view_tabs/forms :: content"></div>
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="interviewsTab">
@@ -173,6 +171,97 @@
 
             </div>
         </div> <!-- / .row -->
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="respondentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Start Interview</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+
+                <form method="post"
+                      th:action="@{/assessments/interview/start}">
+                    <input id="assessmentId" name="assessmentId" th:value="${assessment.id}"
+                           type="hidden"/>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Assessment Form
+                                    </label>
+                                    <select class="form-select" data-choices name="assessmentForm">
+                                        <option value="">Select...</option>
+                                        <th:block th:each="vh : ${assessmentForms}">
+                                            <option th:value="${vh.id}">
+                                                [[${vh.name}]] ([[${vh.email}]])
+                                            </option>
+                                        </th:block>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Respondent Facility
+                                    </label>
+                                    <select class="form-select" data-choices name="facility">
+                                        <option value="">Select...</option>
+                                        <th:block th:each="vh : ${facilityList}">
+                                            <option th:value="${vh.id}">
+                                                [[${vh.name}]] ([[${vh.levelOfCare}]])
+                                            </option>
+                                        </th:block>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Respondent Name
+                                    </label>
+                                    <input class="form-control" id="respondentName" name="respondentName" maxlength="45"
+                                           minlength="2" placeholder="Name" required
+                                           type="text">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Respondent Phone Number
+                                    </label>
+
+                                    <!-- Input -->
+                                    <input class="form-control" id="respondentPhoneNumber" name="respondentPhoneNumber"
+                                           maxlength="45"
+                                           minlength="2" placeholder="Phone Number" required
+                                           type="text">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Respondent Job Title
+                                    </label>
+
+                                    <!-- Input -->
+                                    <input class="form-control" id="respondentJobTitle" name="respondentJobTitle"
+                                           maxlength="45"
+                                           minlength="2" placeholder="Job Title" required
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-primary" type="submit">Save & Start</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div><!-- / .main-content -->
 

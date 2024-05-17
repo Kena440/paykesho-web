@@ -95,6 +95,8 @@ public class AssessmentsController {
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
             List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+            List<Facility> facilityList = facilityService.getAssessmentFacilities();
+            model.addAttribute("facilityList", facilityList);
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("assessmentInterviews", assessmentInterviews);
@@ -109,38 +111,51 @@ public class AssessmentsController {
         }
     }
 
-    @GetMapping("/form/start/{id}")
-    public String startAssessment(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(id);
-            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentForm);
-            List<Facility> facilityList = facilityService.getAssessmentFacilities();
-            AssessmentInterview assessmentInterview = new AssessmentInterview();
-            assessmentInterview.setAssessmentForm(assessmentForm);
-            assessmentInterview.setCreatedDate(new Date());
-
-            for (AssessmentQuestion question : assessmentQuestions) {
-                if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE || question.getQuestionType() == QuestionType.CHECKBOX) {
-                    List<AssessmentQuestionOption> options = assessmentsService.getOptionsByQuestion(question);
-                    question.setOptions(options);
-                }
-            }
-
-            model.addAttribute("assessmentForm", assessmentForm);
-            model.addAttribute("facilityList", facilityList);
-            model.addAttribute("assessmentInterview", assessmentInterview);
-            model.addAttribute("assessmentQuestions", assessmentQuestions);
-
-            return "assessments/assessment_form";
-        } catch (AssessmentToolError assessmentToolError) {
-            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
-            return "redirect:/assessments";
+    @PostMapping("/interview/start")
+    public String saveRespondentData(HttpServletRequest request, Model model) throws AssessmentToolError {
+        Assessment assessment = assessmentsService.getAssessmentById(Integer.valueOf(request.getParameter("assessmentId")));
+        if (assessment == null) {
+            throw new AssessmentToolError("No assessment");
         }
-    }
+        if (!assessment.isEnabled()) {
+            throw new AssessmentToolError("assessment not enabled");
+        }
+        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(Integer.valueOf(request.getParameter("assessmentForm")));
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("No assessment form");
+        }
 
-    @PostMapping("/form/save-respondent-data")
-    public String saveRespondentData() {
+        String respondentName = request.getParameter("respondentName");
+        String respondentJobTitle = request.getParameter("respondentJobTitle");
+        String respondentPhoneNumber = request.getParameter("respondentPhoneNumber");
+        Facility facility = facilityService.getFacilityById(Integer.valueOf(request.getParameter("facility")));
+        if (facility == null) {
+            throw new AssessmentToolError("No facility");
+        }
 
-        return null;
+        AssessmentInterview assessmentInterview = new AssessmentInterview();
+        assessmentInterview.setRespondentName(respondentName);
+        assessmentInterview.setAssessmentForm(assessmentForm);
+        assessmentInterview.setRespondentJobTitle(respondentJobTitle);
+        assessmentInterview.setRespondentPhoneNumber(respondentPhoneNumber);
+        assessmentInterview.setFacility(facility);
+        assessmentInterview.setCreatedDate(new Date());
+        assessmentInterview.setEndTime("12:00");
+        assessmentInterview.setStartTime("10:00");
+        assessmentInterview.setCompleted(false);
+
+        AssessmentInterview savedAssessmentInterview = assessmentsService.saveInterview(assessmentInterview);
+
+        List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentForm);
+        for (AssessmentQuestion question : assessmentQuestions) {
+            if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE || question.getQuestionType() == QuestionType.CHECKBOX) {
+                List<AssessmentQuestionOption> options = assessmentsService.getOptionsByQuestion(question);
+                question.setOptions(options);
+            }
+        }
+
+        model.addAttribute("assessmentInterview", savedAssessmentInterview);
+        model.addAttribute("assessmentQuestions", assessmentQuestions);
+        return "assessments/assessment_form";
     }
 }
