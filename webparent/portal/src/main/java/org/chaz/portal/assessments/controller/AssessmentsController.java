@@ -98,6 +98,7 @@ public class AssessmentsController {
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
             List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+
             List<Facility> facilityList = facilityService.getAssessmentFacilities();
             model.addAttribute("facilityList", facilityList);
             model.addAttribute("assessment", assessment);
@@ -152,6 +153,7 @@ public class AssessmentsController {
         List<AssessmentQuestion> assessmentQuestions = getAssessmentQuestions(assessmentForm);
 
         model.addAttribute("assessmentForm", assessmentForm);
+        model.addAttribute("assessment", assessment);
         model.addAttribute("assessmentInterview", savedAssessmentInterview);
         model.addAttribute("assessmentQuestions", assessmentQuestions);
         return "assessments/assessment_form";
@@ -170,6 +172,7 @@ public class AssessmentsController {
         List<AssessmentQuestion> assessmentQuestions = getAssessmentQuestions(assessmentForm);
 
         model.addAttribute("assessmentForm", assessmentForm);
+        model.addAttribute("assessment", assessmentInterview.getAssessmentForm().getAssessment());
         model.addAttribute("assessmentInterview", assessmentInterview);
         model.addAttribute("assessmentQuestions", assessmentQuestions);
         return "assessments/assessment_form";
@@ -218,7 +221,7 @@ public class AssessmentsController {
                 }
             }
 
-            if (answeredQuestions == totalQuestions) {
+            if (answeredQuestions >= totalQuestions) {
                 assessmentInterview.setCompleted(true);
                 assessmentsService.saveInterview(assessmentInterview);
             }

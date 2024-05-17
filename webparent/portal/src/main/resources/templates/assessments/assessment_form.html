@@ -189,6 +189,7 @@
     </div>
 
     <input type="hidden" name="interviewId" id="interviewId" th:value="${assessmentInterview.id}">
+    <input type="hidden" name="assessmentId" id="assessmentId" th:value="${assessment.id}">
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
 
@@ -310,6 +311,7 @@
 
             const csrfToken = document.querySelector('input[name="_csrf"]').value;
             const interviewId = document.getElementById('interviewId').value;
+            const assessmentId = document.getElementById('assessmentId').value;
 
             Swal.fire({
                 title: 'Are you sure?',
@@ -324,7 +326,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken  // Include the CSRF token in the request headers
+                            'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
                         },
                         body: JSON.stringify({interviewId: interviewId, responses: answers})
                     })
@@ -335,21 +337,33 @@
                             return response.json();
                         })
                         .then(data => {
-                            Swal.fire(
-                                'Submitted!',
-                                'Your answers have been submitted successfully.',
-                                'success'
-                            );
+                            Swal.fire({
+                                title: 'Submitted!',
+                                text: 'Your answers have been submitted successfully.',
+                                icon: 'success',
+                                timer: 2000, // Set a timer to automatically close the alert after 2 seconds
+                                timerProgressBar: true, // Show a progress bar during the timer
+                                onClose: () => {
+                                    // Redirect to another page or perform any other action after the alert is closed
+                                    window.location.href = '/assessments/view/' + assessmentId;
+                                }
+                            });
                             console.log(data);
                         })
                         .catch(error => {
-                            Swal.fire(
-                                'Error!',
-                                'There was an error submitting your answers. Please try again.',
-                                'error'
-                            );
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'There was an error submitting your answers. Please try again.',
+                                icon: 'error',
+                                timer: 2000, // Set a timer to automatically close the alert after 2 seconds
+                                timerProgressBar: true, // Show a progress bar during the timer
+                                onClose: () => {
+                                    // Perform any action after the alert is closed
+                                }
+                            });
                             console.error('Error:', error);
                         });
+
                 }
             });
         });

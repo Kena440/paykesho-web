@@ -143,6 +143,14 @@ public class AssessmentsService {
         return assessmentFormsRepository.findByAssessment(assessment.getId());
     }
 
+    public List<AssessmentQuestionResponse> getAssessmentQuestionResponsesByInterview(AssessmentInterview assessmentInterview) throws AssessmentToolError {
+        if (assessmentInterview == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentQuestionResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
+    }
+
     public Page<Assessment> listForAssessorByPage(Assessor assessor, int pageNum, String sortField, String sortDir, String assessmentKeyword) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
