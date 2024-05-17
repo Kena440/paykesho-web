@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -176,17 +177,56 @@ public class AssessmentsController {
 
     @PostMapping("/interview/submit")
     public ResponseEntity<String> submitAssessment(@RequestBody AssessmentResponseDTO assessmentResponse) {
-        // Log the incoming request
-        logger.info("Received assessment submission: {}", assessmentResponse);
+        String interviewId = assessmentResponse.getInterviewId();
+        Map<String, Object> responses = assessmentResponse.getResponses();
 
-        // Process the responses
-        Map<String, String> responses = assessmentResponse.getResponses();
-        responses.forEach((questionId, answer) -> {
-            logger.info("Question ID: {}, Answer: {}", questionId, answer);
-        });
+        try {
+            AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(Integer.valueOf(interviewId));
+            if (assessmentInterview == null) {
+                throw new AssessmentToolError("Interview not found for ID: " + interviewId);
+            }
 
-        // Return a success response
-        return ResponseEntity.ok("Assessment submitted successfully.");
+            int totalQuestions = getAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
+            int answeredQuestions = 0;
+
+            for (Map.Entry<String, Object> entry : responses.entrySet()) {
+                String questionIdString = entry.getKey();
+                Object answer = entry.getValue();
+
+                AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
+                if (assessmentQuestion == null) {
+                    throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
+                }
+
+                if (answer instanceof String) {
+                    AssessmentQuestionResponse response = new AssessmentQuestionResponse();
+                    response.setAssessmentQuestion(assessmentQuestion);
+                    response.setAnswer((String) answer);
+                    response.setAssessmentInterview(assessmentInterview);
+                    assessmentsService.saveInterviewResponse(response);
+                    answeredQuestions++;
+                } else if (answer instanceof List) {
+                    List<String> answerList = (List<String>) answer;
+                    for (String value : answerList) {
+                        AssessmentQuestionResponse checkboxResponse = new AssessmentQuestionResponse();
+                        checkboxResponse.setAssessmentQuestion(assessmentQuestion);
+                        checkboxResponse.setAnswer(value);
+                        checkboxResponse.setAssessmentInterview(assessmentInterview);
+                        assessmentsService.saveInterviewResponse(checkboxResponse);
+                        answeredQuestions++;
+                    }
+                }
+            }
+
+            if (answeredQuestions == totalQuestions) {
+                assessmentInterview.setCompleted(true);
+                assessmentsService.saveInterview(assessmentInterview);
+            }
+
+            return ResponseEntity.ok("Assessment submitted successfully.");
+        } catch (NumberFormatException | AssessmentToolError e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error submitting assessment: " + e.getMessage());
+        }
     }
 
     private List<AssessmentQuestion> getAssessmentQuestions(AssessmentForm assessmentForm) throws AssessmentToolError {

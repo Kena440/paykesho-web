@@ -17,4 +17,7 @@ public class AssessmentQuestionResponse extends IdBasedEntity {
     private AssessmentQuestion assessmentQuestion;
     @Column(name = "answer", length = 245, nullable = false)
     private String answer;
+    @ManyToOne
+    @JoinColumn(name = "assessment_interview_id")
+    private AssessmentInterview assessmentInterview;
 }

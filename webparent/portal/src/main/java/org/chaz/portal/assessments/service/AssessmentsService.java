@@ -29,6 +29,8 @@ public class AssessmentsService {
     private AssessmentFormsRepository assessmentFormsRepository;
     @Autowired
     private AssessmentQuestionOptionRepository assessmentQuestionOptionRepository;
+    @Autowired
+    private AssessmentQuestionResponseRepository assessmentQuestionResponseRepository;
 
 
     /**
@@ -51,6 +53,14 @@ public class AssessmentsService {
         }
 
         return assessmentInterviewsRepository.save(assessmentInterview);
+    }
+
+    public AssessmentQuestionResponse saveInterviewResponse(AssessmentQuestionResponse assessmentQuestionResponse) {
+        if (assessmentQuestionResponse == null) {
+            return null;
+        }
+
+        return assessmentQuestionResponseRepository.save(assessmentQuestionResponse);
     }
 
     public Assessment getAssessmentById(Integer id) throws AssessmentToolError {
@@ -84,6 +94,18 @@ public class AssessmentsService {
 
         try {
             return assessmentInterviewsRepository.findById(id).get();
+        } catch (NoSuchElementException exception) {
+            throw new AssessmentToolError("Could not find any form");
+        }
+    }
+
+    public AssessmentQuestion getAssessmentQuestionById(Integer id) throws AssessmentToolError {
+        if (id == null) {
+            throw new AssessmentToolError("Null parameter id");
+        }
+
+        try {
+            return assessmentQuestionsRepository.findById(id).get();
         } catch (NoSuchElementException exception) {
             throw new AssessmentToolError("Could not find any form");
         }

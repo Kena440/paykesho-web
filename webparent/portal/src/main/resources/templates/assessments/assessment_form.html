@@ -115,7 +115,8 @@
                                 <div class="card-body">
                                     <div th:switch="${question.questionType.name}">
                                         <div th:case="'FREETEXT'">
-                                            <textarea class="form-control" rows="3" th:name="'question_' + ${question.id}"></textarea>
+                                            <textarea class="form-control" rows="3"
+                                                      th:name="'question_' + ${question.id}"></textarea>
                                         </div>
                                         <div th:case="'MULTIPLE_CHOICE'">
                                             <div th:each="option : ${question.options}">
@@ -151,10 +152,12 @@
                                             <p>Matching question type is not implemented.</p>
                                         </div>
                                         <div th:case="'SHORT_ANSWER'">
-                                            <input type="text" class="form-control" th:name="'question_' + ${question.id}">
+                                            <input type="text" class="form-control"
+                                                   th:name="'question_' + ${question.id}">
                                         </div>
                                         <div th:case="'ESSAY'">
-                                            <textarea class="form-control" rows="5" th:name="'question_' + ${question.id}"></textarea>
+                                            <textarea class="form-control" rows="5"
+                                                      th:name="'question_' + ${question.id}"></textarea>
                                         </div>
                                         <div th:case="*">
                                             <p>Unknown question type.</p>
@@ -185,6 +188,7 @@
         </div> <!-- / .row -->
     </div>
 
+    <input type="hidden" name="interviewId" id="interviewId" th:value="${assessmentInterview.id}">
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
 
@@ -224,6 +228,7 @@
         const totalQuestions = questions.length;
         const nextButton = document.getElementById('nextButton');
         const backButton = document.getElementById('backButton');
+        const interviewId = document.getElementById('interviewId');
         const submitButton = document.createElement('button');
         submitButton.innerText = 'Submit';
         submitButton.className = 'btn btn-primary';
@@ -274,22 +279,37 @@
         submitButton.addEventListener('click', function () {
             const answers = {};
             questions.forEach(question => {
-                const questionId = question.getAttribute('data-question-id'); // Retrieve the question ID from data attribute
+                const questionId = question.getAttribute('data-question-id');
                 const inputs = question.querySelectorAll('input, textarea');
+
+                // Initialize an array to store selected options for checkboxes
+                let selectedOptions = [];
+
                 inputs.forEach(input => {
-                    if (input.type === 'radio' || input.type === 'checkbox') {
+                    if (input.type === 'radio') {
                         if (input.checked) {
-                            answers[questionId] = input.value;
+                            answers[questionId] = input.value; // For radio buttons, store the selected value directly
+                        }
+                    } else if (input.type === 'checkbox') {
+                        if (input.checked) {
+                            selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
                         }
                     } else {
                         if (input.value.trim() !== '') {
-                            answers[questionId] = input.value;
+                            answers[questionId] = input.value; // For textareas or other input types, store the value directly
                         }
                     }
                 });
+
+                // If there are selected options for checkboxes, store them in the answers object
+                if (selectedOptions.length > 0) {
+                    answers[questionId] = selectedOptions;
+                }
             });
 
+
             const csrfToken = document.querySelector('input[name="_csrf"]').value;
+            const interviewId = document.getElementById('interviewId').value;
 
             Swal.fire({
                 title: 'Are you sure?',
@@ -306,7 +326,7 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken  // Include the CSRF token in the request headers
                         },
-                        body: JSON.stringify({responses: answers})
+                        body: JSON.stringify({interviewId: interviewId, responses: answers})
                     })
                         .then(response => {
                             if (!response.ok) {
