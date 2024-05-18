@@ -37,7 +37,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/assessments")
@@ -152,13 +155,14 @@ public class AssessmentsController {
         try {
             Assessment assessment = assessmentsService.getAssessmentById(id);
             List<AssessmentAssessor> assessmentAssessors = assessmentsService.getAssessmentAssessors(assessment);
-            List<AssessmentFeedback> assessmentFeedbacks = assessmentsService.getAssessmentFeedback(assessment);
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
             List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+
             List<Assessor> assessorList = assessorService.assessorList();
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentAssessors", assessmentAssessors);
-            model.addAttribute("assessmentFeedbacks", assessmentFeedbacks);
+            model.addAttribute("assessmentInterviews", assessmentInterviews);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("assessmentForms", assessmentForms);
             model.addAttribute("assessorList", assessorList);
@@ -283,6 +287,28 @@ public class AssessmentsController {
             return Constants.REDIRECT_TO_Assessment_ID + savedAssessmentForm.getAssessment().getId();
         } else {
             return Constants.REDIRECT_TO_Assessments;
+        }
+    }
+
+    @GetMapping("/interview/view/{id}")
+    public String viewAssessmentInterview(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(id);
+            List<AssessmentQuestionResponse> assessmentQuestionResponses = assessmentsService.getAssessmentQuestionResponseByInterviewId(assessmentInterview);
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessmentInterview.getAssessmentForm().getAssessment());
+            Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new HashMap<>();
+            for (AssessmentQuestion question : assessmentQuestions) {
+                List<AssessmentQuestionResponse> responses = assessmentQuestionResponses.stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
+                questionResponseMap.put(question, responses);
+            }
+
+            model.addAttribute("assessmentInterview", assessmentInterview);
+            model.addAttribute("assessmentQuestions", assessmentQuestions);
+            model.addAttribute("questionResponseMap", questionResponseMap);
+            return "assessments/assessment_view";
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
+            return "redirect:/assessments";
         }
     }
 

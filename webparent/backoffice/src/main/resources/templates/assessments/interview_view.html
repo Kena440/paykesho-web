@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Assessment Management
+                                </h6>
+
+                                <!-- Title -->
+                                <h1 class="header-title text-truncate">
+                                    [[${pageTitle}]]
+                                </h1>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Navigation (button group) -->
+                                <div class="nav btn-group d-inline-flex d-none" role="tablist">
+                                    <button class="btn btn-white active" id="dealsListTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsListPane" role="tab" aria-controls="dealsListPane"
+                                            aria-selected="true">
+                                        <span class="fe fe-list"></span>
+                                    </button>
+                                    <button class="btn btn-white" id="dealsCardsTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsCardsPane" role="tab" aria-controls="dealsCardsPane"
+                                            aria-selected="false">
+                                        <span class="fe fe-sidebar"></span>
+                                    </button>
+                                </div> <!-- / .nav -->
+
+                                <!-- Buttons -->
+                                <a th:href="@{/assessments}" class="btn btn-primary ms-2">
+                                    Assessments
+                                </a>
+
+                            </div>
+                        </div> <!-- / .row -->
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Nav -->
+                                <ul class="nav nav-tabs nav-overflow header-tabs">
+                                    <li class="nav-item d-none">
+                                        <a href="#!" class="nav-link text-nowrap active">
+                                            Total <span
+                                                class="badge rounded-pill bg-secondary-soft"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div id="accordion">
+
+                    <!-- Header -->
+                    <div class="header mt-md-5">
+                        <div class="header-body">
+
+                            <!-- Title -->
+                            <h1 class="header-title">
+                                [[${assessmentForm.assessment.name}]] -
+                            </h1>
+
+                            <!-- Subtitle -->
+                            <p class="header-subtitle">
+                                [[${assessmentForm.formName}]]</p>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-12">
+                            <!-- Existing question items -->
+                            <div th:each="question, iterStat : ${assessmentQuestions}"
+                                 class="card question-item"
+                                 th:attr="data-question-id=${question.id},style='display:none;'">
+                                <div class="card-header">
+                                    [[${iterStat.count}]].&nbsp;
+                                    <h4 class="card-header-title" th:text="${question.question}"></h4>
+                                </div>
+                                <div class="card-body">
+                                    <div th:switch="${question.questionType.name}">
+                                        <div th:case="'FREETEXT'">
+                                            <textarea class="form-control" rows="3"
+                                                      th:name="'question_' + ${question.id}"></textarea>
+                                        </div>
+                                        <div th:case="'MULTIPLE_CHOICE'">
+                                            <div th:each="option : ${question.options}">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" th:value="${option}"
+                                                           th:name="'question_' + ${question.id}">
+                                                    <label class="form-check-label" th:text="${option}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div th:case="'TRUE_FALSE'">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" th:value="true"
+                                                       th:name="'question_' + ${question.id}">
+                                                <label class="form-check-label">True</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" th:value="false"
+                                                       th:name="'question_' + ${question.id}">
+                                                <label class="form-check-label">False</label>
+                                            </div>
+                                        </div>
+                                        <div th:case="'CHECKBOX'">
+                                            <div th:each="option : ${question.options}">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" th:value="${option}"
+                                                           th:name="'question_' + ${question.id}">
+                                                    <label class="form-check-label" th:text="${option}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div th:case="'MATCHING'">
+                                            <p>Matching question type is not implemented.</p>
+                                        </div>
+                                        <div th:case="'SHORT_ANSWER'">
+                                            <input type="text" class="form-control"
+                                                   th:name="'question_' + ${question.id}">
+                                        </div>
+                                        <div th:case="'ESSAY'">
+                                            <textarea class="form-control" rows="5"
+                                                      th:name="'question_' + ${question.id}"></textarea>
+                                        </div>
+                                        <div th:case="*">
+                                            <p>Unknown question type.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <th:block th:if="${question.skippable == true}">
+                                        <div class="badge bg-success">Skippable</div>
+                                    </th:block>
+                                    <th:block th:if="${question.skippable == false}">
+                                        <div class="badge bg-danger">Not Skippable</div>
+                                    </th:block>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <button id="backButton" class="btn btn-secondary" style="display:none;">Back</button>
+                            <button class="btn btn-white" id="nextButton">Next</button>
+                            <button class="btn btn-primary" id="submitButton" style="display:none;">Submit</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+    <input type="hidden" name="interviewId" id="interviewId" th:value="${assessmentInterview.id}">
+    <input type="hidden" name="assessmentId" id="assessmentId" th:value="${assessment.id}">
+</div><!-- / .main-content -->
+<div th:replace="fragments/modal_fragment :: modal_dialog"></div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script type="text/javascript">
+    moduleURL = "[[@{/}]]";
+    MAX_FILE_SIZE = 502400; // 500KB
+
+    function checkEmailUnique(form) {
+        url = "[[@{/assessors/rest/check-email}]]";
+        userEmail = $("#email").val();
+        userId = $("#id").val();
+        csrfValue = $("input[name='_csrf']").val();
+
+        params = {id: userId, email: userEmail, _csrf: csrfValue};
+
+        $.post(url, params, function (response) {
+            if (response === "OK") {
+                form.submit();
+            } else if (response === "Duplicated") {
+                showWarningModal("There is another user having the email " + userEmail);
+            } else {
+                showErrorModal("Unknown response from server");
+            }
+        }).fail(function () {
+            showErrorModal("Could not connect to the server");
+        });
+
+        return false;
+    }
+</script>
+<script type="text/javascript" th:src="@{/assets/js/common_form.js}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentQuestionIndex = 0;
+        const questions = document.querySelectorAll('.question-item');
+        const totalQuestions = questions.length;
+        const nextButton = document.getElementById('nextButton');
+        const backButton = document.getElementById('backButton');
+        const interviewId = document.getElementById('interviewId');
+        const submitButton = document.createElement('button');
+        submitButton.innerText = 'Submit';
+        submitButton.className = 'btn btn-primary';
+        submitButton.style.display = 'none';
+        document.querySelector('.container-fluid .col-md-12').appendChild(submitButton);
+
+        function showQuestion(index) {
+            questions.forEach((question, i) => {
+                question.style.display = i === index ? 'block' : 'none';
+            });
+            backButton.style.display = index === 0 ? 'none' : 'inline-block';
+            nextButton.style.display = index === totalQuestions - 1 ? 'none' : 'inline-block';
+            submitButton.style.display = index === totalQuestions - 1 ? 'inline-block' : 'none';
+        }
+
+        function isQuestionAnswered(question) {
+            const inputs = question.querySelectorAll('input, textarea');
+            return Array.from(inputs).some(input => input.checked || input.value.trim() !== '');
+        }
+
+        nextButton.addEventListener('click', function () {
+            const currentQuestion = questions[currentQuestionIndex];
+            const skippable = currentQuestion.querySelector('.badge.bg-success') !== null;
+            const answered = isQuestionAnswered(currentQuestion);
+
+            if (!skippable && !answered) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'This question is not skippable. Please provide an answer before proceeding.'
+                });
+                return;
+            }
+
+            if (currentQuestionIndex < totalQuestions - 1) {
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+            }
+        });
+
+        backButton.addEventListener('click', function () {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+            }
+        });
+
+        submitButton.addEventListener('click', function () {
+            const answers = {};
+            questions.forEach(question => {
+                const questionId = question.getAttribute('data-question-id');
+                const inputs = question.querySelectorAll('input, textarea');
+
+                // Initialize an array to store selected options for checkboxes
+                let selectedOptions = [];
+
+                inputs.forEach(input => {
+                    if (input.type === 'radio') {
+                        if (input.checked) {
+                            answers[questionId] = input.value; // For radio buttons, store the selected value directly
+                        }
+                    } else if (input.type === 'checkbox') {
+                        if (input.checked) {
+                            selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
+                        }
+                    } else {
+                        if (input.value.trim() !== '') {
+                            answers[questionId] = input.value; // For textareas or other input types, store the value directly
+                        }
+                    }
+                });
+
+                // If there are selected options for checkboxes, store them in the answers object
+                if (selectedOptions.length > 0) {
+                    answers[questionId] = selectedOptions;
+                }
+            });
+
+
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
+            const interviewId = document.getElementById('interviewId').value;
+            const assessmentId = document.getElementById('assessmentId').value;
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to edit your answers after submission!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, submit it!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/assessments/interview/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
+                        },
+                        body: JSON.stringify({interviewId: interviewId, responses: answers})
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                // Handle error response
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'There was an error submitting answers. Please try again.',
+                                    icon: 'error',
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                });
+                            } else {
+                                // Handle successful response
+                                Swal.fire({
+                                    title: 'Submitted!',
+                                    text: 'Answers have been submitted successfully.',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                }).then((result) => {
+                                    console.log(result)
+                                    window.location.href = '/assessments/view/' + assessmentId;
+
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // Handle network errors or exceptions
+                            console.error('Error:', error);
+                        });
+
+                }
+            });
+        });
+
+        showQuestion(currentQuestionIndex);
+    });
+</script>
+
+
+</body>
+
+
+</html>

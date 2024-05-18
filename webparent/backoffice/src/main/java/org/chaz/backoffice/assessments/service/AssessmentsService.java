@@ -28,8 +28,10 @@ public class AssessmentsService {
     private AssessmentFormsRepository assessmentFormsRepository;
     @Autowired
     private AssessmentQuestionOptionRepository assessmentQuestionOptionRepository;
-
-
+    @Autowired
+    private AssessmentInterviewsRepository assessmentInterviewsRepository;
+    @Autowired
+    private AssessmentQuestionResponseRepository assessmentQuestionResponseRepository;
     /**
      * +
      * This method saves assessment submitted from the assessment
@@ -133,6 +135,18 @@ public class AssessmentsService {
         }
     }
 
+    public AssessmentInterview getAssessmentInterviewById(Integer id) throws AssessmentToolError {
+        if (id == null) {
+            throw new AssessmentToolError("Null parameter id");
+        }
+
+        try {
+            return assessmentInterviewsRepository.findById(id).get();
+        } catch (NoSuchElementException exception) {
+            throw new AssessmentToolError("Could not find any Assessment");
+        }
+    }
+
     public void delete(Integer id) throws AssessmentToolError {
         if (id == null) {
             throw new AssessmentToolError("Null parameter id");
@@ -175,6 +189,14 @@ public class AssessmentsService {
         return assessmentFeedbackRepository.findByAssessment(assessment.getId());
     }
 
+    public List<AssessmentInterview> getAssessmentInterviews(Assessment assessment) throws AssessmentToolError {
+        if (assessment == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentInterviewsRepository.findByAssessment(assessment.getId());
+    }
+
     public List<AssessmentAssessor> getAssessmentAssessors(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
             throw new AssessmentToolError("Null parameter assessment");
@@ -197,5 +219,13 @@ public class AssessmentsService {
         }
 
         return assessmentFormsRepository.findByAssessment(assessment.getId());
+    }
+
+    public List<AssessmentQuestionResponse> getAssessmentQuestionResponseByInterviewId(AssessmentInterview assessmentInterview) throws AssessmentToolError {
+        if (assessmentInterview == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentQuestionResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
     }
 }
