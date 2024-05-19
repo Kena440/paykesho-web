@@ -3,11 +3,9 @@ package org.chaz.portal.settings.service;
 import org.chaz.portal.settings.currency.CurrencySettingBag;
 import org.chaz.portal.settings.email.EmailSettingBag;
 import org.chaz.portal.settings.payment.PaymentSettingBag;
-import org.chaz.portal.settings.repository.CurrencyRepository;
-import org.chaz.portal.settings.repository.NeedTypesRepository;
-import org.chaz.portal.settings.repository.SettingRepository;
-import org.chaz.portal.settings.repository.StateRepository;
+import org.chaz.portal.settings.repository.*;
 import org.commons.entity.State;
+import org.commons.entity.facilities.LevelOfCare;
 import org.commons.entity.settings.Country;
 import org.commons.entity.settings.Currency;
 import org.commons.entity.settings.NeedType;
@@ -28,7 +26,10 @@ public class SettingService {
     private StateRepository stateRepository;
     @Autowired
     private NeedTypesRepository needTypesRepository;
-
+    @Autowired
+    private CountryRepository countryRepository;
+    @Autowired
+    private LevelOfCareRepository levelOfCareRepository;
     public List<Setting> getGeneralSettings() {
         return settingRepository.findByTwoCategories(SettingCategory.GENERAL, SettingCategory.CURRENCY);
     }
@@ -76,6 +77,18 @@ public class SettingService {
 
     public List<Setting> getCurrencySettings() {
         return settingRepository.findByCategory(SettingCategory.CURRENCY);
+    }
+
+    public Country getCountryByName(String name) {
+        Country countryInDb = countryRepository.findCountryByName(name);
+        if (countryInDb == null) {
+            return null;
+        }
+        return countryInDb;
+    }
+
+    public LevelOfCare findLevelOfCareById(Integer id) {
+        return levelOfCareRepository.findById(id).get();
     }
 
 }

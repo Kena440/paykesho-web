@@ -1,13 +1,18 @@
 package org.chaz.portal.facilities.service;
 
+import org.chaz.portal.facilities.dto.DataItem;
+import org.chaz.portal.facilities.dto.GPSDataItem;
 import org.chaz.portal.facilities.repository.FacilityRepository;
+import org.chaz.portal.settings.service.SettingService;
 import org.commons.entity.facilities.Facility;
+import org.commons.entity.facilities.LevelOfCare;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -19,6 +24,8 @@ public class FacilityService {
     protected DateFormat dateFormat;
     @Autowired
     private FacilityRepository facilityRepository;
+    @Autowired
+    private SettingService settingService;
 
     public Facility save(Facility facility) {
         if (facility == null) {
@@ -142,10 +149,48 @@ public class FacilityService {
         return true;
     }
 
+    public List<DataItem> getFacilityTypesDataEnabled(boolean enabled) {
+        List<Facility> memberInstitutions = facilityRepository.findFacilityTypesEnabled(enabled);
+
+        List<DataItem> dataItemList = new ArrayList<>();
+
+        for (Facility detail : memberInstitutions) {
+            LevelOfCare levelOfCare = settingService.findLevelOfCareById(detail.getLevelOfCare().getId());
+            String identifier = levelOfCare.getName();
+
+            DataItem dataItem = new DataItem(identifier);
+
+            int itemIndex = dataItemList.indexOf(dataItem);
+            if (itemIndex >= 0) {
+                dataItem = dataItemList.get(itemIndex);
+                dataItem.increaseItemCount(1);
+            } else {
+                dataItemList.add(new DataItem(identifier, 1));
+            }
+        }
+
+        return dataItemList;
+    }
+
     public Long countInstitutions() {
         return facilityRepository.count();
     }
 
+    public List<GPSDataItem> getFacilityGPSDataEnabled(boolean enabled) {
+        List<Facility> memberInstitutions = facilityRepository.findFacilityTypesEnabled(enabled);
+
+        List<GPSDataItem> dataItemList = new ArrayList<>();
+
+        for (Facility detail : memberInstitutions) {
+            String title = detail.getName();
+            float lng = detail.getLongitude();
+            float lat = detail.getLatitude();
+
+            dataItemList.add(new GPSDataItem(title, lng, lat));
+        }
+
+        return dataItemList;
+    }
     public List<Facility> getAssessmentFacilities(){
         return facilityRepository.findFacilityEnabled(true);
     }

@@ -166,4 +166,12 @@ public class AssessmentsService {
     public List<AssessmentQuestionOption> getOptionsByQuestion(AssessmentQuestion question) {
         return assessmentQuestionOptionRepository.findByAssessmentQuestion(question.getId());
     }
+
+    public List<Assessment> getUpcomingAssessments(int i) {
+        if (i > 0) {
+            return assessmentsRepository.findUpcomingAssessments(i);
+        } else {
+            return assessmentsRepository.findUpcomingAssessments(30);
+        }
+    }
 }

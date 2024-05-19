@@ -99,4 +99,12 @@ public class EventsService {
         }
     }
 
+    public List<Event> getUpcomingEvents(int i) {
+        if (i > 0) {
+            return eventsRepository.findUpcomingEvents(i);
+        } else {
+            return eventsRepository.findUpcomingEvents(30);
+        }
+    }
+
 }

@@ -172,6 +172,7 @@
                                 </div>
                                 <div class="tab-pane fade" id="reportsTab">
                                     <div class="row">
+                                        <div th:replace="assessments/view_tabs/reports :: content"></div>
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="miscTab">
@@ -396,6 +397,8 @@
 </div><!-- / .main-content -->
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
 <script type="text/javascript">
     contextPath = "[[@{/}]]";
 
