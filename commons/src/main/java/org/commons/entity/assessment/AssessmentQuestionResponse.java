@@ -20,4 +20,9 @@ public class AssessmentQuestionResponse extends IdBasedEntity {
     @ManyToOne
     @JoinColumn(name = "assessment_interview_id")
     private AssessmentInterview assessmentInterview;
+
+    @Override
+    public String toString() {
+        return answer;
+    }
 }

@@ -36,10 +36,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -296,16 +293,19 @@ public class AssessmentsController {
             AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(id);
             List<AssessmentQuestionResponse> assessmentQuestionResponses = assessmentsService.getAssessmentQuestionResponseByInterviewId(assessmentInterview);
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessmentInterview.getAssessmentForm().getAssessment());
-            Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new HashMap<>();
+            Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new LinkedHashMap<>();
             for (AssessmentQuestion question : assessmentQuestions) {
-                List<AssessmentQuestionResponse> responses = assessmentQuestionResponses.stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
+                List<AssessmentQuestionResponse> responses = assessmentQuestionResponses.stream()
+                        .filter(response -> response.getAssessmentQuestion().getId().equals(question.getId()))
+                        .collect(Collectors.toList());
                 questionResponseMap.put(question, responses);
             }
-
             model.addAttribute("assessmentInterview", assessmentInterview);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("questionResponseMap", questionResponseMap);
-            return "assessments/assessment_view";
+            model.addAttribute("pageTitle", "Interview View");
+
+            return "assessments/interview_view";
         } catch (AssessmentToolError assessmentToolError) {
             redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/assessments";
