@@ -33,8 +33,8 @@ public class AssessmentsRestController {
         return assessmentsService.isAssessmentUnique(id, name) ? "OK" : "Duplicated";
     }
 
-    @GetMapping("/distribution/{id}")
-    public ResponseEntity<Map<String, Map<String, Long>>> getDistributionPerQuestion(@PathVariable("id") Integer id) {
+    @GetMapping("/distribution/aggregated/{id}")
+    public ResponseEntity<Map<String, Map<String, Long>>> getDistributionPerQuestionAggregated(@PathVariable("id") Integer id) {
         try {
             Assessment assessment = assessmentsService.getAssessmentById(id);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
@@ -43,22 +43,44 @@ public class AssessmentsRestController {
             // Filter only MULTIPLE_CHOICE and CHECKBOX questions
             List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream().filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX)).collect(Collectors.toList());
 
-            Map<String, Map<String, Long>> distributionPerQuestion = new LinkedHashMap<>();
-            for (AssessmentQuestion question : filteredQuestions) {
-                Map<String, Long> distribution = new LinkedHashMap<>();
-                for (AssessmentInterview interview : assessmentInterviews) {
-                    List<AssessmentQuestionResponse> responses = assessmentsService.getAssessmentQuestionResponseByInterviewId(interview).stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
-                    for (AssessmentQuestionResponse response : responses) {
-                        distribution.merge(response.getAnswer(), 1L, Long::sum);
-                    }
-                }
-                distributionPerQuestion.put(question.getQuestion(), distribution);
-            }
-
-            return ResponseEntity.ok(distributionPerQuestion);
+            return getMapResponseEntity(assessmentInterviews, filteredQuestions);
         } catch (AssessmentToolError e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+    }
+
+    @GetMapping("/distribution/disaggregated/{id}")
+    public ResponseEntity<Map<String, Map<String, Long>>> getDistributionPerQuestionDisaggregated(@PathVariable("id") Integer id) {
+        try {
+            Assessment assessment = assessmentsService.getAssessmentById(id);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+
+            // Filter only MULTIPLE_CHOICE and CHECKBOX questions
+            List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream()
+                    .filter(q -> !q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) && !q.getQuestionType().equals(QuestionType.CHECKBOX))
+                    .collect(Collectors.toList());
+
+            return getMapResponseEntity(assessmentInterviews, filteredQuestions);
+        } catch (AssessmentToolError e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    private ResponseEntity<Map<String, Map<String, Long>>> getMapResponseEntity(List<AssessmentInterview> assessmentInterviews, List<AssessmentQuestion> filteredQuestions) throws AssessmentToolError {
+        Map<String, Map<String, Long>> distributionPerQuestion = new LinkedHashMap<>();
+        for (AssessmentQuestion question : filteredQuestions) {
+            Map<String, Long> distribution = new LinkedHashMap<>();
+            for (AssessmentInterview interview : assessmentInterviews) {
+                List<AssessmentQuestionResponse> responses = assessmentsService.getAssessmentQuestionResponseByInterviewId(interview).stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
+                for (AssessmentQuestionResponse response : responses) {
+                    distribution.merge(response.getAnswer(), 1L, Long::sum);
+                }
+            }
+            distributionPerQuestion.put(question.getQuestion(), distribution);
+        }
+
+        return ResponseEntity.ok(distributionPerQuestion);
     }
 
     @GetMapping("/facility-types/{id}")

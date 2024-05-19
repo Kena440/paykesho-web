@@ -470,7 +470,8 @@
 <script th:inline="javascript">
 
     var assessmentId = document.getElementById('assessmentId').value;
-    var distributionUrl = '/assessments/rest/distribution/' + assessmentId;
+    var distributionAggregatedUrl = '/assessments/rest/distribution/aggregated/' + assessmentId;
+    var distributionDisaggregatedUrl = '/assessments/rest/distribution/disaggregated/' + assessmentId;
     var facilityTypeUrl = '/assessments/rest/facility-types/' + assessmentId;
     var facilityProvinceUrl = '/assessments/rest/facility-provinces/' + assessmentId;
     var facilityResponseUrl = '/assessments/rest/facility-response/' + assessmentId;
@@ -479,7 +480,7 @@
     var completionRateUrl = '/assessments/rest/completion-rates/' + assessmentId;
     var completionTimeUrl = '/assessments/rest/average-completion-time/' + assessmentId;
 
-    $.get(distributionUrl, function (response) {
+    $.get(distributionAggregatedUrl, function (response) {
         var chartsContainer = $('#charts-container');
 
         $.each(response, function (question, distribution) {
@@ -509,8 +510,8 @@
                     datasets: [{
                         label: 'Responses',
                         data: data,
-                        backgroundColor: 'rgb(172,239,176)',
-                        borderColor: 'rgb(27,134,31)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }]
                 },
@@ -524,6 +525,31 @@
                     }
                 }
             });
+        });
+    });
+    $.get(distributionDisaggregatedUrl, function (response) {
+        var questionsContainer = $('#questions-container');
+
+        $.each(response, function (question, interviews) {
+            var questionText = question;
+
+            // Create HTML for question and answers
+            var questionHTML = '<div class="card mb-3">' +
+                '    <div class="card-header">' +
+                '        <h4 class="card-header-title">' + questionText + '</h4>' +
+                '    </div>' +
+                '    <div class="card-body">';
+
+            $.each(interviews, function (index, interview) {
+                var interviewHTML = '        <ul class="responses">';
+                interviewHTML += '            <li>' + index + '</li>';
+                interviewHTML += '        </ul>';
+                questionHTML += interviewHTML;
+            });
+            questionHTML += '    </div>' +
+                '</div>';
+
+            questionsContainer.append(questionHTML);
         });
     });
     $.get(facilityTypeUrl, function (response) {

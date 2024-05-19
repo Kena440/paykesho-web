@@ -247,8 +247,8 @@ public class AssessmentsService {
     }
 
     public Map<String, Long> getCompletionRates(Integer assessmentId) {
-        long totalInterviews = assessmentInterviewsRepository.countByAssessmentId(assessmentId);
-        long completedInterviews = assessmentInterviewsRepository.countByAssessmentIdAndStatus(assessmentId, true);
+        long totalInterviews = assessmentInterviewsRepository.countByAssessmentFormAssessmentId(assessmentId);
+        long completedInterviews = assessmentInterviewsRepository.countByAssessmentFormAssessmentIdAndCompleted(assessmentId, true);
         Map<String, Long> completionRates = new HashMap<>();
         completionRates.put("totalInterviews", totalInterviews);
         completionRates.put("completedInterviews", completedInterviews);
