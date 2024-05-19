@@ -119,4 +119,14 @@ public class AssessmentsRestController {
     public Map<String, Long> getAssessorInterviews(@PathVariable("id") Integer assessmentId) {
         return assessmentsService.getInterviewsByAssessor(assessmentId);
     }
+
+    @GetMapping("/completion-rates/{id}")
+    public Map<String, Long> getCompletionRates(@PathVariable("id") Integer assessmentId) {
+        return assessmentsService.getCompletionRates(assessmentId);
+    }
+
+    @GetMapping("/average-completion-time/{id}")
+    public Map<String, Double> getAverageCompletionTime(@PathVariable("id") Integer assessmentId) {
+        return assessmentsService.getAverageCompletionTime(assessmentId);
+    }
 }

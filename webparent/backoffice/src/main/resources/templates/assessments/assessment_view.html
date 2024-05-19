@@ -476,6 +476,8 @@
     var facilityResponseUrl = '/assessments/rest/facility-response/' + assessmentId;
     var facilityDistrictUrl = '/assessments/rest/facility-districts/' + assessmentId;
     var assessorInterviewsUrl = '/assessments/rest/assessor-interviews/' + assessmentId;
+    var completionRateUrl = '/assessments/rest/completion-rates/' + assessmentId;
+    var completionTimeUrl = '/assessments/rest/average-completion-time/' + assessmentId;
 
     $.get(distributionUrl, function (response) {
         var chartsContainer = $('#charts-container');
@@ -663,6 +665,56 @@
                 datasets: [{
                     label: 'Number of Interviews',
                     data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+    $.get(completionRateUrl, function (response) {
+        var ctx = document.getElementById('completionRateChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed Interviews', 'Total Interviews'],
+                datasets: [{
+                    data: [response.completedInterviews, response.totalInterviews],
+                    backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+    $.get(completionTimeUrl, function (response) {
+        var ctx = document.getElementById('completionTimeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Average Time', 'Min Time', 'Max Time'],
+                datasets: [{
+                    label: 'Completion Time (minutes)',
+                    data: [response.averageTime, response.minTime, response.maxTime],
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1

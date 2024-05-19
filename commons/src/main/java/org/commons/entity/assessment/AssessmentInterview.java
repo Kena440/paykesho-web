@@ -33,6 +33,8 @@ public class AssessmentInterview extends IdBasedEntity {
     private String endTime;
     @Column(name = "created_date")
     private Date createdDate;
+    @Column(name = "completed_date")
+    private Date completedDate;
     private boolean completed;
     @ManyToOne
     @JoinColumn(name = "assessor_id")

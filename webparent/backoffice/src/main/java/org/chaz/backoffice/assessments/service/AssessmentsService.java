@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -247,5 +244,33 @@ public class AssessmentsService {
                         interview -> interview.getAssessor().getName(),
                         Collectors.counting()
                 ));
+    }
+
+    public Map<String, Long> getCompletionRates(Integer assessmentId) {
+        long totalInterviews = assessmentInterviewsRepository.countByAssessmentId(assessmentId);
+        long completedInterviews = assessmentInterviewsRepository.countByAssessmentIdAndStatus(assessmentId, true);
+        Map<String, Long> completionRates = new HashMap<>();
+        completionRates.put("totalInterviews", totalInterviews);
+        completionRates.put("completedInterviews", completedInterviews);
+        return completionRates;
+    }
+
+    public Map<String, Double> getAverageCompletionTime(Integer assessmentId) {
+        List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
+
+        DoubleSummaryStatistics stats = interviews.stream()
+                .mapToDouble(interview -> {
+                    // Assuming getStartTime() and getEndTime() return a java.util.Date or java.time.LocalDateTime
+                    long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
+                    return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
+                })
+                .summaryStatistics();
+
+        Map<String, Double> completionTimes = new HashMap<>();
+        completionTimes.put("averageTime", stats.getAverage());
+        completionTimes.put("minTime", stats.getMin());
+        completionTimes.put("maxTime", stats.getMax());
+
+        return completionTimes;
     }
 }

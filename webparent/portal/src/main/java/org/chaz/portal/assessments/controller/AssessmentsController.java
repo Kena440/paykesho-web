@@ -226,6 +226,7 @@ public class AssessmentsController {
 
             if (answeredQuestions >= totalQuestions) {
                 assessmentInterview.setCompleted(true);
+                assessmentInterview.setCompletedDate(new Date());
                 assessmentsService.saveInterview(assessmentInterview);
             }
 

@@ -20,4 +20,8 @@ public interface AssessmentInterviewsRepository extends SearchRepository<Assessm
 
     @Query("select e from AssessmentInterview e where e.assessmentForm.assessment.id = ?1 order by e.assessmentForm.assessment.assessmentDate desc")
     public Page<AssessmentInterview> findPageForAllByAssessment(Integer eventId, Pageable pageable);
+
+    long countByAssessmentId(Integer assessmentId);
+
+    long countByAssessmentIdAndStatus(Integer assessmentId, Boolean completed);
 }
