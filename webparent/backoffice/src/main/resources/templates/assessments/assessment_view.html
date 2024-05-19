@@ -308,7 +308,8 @@
                                         Type
                                     </label>
 
-                                    <select class="form-select mb-3" data-choices name="questionType" required onchange="showOptionsField()">
+                                    <select class="form-select mb-3" data-choices name="questionType" required
+                                            onchange="showOptionsField()">
                                         <option value="">Select...</option>
 
                                         <th:block
@@ -348,7 +349,8 @@
                                     <div id="optionsList">
                                         <!-- This is where dynamically added options will be displayed -->
                                     </div>
-                                    <button type="button" class="btn btn-primary" onclick="addOption()">Add Option</button>
+                                    <button type="button" class="btn btn-primary" onclick="addOption()">Add Option
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -380,7 +382,7 @@
                                     <label class="form-label">
                                         Form Name
                                     </label>
-                                    <input class="form-control" name="formName" type="text"  placeholder="Name" required>
+                                    <input class="form-control" name="formName" type="text" placeholder="Name" required>
                                 </div>
                             </div>
 
@@ -394,6 +396,9 @@
             </div>
         </div>
     </div>
+
+    <input type="hidden" name="aId" id="aId" th:value="${assessment.id}">
+
 </div><!-- / .main-content -->
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
@@ -462,7 +467,223 @@
     // Call showOptionsField initially to show/hide options field based on initial question type
     showOptionsField();
 </script>
+<script th:inline="javascript">
 
+    var assessmentId = document.getElementById('assessmentId').value;
+    var distributionUrl = '/assessments/rest/distribution/' + assessmentId;
+    var facilityTypeUrl = '/assessments/rest/facility-types/' + assessmentId;
+    var facilityProvinceUrl = '/assessments/rest/facility-provinces/' + assessmentId;
+    var facilityResponseUrl = '/assessments/rest/facility-response/' + assessmentId;
+    var facilityDistrictUrl = '/assessments/rest/facility-districts/' + assessmentId;
+    var assessorInterviewsUrl = '/assessments/rest/assessor-interviews/' + assessmentId;
+
+    $.get(distributionUrl, function (response) {
+        var chartsContainer = $('#charts-container');
+
+        $.each(response, function (question, distribution) {
+            var questionText = question;
+            var labels = Object.keys(distribution);
+            var data = Object.values(distribution);
+            var chartId = 'chart' + labels.join('').replace(/\s+/g, '');
+
+            chartsContainer.append(
+                '<div class="col-12 col-md-6" >' +
+                '<div class="card mb-3">' +
+                '  <div class="card-header">' +
+                '    <h4 class="card-header-title">' + questionText + '</h4>' +
+                '  </div>' +
+                '  <div class="card-body">' +
+                '    <canvas id="' + chartId + '"></canvas>' +
+                '  </div>' +
+                '</div>' +
+                '</div>'
+            );
+
+            var ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Responses',
+                        data: data,
+                        backgroundColor: 'rgb(172,239,176)',
+                        borderColor: 'rgb(27,134,31)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+    });
+    $.get(facilityTypeUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+        var ctx = document.getElementById('facilityTypeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+    $.get(facilityProvinceUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+        var ctx = document.getElementById('facilityProvinceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+    $.get(facilityDistrictUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+        var ctx = document.getElementById('facilityDistrictChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+    $.get(facilityResponseUrl, function (response) {
+        var totalFacilities = response.totalFacilities;
+        var respondingFacilities = response.respondingFacilities;
+        var nonRespondingFacilities = totalFacilities - respondingFacilities;
+
+        var ctx = document.getElementById('facilityResponseChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Responding Facilities', 'Non-responding Facilities'],
+                datasets: [{
+                    data: [respondingFacilities, nonRespondingFacilities],
+                    backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+    $.get(assessorInterviewsUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+
+        var ctx = document.getElementById('assessorInterviewsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Interviews',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

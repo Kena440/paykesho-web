@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -227,5 +230,22 @@ public class AssessmentsService {
         }
 
         return assessmentQuestionResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
+    }
+
+    public int getRespondingFacilities(Integer assessmentId) {
+        List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
+        Set<Integer> uniqueFacilityIds = interviews.stream()
+                .map(interview -> interview.getFacility().getId())
+                .collect(Collectors.toSet());
+        return uniqueFacilityIds.size();
+    }
+
+    public Map<String, Long> getInterviewsByAssessor(Integer assessmentId) {
+        List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
+        return interviews.stream()
+                .collect(Collectors.groupingBy(
+                        interview -> interview.getAssessor().getName(),
+                        Collectors.counting()
+                ));
     }
 }
