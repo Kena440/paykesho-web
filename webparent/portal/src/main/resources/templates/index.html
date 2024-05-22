@@ -256,6 +256,7 @@
         const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-facility-gps-data/true";
 
         $.get(facilityTypesDataRequestUrl, function (responseJSON) {
+            console.log(responseJSON)
             $.each(responseJSON, function (index, reportItem) {
                 facilityTypes.push(reportItem.identifier);
                 facilityTypesData.push(reportItem.itemCount);

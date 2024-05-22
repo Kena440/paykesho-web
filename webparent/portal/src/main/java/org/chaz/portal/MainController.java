@@ -33,7 +33,7 @@ public class MainController {
     private SettingService settingService;
 
     @GetMapping("")
-    public String viewHomePage(Model model, HttpServletRequest request) throws AssessmentToolError {
+    public String viewHomePage(Model model, HttpServletRequest request) {
         Assessor assessor = assessorService.getAuthenticatedAssessor(request);
         Country country = settingService.getCountryByName("Zambia");
 
@@ -43,6 +43,7 @@ public class MainController {
         model.addAttribute("upcomingAssessments", assessmentsService.getUpcomingAssessments(30));
         model.addAttribute("countTotalInterviews", countTotalInterviews);
         model.addAttribute("countTotalAssessments", countTotalAssessments);
+        if (country != null) model.addAttribute("country", country);
 
         return "index";
     }
