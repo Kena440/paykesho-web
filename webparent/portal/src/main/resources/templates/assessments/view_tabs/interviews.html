@@ -28,7 +28,7 @@
             <input class="form-control" id="searchInterviewsInput" placeholder="Search..." type="text">
         </div>
 
-        <div class="col-12 col-md-12">
+        <div class="col-12 col-md-12 full-details">
             <div class="table-responsive">
                 <table class="table table-sm table-bordered my-4" id="interviewsTable">
                     <thead>
@@ -115,6 +115,37 @@
                 <hr>
                 <button class="btn btn-primary" id="showMoreBtn">Show More</button>
                 <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
+            </div>
+        </div>
+
+        <div class="col-12 col-md-12 less-details">
+            <div th:each="interview, interviewStat : ${assessmentInterviews}" class="row m-1">
+                <div class="col col-12">
+                    <td><small>[[${interview.respondentName}]]</small> (<small>[[${interview.facility.name}]]</small>)</td>
+                    <br>
+                    <td>
+                        <th:block th:if="${interview.completed == true}">
+                            <div class="badge bg-success">
+                                Done
+                            </div>
+                        </th:block>
+                        <th:block th:if="${interview.completed == false}">
+                            <div class="badge bg-danger">
+                                Pending
+                            </div>
+                        </th:block>
+                    </td>
+                    <td class="px-0 text-center">
+                        <th:block th:if="${interview.completed == false}">
+                            <a class="btn btn-sm btn-primary"
+                               th:href="@{'/assessments/interview/continue/' + ${interview.id}}">
+                                <span class="fe fe-play"></span>
+                                Continue
+                            </a>
+                        </th:block>
+                    </td>
+                </div>
+                <hr>
             </div>
         </div>
     </div>
