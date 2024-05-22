@@ -201,7 +201,6 @@
                                                            th:name="'question_' + ${question.id} + '_averagePercentageError'"/>
                                                 </div>
                                             </div>
-
                                         </div>
                                         <div th:case="*">
                                             <p>Unknown question type.</p>
@@ -234,6 +233,7 @@
 
     <input type="hidden" name="interviewId" id="interviewId" th:value="${assessmentInterview.id}">
     <input type="hidden" name="assessmentId" id="assessmentId" th:value="${assessment.id}">
+    <input type="hidden" name="formType" id="formType" th:value="${assessmentForm.formType.name()}">
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
 
@@ -241,33 +241,6 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
-<script type="text/javascript">
-    moduleURL = "[[@{/}]]";
-    MAX_FILE_SIZE = 502400; // 500KB
-
-    function checkEmailUnique(form) {
-        url = "[[@{/assessors/rest/check-email}]]";
-        userEmail = $("#email").val();
-        userId = $("#id").val();
-        csrfValue = $("input[name='_csrf']").val();
-
-        params = {id: userId, email: userEmail, _csrf: csrfValue};
-
-        $.post(url, params, function (response) {
-            if (response === "OK") {
-                form.submit();
-            } else if (response === "Duplicated") {
-                showWarningModal("There is another user having the email " + userEmail);
-            } else {
-                showErrorModal("Unknown response from server");
-            }
-        }).fail(function () {
-            showErrorModal("Could not connect to the server");
-        });
-
-        return false;
-    }
-</script>
 <script type="text/javascript" th:src="@{/assets/js/common_form.js}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -324,6 +297,8 @@
             }
         });
 
+        const formType = document.getElementById('formType').value;
+
         submitButton.addEventListener('click', function () {
             const answers = {};
             questions.forEach(question => {
@@ -332,27 +307,59 @@
 
                 // Initialize an array to store selected options for checkboxes
                 let selectedOptions = [];
+                let productData = {};
 
                 inputs.forEach(input => {
-                    if (input.type === 'radio') {
-                        if (input.checked) {
-                            answers[questionId] = input.value; // For radio buttons, store the selected value directly
+                    if (formType === 'GENERAL') {
+                        if (input.type === 'radio') {
+                            if (input.checked) {
+                                answers[questionId] = input.value; // For radio buttons, store the selected value directly
+                            }
+                        } else if (input.type === 'checkbox') {
+                            if (input.checked) {
+                                selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
+                            }
+                        } else {
+                            if (input.value.trim() !== '') {
+                                answers[questionId] = input.value; // For textareas or other input types, store the value directly
+                            }
                         }
-                    } else if (input.type === 'checkbox') {
-                        if (input.checked) {
-                            selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
-                        }
-                    } else {
-                        if (input.value.trim() !== '') {
-                            answers[questionId] = input.value; // For textareas or other input types, store the value directly
+                    } else if (formType === 'PRODUCTS') {
+                        if (input.type === 'radio') {
+                            if (input.checked) {
+                                if (input.name.includes('_managedAtFacility')) {
+                                    productData['managedAtFacility'] = input.value === 'true';
+                                }
+                            }
+                        } else {
+                            if (input.name.includes('_sohActual')) {
+                                productData['sohActual'] = parseInt(input.value, 10);
+                            } else if (input.name.includes('_sohElmisFe')) {
+                                productData['sohElmisFe'] = parseInt(input.value, 10);
+                            } else if (input.name.includes('_variance')) {
+                                productData['variance'] = parseInt(input.value, 10);
+                            } else if (input.name.includes('_percentageError')) {
+                                productData['percentageError'] = parseFloat(input.value);
+                            } else if (input.name.includes('_averagePercentageError')) {
+                                productData['averagePercentageError'] = parseFloat(input.value);
+                            } else {
+                                // Handle any other input types as needed
+                            }
                         }
                     }
                 });
 
-                // If there are selected options for checkboxes, store them in the answers object
-                if (selectedOptions.length > 0) {
-                    answers[questionId] = selectedOptions;
+                if (formType === 'GENERAL') {
+                    // If there are selected options for checkboxes, store them in the answers object
+                    if (selectedOptions.length > 0) {
+                        answers[questionId] = selectedOptions;
+                    }
+                } else if (formType === 'PRODUCTS') {
+                    if (Object.keys(productData).length > 0) {
+                        answers[questionId] = productData;
+                    }
                 }
+
             });
 
 

@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -219,44 +220,38 @@ public class AssessmentsController {
             String questionIdString = entry.getKey();
             Object answer = entry.getValue();
 
-            if (questionIdString.startsWith("question_")) {
-                String[] parts = questionIdString.split("_");
-                Long questionId = Long.parseLong(parts[1]);
-                String field = parts[2];
+            AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
+            if (assessmentQuestion == null) {
+                throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
+            }
 
-                AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
-                if (assessmentQuestion == null) {
-                    throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
-                }
-
+            if (answer instanceof LinkedHashMap) {
+                LinkedHashMap<String, Object> productData = (LinkedHashMap<String, Object>) answer;
                 AssessmentQuestionResponse response = new AssessmentQuestionResponse();
                 response.setAssessmentQuestion(assessmentQuestion);
+                response.setAssessmentInterview(assessmentInterview);
 
-                switch (field) {
-                    case "managedAtFacility":
-                        response.setManagedAtFacility((Boolean) answer);
-                        break;
-                    case "sohActual":
-                        response.setSohActual((Integer) answer);
-                        break;
-                    case "sohElmisFe":
-                        response.setSohElmisFe((Integer) answer);
-                        break;
-                    case "variance":
-                        response.setVariance((Integer) answer);
-                        break;
-                    case "percentageError":
-                        response.setPercentageError((Double) answer);
-                        break;
-                    case "averagePercentageError":
-                        response.setAveragePercentageError((Double) answer);
-                        break;
-                    default:
-                        response.setAnswer((String) answer);
-                        break;
+                if (productData.containsKey("managedAtFacility")) {
+                    response.setManagedAtFacility((Boolean) productData.get("managedAtFacility"));
+                }
+                if (productData.containsKey("sohActual")) {
+                    response.setSohActual(convertToInteger(productData.get("sohActual")));
+                }
+                if (productData.containsKey("sohElmisFe")) {
+                    response.setSohElmisFe(convertToInteger(productData.get("sohElmisFe")));
+                }
+                if (productData.containsKey("variance")) {
+                    response.setVariance(convertToInteger(productData.get("variance")));
+                }
+                if (productData.containsKey("percentageError")) {
+                    response.setPercentageError(convertToDouble(productData.get("percentageError")));
+                }
+                if (productData.containsKey("averagePercentageError")) {
+                    response.setAveragePercentageError(convertToDouble(productData.get("averagePercentageError")));
                 }
 
-                response.setAssessmentInterview(assessmentInterview);
+                response.setAnswer("size -> " + ((LinkedHashMap<?, ?>) answer).size());
+
                 assessmentsService.saveInterviewResponse(response);
                 answeredQuestions++;
             }
@@ -305,5 +300,33 @@ public class AssessmentsController {
             }
         }
         return assessmentQuestions;
+    }
+
+    private Integer convertToInteger(Object value) {
+        if (value instanceof Integer) {
+            return (Integer) value;
+        } else if (value instanceof String) {
+            try {
+                return Integer.parseInt((String) value);
+            } catch (NumberFormatException e) {
+                return null; // or handle the exception as needed
+            }
+        }
+        return null; // or handle the null case as needed
+    }
+
+    private Double convertToDouble(Object value) {
+        if (value instanceof Double) {
+            return (Double) value;
+        } else if (value instanceof Integer) {
+            return ((Integer) value).doubleValue();
+        } else if (value instanceof String) {
+            try {
+                return Double.parseDouble((String) value);
+            } catch (NumberFormatException e) {
+                return null; // or handle the exception as needed
+            }
+        }
+        return null; // or handle the null case as needed
     }
 }
