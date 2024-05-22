@@ -5,7 +5,25 @@
 <!-- Added by HTTrack -->
 <meta http-equiv="content-type" content="text/html;charset=utf-8"/><!-- /Added by HTTrack -->
 <head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
+<style>
+    .question-col {
+        width: 40%;
+        word-wrap: break-word;
+    }
 
+    .small-col {
+        width: 8%;
+        word-wrap: break-word;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table-nowrap th, .table-nowrap td {
+        white-space: normal;
+    }
+</style>
 <body>
 
 <form th:replace="fragments/fragments :: offcanvas_demo"></form>
@@ -59,7 +77,8 @@
                                 </div> <!-- / .nav -->
 
                                 <!-- Buttons -->
-                                <a th:href="@{'/assessments/view/'+${assessmentInterview.assessmentForm.assessment.id}}" class="btn btn-primary ms-2">
+                                <a th:href="@{'/assessments/view/'+${assessmentInterview.assessmentForm.assessment.id}}"
+                                   class="btn btn-primary ms-2">
                                     Back
                                 </a>
 
@@ -147,7 +166,9 @@
 
                                             <!-- Text -->
                                             <p class="text-muted mb-4">
-                                                <strong class="text-body">[[${assessmentInterview.assessor.name}]]</strong>
+                                                <strong class="text-body">[[${assessmentInterview.assessor.name}]]</strong><br>
+                                                <time datetime="2018-04-23"
+                                                      th:replace="fragments/fragments :: format_date(${assessmentInterview.createdDate})"></time>
                                             </p>
 
                                         </div>
@@ -155,7 +176,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-12"
+                             th:if="${assessmentInterview.getAssessmentForm().formType.name() == T(org.commons.enums.FormType).GENERAL.name()}">
                             <div th:each="entry, iterStat : ${questionResponseMap}">
                                 <div class="card mb-3">
                                     <div class="card-header">
@@ -173,6 +195,64 @@
                                         </ul>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-12"
+                             th:if="${assessmentInterview.getAssessmentForm().formType.name() == T(org.commons.enums.FormType).PRODUCTS.name()}">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    [[${assessmentInterview.assessmentForm.formName}]]
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover table-nowrap card-table"
+                                               th:if="${questionResponseMap.size() > 0}">
+                                            <thead>
+                                            <tr>
+                                                <th class="list-sort text-muted text-center" scope="col">No.</th>
+                                                <th class="list-sort text-muted question-col" scope="col">Product</th>
+                                                <th class="list-sort text-muted small-col text-center" scope="col">Is
+                                                    this managed at this facility? (Y/N)
+                                                </th>
+                                                <th class="list-sort text-muted small-col text-center" scope="col">SOH
+                                                    (Actual)
+                                                </th>
+                                                <th class="list-sort text-muted small-col text-center" scope="col">SOH
+                                                    (eLMIS FE)
+                                                </th>
+                                                <th class="list-sort text-muted small-col text-center" scope="col">
+                                                    Variance
+                                                </th>
+                                                <th class="list-sort text-muted small-col text-center" scope="col">
+                                                    Percentage Error
+                                                </th>
+                                                <th class="list-sort text-muted small-col text-center" scope="col">
+                                                    Average Percentage Error
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="list fs-base">
+                                            <tr th:each="entry, iterStat : ${questionResponseMap}">
+                                                <td class="text-center">[[${iterStat.count}]]</td>
+                                                <td class="question-col">[[${entry.key.question}]]</td>
+                                                <td class="small-col text-center" th:each="response : ${entry.value}"
+                                                    th:text="${response.managedAtFacility ? 'Yes' : 'No'}"></td>
+                                                <td class="small-col text-center" th:each="response : ${entry.value}"
+                                                    th:text="${response.sohActual}"></td>
+                                                <td class="small-col text-center" th:each="response : ${entry.value}"
+                                                    th:text="${response.sohElmisFe}"></td>
+                                                <td class="small-col text-center" th:each="response : ${entry.value}"
+                                                    th:text="${response.variance}"></td>
+                                                <td class="small-col text-center" th:each="response : ${entry.value}"
+                                                    th:text="${response.percentageError}"></td>
+                                                <td class="small-col text-center" th:each="response : ${entry.value}"
+                                                    th:text="${response.averagePercentageError}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-footer"></div>
                             </div>
                         </div>
                     </div>

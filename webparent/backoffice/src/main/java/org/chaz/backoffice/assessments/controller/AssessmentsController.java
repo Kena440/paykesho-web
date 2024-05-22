@@ -171,7 +171,7 @@ public class AssessmentsController {
             try {
 
                 // Filter only MULTIPLE_CHOICE and CHECKBOX questions
-                List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream().filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX)).collect(Collectors.toList());
+                List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream().filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX) || q.getQuestionType().equals(QuestionType.PRODUCT)).collect(Collectors.toList());
 
                 Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new LinkedHashMap<>();
                 for (AssessmentQuestion question : filteredQuestions) {

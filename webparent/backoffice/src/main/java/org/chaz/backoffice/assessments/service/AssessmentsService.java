@@ -236,6 +236,8 @@ public class AssessmentsService {
         return assessmentQuestionResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
     }
 
+
+
     public int getRespondingFacilities(Integer assessmentId) {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
         Set<Integer> uniqueFacilityIds = interviews.stream()

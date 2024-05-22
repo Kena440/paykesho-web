@@ -13,4 +13,5 @@ public interface AssessmentQuestionResponseRepository extends JpaRepository<Asse
 
     @Query("select e from AssessmentQuestionResponse e where e.assessmentInterview.id = ?1 order by e.id desc")
     public List<AssessmentQuestionResponse> findByAssessmentInterview(Integer eventId);
+
 }

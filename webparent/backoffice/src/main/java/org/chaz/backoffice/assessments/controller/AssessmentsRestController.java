@@ -58,7 +58,7 @@ public class AssessmentsRestController {
 
             // Filter only MULTIPLE_CHOICE and CHECKBOX questions
             List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream()
-                    .filter(q -> !q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) && !q.getQuestionType().equals(QuestionType.CHECKBOX))
+                    .filter(q -> !q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) && !q.getQuestionType().equals(QuestionType.CHECKBOX) && !q.getQuestionType().equals(QuestionType.PRODUCT))
                     .collect(Collectors.toList());
 
             return getMapResponseEntity(assessmentInterviews, filteredQuestions);

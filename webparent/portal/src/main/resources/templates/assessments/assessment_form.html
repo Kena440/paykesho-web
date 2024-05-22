@@ -234,6 +234,10 @@
     <input type="hidden" name="interviewId" id="interviewId" th:value="${assessmentInterview.id}">
     <input type="hidden" name="assessmentId" id="assessmentId" th:value="${assessment.id}">
     <input type="hidden" name="formType" id="formType" th:value="${assessmentForm.formType.name()}">
+    <input type="hidden" name="formTypeGeneral" id="formTypeGeneral"
+           th:value="${assessmentForm.formType.GENERAL.name()}">
+    <input type="hidden" name="formTypeProducts" id="formTypeProducts"
+           th:value="${assessmentForm.formType.PRODUCTS.name()}">
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
 
@@ -298,6 +302,8 @@
         });
 
         const formType = document.getElementById('formType').value;
+        const formTypeProducts = document.getElementById('formTypeProducts').value;
+        const formTypeGeneral = document.getElementById('formTypeGeneral').value;
 
         submitButton.addEventListener('click', function () {
             const answers = {};
@@ -310,7 +316,7 @@
                 let productData = {};
 
                 inputs.forEach(input => {
-                    if (formType === 'GENERAL') {
+                    if (formType === formTypeGeneral) {
                         if (input.type === 'radio') {
                             if (input.checked) {
                                 answers[questionId] = input.value; // For radio buttons, store the selected value directly
@@ -324,7 +330,7 @@
                                 answers[questionId] = input.value; // For textareas or other input types, store the value directly
                             }
                         }
-                    } else if (formType === 'PRODUCTS') {
+                    } else if (formType === formTypeProducts) {
                         if (input.type === 'radio') {
                             if (input.checked) {
                                 if (input.name.includes('_managedAtFacility')) {
@@ -349,12 +355,12 @@
                     }
                 });
 
-                if (formType === 'GENERAL') {
+                if (formType === formTypeGeneral) {
                     // If there are selected options for checkboxes, store them in the answers object
                     if (selectedOptions.length > 0) {
                         answers[questionId] = selectedOptions;
                     }
-                } else if (formType === 'PRODUCTS') {
+                } else if (formType === formTypeProducts) {
                     if (Object.keys(productData).length > 0) {
                         answers[questionId] = productData;
                     }

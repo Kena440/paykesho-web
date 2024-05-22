@@ -489,6 +489,7 @@
 
     var assessmentId = document.getElementById('assessmentId').value;
     var distributionAggregatedUrl = '/assessments/rest/distribution/aggregated/' + assessmentId;
+    //var distributionProductsUrl = '/assessments/rest/distribution/products/' + assessmentId;
     var distributionDisaggregatedUrl = '/assessments/rest/distribution/disaggregated/' + assessmentId;
     var facilityTypeUrl = '/assessments/rest/facility-types/' + assessmentId;
     var facilityProvinceUrl = '/assessments/rest/facility-provinces/' + assessmentId;
@@ -545,6 +546,27 @@
             });
         });
     });
+ /*   $.get(distributionProductsUrl, function (data) {
+        var tableBody = $('#products-table-body');
+        tableBody.empty(); // Clear existing table body content
+
+        // Loop through the data and append rows to the table body
+        $.each(data, function (index, entry) {
+            var rowHtml = '<tr>' +
+                '<td class="text-center">' + entry.count + '</td>' +
+                '<td>' + entry.question + '</td>' +
+                '<td class="text-center">' + (entry.managedAtFacility ? 'Yes' : 'No') + '</td>' +
+                '<td class="text-center">' + entry.sohActual + '</td>' +
+                '<td class="text-center">' + entry.sohElmisFe + '</td>' +
+                '<td class="text-center">' + entry.variance + '</td>' +
+                '<td class="text-center">' + entry.percentageError + '</td>' +
+                '<td class="text-center">' + entry.averagePercentageError + '</td>' +
+                '</tr>';
+
+            tableBody.append(rowHtml);
+        });
+    });*/
+
     $.get(distributionDisaggregatedUrl, function (response) {
         var questionsContainer = $('#questions-container');
 
