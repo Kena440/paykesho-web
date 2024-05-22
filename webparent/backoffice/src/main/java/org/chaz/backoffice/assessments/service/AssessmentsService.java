@@ -213,6 +213,13 @@ public class AssessmentsService {
         return assessmentQuestionsRepository.findByAssessment(assessment.getId());
     }
 
+    public List<AssessmentQuestion> getAssessmentQuestionsByForm(AssessmentForm assessmentForm) throws AssessmentToolError {
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("Null parameter assessmentForm");
+        }
+
+        return assessmentQuestionsRepository.findByAssessmentForm(assessmentForm.getId());
+    }
     public List<AssessmentForm> getAssessmentForms(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
             throw new AssessmentToolError("Null parameter assessment");

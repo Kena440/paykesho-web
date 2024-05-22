@@ -7,6 +7,7 @@ import org.chaz.portal.assessors.service.AssessorService;
 import org.chaz.portal.facilities.service.FacilityService;
 import org.commons.entity.assessment.*;
 import org.commons.entity.facilities.Facility;
+import org.commons.enums.FormType;
 import org.commons.enums.QuestionType;
 import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
@@ -195,33 +196,10 @@ public class AssessmentsController {
             int totalQuestions = getAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
             int answeredQuestions = 0;
 
-            for (Map.Entry<String, Object> entry : responses.entrySet()) {
-                String questionIdString = entry.getKey();
-                Object answer = entry.getValue();
-
-                AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
-                if (assessmentQuestion == null) {
-                    throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
-                }
-
-                if (answer instanceof String) {
-                    AssessmentQuestionResponse response = new AssessmentQuestionResponse();
-                    response.setAssessmentQuestion(assessmentQuestion);
-                    response.setAnswer((String) answer);
-                    response.setAssessmentInterview(assessmentInterview);
-                    assessmentsService.saveInterviewResponse(response);
-                    answeredQuestions++;
-                } else if (answer instanceof List) {
-                    List<String> answerList = (List<String>) answer;
-                    for (String value : answerList) {
-                        AssessmentQuestionResponse checkboxResponse = new AssessmentQuestionResponse();
-                        checkboxResponse.setAssessmentQuestion(assessmentQuestion);
-                        checkboxResponse.setAnswer(value);
-                        checkboxResponse.setAssessmentInterview(assessmentInterview);
-                        assessmentsService.saveInterviewResponse(checkboxResponse);
-                        answeredQuestions++;
-                    }
-                }
+            if (assessmentInterview.getAssessmentForm().getFormType().equals(FormType.GENERAL)) {
+                answeredQuestions = getAnsweredQuestionsGeneralForm(responses, assessmentInterview, answeredQuestions);
+            } else if (assessmentInterview.getAssessmentForm().getFormType().equals(FormType.PRODUCTS)) {
+                answeredQuestions = getAnsweredQuestionsProductsForm(responses, assessmentInterview, answeredQuestions);
             }
 
             if (answeredQuestions >= totalQuestions) {
@@ -234,6 +212,88 @@ public class AssessmentsController {
         } catch (NumberFormatException | AssessmentToolError e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error submitting assessment: " + e.getMessage());
         }
+    }
+
+    private int getAnsweredQuestionsProductsForm(Map<String, Object> responses, AssessmentInterview assessmentInterview, int answeredQuestions) throws AssessmentToolError {
+        for (Map.Entry<String, Object> entry : responses.entrySet()) {
+            String questionIdString = entry.getKey();
+            Object answer = entry.getValue();
+
+            if (questionIdString.startsWith("question_")) {
+                String[] parts = questionIdString.split("_");
+                Long questionId = Long.parseLong(parts[1]);
+                String field = parts[2];
+
+                AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
+                if (assessmentQuestion == null) {
+                    throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
+                }
+
+                AssessmentQuestionResponse response = new AssessmentQuestionResponse();
+                response.setAssessmentQuestion(assessmentQuestion);
+
+                switch (field) {
+                    case "managedAtFacility":
+                        response.setManagedAtFacility((Boolean) answer);
+                        break;
+                    case "sohActual":
+                        response.setSohActual((Integer) answer);
+                        break;
+                    case "sohElmisFe":
+                        response.setSohElmisFe((Integer) answer);
+                        break;
+                    case "variance":
+                        response.setVariance((Integer) answer);
+                        break;
+                    case "percentageError":
+                        response.setPercentageError((Double) answer);
+                        break;
+                    case "averagePercentageError":
+                        response.setAveragePercentageError((Double) answer);
+                        break;
+                    default:
+                        response.setAnswer((String) answer);
+                        break;
+                }
+
+                response.setAssessmentInterview(assessmentInterview);
+                assessmentsService.saveInterviewResponse(response);
+                answeredQuestions++;
+            }
+        }
+        return answeredQuestions;
+    }
+
+    private int getAnsweredQuestionsGeneralForm(Map<String, Object> responses, AssessmentInterview assessmentInterview, int answeredQuestions) throws AssessmentToolError {
+        for (Map.Entry<String, Object> entry : responses.entrySet()) {
+            String questionIdString = entry.getKey();
+            Object answer = entry.getValue();
+
+            AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
+            if (assessmentQuestion == null) {
+                throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
+            }
+
+            if (answer instanceof String) {
+                AssessmentQuestionResponse response = new AssessmentQuestionResponse();
+                response.setAssessmentQuestion(assessmentQuestion);
+                response.setAnswer((String) answer);
+                response.setAssessmentInterview(assessmentInterview);
+                assessmentsService.saveInterviewResponse(response);
+                answeredQuestions++;
+            } else if (answer instanceof List) {
+                List<String> answerList = (List<String>) answer;
+                for (String value : answerList) {
+                    AssessmentQuestionResponse checkboxResponse = new AssessmentQuestionResponse();
+                    checkboxResponse.setAssessmentQuestion(assessmentQuestion);
+                    checkboxResponse.setAnswer(value);
+                    checkboxResponse.setAssessmentInterview(assessmentInterview);
+                    assessmentsService.saveInterviewResponse(checkboxResponse);
+                    answeredQuestions++;
+                }
+            }
+        }
+        return answeredQuestions;
     }
 
     private List<AssessmentQuestion> getAssessmentQuestions(AssessmentForm assessmentForm) throws AssessmentToolError {

@@ -38,11 +38,14 @@
                 <table class="table table-sm table-bordered my-4" id="formsTable">
                     <thead>
                     <tr>
-                        <th class="px-0 bg-transparent border-top-0">
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">#</span>
                         </th>
-                        <th class="px-0 bg-transparent border-top-0 text-start">
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Name</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Type</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Date</span>
@@ -55,11 +58,14 @@
                     <tbody>
                     <tr th:each="form, formStat : ${assessmentForms}">
 
-                        <td class="px-0">
+                        <td class="px-0 text-sm-center">
                             <small>[[${formStat.count}]]</small>
                         </td>
-                        <td class="px-0 text-start">
+                        <td class="px-0 text-sm-center">
                             <small>[[${form.formName}]]</small>
+                        </td>
+                        <td class="px-0 text-sm-center">
+                            <small>[[${form.formType}]]</small>
                         </td>
                         <td class="px-0 text-sm-center">
                             <small>
@@ -72,7 +78,6 @@
                                 <a class="fe fe-edit" th:href="@{'/assessments/form/edit/'+${form.id}}"
                                    title="Edit">
                                 </a>
-                                &nbsp;
                                 &nbsp;
                                 &nbsp;
                                 <a class="fe fe-trash" th:href="@{'/assessments/form/delete/'+${form.id}}"
@@ -98,10 +103,10 @@
                 <table class="table table-sm table-bordered my-4" id="questionsTable">
                     <thead>
                     <tr>
-                        <th class="px-0 bg-transparent border-top-0">
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">#</span>
                         </th>
-                        <th class="px-0 bg-transparent border-top-0 text-start">
+                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Question</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
@@ -124,7 +129,7 @@
                     <tbody>
                     <tr th:each="question, questionStat : ${assessmentQuestions}">
 
-                        <td class="px-0">
+                        <td class="px-0 text-center">
                             <small>[[${questionStat.count}]]</small>
                         </td>
                         <td class="px-0 text-start">
@@ -161,7 +166,6 @@
                                 <a class="fe fe-edit" th:href="@{'/assessments/question/edit/'+${question.id}}"
                                    title="Edit">
                                 </a>
-                                &nbsp;
                                 &nbsp;
                                 &nbsp;
                                 <a class="fe fe-trash" th:href="@{'/assessments/question/delete/'+${question.id}}"

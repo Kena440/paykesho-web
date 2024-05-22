@@ -20,7 +20,23 @@ public class AssessmentQuestionResponse extends IdBasedEntity {
     @ManyToOne
     @JoinColumn(name = "assessment_interview_id")
     private AssessmentInterview assessmentInterview;
+    @Column(name = "managed_at_facility")
+    private Boolean managedAtFacility;
 
+    @Column(name = "soh_actual")
+    private Integer sohActual;
+
+    @Column(name = "soh_elmis_fe")
+    private Integer sohElmisFe;
+
+    @Column(name = "variance")
+    private Integer variance;
+
+    @Column(name = "percentage_error")
+    private Double percentageError;
+
+    @Column(name = "average_percentage_error")
+    private Double averagePercentageError;
     @Override
     public String toString() {
         return answer;

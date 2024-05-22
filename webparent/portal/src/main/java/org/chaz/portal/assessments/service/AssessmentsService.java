@@ -124,7 +124,7 @@ public class AssessmentsService {
             throw new AssessmentToolError("Null parameter assessmentForm");
         }
 
-        return assessmentQuestionsRepository.findByAssessment(assessmentForm.getId());
+        return assessmentQuestionsRepository.findByAssessmentForm(assessmentForm.getId());
     }
 
     public List<AssessmentInterview> getAssessmentInterviews(Assessment assessment) throws AssessmentToolError {

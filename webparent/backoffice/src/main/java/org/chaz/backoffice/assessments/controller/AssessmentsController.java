@@ -10,6 +10,7 @@ import org.chaz.backoffice.paging.PagingAndSortingParam;
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.service.SettingService;
 import org.commons.entity.assessment.*;
+import org.commons.enums.FormType;
 import org.commons.enums.QuestionType;
 import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
@@ -170,31 +171,25 @@ public class AssessmentsController {
             try {
 
                 // Filter only MULTIPLE_CHOICE and CHECKBOX questions
-                List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream()
-                        .filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX))
-                        .collect(Collectors.toList());
+                List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream().filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX)).collect(Collectors.toList());
 
                 Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new LinkedHashMap<>();
                 for (AssessmentQuestion question : filteredQuestions) {
                     List<AssessmentQuestionResponse> allResponses = new ArrayList<>();
                     for (AssessmentInterview interview : assessmentInterviews) {
-                        List<AssessmentQuestionResponse> responses = assessmentsService.getAssessmentQuestionResponseByInterviewId(interview).stream()
-                                .filter(response -> response.getAssessmentQuestion().getId().equals(question.getId()))
-                                .collect(Collectors.toList());
+                        List<AssessmentQuestionResponse> responses = assessmentsService.getAssessmentQuestionResponseByInterviewId(interview).stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
                         allResponses.addAll(responses);
                     }
                     questionResponseMap.put(question, allResponses);
                 }
 
                 // Aggregate data
-                Map<AssessmentQuestion, Long> responseCountPerQuestion = questionResponseMap.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, entry -> (long) entry.getValue().size()));
+                Map<AssessmentQuestion, Long> responseCountPerQuestion = questionResponseMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> (long) entry.getValue().size()));
 
                 Map<AssessmentQuestion, Map<String, Long>> distributionPerQuestion = new LinkedHashMap<>();
                 for (Map.Entry<AssessmentQuestion, List<AssessmentQuestionResponse>> entry : questionResponseMap.entrySet()) {
                     AssessmentQuestion question = entry.getKey();
-                    Map<String, Long> distribution = entry.getValue().stream()
-                            .collect(Collectors.groupingBy(AssessmentQuestionResponse::getAnswer, Collectors.counting()));
+                    Map<String, Long> distribution = entry.getValue().stream().collect(Collectors.groupingBy(AssessmentQuestionResponse::getAnswer, Collectors.counting()));
                     distributionPerQuestion.put(question, distribution);
                 }
                 model.addAttribute("responseCountPerQuestion", responseCountPerQuestion);
@@ -210,7 +205,6 @@ public class AssessmentsController {
             return "redirect:/assessments";
         }
     }
-
 
     @GetMapping("/generateQRCode")
     public void generateQRCode(String qrContent, HttpServletResponse response) throws IOException {
@@ -310,10 +304,12 @@ public class AssessmentsController {
 
         if (assessment.isEnabled()) {
             String formName = request.getParameter("formName");
+            String formType = request.getParameter("formType");
 
             AssessmentForm question = new AssessmentForm();
             question.setAssessment(assessment);
             question.setFormName(formName);
+            question.setFormType(FormType.valueOf(formType));
             question.setCreatedDate(new Date());
 
             AssessmentForm savedAssessmentForm = assessmentsService.saveForm(question);
@@ -330,12 +326,10 @@ public class AssessmentsController {
         try {
             AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(id);
             List<AssessmentQuestionResponse> assessmentQuestionResponses = assessmentsService.getAssessmentQuestionResponseByInterviewId(assessmentInterview);
-            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessmentInterview.getAssessmentForm().getAssessment());
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentInterview.getAssessmentForm());
             Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new LinkedHashMap<>();
             for (AssessmentQuestion question : assessmentQuestions) {
-                List<AssessmentQuestionResponse> responses = assessmentQuestionResponses.stream()
-                        .filter(response -> response.getAssessmentQuestion().getId().equals(question.getId()))
-                        .collect(Collectors.toList());
+                List<AssessmentQuestionResponse> responses = assessmentQuestionResponses.stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
                 questionResponseMap.put(question, responses);
             }
             model.addAttribute("assessmentInterview", assessmentInterview);

@@ -13,6 +13,9 @@ public interface AssessmentQuestionsRepository extends SearchRepository<Assessme
     @Query("select e from AssessmentQuestion e where e.assessmentForm.assessment.id = ?1 order by e.assessmentForm.assessment.assessmentDate desc")
     public List<AssessmentQuestion> findByAssessment(Integer eventId);
 
+    @Query("select e from AssessmentQuestion e where e.assessmentForm.id = ?1 order by e.assessmentForm.assessment.assessmentDate desc")
+    public List<AssessmentQuestion> findByAssessmentForm(Integer eventId);
+
     @Query("select e from AssessmentQuestion e where concat(e.assessmentForm.assessment.name, ' ', e.assessmentForm.assessment.assessmentDate) like %?1%")
     public Page<AssessmentQuestion> findAll(String keyword, Pageable pageable);
 
