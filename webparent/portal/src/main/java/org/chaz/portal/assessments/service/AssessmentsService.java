@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -150,6 +151,15 @@ public class AssessmentsService {
 
         return assessmentQuestionResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
     }
+
+    public List<AssessmentQuestion> getVerifiedAssessmentQuestions(AssessmentForm assessmentForm) {
+        List<AssessmentQuestion> allQuestions = assessmentQuestionsRepository.findByAssessmentForm(assessmentForm.getId());
+
+        return allQuestions.stream()
+                .filter(AssessmentQuestion::isNeedsVerification)
+                .collect(Collectors.toList());
+    }
+
 
     public Page<Assessment> listForAssessorByPage(Assessor assessor, int pageNum, String sortField, String sortDir, String assessmentKeyword) {
         Sort sort = Sort.by(sortField);

@@ -260,6 +260,7 @@ public class AssessmentsController {
         String questionParam = request.getParameter("question");
         String questionSkippableParam = request.getParameter("questionSkippable");
         String questionNeedsVerificationParam = request.getParameter("questionNeedsVerification");
+        String verificationQuestionParam = "";
         String questionVerificationInputTypeParam = "";
 
         // Check if any of the required parameters are empty
@@ -275,6 +276,7 @@ public class AssessmentsController {
         boolean questionNeedsVerification = Boolean.parseBoolean(questionNeedsVerificationParam);
 
         if (questionNeedsVerification) {
+            verificationQuestionParam = request.getParameter("verificationQuestion");
             questionVerificationInputTypeParam = request.getParameter("verificationInputType");
         }
 
@@ -294,6 +296,7 @@ public class AssessmentsController {
 
             if (questionNeedsVerification) {
                 question.setVerificationOption(questionVerificationInputTypeParam);
+                question.setVerificationQuestion(verificationQuestionParam);
             }
 
             question.setCreatedDate(new Date());

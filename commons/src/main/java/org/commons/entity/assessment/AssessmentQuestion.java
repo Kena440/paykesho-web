@@ -33,6 +33,9 @@ public class AssessmentQuestion extends IdBasedEntity {
     @Column(name = "verification_option", length = 500)
     private String verificationOption;
 
+    @Column(name = "verification_question", length = 500)
+    private String verificationQuestion;
+
     @Column(name = "verification_comment", length = 500)
     private String verificationComment;
 

@@ -36,8 +36,6 @@ public class AssessmentsController {
     @Autowired
     private AssessmentsService assessmentsService;
     @Autowired
-    private AssessmentCodeService assessmentCodeService;
-    @Autowired
     private AssessorService assessorService;
     @Autowired
     private FacilityService facilityService;
@@ -45,7 +43,7 @@ public class AssessmentsController {
 
 
     @GetMapping("")
-    public String listFirstPage(Model model, HttpServletRequest request) throws AssessmentToolError {
+    public String listFirstPage(Model model, HttpServletRequest request) {
         return listAllAssessmentsByPage(model, request, 1, "assessmentDate", "desc", null);
     }
 
@@ -158,6 +156,7 @@ public class AssessmentsController {
 
         List<AssessmentQuestion> assessmentQuestions = getAssessmentQuestions(assessmentForm);
 
+        model.addAttribute("pageTitle", "Start Interview");
         model.addAttribute("assessmentForm", assessmentForm);
         model.addAttribute("assessment", assessment);
         model.addAttribute("assessmentInterview", savedAssessmentInterview);
@@ -166,7 +165,7 @@ public class AssessmentsController {
     }
 
     @GetMapping("/interview/continue/{id}")
-    public String continueAssessmentInterview(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) throws AssessmentToolError {
+    public String continueAssessmentInterview(@PathVariable("id") Integer id, Model model) throws AssessmentToolError {
 
         AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(id);
         if (assessmentInterview == null) {
@@ -177,11 +176,32 @@ public class AssessmentsController {
 
         List<AssessmentQuestion> assessmentQuestions = getAssessmentQuestions(assessmentForm);
 
+        model.addAttribute("pageTitle", "Continue Interview");
         model.addAttribute("assessmentForm", assessmentForm);
         model.addAttribute("assessment", assessmentInterview.getAssessmentForm().getAssessment());
         model.addAttribute("assessmentInterview", assessmentInterview);
         model.addAttribute("assessmentQuestions", assessmentQuestions);
         return "assessments/assessment_form";
+    }
+
+    @GetMapping("/interview/verification/{id}")
+    public String startAssessmentInterviewVerification(@PathVariable("id") Integer id, Model model) throws AssessmentToolError {
+
+        AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(id);
+        if (assessmentInterview == null) {
+            throw new AssessmentToolError("No assessment Interview");
+        }
+
+        AssessmentForm assessmentForm = assessmentInterview.getAssessmentForm();
+
+        List<AssessmentQuestion> assessmentQuestions = assessmentsService.getVerifiedAssessmentQuestions(assessmentForm);
+
+        model.addAttribute("assessmentForm", assessmentForm);
+        model.addAttribute("pageTitle", "Verification");
+        model.addAttribute("assessment", assessmentInterview.getAssessmentForm().getAssessment());
+        model.addAttribute("assessmentInterview", assessmentInterview);
+        model.addAttribute("assessmentVerificationQuestions", assessmentQuestions);
+        return "assessments/assessment_verification_form";
     }
 
     @PostMapping("/interview/submit")
