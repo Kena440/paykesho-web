@@ -20,6 +20,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -254,27 +255,53 @@ public class AssessmentsController {
     @PostMapping("/save-question")
     public String saveAssessmentQuestion(RedirectAttributes redirectAttributes, HttpServletRequest request) throws AssessmentToolError {
 
-        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(Integer.valueOf(request.getParameter("assessmentForm")));
+        String assessmentFormIdParam = request.getParameter("assessmentForm");
+        String questionTypeParam = request.getParameter("questionType");
+        String questionParam = request.getParameter("question");
+        String questionSkippableParam = request.getParameter("questionSkippable");
+        String questionNeedsVerificationParam = request.getParameter("questionNeedsVerification");
+        String questionVerificationInputTypeParam = "";
+
+        // Check if any of the required parameters are empty
+        if (StringUtils.isEmpty(assessmentFormIdParam) || StringUtils.isEmpty(questionTypeParam) || StringUtils.isEmpty(questionParam) || StringUtils.isEmpty(questionSkippableParam) || StringUtils.isEmpty(questionNeedsVerificationParam)) {
+            throw new AssessmentToolError("One or more required parameters are empty");
+        }
+
+        // Convert parameters to appropriate types
+        Integer assessmentFormId = Integer.valueOf(assessmentFormIdParam);
+        QuestionType questionType = QuestionType.valueOf(questionTypeParam);
+        String questionReq = questionParam;
+        boolean questionSkippable = Boolean.parseBoolean(questionSkippableParam);
+        boolean questionNeedsVerification = Boolean.parseBoolean(questionNeedsVerificationParam);
+
+        if (questionNeedsVerification) {
+            questionVerificationInputTypeParam = request.getParameter("verificationInputType");
+        }
+
+        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(assessmentFormId);
 
         if (assessmentForm == null) {
-            throw new AssessmentToolError("No assessmentForm");
+            throw new AssessmentToolError("No assessmentForm found for ID: " + assessmentFormId);
         }
 
         if (assessmentForm.getAssessment().isEnabled()) {
-            String questionType = request.getParameter("questionType");
-            String questionFromReq = request.getParameter("question");
-            String questionSkippable = request.getParameter("questionSkippable");
-
             AssessmentQuestion question = new AssessmentQuestion();
             question.setAssessmentForm(assessmentForm);
-            question.setQuestionType(QuestionType.valueOf(questionType));
-            question.setQuestion(questionFromReq);
-            question.setSkippable(Boolean.parseBoolean(questionSkippable));
+            question.setQuestionType(questionType);
+            question.setQuestion(questionReq);
+            question.setSkippable(questionSkippable);
+            question.setNeedsVerification(questionNeedsVerification);
+
+            if (questionNeedsVerification) {
+                question.setVerificationOption(questionVerificationInputTypeParam);
+            }
+
             question.setCreatedDate(new Date());
 
             AssessmentQuestion savedAssessmentQuestion = assessmentsService.saveQuestion(question);
 
-            if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE || question.getQuestionType() == QuestionType.CHECKBOX) {
+            // Handle options if applicable
+            if (questionType == QuestionType.MULTIPLE_CHOICE || questionType == QuestionType.CHECKBOX) {
                 String[] options = request.getParameterValues("options");
                 if (options != null) {
                     for (String optionText : options) {
@@ -291,7 +318,6 @@ public class AssessmentsController {
         } else {
             return Constants.REDIRECT_TO_Assessments;
         }
-
     }
 
     @PostMapping("/save-form")

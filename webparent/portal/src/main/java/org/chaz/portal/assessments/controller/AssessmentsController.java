@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -231,30 +232,48 @@ public class AssessmentsController {
                 response.setAssessmentQuestion(assessmentQuestion);
                 response.setAssessmentInterview(assessmentInterview);
 
+                int sohActual = 0;
+                int sohElmisFe = 0;
+                int variance = 0;
+
                 if (productData.containsKey("managedAtFacility")) {
                     response.setManagedAtFacility((Boolean) productData.get("managedAtFacility"));
                 }
                 if (productData.containsKey("sohActual")) {
-                    response.setSohActual(convertToInteger(productData.get("sohActual")));
+                    sohActual = convertToInteger(productData.get("sohActual"));
+                    response.setSohActual(sohActual);
                 }
                 if (productData.containsKey("sohElmisFe")) {
-                    response.setSohElmisFe(convertToInteger(productData.get("sohElmisFe")));
-                }
-                if (productData.containsKey("variance")) {
-                    response.setVariance(convertToInteger(productData.get("variance")));
-                }
-                if (productData.containsKey("percentageError")) {
-                    response.setPercentageError(convertToDouble(productData.get("percentageError")));
-                }
-                if (productData.containsKey("averagePercentageError")) {
-                    response.setAveragePercentageError(convertToDouble(productData.get("averagePercentageError")));
+                    sohElmisFe = convertToInteger(productData.get("sohElmisFe"));
+                    response.setSohElmisFe(sohElmisFe);
                 }
 
+                variance = sohActual - sohElmisFe;
+
+                response.setVariance(variance);
+
+                double percentageError = 0.0;
+                if (sohActual != 0) {
+                    percentageError = ((double) variance / sohActual) * 100;
+                }
+
+                DecimalFormat df = new DecimalFormat("#.##");
+                percentageError = Double.parseDouble(df.format(percentageError));
+
+                response.setPercentageError(percentageError);
                 response.setAnswer("size -> " + ((LinkedHashMap<?, ?>) answer).size());
 
                 assessmentsService.saveInterviewResponse(response);
                 answeredQuestions++;
+            } else if (answer instanceof String) {
+                AssessmentQuestionResponse response = new AssessmentQuestionResponse();
+                response.setAssessmentQuestion(assessmentQuestion);
+                response.setAnswer((String) answer);
+                response.setAssessmentInterview(assessmentInterview);
+                assessmentsService.saveInterviewResponse(response);
+                answeredQuestions++;
             }
+
         }
         return answeredQuestions;
     }

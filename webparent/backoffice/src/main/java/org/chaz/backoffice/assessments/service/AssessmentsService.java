@@ -32,6 +32,7 @@ public class AssessmentsService {
     private AssessmentInterviewsRepository assessmentInterviewsRepository;
     @Autowired
     private AssessmentQuestionResponseRepository assessmentQuestionResponseRepository;
+
     /**
      * +
      * This method saves assessment submitted from the assessment
@@ -220,12 +221,18 @@ public class AssessmentsService {
 
         return assessmentQuestionsRepository.findByAssessmentForm(assessmentForm.getId());
     }
+
     public List<AssessmentForm> getAssessmentForms(Assessment assessment) throws AssessmentToolError {
         if (assessment == null) {
             throw new AssessmentToolError("Null parameter assessment");
         }
+        List<AssessmentForm> assessmentForms = assessmentFormsRepository.findByAssessment(assessment.getId());
+     /*   for (AssessmentForm form : assessmentForms) {
+            List<AssessmentQuestion> questions = assessmentQuestionsRepository.findByAssessmentForm(form.getId());
+            form.setQuestions(questions);
+        }*/
+        return assessmentForms;
 
-        return assessmentFormsRepository.findByAssessment(assessment.getId());
     }
 
     public List<AssessmentQuestionResponse> getAssessmentQuestionResponseByInterviewId(AssessmentInterview assessmentInterview) throws AssessmentToolError {
@@ -237,22 +244,15 @@ public class AssessmentsService {
     }
 
 
-
     public int getRespondingFacilities(Integer assessmentId) {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
-        Set<Integer> uniqueFacilityIds = interviews.stream()
-                .map(interview -> interview.getFacility().getId())
-                .collect(Collectors.toSet());
+        Set<Integer> uniqueFacilityIds = interviews.stream().map(interview -> interview.getFacility().getId()).collect(Collectors.toSet());
         return uniqueFacilityIds.size();
     }
 
     public Map<String, Long> getInterviewsByAssessor(Integer assessmentId) {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
-        return interviews.stream()
-                .collect(Collectors.groupingBy(
-                        interview -> interview.getAssessor().getName(),
-                        Collectors.counting()
-                ));
+        return interviews.stream().collect(Collectors.groupingBy(interview -> interview.getAssessor().getName(), Collectors.counting()));
     }
 
     public Map<String, Long> getCompletionRates(Integer assessmentId) {
@@ -267,13 +267,11 @@ public class AssessmentsService {
     public Map<String, Double> getAverageCompletionTime(Integer assessmentId) {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
 
-        DoubleSummaryStatistics stats = interviews.stream()
-                .mapToDouble(interview -> {
-                    // Assuming getStartTime() and getEndTime() return a java.util.Date or java.time.LocalDateTime
-                    long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
-                    return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
-                })
-                .summaryStatistics();
+        DoubleSummaryStatistics stats = interviews.stream().mapToDouble(interview -> {
+            // Assuming getStartTime() and getEndTime() return a java.util.Date or java.time.LocalDateTime
+            long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
+            return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
+        }).summaryStatistics();
 
         Map<String, Double> completionTimes = new HashMap<>();
         completionTimes.put("averageTime", stats.getAverage());

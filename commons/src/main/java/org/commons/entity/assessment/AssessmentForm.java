@@ -9,6 +9,7 @@ import org.commons.enums.QuestionType;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,5 +26,8 @@ public class AssessmentForm extends IdBasedEntity {
     private FormType formType;
     @Column(name = "created_date")
     private Date createdDate;
+
+/*    @Transient
+    private List<AssessmentQuestion> questions;*/
 
 }

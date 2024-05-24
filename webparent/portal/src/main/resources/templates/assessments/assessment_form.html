@@ -175,30 +175,15 @@
                                             </div>
                                             <hr>
                                             <div class="row">
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-6">
                                                     <label>SOH (ACTUAL)</label>
                                                     <input class="form-control" type="number"
                                                            th:name="'question_' + ${question.id} + '_sohActual'"/>
                                                 </div>
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-6">
                                                     <label>SOH (eLMIS FE)</label>
                                                     <input class="form-control" type="number"
                                                            th:name="'question_' + ${question.id} + '_sohElmisFe'"/>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <label>VARIANCE</label>
-                                                    <input class="form-control" type="number"
-                                                           th:name="'question_' + ${question.id} + '_variance'"/>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <label>Percentage Error</label>
-                                                    <input class="form-control" type="number" step="0.01"
-                                                           th:name="'question_' + ${question.id} + '_percentageError'"/>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <label>Average Percentage Error</label>
-                                                    <input class="form-control" type="number" step="0.01"
-                                                           th:name="'question_' + ${question.id} + '_averagePercentageError'"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -335,6 +320,8 @@
                             if (input.checked) {
                                 if (input.name.includes('_managedAtFacility')) {
                                     productData['managedAtFacility'] = input.value === 'true';
+                                } else {
+                                    answers[questionId] = input.value;
                                 }
                             }
                         } else {
@@ -342,14 +329,10 @@
                                 productData['sohActual'] = parseInt(input.value, 10);
                             } else if (input.name.includes('_sohElmisFe')) {
                                 productData['sohElmisFe'] = parseInt(input.value, 10);
-                            } else if (input.name.includes('_variance')) {
-                                productData['variance'] = parseInt(input.value, 10);
-                            } else if (input.name.includes('_percentageError')) {
-                                productData['percentageError'] = parseFloat(input.value);
-                            } else if (input.name.includes('_averagePercentageError')) {
-                                productData['averagePercentageError'] = parseFloat(input.value);
                             } else {
-                                // Handle any other input types as needed
+                                if (input.value.trim() !== '') {
+                                    answers[questionId] = input.value;
+                                }
                             }
                         }
                     }

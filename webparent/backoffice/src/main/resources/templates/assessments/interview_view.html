@@ -226,33 +226,53 @@
                                                 <th class="list-sort text-muted small-col text-center" scope="col">
                                                     Percentage Error
                                                 </th>
-                                                <th class="list-sort text-muted small-col text-center" scope="col">
-                                                    Average Percentage Error
-                                                </th>
                                             </tr>
                                             </thead>
                                             <tbody class="list fs-base">
                                             <tr th:each="entry, iterStat : ${questionResponseMap}">
-                                                <td class="text-center">[[${iterStat.count}]]</td>
-                                                <td class="question-col">[[${entry.key.question}]]</td>
-                                                <td class="small-col text-center" th:each="response : ${entry.value}"
-                                                    th:text="${response.managedAtFacility ? 'Yes' : 'No'}"></td>
-                                                <td class="small-col text-center" th:each="response : ${entry.value}"
-                                                    th:text="${response.sohActual}"></td>
-                                                <td class="small-col text-center" th:each="response : ${entry.value}"
-                                                    th:text="${response.sohElmisFe}"></td>
-                                                <td class="small-col text-center" th:each="response : ${entry.value}"
-                                                    th:text="${response.variance}"></td>
-                                                <td class="small-col text-center" th:each="response : ${entry.value}"
-                                                    th:text="${response.percentageError}"></td>
-                                                <td class="small-col text-center" th:each="response : ${entry.value}"
-                                                    th:text="${response.averagePercentageError}"></td>
+                                                <th:block
+                                                        th:if="${entry.key.questionType.name() == T(org.commons.enums.QuestionType).PRODUCT.name()}">
+                                                    <td class="text-center">[[${iterStat.count}]]</td>
+                                                    <td class="question-col">[[${entry.key.question}]]</td>
+                                                    <td class="small-col text-center"
+                                                        th:each="response : ${entry.value}"
+                                                        th:text="${response.managedAtFacility ? 'Yes' : 'No'}"></td>
+                                                    <td class="small-col text-center"
+                                                        th:each="response : ${entry.value}"
+                                                        th:text="${response.sohActual}"></td>
+                                                    <td class="small-col text-center"
+                                                        th:each="response : ${entry.value}"
+                                                        th:text="${response.sohElmisFe}"></td>
+                                                    <td class="small-col text-center"
+                                                        th:each="response : ${entry.value}"
+                                                        th:text="${response.variance}"></td>
+                                                    <td class="small-col text-center"
+                                                        th:each="response : ${entry.value}"
+                                                        th:text="${response.percentageError}"></td>
+                                                </th:block>
                                             </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                                 <div class="card-footer"></div>
+                            </div>
+                            <div th:each="entry, iterStat : ${questionResponseMap}" th:unless="${entry.key.questionType.name() == T(org.commons.enums.QuestionType).PRODUCT.name()}">
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h4 class="card-header-title" th:text="${entry.key.question}">Question text</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <strong>
+                                                <li class="list-group-item"
+                                                    th:each="response : ${entry.value}"
+                                                    th:text="${response.answer}">Response
+                                                </li>
+                                            </strong>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
