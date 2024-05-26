@@ -183,11 +183,7 @@
 
     <input type="hidden" name="interviewId" id="interviewId" th:value="${assessmentInterview.id}">
     <input type="hidden" name="assessmentId" id="assessmentId" th:value="${assessment.id}">
-    <input type="hidden" name="formType" id="formType" th:value="${assessmentForm.formType.name()}">
-    <input type="hidden" name="formTypeGeneral" id="formTypeGeneral"
-           th:value="${assessmentForm.formType.GENERAL.name()}">
-    <input type="hidden" name="formTypeProducts" id="formTypeProducts"
-           th:value="${assessmentForm.formType.PRODUCTS.name()}">
+
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
 
@@ -251,10 +247,6 @@
             }
         });
 
-        const formType = document.getElementById('formType').value;
-        const formTypeProducts = document.getElementById('formTypeProducts').value;
-        const formTypeGeneral = document.getElementById('formTypeGeneral').value;
-
         submitButton.addEventListener('click', function () {
             const answers = {};
             questions.forEach(question => {
@@ -266,54 +258,24 @@
                 let productData = {};
 
                 inputs.forEach(input => {
-                    if (formType === formTypeGeneral) {
-                        if (input.type === 'radio') {
-                            if (input.checked) {
-                                answers[questionId] = input.value; // For radio buttons, store the selected value directly
-                            }
-                        } else if (input.type === 'checkbox') {
-                            if (input.checked) {
-                                selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
-                            }
-                        } else {
-                            if (input.value.trim() !== '') {
-                                answers[questionId] = input.value; // For textareas or other input types, store the value directly
-                            }
+                    if (input.type === 'radio') {
+                        if (input.checked) {
+                            answers[questionId] = input.value; // For radio buttons, store the selected value directly
                         }
-                    } else if (formType === formTypeProducts) {
-                        if (input.type === 'radio') {
-                            if (input.checked) {
-                                if (input.name.includes('_managedAtFacility')) {
-                                    productData['managedAtFacility'] = input.value === 'true';
-                                } else {
-                                    answers[questionId] = input.value;
-                                }
-                            }
-                        } else {
-                            if (input.name.includes('_sohActual')) {
-                                productData['sohActual'] = parseInt(input.value, 10);
-                            } else if (input.name.includes('_sohElmisFe')) {
-                                productData['sohElmisFe'] = parseInt(input.value, 10);
-                            } else {
-                                if (input.value.trim() !== '') {
-                                    answers[questionId] = input.value;
-                                }
-                            }
+                    } else if (input.type === 'checkbox') {
+                        if (input.checked) {
+                            selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
+                        }
+                    } else {
+                        if (input.value.trim() !== '') {
+                            answers[questionId] = input.value; // For textareas or other input types, store the value directly
                         }
                     }
                 });
 
-                if (formType === formTypeGeneral) {
-                    // If there are selected options for checkboxes, store them in the answers object
-                    if (selectedOptions.length > 0) {
-                        answers[questionId] = selectedOptions;
-                    }
-                } else if (formType === formTypeProducts) {
-                    if (Object.keys(productData).length > 0) {
-                        answers[questionId] = productData;
-                    }
+                if (selectedOptions.length > 0) {
+                    answers[questionId] = selectedOptions;
                 }
-
             });
 
 
@@ -330,7 +292,7 @@
                 cancelButtonText: 'No, cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/assessments/interview/submit', {
+                    fetch('/assessments/interview/verification/submit', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

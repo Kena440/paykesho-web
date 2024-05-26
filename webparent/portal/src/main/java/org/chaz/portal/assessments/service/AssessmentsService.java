@@ -32,6 +32,8 @@ public class AssessmentsService {
     private AssessmentQuestionOptionRepository assessmentQuestionOptionRepository;
     @Autowired
     private AssessmentQuestionResponseRepository assessmentQuestionResponseRepository;
+    @Autowired
+    private AssessmentQuestionVerificationResponseRepository assessmentQuestionVerificationResponseRepository;
 
 
     /**
@@ -63,6 +65,16 @@ public class AssessmentsService {
 
         return assessmentQuestionResponseRepository.save(assessmentQuestionResponse);
     }
+
+    public AssessmentQuestionVerificationResponse saveInterviewVerificationResponse(AssessmentQuestionVerificationResponse verificationResponse) {
+        if (verificationResponse == null) {
+            return null;
+        }
+
+        return assessmentQuestionVerificationResponseRepository.save(verificationResponse);
+    }
+
+
 
     public Assessment getAssessmentById(Integer id) throws AssessmentToolError {
         if (id == null) {

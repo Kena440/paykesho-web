@@ -35,7 +35,10 @@ public class AssessmentInterview extends IdBasedEntity {
     private Date createdDate;
     @Column(name = "completed_date")
     private Date completedDate;
+    @Column(name = "verified_date")
+    private Date verifiedDate;
     private boolean completed;
+    private boolean verified;
     @ManyToOne
     @JoinColumn(name = "assessor_id")
     private Assessor assessor;

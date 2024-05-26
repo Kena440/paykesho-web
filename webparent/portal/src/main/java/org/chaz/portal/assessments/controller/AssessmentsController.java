@@ -236,6 +236,61 @@ public class AssessmentsController {
         }
     }
 
+    @PostMapping("/interview/verification/submit")
+    public ResponseEntity<String> submitAssessmentVerification(@RequestBody AssessmentResponseDTO assessmentResponse) {
+        String interviewId = assessmentResponse.getInterviewId();
+        Map<String, Object> responses = assessmentResponse.getResponses();
+
+        try {
+            AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(Integer.valueOf(interviewId));
+            if (assessmentInterview == null) {
+                throw new AssessmentToolError("Interview not found for ID: " + interviewId);
+            }
+
+            int totalQuestions = getAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
+            int answeredQuestions = 0;
+
+            for (Map.Entry<String, Object> entry : responses.entrySet()) {
+                String questionIdString = entry.getKey();
+                Object answer = entry.getValue();
+
+                AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
+                if (assessmentQuestion == null) {
+                    throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
+                }
+
+                if (answer instanceof String) {
+                    AssessmentQuestionVerificationResponse response = new AssessmentQuestionVerificationResponse();
+                    response.setAssessmentQuestion(assessmentQuestion);
+                    response.setAnswer((String) answer);
+                    response.setAssessmentInterview(assessmentInterview);
+                    assessmentsService.saveInterviewVerificationResponse(response);
+                    answeredQuestions++;
+                } else if (answer instanceof List) {
+                    List<String> answerList = (List<String>) answer;
+                    for (String value : answerList) {
+                        AssessmentQuestionVerificationResponse checkboxResponse = new AssessmentQuestionVerificationResponse();
+                        checkboxResponse.setAssessmentQuestion(assessmentQuestion);
+                        checkboxResponse.setAnswer(value);
+                        checkboxResponse.setAssessmentInterview(assessmentInterview);
+                        assessmentsService.saveInterviewVerificationResponse(checkboxResponse);
+                        answeredQuestions++;
+                    }
+                }
+            }
+
+            if (answeredQuestions >= totalQuestions) {
+                assessmentInterview.setVerified(true);
+                assessmentInterview.setCompletedDate(new Date());
+                assessmentsService.saveInterview(assessmentInterview);
+            }
+
+            return ResponseEntity.ok("Assessment Verification submitted successfully.");
+        } catch (NumberFormatException | AssessmentToolError e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error submitting assessment: " + e.getMessage());
+        }
+    }
+
     private int getAnsweredQuestionsProductsForm(Map<String, Object> responses, AssessmentInterview assessmentInterview, int answeredQuestions) throws AssessmentToolError {
         for (Map.Entry<String, Object> entry : responses.entrySet()) {
             String questionIdString = entry.getKey();
