@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
+<style>
+    .question-col {
+        width: 40%;
+        word-wrap: break-word;
+    }
+
+    .small-col {
+        width: 8%;
+        word-wrap: break-word;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table-nowrap th, .table-nowrap td {
+        white-space: normal;
+    }
+</style>
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Assessment Management
+                                </h6>
+
+                                <!-- Title -->
+                                <h1 class="header-title text-truncate">
+                                    [[${pageTitle}]]
+                                </h1>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Navigation (button group) -->
+                                <div class="nav btn-group d-inline-flex d-none" role="tablist">
+                                    <button class="btn btn-white active" id="dealsListTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsListPane" role="tab" aria-controls="dealsListPane"
+                                            aria-selected="true">
+                                        <span class="fe fe-list"></span>
+                                    </button>
+                                    <button class="btn btn-white" id="dealsCardsTab" data-bs-toggle="tab"
+                                            data-bs-target="#dealsCardsPane" role="tab" aria-controls="dealsCardsPane"
+                                            aria-selected="false">
+                                        <span class="fe fe-sidebar"></span>
+                                    </button>
+                                </div> <!-- / .nav -->
+
+                                <!-- Buttons -->
+                                <a th:href="@{'/assessments/view/'+${assessmentInterview.assessmentForm.assessment.id}}"
+                                   class="btn btn-primary ms-2">
+                                    Back
+                                </a>
+
+                            </div>
+                        </div> <!-- / .row -->
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Nav -->
+                                <ul class="nav nav-tabs nav-overflow header-tabs">
+                                    <li class="nav-item d-none">
+                                        <a href="#!" class="nav-link text-nowrap active">
+                                            Total <span
+                                                class="badge rounded-pill bg-secondary-soft"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div id="accordion">
+
+                    <!-- Header -->
+                    <div class="header mt-md-5">
+                        <div class="header-body">
+
+                            <!-- Title -->
+                            <h1 class="header-title">
+                                [[${assessmentInterview.assessmentForm.assessment.name}]] -
+                            </h1>
+
+                            <!-- Subtitle -->
+                            <p class="header-subtitle">
+                                [[${assessmentInterview.assessmentForm.formName}]]</p>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-12">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    Respondent Details
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 col-md-4">
+
+                                            <!-- Heading -->
+                                            <h6 class="text-uppercase text-muted">
+                                                Respondent Details
+                                            </h6>
+
+                                            <!-- Text -->
+                                            <p class="text-muted mb-4">
+                                                <strong class="text-body">[[${assessmentInterview.respondentName}]]</strong><br>
+                                                <strong class="text-body">[[${assessmentInterview.respondentPhoneNumber}]]</strong><br>
+                                                <strong class="text-body">[[${assessmentInterview.respondentJobTitle}]]</strong>
+                                            </p>
+
+                                        </div>
+                                        <div class="col-12 col-md-4">
+
+                                            <!-- Heading -->
+                                            <h6 class="text-uppercase text-muted">
+                                                Facility
+                                            </h6>
+
+                                            <!-- Text -->
+                                            <p class="text-muted mb-4">
+                                                <strong class="text-body">[[${assessmentInterview.facility.name}]]</strong>
+                                            </p>
+
+                                        </div>
+                                        <div class="col-12 col-md-4">
+
+                                            <!-- Heading -->
+                                            <h6 class="text-uppercase text-muted">
+                                                Assessor
+                                            </h6>
+
+                                            <!-- Text -->
+                                            <p class="text-muted mb-4">
+                                                <strong class="text-body">[[${assessmentInterview.assessor.name}]]</strong><br>
+                                                <time datetime="2018-04-23"
+                                                      th:replace="fragments/fragments :: format_date(${assessmentInterview.createdDate})"></time>
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                Verification Questions
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12 col-md-12">
+                                        <div th:each="entry, iterStat : ${questionResponseMap}">
+                                            <div class="card mb-3">
+                                                <div class="card-header">
+                                                    [[${iterStat.count}]].&nbsp;
+                                                    <h4 class="card-header-title"
+                                                        th:text="${entry.key.verificationQuestion}">
+                                                        Question text</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                    <ul class="list-group list-group-flush">
+                                                        <strong>
+                                                            <li class="list-group-item"
+                                                                th:each="response : ${entry.value}"
+                                                                th:text="${response.answer}">Response
+                                                            </li>
+                                                        </strong>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+</div><!-- / .main-content -->
+<div th:replace="fragments/modal_fragment :: modal_dialog"></div>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+
+
+</html>

@@ -32,6 +32,8 @@ public class AssessmentsService {
     private AssessmentInterviewsRepository assessmentInterviewsRepository;
     @Autowired
     private AssessmentQuestionResponseRepository assessmentQuestionResponseRepository;
+    @Autowired
+    private AssessmentQuestionVerificationResponseRepository assessmentQuestionVerificationResponseRepository;
 
     /**
      * +
@@ -174,6 +176,14 @@ public class AssessmentsService {
         assessmentsRepository.updateEnableStatus(id, enabled);
     }
 
+    public List<AssessmentQuestion> getVerifiedAssessmentQuestions(AssessmentForm assessmentForm) {
+        List<AssessmentQuestion> allQuestions = assessmentQuestionsRepository.findByAssessmentForm(assessmentForm.getId());
+
+        return allQuestions.stream()
+                .filter(AssessmentQuestion::isNeedsVerification)
+                .collect(Collectors.toList());
+    }
+
     public List<Assessment> getUpcomingAssessments(int i) {
         if (i > 0) {
             return assessmentsRepository.findUpcomingAssessments(i);
@@ -241,6 +251,13 @@ public class AssessmentsService {
         }
 
         return assessmentQuestionResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
+    }
+   public List<AssessmentQuestionVerificationResponse> getAssessmentQuestionVerificationResponseByInterviewId(AssessmentInterview assessmentInterview) throws AssessmentToolError {
+        if (assessmentInterview == null) {
+            throw new AssessmentToolError("Null parameter assessment");
+        }
+
+        return assessmentQuestionVerificationResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
     }
 
 

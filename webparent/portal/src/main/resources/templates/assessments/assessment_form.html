@@ -122,9 +122,14 @@
                                             <div th:each="option : ${question.options}">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" th:value="${option}"
-                                                           th:name="'question_' + ${question.id}">
-                                                    <label class="form-check-label" th:text="${option}"></label>
+                                                           th:name="'question_' + ${question.id}"
+                                                           th:attr="data-is-others=${option.optionText == 'Others'}">
+                                                    <label class="form-check-label" th:text="${option.optionText}"></label>
                                                 </div>
+                                            </div>
+                                            <div class="form-check others-textbox" style="display:none;">
+                                                <br>
+                                                <input class="form-control" type="text" th:name="'question_' + ${question.id} + '_others'">
                                             </div>
                                         </div>
                                         <div th:case="'TRUE_FALSE'">
@@ -143,9 +148,14 @@
                                             <div th:each="option : ${question.options}">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" th:value="${option}"
-                                                           th:name="'question_' + ${question.id}">
-                                                    <label class="form-check-label" th:text="${option}"></label>
+                                                           th:name="'question_' + ${question.id}"
+                                                           th:attr="data-is-others=${option.optionText == 'Others'}">
+                                                    <label class="form-check-label" th:text="${option.optionText}"></label>
                                                 </div>
+                                            </div>
+                                            <div class="form-check others-textbox" style="display:none;">
+                                                <br>
+                                                <input class="form-control" type="text" th:name="'question_' + ${question.id} + '_others'">
                                             </div>
                                         </div>
                                         <div th:case="'MATCHING'">
@@ -286,6 +296,18 @@
             }
         });
 
+        document.querySelectorAll('input[data-is-others]').forEach(input => {
+            input.addEventListener('change', function () {
+                const questionItem = this.closest('.question-item');
+                const othersTextbox = questionItem.querySelector('.others-textbox');
+                if (this.checked && this.getAttribute('data-is-others') === 'true') {
+                    othersTextbox.style.display = 'block';
+                } else {
+                    othersTextbox.style.display = 'none';
+                }
+            });
+        });
+
         const formType = document.getElementById('formType').value;
         const formTypeProducts = document.getElementById('formTypeProducts').value;
         const formTypeGeneral = document.getElementById('formTypeGeneral').value;
@@ -305,10 +327,16 @@
                         if (input.type === 'radio') {
                             if (input.checked) {
                                 answers[questionId] = input.value; // For radio buttons, store the selected value directly
+                                if (input.getAttribute('data-is-others') === 'true') {
+                                    answers[questionId + '_others'] = question.querySelector('.others-textbox input').value;
+                                }
                             }
                         } else if (input.type === 'checkbox') {
                             if (input.checked) {
                                 selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
+                                if (input.getAttribute('data-is-others') === 'true') {
+                                    answers[questionId + '_others'] = question.querySelector('.others-textbox input').value;
+                                }
                             }
                         } else {
                             if (input.value.trim() !== '') {

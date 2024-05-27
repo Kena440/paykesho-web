@@ -50,9 +50,6 @@
                             <span class="h6">Assessor</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Status</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Action</span>
                         </th>
                     </tr>
@@ -61,7 +58,27 @@
                     <tr th:each="interview, interviewStat : ${assessmentInterviews}">
 
                         <td class="px-0 text-center">
-                            <small>[[${interviewStat.count}]]</small>
+                            <small>[[${interviewStat.count}]]</small><br>
+                            <th:block th:if="${interview.completed == true}">
+                                <div class="badge bg-success">
+                                    Completed
+                                </div>
+                            </th:block>
+                            <th:block th:if="${interview.completed == false}">
+                                <div class="badge bg-danger">
+                                    Pending Completion
+                                </div>
+                            </th:block>
+                            <th:block th:if="${interview.verified == true}">
+                                <div class="badge bg-success">
+                                    Verified
+                                </div>
+                            </th:block>
+                            <th:block th:if="${interview.verified == false}">
+                                <div class="badge bg-danger">
+                                    Pending Verification
+                                </div>
+                            </th:block>
                         </td>
                         <td class="px-0 text-center">
                             <small>[[${interview.respondentName}]]</small>
@@ -85,19 +102,7 @@
                         </td>
                         <td class="px-0 text-center">
                             <th:block th:if="${interview.completed == true}">
-                                <div class="badge bg-success">
-                                    Done
-                                </div>
-                            </th:block>
-                            <th:block th:if="${interview.completed == false}">
-                                <div class="badge bg-danger">
-                                    Pending Completion
-                                </div>
-                            </th:block>
-                        </td>
-                        <td class="px-0 text-center">
-                            <th:block th:if="${interview.completed == true}">
-                                <a class="btn btn-primary"
+                                <a class="btn btn-sm btn-primary"
                                    th:href="@{'/assessments/interview/view/' + ${interview.id}}">
                                     <span class="fe fe-file"></span>
                                     View

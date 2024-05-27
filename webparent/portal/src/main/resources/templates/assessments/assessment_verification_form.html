@@ -159,9 +159,9 @@
                                         <div class="col-12 col-md-12">
                                             <div class="form-group">
                                                 <label class="form-label">Comment</label>
-                                                <textarea class="form-control"
+                                     <!--           <textarea class="form-control"
                                                           th:name="'verificationComment_' + ${verification.id}" rows="3"
-                                                          required></textarea>
+                                                          required></textarea>-->
                                             </div>
                                         </div>
                                     </div>
@@ -253,9 +253,9 @@
                 const questionId = question.getAttribute('data-question-id');
                 const inputs = question.querySelectorAll('input, textarea');
 
+
                 // Initialize an array to store selected options for checkboxes
                 let selectedOptions = [];
-                let productData = {};
 
                 inputs.forEach(input => {
                     if (input.type === 'radio') {
@@ -291,6 +291,8 @@
                 confirmButtonText: 'Yes, submit it!',
                 cancelButtonText: 'No, cancel'
             }).then((result) => {
+
+                console.log(answers)
                 if (result.isConfirmed) {
                     fetch('/assessments/interview/verification/submit', {
                         method: 'POST',

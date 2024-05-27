@@ -16,6 +16,8 @@ public class AssessmentQuestionVerificationResponse extends IdBasedEntity {
     private AssessmentQuestion assessmentQuestion;
     @Column(name = "answer", length = 245, nullable = false)
     private String answer;
+    @Column(name = "verification_comment", length = 500)
+    private String verificationComment;
     @ManyToOne
     @JoinColumn(name = "assessment_interview_id")
     private AssessmentInterview assessmentInterview;

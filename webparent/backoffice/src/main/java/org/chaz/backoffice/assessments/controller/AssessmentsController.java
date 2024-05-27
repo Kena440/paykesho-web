@@ -361,12 +361,40 @@ public class AssessmentsController {
                 List<AssessmentQuestionResponse> responses = assessmentQuestionResponses.stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
                 questionResponseMap.put(question, responses);
             }
+
+            List<AssessmentQuestion> assessmentVerificationQuestions = assessmentsService.getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm());
+
             model.addAttribute("assessmentInterview", assessmentInterview);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("questionResponseMap", questionResponseMap);
+            model.addAttribute("assessmentVerificationQuestions", assessmentVerificationQuestions.size());
             model.addAttribute("pageTitle", "Interview View");
 
             return "assessments/interview_view";
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
+            return "redirect:/assessments";
+        }
+    }
+
+    @GetMapping("/interview/verification/view/{id}")
+    public String viewAssessmentInterviewVerification(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            AssessmentInterview assessmentInterview = assessmentsService.getAssessmentInterviewById(id);
+            List<AssessmentQuestionVerificationResponse> assessmentQuestionVerificationResponses = assessmentsService.getAssessmentQuestionVerificationResponseByInterviewId(assessmentInterview);
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm());
+            Map<AssessmentQuestion, List<AssessmentQuestionVerificationResponse>> questionResponseMap = new LinkedHashMap<>();
+            for (AssessmentQuestion question : assessmentQuestions) {
+                List<AssessmentQuestionVerificationResponse> responses = assessmentQuestionVerificationResponses.stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
+                questionResponseMap.put(question, responses);
+            }
+
+            model.addAttribute("assessmentInterview", assessmentInterview);
+            model.addAttribute("questionResponseMap", questionResponseMap);
+            model.addAttribute("assessmentVerificationQuestions", assessmentQuestions);
+            model.addAttribute("pageTitle", "Interview Verification View");
+
+            return "assessments/interview_verification_view";
         } catch (AssessmentToolError assessmentToolError) {
             redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/assessments";

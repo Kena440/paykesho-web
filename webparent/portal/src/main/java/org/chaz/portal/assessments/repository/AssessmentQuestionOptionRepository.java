@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AssessmentQuestionOptionRepository extends JpaRepository<AssessmentQuestionOption, Integer> {
 
-    @Query("select e from AssessmentQuestionOption e where e.question.id = ?1 order by e.id desc")
+    @Query("select e from AssessmentQuestionOption e where e.question.id = ?1 order by e.id asc")
     public List<AssessmentQuestionOption> findByAssessmentQuestion(Integer eventId);
 
 }

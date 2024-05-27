@@ -247,7 +247,7 @@ public class AssessmentsController {
                 throw new AssessmentToolError("Interview not found for ID: " + interviewId);
             }
 
-            int totalQuestions = getAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
+            int totalQuestions = assessmentsService.getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
             int answeredQuestions = 0;
 
             for (Map.Entry<String, Object> entry : responses.entrySet()) {

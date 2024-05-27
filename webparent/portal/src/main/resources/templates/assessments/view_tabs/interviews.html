@@ -66,12 +66,22 @@
                             <small>[[${interviewStat.count}]]</small><br>
                             <th:block th:if="${interview.completed == true}">
                                 <div class="badge bg-success">
-                                    Done
+                                    Completed
                                 </div>
                             </th:block>
                             <th:block th:if="${interview.completed == false}">
                                 <div class="badge bg-danger">
-                                    Pending
+                                    Pending Completion
+                                </div>
+                            </th:block>
+                            <th:block th:if="${interview.verified == true}">
+                                <div class="badge bg-success">
+                                    Verified
+                                </div>
+                            </th:block>
+                            <th:block th:if="${interview.verified == false}">
+                                <div class="badge bg-danger">
+                                    Pending Verification
                                 </div>
                             </th:block>
                         </td>
@@ -104,11 +114,13 @@
                                 </a>
                             </th:block>
                             <br>
-                            <a class="btn btn-sm btn-secondary"
-                               th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
-                                <span class="fe fe-folder"></span>
-                                Verification
-                            </a>
+                            <th:block th:if="${interview.verified == false}">
+                                <a class="btn btn-sm btn-secondary"
+                                   th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
+                                    <span class="fe fe-folder"></span>
+                                    Verification
+                                </a>
+                            </th:block>
                         </td>
                     </tr>
                     </tbody>
@@ -122,7 +134,8 @@
         <div class="col-12 col-md-12 less-details">
             <div th:each="interview, interviewStat : ${assessmentInterviews}" class="row m-1">
                 <div class="col col-12">
-                    <td><small>[[${interview.respondentName}]]</small> (<small>[[${interview.facility.name}]]</small>)</td>
+                    <td><small>[[${interview.respondentName}]]</small> (<small>[[${interview.facility.name}]]</small>)
+                    </td>
                     <br>
                     <td>
                         <th:block th:if="${interview.completed == true}">
