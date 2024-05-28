@@ -16,8 +16,8 @@ public class FacilityRestController {
     private FacilityService facilityService;
 
     @PostMapping("/check-facility")
-    public String checkDuplicateFacility(Integer id, Integer provinceId, String facilityName, Integer levelOfCareId) {
-        return facilityService.isFacilityUnique(id, provinceId, facilityName, levelOfCareId) ? "OK" : "Duplicated";
+    public String checkDuplicateFacility(Integer id, Integer provinceId, String facilityName, Integer levelOfCare) {
+        return facilityService.isFacilityUnique(id, provinceId, facilityName, levelOfCare) ? "OK" : "Duplicated";
     }
 
     @GetMapping("/get-facility-types-data/{enabled}")
