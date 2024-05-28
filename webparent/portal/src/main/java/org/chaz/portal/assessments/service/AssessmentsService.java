@@ -1,7 +1,6 @@
 package org.chaz.portal.assessments.service;
 
 import org.chaz.portal.assessments.repository.*;
-import org.chaz.portal.paging.PagingAndSortingHelper;
 import org.commons.entity.assessment.*;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +72,6 @@ public class AssessmentsService {
 
         return assessmentQuestionVerificationResponseRepository.save(verificationResponse);
     }
-
 
 
     public Assessment getAssessmentById(Integer id) throws AssessmentToolError {

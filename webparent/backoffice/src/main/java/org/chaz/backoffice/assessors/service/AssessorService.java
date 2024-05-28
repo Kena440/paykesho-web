@@ -8,7 +8,6 @@ import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.repository.CountryRepository;
 import org.chaz.backoffice.settings.service.SettingService;
 import org.commons.entity.assessment.Assessor;
-import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;

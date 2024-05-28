@@ -3,7 +3,7 @@
 
 <!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
 <!-- Added by HTTrack -->
-<meta http-equiv="content-type" content="text/html;charset=utf-8"/><!-- /Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
 <head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
 
 <body>
@@ -46,20 +46,20 @@
 
                                 <!-- Navigation (button group) -->
                                 <div class="nav btn-group d-inline-flex d-none" role="tablist">
-                                    <button class="btn btn-white active" id="dealsListTab" data-bs-toggle="tab"
-                                            data-bs-target="#dealsListPane" role="tab" aria-controls="dealsListPane"
-                                            aria-selected="true">
+                                    <button aria-controls="dealsListPane" aria-selected="true" class="btn btn-white active"
+                                            data-bs-target="#dealsListPane" data-bs-toggle="tab" id="dealsListTab"
+                                            role="tab">
                                         <span class="fe fe-list"></span>
                                     </button>
-                                    <button class="btn btn-white" id="dealsCardsTab" data-bs-toggle="tab"
-                                            data-bs-target="#dealsCardsPane" role="tab" aria-controls="dealsCardsPane"
-                                            aria-selected="false">
+                                    <button aria-controls="dealsCardsPane" aria-selected="false" class="btn btn-white"
+                                            data-bs-target="#dealsCardsPane" data-bs-toggle="tab" id="dealsCardsTab"
+                                            role="tab">
                                         <span class="fe fe-sidebar"></span>
                                     </button>
                                 </div> <!-- / .nav -->
 
                                 <!-- Buttons -->
-                                <a th:href="@{'/assessments/view/' +${assessment.id}}" class="btn btn-primary ms-2">
+                                <a class="btn btn-primary ms-2" th:href="@{'/assessments/view/' +${assessment.id}}">
                                     Back
                                 </a>
 
@@ -71,7 +71,7 @@
                                 <!-- Nav -->
                                 <ul class="nav nav-tabs nav-overflow header-tabs">
                                     <li class="nav-item d-none">
-                                        <a href="#!" class="nav-link text-nowrap active">
+                                        <a class="nav-link text-nowrap active" href="#!">
                                             Total <span
                                                 class="badge rounded-pill bg-secondary-soft"></span>
                                         </a>
@@ -118,9 +118,9 @@
                         </div>
                         <div class="col-12 col-md-12" th:if="${assessmentVerificationQuestions.size() > 0}">
                             <!-- Existing question items -->
-                            <div th:each="verification, iterStat : ${assessmentVerificationQuestions}"
-                                 class="card question-item"
-                                 th:attr="data-question-id=${verification.id},style='display:none;'">
+                            <div class="card question-item"
+                                 th:attr="data-question-id=${verification.id},style='display:none;'"
+                                 th:each="verification, iterStat : ${assessmentVerificationQuestions}">
                                 <div class="card-header">
                                     [[${iterStat.count}]].&nbsp;
                                     <h4 class="card-header-title" th:text="${verification.verificationQuestion}"></h4>
@@ -138,16 +138,16 @@
                                                 <label class="form-label">Verification Response</label>
                                                 <div th:switch="${verification.verificationOption}">
                                                     <div th:case="'TEXT'">
-                                                        <input type="text" class="form-control"
-                                                               th:name="'verification_' + ${verification.id}">
+                                                        <input class="form-control" th:name="'verification_' + ${verification.id}"
+                                                               type="text">
                                                     </div>
                                                     <div th:case="'NUMBER'">
-                                                        <input type="number" class="form-control"
-                                                               th:name="'verification_' + ${verification.id}">
+                                                        <input class="form-control" th:name="'verification_' + ${verification.id}"
+                                                               type="number">
                                                     </div>
                                                     <div th:case="'DATE'">
-                                                        <input type="date" class="form-control"
-                                                               th:name="'verification_' + ${verification.id}">
+                                                        <input class="form-control" th:name="'verification_' + ${verification.id}"
+                                                               type="date">
                                                     </div>
 
                                                     <div th:case="*">
@@ -159,9 +159,9 @@
                                         <div class="col-12 col-md-12">
                                             <div class="form-group">
                                                 <label class="form-label">Comment</label>
-                                     <!--           <textarea class="form-control"
-                                                          th:name="'verificationComment_' + ${verification.id}" rows="3"
-                                                          required></textarea>-->
+                                                <!--           <textarea class="form-control"
+                                                                     th:name="'verificationComment_' + ${verification.id}" rows="3"
+                                                                     required></textarea>-->
                                             </div>
                                         </div>
                                     </div>
@@ -169,7 +169,7 @@
                                 </div>
                             </div>
                             <hr>
-                            <button id="backButton" class="btn btn-secondary" style="display:none;">Back</button>
+                            <button class="btn btn-secondary" id="backButton" style="display:none;">Back</button>
                             <button class="btn btn-white" id="nextButton">Next</button>
                             <button class="btn btn-primary" id="submitButton" style="display:none;">Submit</button>
                         </div>
@@ -181,8 +181,8 @@
         </div> <!-- / .row -->
     </div>
 
-    <input type="hidden" name="interviewId" id="interviewId" th:value="${assessmentInterview.id}">
-    <input type="hidden" name="assessmentId" id="assessmentId" th:value="${assessment.id}">
+    <input id="interviewId" name="interviewId" th:value="${assessmentInterview.id}" type="hidden">
+    <input id="assessmentId" name="assessmentId" th:value="${assessment.id}" type="hidden">
 
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
@@ -191,7 +191,7 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
-<script type="text/javascript" th:src="@{/assets/js/common_form.js}"></script>
+<script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let currentQuestionIndex = 0;

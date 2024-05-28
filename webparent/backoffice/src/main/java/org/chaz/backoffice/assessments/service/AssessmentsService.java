@@ -252,7 +252,8 @@ public class AssessmentsService {
 
         return assessmentQuestionResponseRepository.findByAssessmentInterview(assessmentInterview.getId());
     }
-   public List<AssessmentQuestionVerificationResponse> getAssessmentQuestionVerificationResponseByInterviewId(AssessmentInterview assessmentInterview) throws AssessmentToolError {
+
+    public List<AssessmentQuestionVerificationResponse> getAssessmentQuestionVerificationResponseByInterviewId(AssessmentInterview assessmentInterview) throws AssessmentToolError {
         if (assessmentInterview == null) {
             throw new AssessmentToolError("Null parameter assessment");
         }

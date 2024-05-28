@@ -1,7 +1,6 @@
 package org.chaz.portal.assessments.controller;
 
 import org.chaz.portal.assessments.dto.AssessmentResponseDTO;
-import org.chaz.portal.assessments.service.AssessmentCodeService;
 import org.chaz.portal.assessments.service.AssessmentsService;
 import org.chaz.portal.assessors.service.AssessorService;
 import org.chaz.portal.facilities.service.FacilityService;
@@ -33,14 +32,13 @@ import java.util.Map;
 public class AssessmentsController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssessmentsController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AssessmentsController.class);
     @Autowired
     private AssessmentsService assessmentsService;
     @Autowired
     private AssessorService assessorService;
     @Autowired
     private FacilityService facilityService;
-    private static final Logger logger = LoggerFactory.getLogger(AssessmentsController.class);
-
 
     @GetMapping("")
     public String listFirstPage(Model model, HttpServletRequest request) {

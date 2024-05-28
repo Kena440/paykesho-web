@@ -4,12 +4,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.entity.IdBasedEntity;
 import org.commons.enums.FormType;
-import org.commons.enums.GenderType;
-import org.commons.enums.QuestionType;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor

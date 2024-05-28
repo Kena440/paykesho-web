@@ -7,7 +7,6 @@ import org.chaz.portal.facilities.service.FacilityService;
 import org.chaz.portal.settings.service.SettingService;
 import org.commons.entity.assessment.Assessor;
 import org.commons.entity.settings.Country;
-import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;

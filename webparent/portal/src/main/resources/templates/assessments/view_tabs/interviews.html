@@ -132,7 +132,7 @@
         </div>
 
         <div class="col-12 col-md-12 less-details">
-            <div th:each="interview, interviewStat : ${assessmentInterviews}" class="row m-1">
+            <div class="row m-1" th:each="interview, interviewStat : ${assessmentInterviews}">
                 <div class="col col-12">
                     <td><small>[[${interview.respondentName}]]</small> (<small>[[${interview.facility.name}]]</small>)
                     </td>

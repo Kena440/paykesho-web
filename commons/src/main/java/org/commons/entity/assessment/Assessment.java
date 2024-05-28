@@ -2,7 +2,6 @@ package org.commons.entity.assessment;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
 
 import javax.persistence.Column;

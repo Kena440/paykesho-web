@@ -42,9 +42,9 @@ public class AssessorController {
 
     @PostMapping(value = "/signup-customer")
     public String signUpAssessor(Assessor assessor,
-                                    RedirectAttributes redirectAttributes,
-                                    Model model,
-                                    HttpServletRequest request) {
+                                 RedirectAttributes redirectAttributes,
+                                 Model model,
+                                 HttpServletRequest request) {
         assessorService.registerAssessor(assessor);
         //sendVerificationEmail(request, assessor);
 
@@ -72,7 +72,7 @@ public class AssessorController {
 
     @GetMapping("/account")
     public String viewAssessorAccount(Model model,
-                                         HttpServletRequest httpServletRequest) {
+                                      HttpServletRequest httpServletRequest) {
 
         String pageTitle = "My Account";
         List<Country> countryList = assessorService.countryList();

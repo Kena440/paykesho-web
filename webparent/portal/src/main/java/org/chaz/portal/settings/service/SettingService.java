@@ -30,6 +30,7 @@ public class SettingService {
     private CountryRepository countryRepository;
     @Autowired
     private LevelOfCareRepository levelOfCareRepository;
+
     public List<Setting> getGeneralSettings() {
         return settingRepository.findByTwoCategories(SettingCategory.GENERAL, SettingCategory.CURRENCY);
     }

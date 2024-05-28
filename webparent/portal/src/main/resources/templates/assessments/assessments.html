@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+<html lang="en"
       xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
 <head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
@@ -197,7 +197,7 @@
                     </div>
 
                     <div class="col-12 col-md-12 less-details">
-                        <div th:each="assessment, assessmentStat : ${assessmentList}" class="row m-1">
+                        <div class="row m-1" th:each="assessment, assessmentStat : ${assessmentList}">
                             <div class="col col-12">
                                 <td>
                                     <a th:href="@{'/assessments/view/'+${assessment.id}}"

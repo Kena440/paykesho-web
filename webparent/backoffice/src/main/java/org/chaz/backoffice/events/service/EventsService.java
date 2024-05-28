@@ -1,9 +1,8 @@
 package org.chaz.backoffice.events.service;
 
-import org.chaz.backoffice.events.repository.*;
+import org.chaz.backoffice.events.repository.EventsRepository;
 import org.chaz.backoffice.paging.PagingAndSortingHelper;
-import org.commons.entity.event.*;
-import org.commons.entity.facilities.Facility;
+import org.commons.entity.event.Event;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -3,7 +3,6 @@ package org.commons.entity.assessment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.entity.IdBasedEntity;
-import org.commons.enums.QuestionType;
 
 import javax.persistence.*;
 
@@ -37,6 +36,7 @@ public class AssessmentQuestionResponse extends IdBasedEntity {
 
     @Column(name = "average_percentage_error")
     private Double averagePercentageError;
+
     @Override
     public String toString() {
         return answer;

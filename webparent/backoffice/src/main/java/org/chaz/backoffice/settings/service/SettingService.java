@@ -77,7 +77,6 @@ public class SettingService {
     }
 
 
-
     public List<LevelOfCare> levelOfCareList() {
         return levelOfCareRepository.findAllByOrderByNameAsc();
     }

@@ -191,7 +191,8 @@ public class FacilityService {
 
         return dataItemList;
     }
-    public List<Facility> getAssessmentFacilities(){
+
+    public List<Facility> getAssessmentFacilities() {
         return facilityRepository.findFacilityEnabled(true);
     }
 }

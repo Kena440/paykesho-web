@@ -29,6 +29,7 @@ public interface FacilityRepository extends CrudRepository<Facility, Integer> {
 
     @Query("select m " + "from Facility m " + "where m.enabled = ?1 ")
     List<Facility> findFacilityTypesEnabled(boolean enabled);
+
     @Query("select m from Facility m where m.levelOfCare.id = ?1 and m.enabled = ?2 ")
     List<Facility> findFacilitysByLevelOfCareIdAndEnabled(Integer id, boolean enabled);
 
