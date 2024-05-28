@@ -298,7 +298,8 @@
                             <div class="col-12 col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Type</label>
-                                    <select class="form-select mb-3" data-choices name="questionType" onchange="showOptionsField()"
+                                    <select class="form-select mb-3" data-choices name="questionType"
+                                            onchange="showOptionsField()"
                                             required>
                                         <option value="">Select...</option>
                                         <th:block th:each="ps : ${T(org.commons.enums.QuestionType).values()}">

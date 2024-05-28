@@ -46,7 +46,8 @@
 
                                 <!-- Navigation (button group) -->
                                 <div class="nav btn-group d-inline-flex d-none" role="tablist">
-                                    <button aria-controls="dealsListPane" aria-selected="true" class="btn btn-white active"
+                                    <button aria-controls="dealsListPane" aria-selected="true"
+                                            class="btn btn-white active"
                                             data-bs-target="#dealsListPane" data-bs-toggle="tab" id="dealsListTab"
                                             role="tab">
                                         <span class="fe fe-list"></span>
@@ -121,7 +122,9 @@
                                         <div th:case="'MULTIPLE_CHOICE'">
                                             <div th:each="option : ${question.options}">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" th:attr="data-is-others=${option.optionText == 'Others'}" th:name="'question_' + ${question.id}"
+                                                    <input class="form-check-input"
+                                                           th:attr="data-is-others=${option.optionText == 'Others'}"
+                                                           th:name="'question_' + ${question.id}"
                                                            th:value="${option}"
                                                            type="radio">
                                                     <label class="form-check-label"
@@ -130,18 +133,21 @@
                                             </div>
                                             <div class="form-check others-textbox" style="display:none;">
                                                 <br>
-                                                <input class="form-control" th:name="'question_' + ${question.id} + '_others'"
+                                                <input class="form-control"
+                                                       th:name="'question_' + ${question.id} + '_others'"
                                                        type="text">
                                             </div>
                                         </div>
                                         <div th:case="'TRUE_FALSE'">
                                             <div class="form-check">
-                                                <input class="form-check-input" th:name="'question_' + ${question.id}" th:value="true"
+                                                <input class="form-check-input" th:name="'question_' + ${question.id}"
+                                                       th:value="true"
                                                        type="radio">
                                                 <label class="form-check-label">True</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" th:name="'question_' + ${question.id}" th:value="false"
+                                                <input class="form-check-input" th:name="'question_' + ${question.id}"
+                                                       th:value="false"
                                                        type="radio">
                                                 <label class="form-check-label">False</label>
                                             </div>
@@ -149,7 +155,9 @@
                                         <div th:case="'CHECKBOX'">
                                             <div th:each="option : ${question.options}">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" th:attr="data-is-others=${option.optionText == 'Others'}" th:name="'question_' + ${question.id}"
+                                                    <input class="form-check-input"
+                                                           th:attr="data-is-others=${option.optionText == 'Others'}"
+                                                           th:name="'question_' + ${question.id}"
                                                            th:value="${option}"
                                                            type="checkbox">
                                                     <label class="form-check-label"
@@ -158,7 +166,8 @@
                                             </div>
                                             <div class="form-check others-textbox" style="display:none;">
                                                 <br>
-                                                <input class="form-control" th:name="'question_' + ${question.id} + '_others'"
+                                                <input class="form-control"
+                                                       th:name="'question_' + ${question.id} + '_others'"
                                                        type="text">
                                             </div>
                                         </div>
@@ -177,12 +186,16 @@
                                             <div>
                                                 <label>Is this managed at this facility? (Y/N)</label>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" th:name="'question_' + ${question.id} + '_managedAtFacility'" type="radio"
+                                                    <input class="form-check-input"
+                                                           th:name="'question_' + ${question.id} + '_managedAtFacility'"
+                                                           type="radio"
                                                            value="true"/>
                                                     <label class="form-check-label">Yes</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" th:name="'question_' + ${question.id} + '_managedAtFacility'" type="radio"
+                                                    <input class="form-check-input"
+                                                           th:name="'question_' + ${question.id} + '_managedAtFacility'"
+                                                           type="radio"
                                                            value="false"/>
                                                     <label class="form-check-label">No</label>
                                                 </div>
@@ -191,12 +204,14 @@
                                             <div class="row">
                                                 <div class="col-sm-6">
                                                     <label>SOH (ACTUAL)</label>
-                                                    <input class="form-control" th:name="'question_' + ${question.id} + '_sohActual'"
+                                                    <input class="form-control"
+                                                           th:name="'question_' + ${question.id} + '_sohActual'"
                                                            type="number"/>
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <label>SOH (eLMIS FE)</label>
-                                                    <input class="form-control" th:name="'question_' + ${question.id} + '_sohElmisFe'"
+                                                    <input class="form-control"
+                                                           th:name="'question_' + ${question.id} + '_sohElmisFe'"
                                                            type="number"/>
                                                 </div>
                                             </div>

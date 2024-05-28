@@ -46,7 +46,8 @@
 
                                 <!-- Navigation (button group) -->
                                 <div class="nav btn-group d-inline-flex d-none" role="tablist">
-                                    <button aria-controls="dealsListPane" aria-selected="true" class="btn btn-white active"
+                                    <button aria-controls="dealsListPane" aria-selected="true"
+                                            class="btn btn-white active"
                                             data-bs-target="#dealsListPane" data-bs-toggle="tab" id="dealsListTab"
                                             role="tab">
                                         <span class="fe fe-list"></span>
@@ -138,15 +139,18 @@
                                                 <label class="form-label">Verification Response</label>
                                                 <div th:switch="${verification.verificationOption}">
                                                     <div th:case="'TEXT'">
-                                                        <input class="form-control" th:name="'verification_' + ${verification.id}"
+                                                        <input class="form-control"
+                                                               th:name="'verification_' + ${verification.id}"
                                                                type="text">
                                                     </div>
                                                     <div th:case="'NUMBER'">
-                                                        <input class="form-control" th:name="'verification_' + ${verification.id}"
+                                                        <input class="form-control"
+                                                               th:name="'verification_' + ${verification.id}"
                                                                type="number">
                                                     </div>
                                                     <div th:case="'DATE'">
-                                                        <input class="form-control" th:name="'verification_' + ${verification.id}"
+                                                        <input class="form-control"
+                                                               th:name="'verification_' + ${verification.id}"
                                                                type="date">
                                                     </div>
 
