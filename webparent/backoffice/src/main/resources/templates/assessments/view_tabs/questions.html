@@ -35,12 +35,12 @@
             <div class="accordion" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <button aria-controls="collapseOne" aria-expanded="true" class="accordion-button"
+                                data-bs-target="#collapseOne" data-bs-toggle="collapse" type="button">
                             Forms
                         </button>
                     </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                    <div class="accordion-collapse collapse show" data-bs-parent="#accordionExample" id="collapseOne">
                         <div class="accordion-body">
                             <div class="row" th:if="${assessmentForms.size() > 0}">
                                 <div class="col-6">
@@ -115,12 +115,12 @@
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        <button aria-controls="collapseTwo" aria-expanded="false" class="accordion-button collapsed"
+                                data-bs-target="#collapseTwo" data-bs-toggle="collapse" type="button">
                             Questions
                         </button>
                     </h2>
-                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseTwo">
                         <div class="accordion-body">
                             <div class="row" th:if="${assessmentQuestions.size() > 0}">
                                 <div class="col-6">

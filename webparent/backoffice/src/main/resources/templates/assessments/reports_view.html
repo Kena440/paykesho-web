@@ -109,25 +109,29 @@
                             <div class="accordion" id="accordionExample">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button aria-controls="collapseOne" aria-expanded="true" class="accordion-button collapsed"
+                                        <button aria-controls="collapseOne" aria-expanded="true"
+                                                class="accordion-button collapsed"
                                                 data-bs-target="#collapseOne"
                                                 data-bs-toggle="collapse" type="button">
                                             Aggregated Data
                                         </button>
                                     </h2>
-                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseOne">
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample"
+                                         id="collapseOne">
                                         <div class="accordion-body">
                                             <div class="row">
                                                 <div class="col-12 col-md-12">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">Response Count Per Question</h4>
+                                                            <h4 class="card-header-title">Response Count Per
+                                                                Question</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <ul class="list-group list-group-flush">
                                                                 <li class="list-group-item"
                                                                     th:each="response : ${responseCountPerQuestion}">
-                                                                    <strong th:text="${response.key.question}">Question text</strong>:
+                                                                    <strong th:text="${response.key.question}">Question
+                                                                        text</strong>:
                                                                     <span th:text="${response.value}">Response count</span>
                                                                 </li>
                                                             </ul>
@@ -139,7 +143,8 @@
                                                 <div class="col-12 col-md-12">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">Answer Distribution Per Question</h4>
+                                                            <h4 class="card-header-title">Answer Distribution Per
+                                                                Question</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <!-- Charts will be appended here by jQuery -->
@@ -155,12 +160,14 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button aria-controls="collapseTwo" aria-expanded="false" class="accordion-button collapsed"
+                                        <button aria-controls="collapseTwo" aria-expanded="false"
+                                                class="accordion-button collapsed"
                                                 data-bs-target="#collapseTwo" data-bs-toggle="collapse" type="button">
                                             Disaggregated Data
                                         </button>
                                     </h2>
-                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseTwo">
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample"
+                                         id="collapseTwo">
                                         <div class="accordion-body">
                                             <div id="questions-container">
 
@@ -170,18 +177,21 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button aria-controls="collapseThree" aria-expanded="false" class="accordion-button collapsed"
+                                        <button aria-controls="collapseThree" aria-expanded="false"
+                                                class="accordion-button collapsed"
                                                 data-bs-target="#collapseThree" data-bs-toggle="collapse" type="button">
                                             Facility Data
                                         </button>
                                     </h2>
-                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseThree">
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample"
+                                         id="collapseThree">
                                         <div class="accordion-body">
                                             <div class="row">
                                                 <div class="col-12 col-md-6">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">Facility Type Distribution</h4>
+                                                            <h4 class="card-header-title">Facility Type
+                                                                Distribution</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <canvas id="facilityTypeChart"></canvas>
@@ -191,7 +201,8 @@
                                                 <div class="col-12 col-md-6">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">Facility Province Distribution</h4>
+                                                            <h4 class="card-header-title">Facility Province
+                                                                Distribution</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <canvas id="facilityProvinceChart"></canvas>
@@ -201,7 +212,8 @@
                                                 <div class="col-12 col-md-6">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">Facility District Distribution</h4>
+                                                            <h4 class="card-header-title">Facility District
+                                                                Distribution</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <canvas id="facilityDistrictChart"></canvas>
@@ -224,18 +236,21 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button aria-controls="collapseFour" aria-expanded="false" class="accordion-button collapsed"
+                                        <button aria-controls="collapseFour" aria-expanded="false"
+                                                class="accordion-button collapsed"
                                                 data-bs-target="#collapseFour" data-bs-toggle="collapse" type="button">
                                             Assessor Data
                                         </button>
                                     </h2>
-                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseFour">
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample"
+                                         id="collapseFour">
                                         <div class="accordion-body">
                                             <div class="row">
                                                 <div class="col-12 col-md-6">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">Interviews Conducted by Each Assessor</h4>
+                                                            <h4 class="card-header-title">Interviews Conducted by Each
+                                                                Assessor</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <canvas id="assessorInterviewsChart"></canvas>
@@ -248,18 +263,21 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button aria-controls="collapseFive" aria-expanded="false" class="accordion-button collapsed"
+                                        <button aria-controls="collapseFive" aria-expanded="false"
+                                                class="accordion-button collapsed"
                                                 data-bs-target="#collapseFive" data-bs-toggle="collapse" type="button">
                                             Assessment Data
                                         </button>
                                     </h2>
-                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseFive">
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample"
+                                         id="collapseFive">
                                         <div class="accordion-body">
                                             <div class="row">
                                                 <div class="col-12 col-md-6">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
-                                                            <h4 class="card-header-title">Assessment Completion Rate</h4>
+                                                            <h4 class="card-header-title">Assessment Completion
+                                                                Rate</h4>
                                                         </div>
                                                         <div class="card-body">
                                                             <canvas id="completionRateChart"></canvas>
