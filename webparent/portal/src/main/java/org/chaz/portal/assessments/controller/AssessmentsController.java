@@ -31,7 +31,6 @@ import java.util.Map;
 @RequestMapping("/assessments")
 public class AssessmentsController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AssessmentsController.class);
     private static final Logger logger = LoggerFactory.getLogger(AssessmentsController.class);
     @Autowired
     private AssessmentsService assessmentsService;
@@ -312,15 +311,19 @@ public class AssessmentsController {
                 if (productData.containsKey("managedAtFacility")) {
                     response.setManagedAtFacility((Boolean) productData.get("managedAtFacility"));
                 }
-                if (productData.containsKey("sohActual")) {
-                    sohActual = convertToInteger(productData.get("sohActual"));
-                    response.setSohActual(sohActual);
-                }
-                if (productData.containsKey("sohElmisFe")) {
-                    sohElmisFe = convertToInteger(productData.get("sohElmisFe"));
-                    response.setSohElmisFe(sohElmisFe);
+                try {
+                    if (productData.containsKey("sohActual") && productData.get("sohActual") != null) {
+                        sohActual = convertToInteger(productData.get("sohActual"));
+                    }
+                    if (productData.containsKey("sohElmisFe") && productData.get("sohActual") != null) {
+                        sohElmisFe = convertToInteger(productData.get("sohElmisFe"));
+                    }
+                } catch (NumberFormatException e) {
+                    logger.info(e.getMessage());
                 }
 
+                response.setSohActual(sohActual);
+                response.setSohElmisFe(sohElmisFe);
                 variance = sohActual - sohElmisFe;
 
                 response.setVariance(variance);

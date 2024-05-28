@@ -345,16 +345,16 @@
                     if (formType === formTypeGeneral) {
                         if (input.type === 'radio') {
                             if (input.checked) {
-                                answers[questionId] = input.value; // For radio buttons, store the selected value directly
+                                answers[questionId] = input.value;
                                 if (input.getAttribute('data-is-others') === 'true') {
-                                    answers[questionId + '_others'] = question.querySelector('.others-textbox input').value;
+                                    answers[questionId] = question.querySelector('.others-textbox input').value;
                                 }
                             }
                         } else if (input.type === 'checkbox') {
                             if (input.checked) {
-                                selectedOptions.push(input.value); // For checkboxes, add the selected value to the array
+                                selectedOptions.push(input.value);
                                 if (input.getAttribute('data-is-others') === 'true') {
-                                    answers[questionId + '_others'] = question.querySelector('.others-textbox input').value;
+                                    selectedOptions.push(question.querySelector('.others-textbox input').value)
                                 }
                             }
                         } else {
@@ -386,9 +386,8 @@
                 });
 
                 if (formType === formTypeGeneral) {
-                    // If there are selected options for checkboxes, store them in the answers object
                     if (selectedOptions.length > 0) {
-                        answers[questionId] = selectedOptions;
+                        answers[questionId] = selectedOptions.filter(option => option !== 'Others');
                     }
                 } else if (formType === formTypeProducts) {
                     if (Object.keys(productData).length > 0) {

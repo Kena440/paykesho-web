@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface AssessmentInterviewsRepository extends SearchRepository<AssessmentInterview, Integer> {
 
-    @Query("select e from AssessmentInterview e where e.assessmentForm.assessment.id = ?1 order by e.assessmentForm.assessment.assessmentDate desc")
+    @Query("select e from AssessmentInterview e where e.assessmentForm.assessment.id = ?1 order by e.id desc")
     public List<AssessmentInterview> findByAssessment(Integer eventId);
 
     @Query("select e from AssessmentInterview e where concat(e.assessmentForm.assessment.name, ' ', e.assessmentForm.assessment.assessmentDate) like %?1%")
