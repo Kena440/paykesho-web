@@ -28,161 +28,208 @@
             </a>
         </div>
     </div>
-    <div class="row" th:if="${assessmentForms.size() > 0}">
-        <div class="col-6">
-            <input class="form-control" id="searchFormsInput" placeholder="Search..." type="text">
-        </div>
-
+    <br>
+    <hr>
+    <div class="row">
         <div class="col-12 col-md-12">
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered my-4" id="formsTable">
-                    <thead>
-                    <tr>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">#</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Name</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Type</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Date</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Action</span>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="form, formStat : ${assessmentForms}">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Forms
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="row" th:if="${assessmentForms.size() > 0}">
+                                <div class="col-6">
+                                    <input class="form-control" id="searchFormsInput" placeholder="Search..."
+                                           type="text">
+                                </div>
 
-                        <td class="px-0 text-sm-center">
-                            <small>[[${formStat.count}]]</small>
-                        </td>
-                        <td class="px-0 text-sm-center">
-                            <small>[[${form.formName}]]</small>
-                        </td>
-                        <td class="px-0 text-sm-center">
-                            <small>[[${form.formType}]]</small>
-                        </td>
-                        <td class="px-0 text-sm-center">
-                            <small>
-                                <time datetime="2018-04-23"
-                                      th:replace="fragments/fragments :: format_date(${form.createdDate})"></time>
-                            </small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                <a class="fe fe-edit" th:href="@{'/assessments/form/edit/'+${form.id}}"
-                                   title="Edit">
-                                </a>
-                                &nbsp;
-                                &nbsp;
-                                <a class="fe fe-trash" th:href="@{'/assessments/form/delete/'+${form.id}}"
-                                   title="Delete">
-                                </a>
-                            </th:block>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr>
-                <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
+                                <div class="col-12 col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered my-4" id="formsTable">
+                                            <thead>
+                                            <tr>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">#</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Name</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Type</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Date</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Action</span>
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="form, formStat : ${assessmentForms}">
+
+                                                <td class="px-0 text-sm-center">
+                                                    <small>[[${formStat.count}]]</small>
+                                                </td>
+                                                <td class="px-0 text-sm-center">
+                                                    <small>[[${form.formName}]]</small>
+                                                </td>
+                                                <td class="px-0 text-sm-center">
+                                                    <small>[[${form.formType}]]</small>
+                                                </td>
+                                                <td class="px-0 text-sm-center">
+                                                    <small>
+                                                        <time datetime="2018-04-23"
+                                                              th:replace="fragments/fragments :: format_date(${form.createdDate})"></time>
+                                                    </small>
+                                                </td>
+                                                <td class="px-0 text-center">
+                                                    <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                                        <a class="fe fe-edit"
+                                                           th:href="@{'/assessments/form/edit/'+${form.id}}"
+                                                           title="Edit">
+                                                        </a>
+                                                        &nbsp;
+                                                        &nbsp;
+                                                        <a class="fe fe-trash"
+                                                           th:href="@{'/assessments/form/delete/'+${form.id}}"
+                                                           title="Delete">
+                                                        </a>
+                                                    </th:block>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <hr>
+                                        <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Questions
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="row" th:if="${assessmentQuestions.size() > 0}">
+                                <div class="col-6">
+                                    <input class="form-control" id="searchQuestionsInput" placeholder="Search..."
+                                           type="text">
+                                </div>
+
+                                <div class="col-12 col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered my-4" id="questionsTable">
+                                            <thead>
+                                            <tr>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">#</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Question</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Question Type</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Skippable / Verification</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Form</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Date</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Action</span>
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="question, questionStat : ${assessmentQuestions}">
+
+                                                <td class="px-0 text-center">
+                                                    <small>[[${questionStat.count}]]</small>
+                                                </td>
+                                                <td class="px-0 text-start">
+                                                    <small>[[${question.question}]]</small>
+                                                </td>
+                                                <td class="px-0 text-center">
+                                                    <small>[[${question.questionType}]]</small>
+                                                </td>
+                                                <td class="px-0 text-center">
+                                                    <small>
+                                                        <th:block th:if="${question.skippable == true}">
+                                                            <div class="badge bg-success">
+                                                                Skippable
+                                                            </div>
+                                                        </th:block>
+                                                        <th:block th:if="${question.skippable == false}">
+                                                            <div class="badge bg-danger">
+                                                                Not Skippable
+                                                            </div>
+                                                        </th:block>
+                                                        <th:block th:if="${question.needsVerification == true}">
+                                                            <div class="badge bg-success">
+                                                                Needs Verification
+                                                            </div>
+                                                        </th:block>
+                                                        <th:block th:if="${question.needsVerification == false}">
+                                                            <div class="badge bg-danger">
+                                                                No Verification
+                                                            </div>
+                                                        </th:block>
+                                                    </small>
+                                                </td>
+                                                <td class="px-0 text-center">
+                                                    <small>[[${question.assessmentForm.formName}]] </small>
+                                                </td>
+                                                <td class="px-0 text-sm-center">
+                                                    <small>
+                                                        <time datetime="2018-04-23"
+                                                              th:replace="fragments/fragments :: format_date(${question.createdDate})"></time>
+                                                    </small>
+                                                </td>
+                                                <td class="px-0 text-center">
+                                                    <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                                        <a class="fe fe-edit"
+                                                           th:href="@{'/assessments/question/edit/'+${question.id}}"
+                                                           title="Edit">
+                                                        </a>
+                                                        &nbsp;
+                                                        &nbsp;
+                                                        <a class="fe fe-trash"
+                                                           th:href="@{'/assessments/question/delete/'+${question.id}}"
+                                                           title="Delete">
+                                                        </a>
+                                                    </th:block>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <hr>
+                                        <button class="btn btn-primary" id="showMoreBtn">Show More</button>
+                                        <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row" th:if="${assessmentQuestions.size() > 0}">
-        <div class="col-6">
-            <input class="form-control" id="searchQuestionsInput" placeholder="Search..." type="text">
-        </div>
-
-        <div class="col-12 col-md-12">
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered my-4" id="questionsTable">
-                    <thead>
-                    <tr>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">#</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Question</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Question Type</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Skippable</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Form</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Date</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Action</span>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="question, questionStat : ${assessmentQuestions}">
-
-                        <td class="px-0 text-center">
-                            <small>[[${questionStat.count}]]</small>
-                        </td>
-                        <td class="px-0 text-start">
-                            <small>[[${question.question}]]</small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>[[${question.questionType}]]</small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>
-                                <th:block th:if="${question.skippable == true}">
-                                    <div class="badge bg-success">
-                                        Skippable
-                                    </div>
-                                </th:block>
-                                <th:block th:if="${question.skippable == false}">
-                                    <div class="badge bg-danger">
-                                        Not Skippable
-                                    </div>
-                                </th:block>
-                            </small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>[[${question.assessmentForm.formName}]] </small>
-                        </td>
-                        <td class="px-0 text-sm-center">
-                            <small>
-                                <time datetime="2018-04-23"
-                                      th:replace="fragments/fragments :: format_date(${question.createdDate})"></time>
-                            </small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                <a class="fe fe-edit" th:href="@{'/assessments/question/edit/'+${question.id}}"
-                                   title="Edit">
-                                </a>
-                                &nbsp;
-                                &nbsp;
-                                <a class="fe fe-trash" th:href="@{'/assessments/question/delete/'+${question.id}}"
-                                   title="Delete">
-                                </a>
-                            </th:block>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr>
-                <button class="btn btn-primary" id="showMoreBtn">Show More</button>
-                <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
-            </div>
-        </div>
-    </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             let currentIndex = 0;
@@ -220,7 +267,6 @@
             });
         });
     </script>
-
 </div>
 </body>
 </html> 

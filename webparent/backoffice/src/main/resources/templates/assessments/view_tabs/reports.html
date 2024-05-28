@@ -1,180 +1,76 @@
 <!DOCTYPE html>
-<html lang="en"
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
       xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="content" th:remove="tag">
-
-    <div class="accordion" id="accordionExample">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button aria-controls="collapseOne" aria-expanded="true" class="accordion-button collapsed"
-                        data-bs-target="#collapseOne"
-                        data-bs-toggle="collapse" type="button">
-                    Aggregated Data
-                </button>
-            </h2>
-            <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseOne">
-                <div class="accordion-body">
-                    <div class="row">
-                        <div class="col-12 col-md-12">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Response Count Per Question</h4>
-                                </div>
-                                <div class="card-body">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"
-                                            th:each="response : ${responseCountPerQuestion}">
-                                            <strong th:text="${response.key.question}">Question text</strong>:
-                                            <span th:text="${response.value}">Response count</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-md-12">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Answer Distribution Per Question</h4>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Charts will be appended here by jQuery -->
-                                    <div class="row" id="charts-container">
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-12 col-md-12">
+            <div class="row" th:if="${assessmentForms.size() > 0}">
+                <div class="col-6">
+                    <input class="form-control" id="searchFormsInput" placeholder="Search..."
+                           type="text">
                 </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button aria-controls="collapseTwo" aria-expanded="false" class="accordion-button collapsed"
-                        data-bs-target="#collapseTwo" data-bs-toggle="collapse" type="button">
-                    Disaggregated Data
-                </button>
-            </h2>
-            <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseTwo">
-                <div class="accordion-body">
-                    <div id="questions-container">
 
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button aria-controls="collapseThree" aria-expanded="false" class="accordion-button collapsed"
-                        data-bs-target="#collapseThree" data-bs-toggle="collapse" type="button">
-                    Facility Data
-                </button>
-            </h2>
-            <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseThree">
-                <div class="accordion-body">
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Facility Type Distribution</h4>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="facilityTypeChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Facility Province Distribution</h4>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="facilityProvinceChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Facility District Distribution</h4>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="facilityDistrictChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Facility Response Rate</h4>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="facilityResponseChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button aria-controls="collapseFour" aria-expanded="false" class="accordion-button collapsed"
-                        data-bs-target="#collapseFour" data-bs-toggle="collapse" type="button">
-                    Assessor Data
-                </button>
-            </h2>
-            <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseFour">
-                <div class="accordion-body">
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Interviews Conducted by Each Assessor</h4>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="assessorInterviewsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button aria-controls="collapseFive" aria-expanded="false" class="accordion-button collapsed"
-                        data-bs-target="#collapseFive" data-bs-toggle="collapse" type="button">
-                    Assessment Data
-                </button>
-            </h2>
-            <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseFive">
-                <div class="accordion-body">
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Assessment Completion Rate</h4>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="completionRateChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-12 col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered my-4" id="formsTable">
+                            <thead>
+                            <tr>
+                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                    <span class="h6">#</span>
+                                </th>
+                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                    <span class="h6">Name</span>
+                                </th>
+                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                    <span class="h6">Type</span>
+                                </th>
+                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                    <span class="h6">Date</span>
+                                </th>
+                                <th class="px-0 bg-transparent border-top-0 text-center">
+                                    <span class="h6">Action</span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="form, formStat : ${assessmentForms}">
 
-                        <div class="col-12 col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4 class="card-header-title">Average Completion Time</h4>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="completionTimeChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
+                                <td class="px-0 text-sm-center">
+                                    <small>[[${formStat.count}]]</small>
+                                </td>
+                                <td class="px-0 text-sm-center">
+                                    <small>
+                                        <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                            <a th:href="@{'/assessments/form/reports/'+${form.id}}"
+                                               title="Reports">
+                                                [[${form.formName}]]
+                                            </a>
+                                        </th:block>
+                                    </small>
+                                </td>
+                                <td class="px-0 text-sm-center">
+                                    <small>[[${form.formType}]]</small>
+                                </td>
+                                <td class="px-0 text-sm-center">
+                                    <small>
+                                        <time datetime="2018-04-23"
+                                              th:replace="fragments/fragments :: format_date(${form.createdDate})"></time>
+                                    </small>
+                                </td>
+                                <td class="px-0 text-center">
+                                    <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
+                                        <a class="fe fe-pie-chart"
+                                           th:href="@{'/assessments/form/reports/'+${form.id}}"
+                                           title="Reports">
+                                        </a>
+                                    </th:block>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <hr>
+                        <!--<div th:replace="fragments/fragments :: pagnation('attendees')"></div>-->
                     </div>
                 </div>
             </div>

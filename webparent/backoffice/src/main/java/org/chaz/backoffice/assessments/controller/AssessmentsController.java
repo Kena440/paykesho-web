@@ -157,7 +157,6 @@ public class AssessmentsController {
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
             List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
-
             List<Assessor> assessorList = assessorService.assessorList();
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentAssessors", assessmentAssessors);
@@ -167,38 +166,6 @@ public class AssessmentsController {
             model.addAttribute("assessorList", assessorList);
             model.addAttribute("assessmentLink", "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
             model.addAttribute("qrCodeContent", "/events/generateQRCode?qrContent=" + "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
-
-
-            try {
-
-                // Filter only MULTIPLE_CHOICE and CHECKBOX questions
-                List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream().filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX) || q.getQuestionType().equals(QuestionType.PRODUCT)).collect(Collectors.toList());
-
-                Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new LinkedHashMap<>();
-                for (AssessmentQuestion question : filteredQuestions) {
-                    List<AssessmentQuestionResponse> allResponses = new ArrayList<>();
-                    for (AssessmentInterview interview : assessmentInterviews) {
-                        List<AssessmentQuestionResponse> responses = assessmentsService.getAssessmentQuestionResponseByInterviewId(interview).stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
-                        allResponses.addAll(responses);
-                    }
-                    questionResponseMap.put(question, allResponses);
-                }
-
-                // Aggregate data
-                Map<AssessmentQuestion, Long> responseCountPerQuestion = questionResponseMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> (long) entry.getValue().size()));
-
-                Map<AssessmentQuestion, Map<String, Long>> distributionPerQuestion = new LinkedHashMap<>();
-                for (Map.Entry<AssessmentQuestion, List<AssessmentQuestionResponse>> entry : questionResponseMap.entrySet()) {
-                    AssessmentQuestion question = entry.getKey();
-                    Map<String, Long> distribution = entry.getValue().stream().collect(Collectors.groupingBy(AssessmentQuestionResponse::getAnswer, Collectors.counting()));
-                    distributionPerQuestion.put(question, distribution);
-                }
-                model.addAttribute("responseCountPerQuestion", responseCountPerQuestion);
-                model.addAttribute("distributionPerQuestion", distributionPerQuestion);
-            } catch (AssessmentToolError assessmentToolError) {
-                redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
-                return "redirect:/assessments";
-            }
 
             return "assessments/assessment_view";
         } catch (AssessmentToolError assessmentToolError) {
@@ -399,6 +366,47 @@ public class AssessmentsController {
             redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/assessments";
         }
+    }
+
+    @GetMapping("/form/reports/{id}")
+    public String viewAssessmentFormReport(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) throws AssessmentToolError {
+        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(id);
+
+        List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentForm);
+        List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessmentForm.getAssessment());
+
+        try {
+
+            List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream().filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX) || q.getQuestionType().equals(QuestionType.PRODUCT)).collect(Collectors.toList());
+
+            Map<AssessmentQuestion, List<AssessmentQuestionResponse>> questionResponseMap = new LinkedHashMap<>();
+            for (AssessmentQuestion question : filteredQuestions) {
+                List<AssessmentQuestionResponse> allResponses = new ArrayList<>();
+                for (AssessmentInterview interview : assessmentInterviews) {
+                    List<AssessmentQuestionResponse> responses = assessmentsService.getAssessmentQuestionResponseByInterviewId(interview).stream().filter(response -> response.getAssessmentQuestion().getId().equals(question.getId())).collect(Collectors.toList());
+                    allResponses.addAll(responses);
+                }
+                questionResponseMap.put(question, allResponses);
+            }
+            // Aggregate data
+            Map<AssessmentQuestion, Long> responseCountPerQuestion = questionResponseMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> (long) entry.getValue().size()));
+
+            Map<AssessmentQuestion, Map<String, Long>> distributionPerQuestion = new LinkedHashMap<>();
+            for (Map.Entry<AssessmentQuestion, List<AssessmentQuestionResponse>> entry : questionResponseMap.entrySet()) {
+                AssessmentQuestion question = entry.getKey();
+                Map<String, Long> distribution = entry.getValue().stream().collect(Collectors.groupingBy(AssessmentQuestionResponse::getAnswer, Collectors.counting()));
+                distributionPerQuestion.put(question, distribution);
+            }
+            model.addAttribute("responseCountPerQuestion", responseCountPerQuestion);
+            model.addAttribute("distributionPerQuestion", distributionPerQuestion);
+            model.addAttribute("assessmentForm", assessmentForm);
+            model.addAttribute("pageTitle", "Form Reports");
+            return "assessments/reports_view";
+        } catch (AssessmentToolError assessmentToolError) {
+            redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
+            return "redirect:/assessments";
+        }
+
     }
 
     private void sendEmailToContactPersonThread(AssessmentAssessor assessmentAssessor) {

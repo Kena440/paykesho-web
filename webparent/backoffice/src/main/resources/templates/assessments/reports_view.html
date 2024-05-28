@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
+
+<body>
+
+<form th:replace="fragments/fragments :: offcanvas_demo"></form>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
+<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Assessment Management
+                                </h6>
+
+                                <!-- Title -->
+                                <h1 class="header-title text-truncate">
+                                    [[${pageTitle}]]
+                                </h1>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Navigation (button group) -->
+                                <div class="nav btn-group d-inline-flex d-none" role="tablist">
+                                    <button aria-controls="dealsListPane" aria-selected="true"
+                                            class="btn btn-white active"
+                                            data-bs-target="#dealsListPane" data-bs-toggle="tab" id="dealsListTab"
+                                            role="tab">
+                                        <span class="fe fe-list"></span>
+                                    </button>
+                                    <button aria-controls="dealsCardsPane" aria-selected="false" class="btn btn-white"
+                                            data-bs-target="#dealsCardsPane" data-bs-toggle="tab" id="dealsCardsTab"
+                                            role="tab">
+                                        <span class="fe fe-sidebar"></span>
+                                    </button>
+                                </div> <!-- / .nav -->
+
+                                <!-- Buttons -->
+                                <a class="btn btn-primary ms-2"
+                                   th:href="@{'/assessments/view/'+${assessmentForm.assessment.id}}">
+                                    Back
+                                </a>
+
+                            </div>
+                        </div> <!-- / .row -->
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Nav -->
+                                <ul class="nav nav-tabs nav-overflow header-tabs">
+                                    <li class="nav-item d-none">
+                                        <a class="nav-link text-nowrap active" href="#!">
+                                            Total <span
+                                                class="badge rounded-pill bg-secondary-soft"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div id="accordion">
+
+                    <!-- Header -->
+                    <div class="header mt-md-5">
+                        <div class="header-body">
+
+                            <!-- Title -->
+                            <h1 class="header-title">
+                                [[${assessmentForm.assessment.name}]] -
+                            </h1>
+
+                            <!-- Subtitle -->
+                            <p class="header-subtitle">
+                                [[${assessmentForm.formName}]]</p>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-12">
+                            <div class="accordion" id="accordionExample">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button aria-controls="collapseOne" aria-expanded="true" class="accordion-button collapsed"
+                                                data-bs-target="#collapseOne"
+                                                data-bs-toggle="collapse" type="button">
+                                            Aggregated Data
+                                        </button>
+                                    </h2>
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseOne">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-12 col-md-12">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Response Count Per Question</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <ul class="list-group list-group-flush">
+                                                                <li class="list-group-item"
+                                                                    th:each="response : ${responseCountPerQuestion}">
+                                                                    <strong th:text="${response.key.question}">Question text</strong>:
+                                                                    <span th:text="${response.value}">Response count</span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 col-md-12">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Answer Distribution Per Question</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <!-- Charts will be appended here by jQuery -->
+                                                            <div class="row" id="charts-container">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button aria-controls="collapseTwo" aria-expanded="false" class="accordion-button collapsed"
+                                                data-bs-target="#collapseTwo" data-bs-toggle="collapse" type="button">
+                                            Disaggregated Data
+                                        </button>
+                                    </h2>
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseTwo">
+                                        <div class="accordion-body">
+                                            <div id="questions-container">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button aria-controls="collapseThree" aria-expanded="false" class="accordion-button collapsed"
+                                                data-bs-target="#collapseThree" data-bs-toggle="collapse" type="button">
+                                            Facility Data
+                                        </button>
+                                    </h2>
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseThree">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-12 col-md-6">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Facility Type Distribution</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="facilityTypeChart"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Facility Province Distribution</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="facilityProvinceChart"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Facility District Distribution</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="facilityDistrictChart"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Facility Response Rate</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="facilityResponseChart"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button aria-controls="collapseFour" aria-expanded="false" class="accordion-button collapsed"
+                                                data-bs-target="#collapseFour" data-bs-toggle="collapse" type="button">
+                                            Assessor Data
+                                        </button>
+                                    </h2>
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseFour">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-12 col-md-6">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Interviews Conducted by Each Assessor</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="assessorInterviewsChart"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button aria-controls="collapseFive" aria-expanded="false" class="accordion-button collapsed"
+                                                data-bs-target="#collapseFive" data-bs-toggle="collapse" type="button">
+                                            Assessment Data
+                                        </button>
+                                    </h2>
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseFive">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-12 col-md-6">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Assessment Completion Rate</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="completionRateChart"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Average Completion Time</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="completionTimeChart"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+</div><!-- / .main-content -->
+<div th:replace="fragments/modal_fragment :: modal_dialog"></div>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script th:inline="javascript">
+
+    var assessmentId = document.getElementById('assessmentId').value;
+    var distributionAggregatedUrl = '/assessments/rest/distribution/aggregated/' + assessmentId;
+    //var distributionProductsUrl = '/assessments/rest/distribution/products/' + assessmentId;
+    var distributionDisaggregatedUrl = '/assessments/rest/distribution/disaggregated/' + assessmentId;
+    var facilityTypeUrl = '/assessments/rest/facility-types/' + assessmentId;
+    var facilityProvinceUrl = '/assessments/rest/facility-provinces/' + assessmentId;
+    var facilityResponseUrl = '/assessments/rest/facility-response/' + assessmentId;
+    var facilityDistrictUrl = '/assessments/rest/facility-districts/' + assessmentId;
+    var assessorInterviewsUrl = '/assessments/rest/assessor-interviews/' + assessmentId;
+    var completionRateUrl = '/assessments/rest/completion-rates/' + assessmentId;
+    var completionTimeUrl = '/assessments/rest/average-completion-time/' + assessmentId;
+
+    $.get(distributionAggregatedUrl, function (response) {
+        var chartsContainer = $('#charts-container');
+
+        $.each(response, function (question, distribution) {
+            var questionText = question;
+            var labels = Object.keys(distribution);
+            var data = Object.values(distribution);
+            var chartId = 'chart' + labels.join('').replace(/\s+/g, '');
+
+            chartsContainer.append(
+                '<div class="col-12 col-md-6" >' +
+                '<div class="card mb-3">' +
+                '  <div class="card-header">' +
+                '    <h4 class="card-header-title">' + questionText + '</h4>' +
+                '  </div>' +
+                '  <div class="card-body">' +
+                '    <canvas id="' + chartId + '"></canvas>' +
+                '  </div>' +
+                '</div>' +
+                '</div>'
+            );
+
+            var ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Responses',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+    });
+    /*   $.get(distributionProductsUrl, function (data) {
+           var tableBody = $('#products-table-body');
+           tableBody.empty(); // Clear existing table body content
+
+           // Loop through the data and append rows to the table body
+           $.each(data, function (index, entry) {
+               var rowHtml = '<tr>' +
+                   '<td class="text-center">' + entry.count + '</td>' +
+                   '<td>' + entry.question + '</td>' +
+                   '<td class="text-center">' + (entry.managedAtFacility ? 'Yes' : 'No') + '</td>' +
+                   '<td class="text-center">' + entry.sohActual + '</td>' +
+                   '<td class="text-center">' + entry.sohElmisFe + '</td>' +
+                   '<td class="text-center">' + entry.variance + '</td>' +
+                   '<td class="text-center">' + entry.percentageError + '</td>' +
+                   '<td class="text-center">' + entry.averagePercentageError + '</td>' +
+                   '</tr>';
+
+               tableBody.append(rowHtml);
+           });
+       });*/
+    $.get(distributionDisaggregatedUrl, function (response) {
+        var questionsContainer = $('#questions-container');
+
+        $.each(response, function (question, interviews) {
+            var questionText = question;
+
+            // Create HTML for question and answers
+            var questionHTML = '<div class="card mb-3">' +
+                '    <div class="card-header">' +
+                '        <h4 class="card-header-title">' + questionText + '</h4>' +
+                '    </div>' +
+                '    <div class="card-body">';
+
+            $.each(interviews, function (index, interview) {
+                var interviewHTML = '        <ul class="responses">';
+                interviewHTML += '            <li>' + index + '</li>';
+                interviewHTML += '        </ul>';
+                questionHTML += interviewHTML;
+            });
+            questionHTML += '    </div>' +
+                '</div>';
+
+            questionsContainer.append(questionHTML);
+        });
+    });
+    $.get(facilityTypeUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+        var ctx = document.getElementById('facilityTypeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+    $.get(facilityProvinceUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+        var ctx = document.getElementById('facilityProvinceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+    $.get(facilityDistrictUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+        var ctx = document.getElementById('facilityDistrictChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+    $.get(facilityResponseUrl, function (response) {
+        var totalFacilities = response.totalFacilities;
+        var respondingFacilities = response.respondingFacilities;
+        var nonRespondingFacilities = totalFacilities - respondingFacilities;
+
+        var ctx = document.getElementById('facilityResponseChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Responding Facilities', 'Non-responding Facilities'],
+                datasets: [{
+                    data: [respondingFacilities, nonRespondingFacilities],
+                    backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+    $.get(assessorInterviewsUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+
+        var ctx = document.getElementById('assessorInterviewsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Interviews',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+    $.get(completionRateUrl, function (response) {
+        var ctx = document.getElementById('completionRateChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed Interviews', 'Total Interviews'],
+                datasets: [{
+                    data: [response.completedInterviews, response.totalInterviews],
+                    backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+    $.get(completionTimeUrl, function (response) {
+        var ctx = document.getElementById('completionTimeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Average Time', 'Min Time', 'Max Time'],
+                datasets: [{
+                    label: 'Completion Time (minutes)',
+                    data: [response.averageTime, response.minTime, response.maxTime],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    });
+</script>
+</body>
+
+
+</html>
