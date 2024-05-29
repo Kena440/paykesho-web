@@ -111,7 +111,7 @@
                                         <div class="col">
                                             <ul class="nav nav-tabs nav-overflow header-tabs">
                                                 <li class="nav-item">
-                                                    <a class="nav-link active" data-toggle="tab"
+                                                    <a class="nav-link" data-toggle="tab"
                                                        href="#infoTab">
                                                         Info
                                                     </a>
@@ -128,7 +128,7 @@
                                                     </a>
                                                 </li>
                                                 <li class="nav-item">
-                                                    <a class="nav-link" data-toggle="tab" href="#interviewsTab">
+                                                    <a class="nav-link active" data-toggle="tab" href="#interviewsTab">
                                                         Interviews
                                                     </a>
                                                 </li>
@@ -150,7 +150,7 @@
                         </div>
                         <div class="container-fluid">
                             <div class="tab-content">
-                                <div class="tab-pane fade show active" id="infoTab">
+                                <div class="tab-pane fade" id="infoTab">
                                     <div class="row">
                                         <div th:replace="assessments/view_tabs/info :: content"></div>
                                     </div>
@@ -165,7 +165,7 @@
                                         <div th:replace="assessments/view_tabs/questions :: content"></div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="interviewsTab">
+                                <div class="tab-pane fade  show active" id="interviewsTab">
                                     <div class="row">
                                         <div th:replace="assessments/view_tabs/interviews :: content"></div>
                                     </div>

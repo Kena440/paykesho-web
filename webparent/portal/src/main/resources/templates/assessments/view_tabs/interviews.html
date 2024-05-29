@@ -150,19 +150,13 @@
                         </th:block>
                     </td>
                     <td class="px-0 text-center">
-                        <th:block th:if="${interview.completed == false}">
-                            <a class="btn btn-sm btn-primary"
-                               th:href="@{'/assessments/interview/continue/' + ${interview.id}}">
-                                <span class="fe fe-play"></span>
-                                Continue
+                        <th:block th:if="${interview.verified == false}">
+                            <a class="btn btn-sm btn-secondary"
+                               th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
+                                <span class="fe fe-folder"></span>
+                                Verification
                             </a>
                         </th:block>
-                        <br>
-                        <a class="btn btn-sm btn-secondary"
-                           th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
-                            <span class="fe fe-folder"></span>
-                            Verification
-                        </a>
                     </td>
                 </div>
                 <hr>

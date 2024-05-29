@@ -157,7 +157,7 @@
                                     <tr th:each="assessment, assessmentStat : ${upcomingAssessments}">
                                         <th class="tables-row" scope="row">[[${assessmentStat.count}]]</th>
                                         <td class="tables-first">
-                                            <a th:href="@{'/assessment/view/'+${assessment.id}}"
+                                            <a th:href="@{'/assessments/view/'+${assessment.id}}"
                                                title="Assessment View">
                                                 [[${assessment.name}]]
                                             </a>
