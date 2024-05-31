@@ -205,7 +205,16 @@ public class AssessmentsService {
             throw new AssessmentToolError("Null parameter assessment");
         }
 
-        return assessmentInterviewsRepository.findByAssessment(assessment.getId());
+        List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findByAssessment(assessment.getId());
+
+        for (AssessmentInterview assessmentInterview: assessmentInterviews){
+            int size = getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
+            if (size > 0){
+                assessmentInterview.setNeedsVerification(true);
+            }
+        }
+
+        return assessmentInterviews;
     }
 
     public List<AssessmentAssessor> getAssessmentAssessors(Assessment assessment) throws AssessmentToolError {

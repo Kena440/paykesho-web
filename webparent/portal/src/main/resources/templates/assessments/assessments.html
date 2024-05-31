@@ -144,6 +144,9 @@
                                         <th scope="col"
                                             th:replace="fragments/fragments :: column_Link('assessmentDays', 'Days', 'none')">
                                         </th>
+                                        <th scope="col"
+                                            th:replace="fragments/fragments :: column_Link('enabled', 'Status', 'none')">
+                                        </th>
                                         <th class="list-sort text-muted" scope="col">
                                             <a class="disabled" href="#">Action</a>
                                         </th>
@@ -177,10 +180,9 @@
                                             </th:block>
                                         </td>
                                         <td>
-                                            <a class="fe fe-file"
+                                            <a class="fe fe-eye"
                                                th:href="@{'/assessments/view/'+${assessment.id}}"
                                                title="Assessment View">
-                                                View
                                             </a>
                                         </td>
                                     </tr>

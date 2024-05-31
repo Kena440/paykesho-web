@@ -96,7 +96,6 @@ public class AssessmentsController {
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
             List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
-
             List<Facility> facilityList = facilityService.getAssessmentFacilities();
             model.addAttribute("facilityList", facilityList);
             model.addAttribute("assessment", assessment);
@@ -151,14 +150,7 @@ public class AssessmentsController {
 
         AssessmentInterview savedAssessmentInterview = assessmentsService.saveInterview(assessmentInterview);
 
-        List<AssessmentQuestion> assessmentQuestions = getAssessmentQuestions(assessmentForm);
-
-        model.addAttribute("pageTitle", "Start Interview");
-        model.addAttribute("assessmentForm", assessmentForm);
-        model.addAttribute("assessment", assessment);
-        model.addAttribute("assessmentInterview", savedAssessmentInterview);
-        model.addAttribute("assessmentQuestions", assessmentQuestions);
-        return "assessments/assessment_form";
+        return "redirect:/assessments/interview/continue/" + savedAssessmentInterview.getId();
     }
 
     @GetMapping("/interview/continue/{id}")

@@ -187,12 +187,11 @@
                                         </div>
                                         <div class="col-12 col-md-12"
                                              th:if="${assessmentVerificationQuestions > 0}">
-                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            <div class="alert alert-success alert-dismissible fade show"
+                                                 role="alert">
                                                 This assessment has some verified data
-                                                <a class="btn btn-sm btn-secondary"
-                                                   th:href="@{'/assessments/interview/verification/view/' + ${assessmentInterview.id}}">
-                                                    <span class="fe fe-folder"></span>
-                                                    Verification
+                                                <a th:href="@{'/assessments/interview/verification/view/' + ${assessmentInterview.id}}">
+                                                    View
                                                 </a>
 
                                                 <!-- Button

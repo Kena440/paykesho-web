@@ -39,6 +39,8 @@ public class AssessmentInterview extends IdBasedEntity {
     private Date verifiedDate;
     private boolean completed;
     private boolean verified;
+    @Transient
+    private boolean needsVerification;
     @ManyToOne
     @JoinColumn(name = "assessor_id")
     private Assessor assessor;

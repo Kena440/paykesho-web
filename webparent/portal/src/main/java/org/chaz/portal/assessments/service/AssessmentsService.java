@@ -143,7 +143,16 @@ public class AssessmentsService {
             throw new AssessmentToolError("Null parameter assessment");
         }
 
-        return assessmentInterviewsRepository.findByAssessment(assessment.getId());
+        List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findByAssessment(assessment.getId());
+
+        for (AssessmentInterview assessmentInterview: assessmentInterviews){
+            int size = getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
+            if (size > 0){
+                assessmentInterview.setNeedsVerification(true);
+            }
+        }
+
+        return assessmentInterviews;
     }
 
     public List<AssessmentForm> getAssessmentForms(Assessment assessment) throws AssessmentToolError {
@@ -165,9 +174,7 @@ public class AssessmentsService {
     public List<AssessmentQuestion> getVerifiedAssessmentQuestions(AssessmentForm assessmentForm) {
         List<AssessmentQuestion> allQuestions = assessmentQuestionsRepository.findByAssessmentForm(assessmentForm.getId());
 
-        return allQuestions.stream()
-                .filter(AssessmentQuestion::isNeedsVerification)
-                .collect(Collectors.toList());
+        return allQuestions.stream().filter(AssessmentQuestion::isNeedsVerification).collect(Collectors.toList());
     }
 
 

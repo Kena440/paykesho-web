@@ -29,7 +29,7 @@
                     <thead>
                     <tr>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">#</span>
+                            <span class="h6">Date/Time</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Name</span>
@@ -41,13 +41,13 @@
                             <span class="h6">Facility</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Date/Time</span>
-                        </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Form</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Assessor</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Status</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Action</span>
@@ -58,7 +58,31 @@
                     <tr th:each="interview, interviewStat : ${assessmentInterviews}">
 
                         <td class="px-0 text-center">
-                            <small>[[${interviewStat.count}]]</small><br>
+                            <a class=""
+                               th:href="@{'/assessments/interview/view/' + ${interview.id}}">
+                                <time datetime="2018-04-23"
+                                      th:replace="fragments/fragments :: format_time(${interview.createdDate})"></time>
+                            </a>
+                        </td>
+                        <td class="px-0 text-center">
+                            <a class=""
+                               th:href="@{'/assessments/interview/view/' + ${interview.id}}">
+                                <small>[[${interview.respondentName}]]</small>
+                            </a>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${interview.respondentJobTitle}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${interview.facility.name}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${interview.assessmentForm.formName}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
+                            <small>[[${interview.assessor.name}]]</small>
+                        </td>
+                        <td class="px-0 text-center">
                             <th:block th:if="${interview.completed == true}">
                                 <div class="badge bg-success">
                                     Completed
@@ -69,43 +93,24 @@
                                     Pending Completion
                                 </div>
                             </th:block>
-                            <th:block th:if="${interview.verified == true}">
-                                <div class="badge bg-success">
-                                    Verified
-                                </div>
+                            <th:block th:if="${interview.needsVerification == true}">
+                                <th:block th:if="${interview.verified == true}">
+                                    <div class="badge bg-success">
+                                        Verified
+                                    </div>
+                                </th:block>
+                                <th:block th:if="${interview.verified == false}">
+                                    <div class="badge bg-danger">
+                                        Pending Verification
+                                    </div>
+                                </th:block>
                             </th:block>
-                            <th:block th:if="${interview.verified == false}">
-                                <div class="badge bg-danger">
-                                    Pending Verification
-                                </div>
-                            </th:block>
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>[[${interview.respondentName}]]</small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>[[${interview.respondentJobTitle}]]</small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>[[${interview.facility.name}]]</small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <time datetime="2018-04-23"
-                                  th:replace="fragments/fragments :: format_date(${interview.createdDate})"></time>
-
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>[[${interview.assessmentForm.formName}]]</small>
-                        </td>
-                        <td class="px-0 text-center">
-                            <small>[[${interview.assessor.name}]]</small>
                         </td>
                         <td class="px-0 text-center">
                             <th:block th:if="${interview.completed == true}">
-                                <a class="btn btn-sm btn-primary"
+                                <a class=""
                                    th:href="@{'/assessments/interview/view/' + ${interview.id}}">
-                                    <span class="fe fe-file"></span>
-                                    View
+                                    <span class="fe fe-eye"></span>
                                 </a>
                             </th:block>
                         </td>

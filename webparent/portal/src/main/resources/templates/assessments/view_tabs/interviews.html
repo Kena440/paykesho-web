@@ -34,7 +34,7 @@
                     <thead>
                     <tr>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">#</span>
+                            <span class="h6">Date/Time</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Name</span>
@@ -45,14 +45,15 @@
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Facility</span>
                         </th>
-                        <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Date/Time</span>
-                        </th>
+
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Form</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Assessor</span>
+                        </th>
+                        <th class="px-0 bg-transparent border-top-0 text-center">
+                            <span class="h6">Status</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Action</span>
@@ -61,29 +62,9 @@
                     </thead>
                     <tbody>
                     <tr th:each="interview, interviewStat : ${assessmentInterviews}">
-
                         <td class="px-0 text-center">
-                            <small>[[${interviewStat.count}]]</small><br>
-                            <th:block th:if="${interview.completed == true}">
-                                <div class="badge bg-success">
-                                    Completed
-                                </div>
-                            </th:block>
-                            <th:block th:if="${interview.completed == false}">
-                                <div class="badge bg-danger">
-                                    Pending Completion
-                                </div>
-                            </th:block>
-                            <th:block th:if="${interview.verified == true}">
-                                <div class="badge bg-success">
-                                    Verified
-                                </div>
-                            </th:block>
-                            <th:block th:if="${interview.verified == false}">
-                                <div class="badge bg-danger">
-                                    Pending Verification
-                                </div>
-                            </th:block>
+                            <time datetime="2018-04-23"
+                                  th:replace="fragments/fragments :: format_time(${interview.createdDate})"></time>
                         </td>
                         <td class="px-0 text-center">
                             <small>[[${interview.respondentName}]]</small>
@@ -94,11 +75,7 @@
                         <td class="px-0 text-center">
                             <small>[[${interview.facility.name}]]</small>
                         </td>
-                        <td class="px-0 text-center">
-                            <time datetime="2018-04-23"
-                                  th:replace="fragments/fragments :: format_date(${interview.createdDate})"></time>
 
-                        </td>
                         <td class="px-0 text-center">
                             <small>[[${interview.assessmentForm.formName}]]</small>
                         </td>
@@ -106,20 +83,46 @@
                             <small>[[${interview.assessor.name}]]</small>
                         </td>
                         <td class="px-0 text-center">
+                            <th:block th:if="${interview.completed == true}">
+                                <div class="badge bg-success">
+                                    Completed
+                                </div>
+                            </th:block>
                             <th:block th:if="${interview.completed == false}">
-                                <a class="btn btn-sm btn-primary"
+                                <div class="badge bg-danger">
+                                    Pending Completion
+                                </div>
+                            </th:block>
+                            <th:block th:if="${interview.needsVerification == true}">
+                                <th:block th:if="${interview.verified == true}">
+                                    <div class="badge bg-success">
+                                        Verified
+                                    </div>
+                                </th:block>
+                                <th:block th:if="${interview.verified == false}">
+                                    <div class="badge bg-danger">
+                                        Pending Verification
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </td>
+                        <td class="px-0 text-center">
+                            <th:block th:if="${interview.completed == false}">
+                                <a class=""
                                    th:href="@{'/assessments/interview/continue/' + ${interview.id}}">
                                     <span class="fe fe-play"></span>
                                     Continue
                                 </a>
                             </th:block>
                             <br>
-                            <th:block th:if="${interview.verified == false}">
-                                <a class="btn btn-sm btn-secondary"
-                                   th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
-                                    <span class="fe fe-folder"></span>
-                                    Verification
-                                </a>
+                            <th:block th:if="${interview.needsVerification == true}">
+                                <th:block th:if="${interview.verified == false}">
+                                    <a class=""
+                                       th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
+                                        <span class="fe fe-folder"></span>
+                                        Verification
+                                    </a>
+                                </th:block>
                             </th:block>
                         </td>
                     </tr>
@@ -150,12 +153,22 @@
                         </th:block>
                     </td>
                     <td class="px-0 text-center">
-                        <th:block th:if="${interview.verified == false}">
-                            <a class="btn btn-sm btn-secondary"
-                               th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
-                                <span class="fe fe-folder"></span>
-                                Verification
+                        <th:block th:if="${interview.completed == false}">
+                            <a class="btn btn-sm btn-primary"
+                               th:href="@{'/assessments/interview/continue/' + ${interview.id}}">
+                                <span class="fe fe-play"></span>
+                                Continue
                             </a>
+                        </th:block>
+                        <br>
+                        <th:block th:if="${interview.needsVerification == true}">
+                            <th:block th:if="${interview.verified == false}">
+                                <a class="btn btn-sm btn-secondary"
+                                   th:href="@{'/assessments/interview/verification/' + ${interview.id}}">
+                                    <span class="fe fe-folder"></span>
+                                    Verification
+                                </a>
+                            </th:block>
                         </th:block>
                     </td>
                 </div>

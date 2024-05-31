@@ -179,10 +179,9 @@
                                             </th:block>
                                         </td>
                                         <td>
-                                            <a class="fe fe-file"
+                                            <a class="fe fe-eye"
                                                th:href="@{'/assessments/view/'+${assessment.id}}"
                                                title="Assessment View">
-                                                View
                                             </a>
                                             &nbsp;
                                             <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
