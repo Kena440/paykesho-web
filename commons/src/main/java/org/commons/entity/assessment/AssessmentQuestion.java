@@ -30,6 +30,9 @@ public class AssessmentQuestion extends IdBasedEntity {
     @Column(name = "needs_verification")
     private boolean needsVerification;
 
+    @Column(name = "needs_explanation")
+    private boolean needsExplanation;
+
     @Column(name = "verification_option", length = 500)
     private String verificationOption;
 

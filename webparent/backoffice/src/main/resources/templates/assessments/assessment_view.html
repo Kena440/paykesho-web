@@ -328,6 +328,18 @@
                             </div>
                             <div class="col-12 col-md-12">
                                 <div class="form-group">
+                                    <label class="form-label">Does this question need explanation?</label>
+                                    <select class="form-select" data-choices id="questionNeedsExplanation"
+                                            name="questionNeedsExplanation"
+                                            required>
+                                        <option value="">Select...</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12">
+                                <div class="form-group">
                                     <label class="form-label">Does this question need verification?</label>
                                     <select class="form-select" data-choices id="questionNeedsVerification"
                                             name="questionNeedsVerification" onchange="showVerificationOptionsField()"

@@ -146,6 +146,9 @@
                                                     <span class="h6">Skippable / Verification</span>
                                                 </th>
                                                 <th class="px-0 bg-transparent border-top-0 text-center">
+                                                    <span class="h6">Explanation</span>
+                                                </th>
+                                                <th class="px-0 bg-transparent border-top-0 text-center">
                                                     <span class="h6">Form</span>
                                                 </th>
                                                 <th class="px-0 bg-transparent border-top-0 text-center">
@@ -188,6 +191,16 @@
                                                         <th:block th:if="${question.needsVerification == false}">
                                                             <div class="badge bg-danger">
                                                                 No Verification
+                                                            </div>
+                                                        </th:block>
+                                                        <th:block th:if="${question.needsExplanation == true}">
+                                                            <div class="badge bg-success">
+                                                                Needs Explanation
+                                                            </div>
+                                                        </th:block>
+                                                        <th:block th:if="${question.needsExplanation == false}">
+                                                            <div class="badge bg-danger">
+                                                                No Explanation
                                                             </div>
                                                         </th:block>
                                                     </small>

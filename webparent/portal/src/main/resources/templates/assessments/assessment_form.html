@@ -220,6 +220,15 @@
                                             <p>Unknown question type.</p>
                                         </div>
                                     </div>
+                                    <div th:if="${question.needsExplanation == true}">
+                                        <hr>
+                                        <div class="alert alert-warning" role="alert">
+                                            <strong>Note:</strong> This question requires an explanation.
+                                        </div>
+                                        <textarea class="form-control" rows="3"
+                                                  th:name="'question_' + ${question.id} + '_explanation'"
+                                                  placeholder="Please provide your explanation here..."></textarea>
+                                    </div>
                                 </div>
                                 <div class="card-footer">
                                     <th:block th:if="${question.skippable == true}">
@@ -230,9 +239,7 @@
                                     </th:block>
                                 </div>
                             </div>
-
                             <hr>
-
                             <button class="btn btn-secondary" id="backButton" style="display:none;">Back</button>
                             <button class="btn btn-white" id="nextButton">Next</button>
                             <button class="btn btn-primary" id="submitButton" style="display:none;">Submit</button>

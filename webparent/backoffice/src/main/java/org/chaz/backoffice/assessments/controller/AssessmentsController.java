@@ -227,11 +227,12 @@ public class AssessmentsController {
         String questionParam = request.getParameter("question");
         String questionSkippableParam = request.getParameter("questionSkippable");
         String questionNeedsVerificationParam = request.getParameter("questionNeedsVerification");
+        String questionNeedsExplanationParam = request.getParameter("questionNeedsExplanation");
         String verificationQuestionParam = "";
         String questionVerificationInputTypeParam = "";
 
         // Check if any of the required parameters are empty
-        if (StringUtils.isEmpty(assessmentFormIdParam) || StringUtils.isEmpty(questionTypeParam) || StringUtils.isEmpty(questionParam) || StringUtils.isEmpty(questionSkippableParam) || StringUtils.isEmpty(questionNeedsVerificationParam)) {
+        if (StringUtils.isEmpty(assessmentFormIdParam) || StringUtils.isEmpty(questionTypeParam) || StringUtils.isEmpty(questionParam) || StringUtils.isEmpty(questionSkippableParam) || StringUtils.isEmpty(questionNeedsVerificationParam) || StringUtils.isEmpty(questionNeedsExplanationParam)) {
             throw new AssessmentToolError("One or more required parameters are empty");
         }
 
@@ -241,6 +242,7 @@ public class AssessmentsController {
         String questionReq = questionParam;
         boolean questionSkippable = Boolean.parseBoolean(questionSkippableParam);
         boolean questionNeedsVerification = Boolean.parseBoolean(questionNeedsVerificationParam);
+        boolean questionNeedsExplanation = Boolean.parseBoolean(questionNeedsExplanationParam);
 
         if (questionNeedsVerification) {
             verificationQuestionParam = request.getParameter("verificationQuestion");
@@ -260,6 +262,7 @@ public class AssessmentsController {
             question.setQuestion(questionReq);
             question.setSkippable(questionSkippable);
             question.setNeedsVerification(questionNeedsVerification);
+            question.setNeedsExplanation(questionNeedsExplanation);
 
             if (questionNeedsVerification) {
                 question.setVerificationOption(questionVerificationInputTypeParam);
