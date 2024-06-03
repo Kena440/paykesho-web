@@ -10,6 +10,7 @@ import org.chaz.backoffice.paging.PagingAndSortingParam;
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.service.SettingService;
 import org.commons.entity.assessment.*;
+import org.commons.enums.FormTarget;
 import org.commons.enums.FormType;
 import org.commons.enums.QuestionType;
 import org.commons.utils.AssessmentToolError;
@@ -304,11 +305,13 @@ public class AssessmentsController {
         if (assessment.isEnabled()) {
             String formName = request.getParameter("formName");
             String formType = request.getParameter("formType");
+            String formTarget = request.getParameter("formTarget");
 
             AssessmentForm question = new AssessmentForm();
             question.setAssessment(assessment);
             question.setFormName(formName);
             question.setFormType(FormType.valueOf(formType));
+            question.setFormTarget(FormTarget.valueOf(formTarget));
             question.setCreatedDate(new Date());
 
             AssessmentForm savedAssessmentForm = assessmentsService.saveForm(question);

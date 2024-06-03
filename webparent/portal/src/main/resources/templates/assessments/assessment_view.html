@@ -184,17 +184,28 @@
                                     </select>
                                 </div>
                             </div>
+                            <!-- <div class="col-12 col-md-12" th:switch="${assessmentForm.formTarget}">-->
                             <div class="col-12 col-md-12">
+                                <!--<div class="form-group" th:case="'FACILITY'">-->
                                 <div class="form-group">
-                                    <label class="form-label">
-                                        Respondent Facility
-                                    </label>
+                                    <label class="form-label">Respondent Facility</label>
                                     <select class="form-select" data-choices name="facility">
                                         <option value="">Select...</option>
                                         <th:block th:each="vh : ${facilityList}">
                                             <option th:value="${vh.id}">
                                                 [[${vh.name}]] ([[${vh.levelOfCare}]])
                                             </option>
+                                        </th:block>
+                                    </select>
+                                </div>
+
+                                <!--<div class="form-group" th:case="'DISTRICT'">-->
+                                <div class="form-group">
+                                    <label class="form-label">Respondent District</label>
+                                    <select class="form-select" data-choices name="district">
+                                        <option value="">Select...</option>
+                                        <th:block th:each="district : ${districtList}">
+                                            <option th:text="${district}"></option>
                                         </th:block>
                                     </select>
                                 </div>

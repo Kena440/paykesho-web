@@ -4,8 +4,10 @@ import org.chaz.portal.assessments.dto.AssessmentResponseDTO;
 import org.chaz.portal.assessments.service.AssessmentsService;
 import org.chaz.portal.assessors.service.AssessorService;
 import org.chaz.portal.facilities.service.FacilityService;
+import org.chaz.portal.utils.RequestParamValidator;
 import org.commons.entity.assessment.*;
 import org.commons.entity.facilities.Facility;
+import org.commons.enums.FormTarget;
 import org.commons.enums.FormType;
 import org.commons.enums.QuestionType;
 import org.commons.utils.AssessmentToolError;
@@ -26,6 +28,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/assessments")
@@ -97,7 +100,9 @@ public class AssessmentsController {
             List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
             List<Facility> facilityList = facilityService.getAssessmentFacilities();
+            List<String> districtList = facilityList.stream().map(Facility::getDistrict).distinct().collect(Collectors.toList());
             model.addAttribute("facilityList", facilityList);
+            model.addAttribute("districtList", districtList);
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("assessmentInterviews", assessmentInterviews);
@@ -116,32 +121,49 @@ public class AssessmentsController {
     public String startAssessmentInterview(HttpServletRequest request, Model model) throws AssessmentToolError {
         Assessor assessor = assessorService.getAuthenticatedAssessor(request);
 
-        Assessment assessment = assessmentsService.getAssessmentById(Integer.valueOf(request.getParameter("assessmentId")));
+        Assessment assessment = assessmentsService.getAssessmentById(
+                Integer.valueOf(RequestParamValidator.validateParam(request, "assessmentId"))
+        );
         if (assessment == null) {
             throw new AssessmentToolError("No assessment");
         }
         if (!assessment.isEnabled()) {
-            throw new AssessmentToolError("assessment not enabled");
+            throw new AssessmentToolError("Assessment not enabled");
         }
-        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(Integer.valueOf(request.getParameter("assessmentForm")));
+
+        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(
+                Integer.valueOf(RequestParamValidator.validateParam(request, "assessmentForm"))
+        );
         if (assessmentForm == null) {
             throw new AssessmentToolError("No assessment form");
         }
 
-        String respondentName = request.getParameter("respondentName");
-        String respondentJobTitle = request.getParameter("respondentJobTitle");
-        String respondentPhoneNumber = request.getParameter("respondentPhoneNumber");
-        Facility facility = facilityService.getFacilityById(Integer.valueOf(request.getParameter("facility")));
-        if (facility == null) {
-            throw new AssessmentToolError("No facility");
+        String respondentName = RequestParamValidator.validateParam(request, "respondentName");
+        String respondentJobTitle = RequestParamValidator.validateParam(request, "respondentJobTitle");
+        String respondentPhoneNumber = RequestParamValidator.validateParam(request, "respondentPhoneNumber");
+
+        Facility facility = null;
+        String district = null;
+        AssessmentInterview assessmentInterview = new AssessmentInterview();
+
+        if (assessmentForm.getFormTarget() == FormTarget.FACILITY) {
+            facility = facilityService.getFacilityById(
+                    Integer.valueOf(RequestParamValidator.validateParam(request, "facility"))
+            );
+            if (facility == null) {
+                throw new AssessmentToolError("No facility");
+            }
+            assessmentInterview.setFacility(facility);
+        } else if (assessmentForm.getFormTarget() == FormTarget.DISTRICT) {
+            district = RequestParamValidator.validateParam(request, "district");
+            assessmentInterview.setTargetDistrict(district);
         }
 
-        AssessmentInterview assessmentInterview = new AssessmentInterview();
+
         assessmentInterview.setRespondentName(respondentName);
         assessmentInterview.setAssessmentForm(assessmentForm);
         assessmentInterview.setRespondentJobTitle(respondentJobTitle);
         assessmentInterview.setRespondentPhoneNumber(respondentPhoneNumber);
-        assessmentInterview.setFacility(facility);
         assessmentInterview.setCreatedDate(new Date());
         assessmentInterview.setEndTime("12:00");
         assessmentInterview.setStartTime("10:00");

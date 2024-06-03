@@ -44,7 +44,8 @@ public class AssessmentInterview extends IdBasedEntity {
     @ManyToOne
     @JoinColumn(name = "assessor_id")
     private Assessor assessor;
-
+    @Column(name = "target_district", length = 20, nullable = true)
+    private String targetDistrict;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "assessment_interview_id")
     private List<AssessmentQuestionResponse> responses = new ArrayList<>();

@@ -43,9 +43,8 @@
                             <span class="h6">Title</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Facility</span>
+                            <span class="h6">Facility/District</span>
                         </th>
-
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Form</span>
                         </th>
@@ -73,9 +72,11 @@
                             <small>[[${interview.respondentJobTitle}]]</small>
                         </td>
                         <td class="px-0 text-center">
-                            <small>[[${interview.facility.name}]]</small>
+                            <small th:if="${interview.facility != null}">[[${interview.facility.name}]]</small>
+                            <small th:if="${interview.facility == null && interview.targetDistrict != null}">[[${interview.targetDistrict}]]</small>
+                            <small th:if="${interview.facility == null && interview.targetDistrict == null}">No facility
+                                or district</small>
                         </td>
-
                         <td class="px-0 text-center">
                             <small>[[${interview.assessmentForm.formName}]]</small>
                         </td>
@@ -137,7 +138,10 @@
         <div class="col-12 col-md-12 less-details">
             <div class="row m-1" th:each="interview, interviewStat : ${assessmentInterviews}">
                 <div class="col col-12">
-                    <td><small>[[${interview.respondentName}]]</small> (<small>[[${interview.facility.name}]]</small>)
+                    <td><small>[[${interview.respondentName}]]</small> ( <small
+                            th:if="${interview.facility == null && interview.targetDistrict == null}">No facility or
+                        district</small>
+                        )
                     </td>
                     <br>
                     <td>

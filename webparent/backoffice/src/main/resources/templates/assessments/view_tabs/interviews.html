@@ -38,7 +38,7 @@
                             <span class="h6">Title</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Facility</span>
+                            <span class="h6">Facility/District</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">Form</span>
@@ -74,7 +74,10 @@
                             <small>[[${interview.respondentJobTitle}]]</small>
                         </td>
                         <td class="px-0 text-center">
-                            <small>[[${interview.facility.name}]]</small>
+                            <small th:if="${interview.facility != null}">[[${interview.facility.name}]]</small>
+                            <small th:if="${interview.facility == null && interview.targetDistrict != null}">[[${interview.targetDistrict}]]</small>
+                            <small th:if="${interview.facility == null && interview.targetDistrict == null}">No facility
+                                or district</small>
                         </td>
                         <td class="px-0 text-center">
                             <small>[[${interview.assessmentForm.formName}]]</small>
