@@ -154,7 +154,12 @@
 
                                             <!-- Text -->
                                             <p class="text-muted mb-4">
-                                                <strong class="text-body">[[${assessmentInterview.facility.name}]]</strong>
+                                                <strong class="text-body">
+                                                    <small th:if="${interview.facility != null}">[[${interview.facility.name}]]</small>
+                                                    <small th:if="${interview.facility == null && interview.targetDistrict != null}">[[${interview.targetDistrict}]]</small>
+                                                    <small th:if="${interview.facility == null && interview.targetDistrict == null}">No facility
+                                                        or district</small>
+                                                </strong>
                                             </p>
 
                                         </div>
