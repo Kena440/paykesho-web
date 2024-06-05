@@ -2,7 +2,7 @@ package org.chaz.backoffice.assessments.controller;
 
 import org.chaz.backoffice.assessments.service.AssessmentsService;
 import org.chaz.backoffice.facilities.service.FacilityService;
-import org.commons.entity.assessment.Assessment;
+import org.commons.entity.assessment.AssessmentForm;
 import org.commons.entity.assessment.AssessmentInterview;
 import org.commons.entity.assessment.AssessmentQuestion;
 import org.commons.entity.assessment.AssessmentQuestionResponse;
@@ -36,9 +36,9 @@ public class AssessmentsRestController {
     @GetMapping("/distribution/aggregated/{id}")
     public ResponseEntity<Map<String, Map<String, Long>>> getDistributionPerQuestionAggregated(@PathVariable("id") Integer id) {
         try {
-            Assessment assessment = assessmentsService.getAssessmentById(id);
-            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
-            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+            AssessmentForm form = assessmentsService.getAssessmentFormById(id);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviewsByForm(form);
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(form);
 
             // Filter only MULTIPLE_CHOICE and CHECKBOX questions
             List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream().filter(q -> q.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE) || q.getQuestionType().equals(QuestionType.CHECKBOX)).collect(Collectors.toList());
@@ -52,9 +52,9 @@ public class AssessmentsRestController {
     @GetMapping("/distribution/disaggregated/{id}")
     public ResponseEntity<Map<String, Map<String, Long>>> getDistributionPerQuestionDisaggregated(@PathVariable("id") Integer id) {
         try {
-            Assessment assessment = assessmentsService.getAssessmentById(id);
-            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
-            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+            AssessmentForm form = assessmentsService.getAssessmentFormById(id);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviewsByForm(form);
+            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestionsByForm(form);
 
             // Filter only MULTIPLE_CHOICE and CHECKBOX questions
             List<AssessmentQuestion> filteredQuestions = assessmentQuestions.stream()
@@ -86,10 +86,17 @@ public class AssessmentsRestController {
     @GetMapping("/facility-types/{id}")
     public ResponseEntity<Map<String, Long>> getFacilityTypeDistribution(@PathVariable("id") Integer id) {
         try {
-            Assessment assessment = assessmentsService.getAssessmentById(id);
-            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+            AssessmentForm form = assessmentsService.getAssessmentFormById(id);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviewsByForm(form);
 
-            Map<String, Long> facilityTypeDistribution = assessmentInterviews.stream().collect(Collectors.groupingBy(interview -> interview.getFacility().getLevelOfCare().getName(), Collectors.counting()));
+            Map<String, Long> facilityTypeDistribution = assessmentInterviews.stream()
+                    .filter(interview -> interview.getFacility() != null) // Filter out null facilities
+                    .filter(interview -> interview.getFacility().getLevelOfCare() != null) // Filter out null levels of care
+                    .filter(interview -> interview.getFacility().getLevelOfCare().getName() != null) // Filter out null names
+                    .collect(Collectors.groupingBy(
+                            interview -> interview.getFacility().getLevelOfCare().getName(),
+                            Collectors.counting()
+                    ));
 
             return ResponseEntity.ok(facilityTypeDistribution);
         } catch (AssessmentToolError e) {
@@ -100,35 +107,58 @@ public class AssessmentsRestController {
     @GetMapping("/facility-provinces/{id}")
     public ResponseEntity<Map<String, Long>> getFacilityProvinceDistribution(@PathVariable("id") Integer id) {
         try {
-            Assessment assessment = assessmentsService.getAssessmentById(id);
-            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+            // Validate assessment ID
+            if (id == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
 
-            Map<String, Long> facilityProvinceDistribution = assessmentInterviews.stream().collect(Collectors.groupingBy(interview -> interview.getFacility().getProvince().getName(), Collectors.counting()));
+            AssessmentForm form = assessmentsService.getAssessmentFormById(id);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviewsByForm(form);
+
+            // Filter out null values before grouping by province name
+            Map<String, Long> facilityProvinceDistribution = assessmentInterviews.stream()
+                    .filter(interview -> interview != null &&
+                            interview.getFacility() != null &&
+                            interview.getFacility().getProvince() != null &&
+                            interview.getFacility().getProvince().getName() != null)
+                    .collect(Collectors.groupingBy(interview -> interview.getFacility().getProvince().getName(), Collectors.counting()));
 
             return ResponseEntity.ok(facilityProvinceDistribution);
         } catch (AssessmentToolError e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
 
     @GetMapping("/facility-districts/{id}")
     public ResponseEntity<Map<String, Long>> getFacilityDistrictDistribution(@PathVariable("id") Integer id) {
         try {
-            Assessment assessment = assessmentsService.getAssessmentById(id);
-            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+            // Validate assessment ID
+            if (id == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
 
-            Map<String, Long> facilityProvinceDistribution = assessmentInterviews.stream().collect(Collectors.groupingBy(interview -> interview.getFacility().getDistrict(), Collectors.counting()));
+            AssessmentForm form = assessmentsService.getAssessmentFormById(id);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviewsByForm(form);
 
-            return ResponseEntity.ok(facilityProvinceDistribution);
+            // Filter out null values before grouping by district
+            Map<String, Long> facilityDistrictDistribution = assessmentInterviews.stream()
+                    .filter(interview -> interview != null &&
+                            interview.getFacility() != null &&
+                            interview.getFacility().getDistrict() != null)
+                    .collect(Collectors.groupingBy(interview -> interview.getFacility().getDistrict(), Collectors.counting()));
+
+            return ResponseEntity.ok(facilityDistrictDistribution);
         } catch (AssessmentToolError e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
+
     @GetMapping("/facility-response/{id}")
-    public Map<String, Integer> getFacilityResponseData(@PathVariable("id") Integer assessmentId) {
+    public Map<String, Integer> getFacilityResponseData(@PathVariable("id") Integer assessmentFormId) {
         int totalFacilities = Math.toIntExact(facilityService.countInstitutions());
-        int respondingFacilities = assessmentsService.getRespondingFacilities(assessmentId);
+        int respondingFacilities = assessmentsService.getRespondingFacilities(assessmentFormId);
 
         Map<String, Integer> response = new HashMap<>();
         response.put("totalFacilities", totalFacilities);
@@ -138,17 +168,17 @@ public class AssessmentsRestController {
     }
 
     @GetMapping("/assessor-interviews/{id}")
-    public Map<String, Long> getAssessorInterviews(@PathVariable("id") Integer assessmentId) {
-        return assessmentsService.getInterviewsByAssessor(assessmentId);
+    public Map<String, Long> getAssessorInterviews(@PathVariable("id") Integer assessmentFormId) {
+        return assessmentsService.getInterviewsByAssessor(assessmentFormId);
     }
 
     @GetMapping("/completion-rates/{id}")
-    public Map<String, Long> getCompletionRates(@PathVariable("id") Integer assessmentId) {
-        return assessmentsService.getCompletionRates(assessmentId);
+    public Map<String, Long> getCompletionRates(@PathVariable("id") Integer assessmentFormId) {
+        return assessmentsService.getCompletionRates(assessmentFormId);
     }
 
     @GetMapping("/average-completion-time/{id}")
-    public Map<String, Double> getAverageCompletionTime(@PathVariable("id") Integer assessmentId) {
-        return assessmentsService.getAverageCompletionTime(assessmentId);
+    public Map<String, Double> getAverageCompletionTime(@PathVariable("id") Integer assessmentFormId) {
+        return assessmentsService.getAverageCompletionTime(assessmentFormId);
     }
 }

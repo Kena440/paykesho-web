@@ -21,7 +21,9 @@ public interface AssessmentInterviewsRepository extends SearchRepository<Assessm
     @Query("select e from AssessmentInterview e where e.assessmentForm.assessment.id = ?1 order by e.assessmentForm.assessment.assessmentDate desc")
     public Page<AssessmentInterview> findPageForAllByAssessment(Integer eventId, Pageable pageable);
 
-    long countByAssessmentFormAssessmentId(Integer assessmentId);
+    long countByAssessmentFormId(Integer assessmentId);
 
-    long countByAssessmentFormAssessmentIdAndCompleted(Integer assessmentId, Boolean completed);
+    long countByAssessmentFormIdAndCompleted(Integer assessmentId, Boolean completed);
+
+    List<AssessmentInterview> findAssessmentInterviewsByAssessmentFormId(Integer id);
 }

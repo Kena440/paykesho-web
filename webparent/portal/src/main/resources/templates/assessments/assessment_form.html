@@ -8,9 +8,6 @@
 
 <body>
 
-<form th:replace="fragments/fragments :: offcanvas_demo"></form>
-<div th:replace="fragments/fragments :: sidebar_offcanvas_search"></div>
-<div th:replace="fragments/fragments :: sidebar_offcanvas_activity"></div>
 
 <!-- NAVIGATION -->
 <nav th:replace="fragments/fragments :: side_bar"></nav>
@@ -224,9 +221,9 @@
                                         <div class="alert alert-warning" role="alert">
                                             <strong>Note:</strong> This question requires an explanation.
                                         </div>
-                                        <textarea class="form-control" rows="3"
-                                                  th:name="'question_' + ${question.id} + '_explanation'"
-                                                  placeholder="Please provide your explanation here..."></textarea>
+                                        <textarea class="form-control" placeholder="Please provide your explanation here..."
+                                                  rows="3"
+                                                  th:name="'question_' + ${question.id} + '_explanation'"></textarea>
                                     </div>
                                 </div>
                                 <div class="card-footer">

@@ -207,9 +207,9 @@ public class AssessmentsService {
 
         List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findByAssessment(assessment.getId());
 
-        for (AssessmentInterview assessmentInterview: assessmentInterviews){
+        for (AssessmentInterview assessmentInterview : assessmentInterviews) {
             int size = getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
-            if (size > 0){
+            if (size > 0) {
                 assessmentInterview.setNeedsVerification(true);
             }
         }
@@ -273,38 +273,88 @@ public class AssessmentsService {
 
     public int getRespondingFacilities(Integer assessmentId) {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
-        Set<Integer> uniqueFacilityIds = interviews.stream().map(interview -> interview.getFacility().getId()).collect(Collectors.toSet());
+
+        // Ensure that facilities and their IDs are not null before processing
+        Set<Integer> uniqueFacilityIds = interviews.stream()
+                .filter(interview -> interview.getFacility() != null) // Filter out null facilities
+                .filter(interview -> interview.getFacility().getId() != null) // Filter out facilities with null IDs
+                .map(interview -> interview.getFacility().getId())
+                .collect(Collectors.toSet());
+
         return uniqueFacilityIds.size();
     }
 
     public Map<String, Long> getInterviewsByAssessor(Integer assessmentId) {
-        List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
-        return interviews.stream().collect(Collectors.groupingBy(interview -> interview.getAssessor().getName(), Collectors.counting()));
+        // Check for null assessmentId
+        if (assessmentId == null) {
+            throw new IllegalArgumentException("Assessment ID cannot be null");
+        }
+
+        List<AssessmentInterview> interviews = assessmentInterviewsRepository.findAssessmentInterviewsByAssessmentFormId(assessmentId);
+
+        // Filter out null values before grouping by assessor name
+        return interviews.stream()
+                .filter(interview -> interview != null &&
+                        interview.getAssessor() != null &&
+                        interview.getAssessor().getName() != null)
+                .collect(Collectors.groupingBy(interview -> interview.getAssessor().getName(), Collectors.counting()));
     }
 
     public Map<String, Long> getCompletionRates(Integer assessmentId) {
-        long totalInterviews = assessmentInterviewsRepository.countByAssessmentFormAssessmentId(assessmentId);
-        long completedInterviews = assessmentInterviewsRepository.countByAssessmentFormAssessmentIdAndCompleted(assessmentId, true);
+        // Check for null assessmentId
+        if (assessmentId == null) {
+            throw new IllegalArgumentException("Assessment ID cannot be null");
+        }
+
+        // Initialize completion rates map
         Map<String, Long> completionRates = new HashMap<>();
-        completionRates.put("totalInterviews", totalInterviews);
-        completionRates.put("completedInterviews", completedInterviews);
+
+        try {
+            long totalInterviews = assessmentInterviewsRepository.countByAssessmentFormId(assessmentId);
+            long completedInterviews = assessmentInterviewsRepository.countByAssessmentFormIdAndCompleted(assessmentId, true);
+
+            // Populate the map with completion rates
+            completionRates.put("totalInterviews", totalInterviews);
+            completionRates.put("completedInterviews", completedInterviews);
+        } catch (Exception e) {
+            // Handle potential repository exceptions
+            throw new RuntimeException("Error fetching completion rates", e);
+        }
+
         return completionRates;
     }
 
+
     public Map<String, Double> getAverageCompletionTime(Integer assessmentId) {
+        // Check for null assessmentId
+        if (assessmentId == null) {
+            throw new IllegalArgumentException("Assessment ID cannot be null");
+        }
+
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
 
-        DoubleSummaryStatistics stats = interviews.stream().mapToDouble(interview -> {
-            // Assuming getStartTime() and getEndTime() return a java.util.Date or java.time.LocalDateTime
-            long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
-            return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
-        }).summaryStatistics();
+        // Filter out interviews with null dates
+        DoubleSummaryStatistics stats = interviews.stream()
+                .filter(interview -> interview != null && interview.getCreatedDate() != null && interview.getCompletedDate() != null)
+                .mapToDouble(interview -> {
+                    long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
+                    return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
+                }).summaryStatistics();
 
+        // Initialize map with default values in case of no valid interviews
         Map<String, Double> completionTimes = new HashMap<>();
-        completionTimes.put("averageTime", stats.getAverage());
-        completionTimes.put("minTime", stats.getMin());
-        completionTimes.put("maxTime", stats.getMax());
+        completionTimes.put("averageTime", stats.getCount() > 0 ? stats.getAverage() : 0.0);
+        completionTimes.put("minTime", stats.getCount() > 0 ? stats.getMin() : 0.0);
+        completionTimes.put("maxTime", stats.getCount() > 0 ? stats.getMax() : 0.0);
 
         return completionTimes;
+    }
+
+    public List<AssessmentInterview> getAssessmentInterviewsByForm(AssessmentForm assessmentForm) throws AssessmentToolError {
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("Null parameter assessmentForm");
+        }
+
+        return assessmentInterviewsRepository.findAssessmentInterviewsByAssessmentFormId(assessmentForm.getId());
     }
 }

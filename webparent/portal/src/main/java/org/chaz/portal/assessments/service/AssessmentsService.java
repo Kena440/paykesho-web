@@ -145,9 +145,9 @@ public class AssessmentsService {
 
         List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findByAssessment(assessment.getId());
 
-        for (AssessmentInterview assessmentInterview: assessmentInterviews){
+        for (AssessmentInterview assessmentInterview : assessmentInterviews) {
             int size = getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
-            if (size > 0){
+            if (size > 0) {
                 assessmentInterview.setNeedsVerification(true);
             }
         }
