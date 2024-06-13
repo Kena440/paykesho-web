@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 public interface AssessmentInterviewsRepository extends SearchRepository<AssessmentInterview, Integer> {
@@ -20,4 +21,13 @@ public interface AssessmentInterviewsRepository extends SearchRepository<Assessm
 
     @Query("select e from AssessmentInterview e where e.assessmentForm.assessment.id = ?1 order by e.assessmentForm.assessment.assessmentDate desc")
     public Page<AssessmentInterview> findPageForAllByAssessment(Integer eventId, Pageable pageable);
+
+    @Query("select e from AssessmentInterview e " +
+            "where e.assessmentForm.assessment.id = ?1 " +
+            "and e.createdDate >= ?2 " +
+            "order by e.id desc")
+    public List<AssessmentInterview> findRecentByAssessment(Integer assessmentId, Date twoDaysAgo);
+
+
+    long countAssessmentInterviewsByAssessmentFormAssessmentId(Integer assessmentId);
 }

@@ -3,6 +3,7 @@ package org.chaz.backoffice.assessments.repository;
 import org.commons.entity.assessment.AssessmentQuestionResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -13,5 +14,9 @@ public interface AssessmentQuestionResponseRepository extends JpaRepository<Asse
 
     @Query("select e from AssessmentQuestionResponse e where e.assessmentInterview.id = ?1 order by e.id desc")
     public List<AssessmentQuestionResponse> findByAssessmentInterview(Integer eventId);
+
+    @Query("SELECT r FROM AssessmentQuestionResponse r WHERE r.assessmentInterview.id IN :interviewIds")
+    List<AssessmentQuestionResponse> findByInterviewIds(@Param("interviewIds") List<Integer> interviewIds);
+
 
 }

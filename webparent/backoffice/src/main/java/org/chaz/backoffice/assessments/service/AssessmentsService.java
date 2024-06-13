@@ -5,9 +5,15 @@ import org.chaz.backoffice.paging.PagingAndSortingHelper;
 import org.commons.entity.assessment.*;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -204,8 +210,15 @@ public class AssessmentsService {
         if (assessment == null) {
             throw new AssessmentToolError("Null parameter assessment");
         }
+        return assessmentInterviewsRepository.findByAssessment(assessment.getId());
+    }
 
-        List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findByAssessment(assessment.getId());
+    public List<AssessmentInterview> findRecentInterviews(Integer assessmentId) {
+        // Calculate two days ago
+        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+        Date date = Date.from(twoDaysAgo.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findRecentByAssessment(assessmentId, date);
 
         for (AssessmentInterview assessmentInterview : assessmentInterviews) {
             int size = getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
@@ -213,8 +226,19 @@ public class AssessmentsService {
                 assessmentInterview.setNeedsVerification(true);
             }
         }
-
         return assessmentInterviews;
+    }
+
+    public Page<AssessmentInterview> listAssessmentInterviewsForByPage(int pageNum, String sortField, String sortDir, String keyword) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+
+        Pageable pageable = PageRequest.of(pageNum - 1, 200, sort);
+
+        if (keyword != null) {
+            return assessmentInterviewsRepository.findAll(keyword, pageable);
+        }
+        return assessmentInterviewsRepository.findAll(pageable);
     }
 
     public List<AssessmentAssessor> getAssessmentAssessors(Assessment assessment) throws AssessmentToolError {
@@ -325,29 +349,43 @@ public class AssessmentsService {
     }
 
 
-    public Map<String, Double> getAverageCompletionTime(Integer assessmentId) {
+    public Map<String, String> getAverageCompletionTime(Integer assessmentId) {
         // Check for null assessmentId
         if (assessmentId == null) {
             throw new IllegalArgumentException("Assessment ID cannot be null");
         }
 
-        List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
+        // Retrieve interviews for the given assessmentId
+        List<AssessmentInterview> interviews = assessmentInterviewsRepository.findAssessmentInterviewsByAssessmentFormId(assessmentId);
 
-        // Filter out interviews with null dates
-        DoubleSummaryStatistics stats = interviews.stream()
-                .filter(interview -> interview != null && interview.getCreatedDate() != null && interview.getCompletedDate() != null)
+        // Filter out interviews with null dates and incomplete interviews
+        List<AssessmentInterview> validInterviews = interviews.stream()
+                .filter(interview -> interview.getCreatedDate() != null && interview.getCompletedDate() != null)
+                .collect(Collectors.toList());
+
+        // Calculate statistics only if there are valid interviews
+        DoubleSummaryStatistics stats = validInterviews.stream()
                 .mapToDouble(interview -> {
                     long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
                     return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
-                }).summaryStatistics();
+                })
+                .summaryStatistics();
 
-        // Initialize map with default values in case of no valid interviews
-        Map<String, Double> completionTimes = new HashMap<>();
-        completionTimes.put("averageTime", stats.getCount() > 0 ? stats.getAverage() : 0.0);
-        completionTimes.put("minTime", stats.getCount() > 0 ? stats.getMin() : 0.0);
-        completionTimes.put("maxTime", stats.getCount() > 0 ? stats.getMax() : 0.0);
+        // Initialize map with default values
+        Map<String, String> completionTimes = new HashMap<>();
+        completionTimes.put("averageTime", formatDuration(stats.getCount() > 0 ? stats.getAverage() : 0));
+        completionTimes.put("minTime", formatDuration(stats.getCount() > 0 ? stats.getMin() : 0));
+        completionTimes.put("maxTime", formatDuration(stats.getCount() > 0 ? stats.getMax() : 0));
 
         return completionTimes;
+    }
+
+    // Utility method to format duration in hours and minutes
+    private String formatDuration(double durationMinutes) {
+        long hours = (long) durationMinutes / 60;
+        long minutes = (long) durationMinutes % 60;
+
+        return String.format("%d hours %d minutes", hours, minutes);
     }
 
     public List<AssessmentInterview> getAssessmentInterviewsByForm(AssessmentForm assessmentForm) throws AssessmentToolError {
@@ -356,5 +394,14 @@ public class AssessmentsService {
         }
 
         return assessmentInterviewsRepository.findAssessmentInterviewsByAssessmentFormId(assessmentForm.getId());
+    }
+
+    public List<AssessmentQuestionResponse> getAssessmentQuestionResponsesByInterviews(List<AssessmentInterview> interviews) {
+        List<Integer> interviewIds = interviews.stream().map(AssessmentInterview::getId).collect(Collectors.toList());
+        return assessmentQuestionResponseRepository.findByInterviewIds(interviewIds);
+    }
+
+    public long countAssessmentInterviews(Integer id) {
+        return assessmentInterviewsRepository.countAssessmentInterviewsByAssessmentFormAssessmentId(id);
     }
 }

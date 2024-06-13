@@ -6,6 +6,7 @@ import org.commons.entity.assessment.AssessmentForm;
 import org.commons.entity.assessment.AssessmentInterview;
 import org.commons.entity.assessment.AssessmentQuestion;
 import org.commons.entity.assessment.AssessmentQuestionResponse;
+import org.commons.enums.FormTarget;
 import org.commons.enums.QuestionType;
 import org.commons.utils.AssessmentToolError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,6 +155,30 @@ public class AssessmentsRestController {
         }
     }
 
+    @GetMapping("/districts/{id}")
+    public ResponseEntity<Map<String, Long>> getDistrictDistribution(@PathVariable("id") Integer id) {
+        try {
+            // Validate assessment ID
+            if (id == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+            AssessmentForm form = assessmentsService.getAssessmentFormById(id);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviewsByForm(form);
+
+            // Filter out null values before grouping by district
+            Map<String, Long> facilityDistrictDistribution = assessmentInterviews.stream()
+                    .filter(interview -> interview != null &&
+                            interview.getTargetDistrict() != null &&
+                            interview.getAssessmentForm().getFormTarget() == FormTarget.DISTRICT)
+                    .collect(Collectors.groupingBy(AssessmentInterview::getTargetDistrict, Collectors.counting()));
+
+            return ResponseEntity.ok(facilityDistrictDistribution);
+        } catch (AssessmentToolError e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
 
     @GetMapping("/facility-response/{id}")
     public Map<String, Integer> getFacilityResponseData(@PathVariable("id") Integer assessmentFormId) {
@@ -178,7 +203,7 @@ public class AssessmentsRestController {
     }
 
     @GetMapping("/average-completion-time/{id}")
-    public Map<String, Double> getAverageCompletionTime(@PathVariable("id") Integer assessmentFormId) {
+    public Map<String, String> getAverageCompletionTime(@PathVariable("id") Integer assessmentFormId) {
         return assessmentsService.getAverageCompletionTime(assessmentFormId);
     }
 }

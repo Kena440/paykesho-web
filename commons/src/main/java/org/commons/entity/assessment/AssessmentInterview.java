@@ -6,9 +6,7 @@ import org.commons.entity.IdBasedEntity;
 import org.commons.entity.facilities.Facility;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -46,8 +44,5 @@ public class AssessmentInterview extends IdBasedEntity {
     private Assessor assessor;
     @Column(name = "target_district", length = 20, nullable = true)
     private String targetDistrict;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "assessment_interview_id")
-    private List<AssessmentQuestionResponse> responses = new ArrayList<>();
 
 }

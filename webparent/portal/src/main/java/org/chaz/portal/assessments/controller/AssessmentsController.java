@@ -98,11 +98,14 @@ public class AssessmentsController {
             Assessment assessment = assessmentsService.getAssessmentById(id);
             List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
             List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
-            List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessment);
+            List<AssessmentInterview> assessmentInterviews = assessmentsService.findRecentInterviews(assessment.getId());
             List<Facility> facilityList = facilityService.getAssessmentFacilities();
             List<String> districtList = facilityList.stream().map(Facility::getDistrict).distinct().collect(Collectors.toList());
+            long assessmentInterviewsCount = assessmentsService.countAssessmentInterviews(assessment.getId());
+
             model.addAttribute("facilityList", facilityList);
             model.addAttribute("districtList", districtList);
+            model.addAttribute("assessmentInterviewsCount", assessmentInterviewsCount);
             model.addAttribute("assessment", assessment);
             model.addAttribute("assessmentQuestions", assessmentQuestions);
             model.addAttribute("assessmentInterviews", assessmentInterviews);

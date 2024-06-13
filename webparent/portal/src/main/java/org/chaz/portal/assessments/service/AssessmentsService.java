@@ -11,6 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -200,5 +203,25 @@ public class AssessmentsService {
         } else {
             return assessmentsRepository.findUpcomingAssessments(30);
         }
+    }
+
+    public List<AssessmentInterview> findRecentInterviews(Integer assessmentId) {
+        // Calculate two days ago
+        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+        Date date = Date.from(twoDaysAgo.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findRecentByAssessment(assessmentId, date);
+
+        for (AssessmentInterview assessmentInterview : assessmentInterviews) {
+            int size = getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
+            if (size > 0) {
+                assessmentInterview.setNeedsVerification(true);
+            }
+        }
+        return assessmentInterviews;
+    }
+
+    public long countAssessmentInterviews(Integer id) {
+        return assessmentInterviewsRepository.countAssessmentInterviewsByAssessmentFormAssessmentId(id);
     }
 }

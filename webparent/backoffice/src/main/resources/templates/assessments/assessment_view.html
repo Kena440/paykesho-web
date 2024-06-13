@@ -164,6 +164,7 @@
                                 </div>
                                 <div class="tab-pane fade  show active" id="interviewsTab">
                                     <div class="row">
+                                        <!--<div th:replace="assessments/view_tabs/interview_dates :: content"></div>-->
                                         <div th:replace="assessments/view_tabs/interviews :: content"></div>
                                     </div>
                                 </div>
@@ -434,7 +435,7 @@
                                         Target
                                     </label>
 
-                                    <select class="form-select mb-3" data-choices name="formType" required>
+                                    <select class="form-select mb-3" data-choices name="formTarget" required>
                                         <option value="">Select...</option>
 
                                         <th:block

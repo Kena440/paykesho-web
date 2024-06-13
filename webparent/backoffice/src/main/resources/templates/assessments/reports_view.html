@@ -177,56 +177,75 @@
                                         <button aria-controls="collapseThree" aria-expanded="false"
                                                 class="accordion-button collapsed"
                                                 data-bs-target="#collapseThree" data-bs-toggle="collapse" type="button">
-                                            Facility Data
+                                            Respondent Organization Data
                                         </button>
                                     </h2>
                                     <div class="accordion-collapse collapse" data-bs-parent="#accordionExample"
                                          id="collapseThree">
                                         <div class="accordion-body">
                                             <div class="row">
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card mb-3">
-                                                        <div class="card-header">
-                                                            <h4 class="card-header-title">Facility Type
-                                                                Distribution</h4>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <canvas id="facilityTypeChart"></canvas>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card mb-3">
-                                                        <div class="card-header">
-                                                            <h4 class="card-header-title">Facility Province
-                                                                Distribution</h4>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <canvas id="facilityProvinceChart"></canvas>
+                                                <th:block
+                                                        th:if="${assessmentForm.formTarget.defaultDescription() == T(org.commons.enums.FormTarget).DISTRICT.defaultDescription()}">
+                                                    <div class="col-12 col-md-12">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header">
+                                                                <h4 class="card-header-title">District (DHO)
+                                                                    Distribution</h4>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <canvas id="districtChart"></canvas>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card mb-3">
-                                                        <div class="card-header">
-                                                            <h4 class="card-header-title">Facility District
-                                                                Distribution</h4>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <canvas id="facilityDistrictChart"></canvas>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card mb-3">
-                                                        <div class="card-header">
-                                                            <h4 class="card-header-title">Facility Response Rate</h4>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <canvas id="facilityResponseChart"></canvas>
+                                                </th:block>
+                                                <th:block
+                                                        th:if="${assessmentForm.formTarget.defaultDescription() == T(org.commons.enums.FormTarget).FACILITY.defaultDescription()}">
+                                                    <div class="col-12 col-md-12">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header">
+                                                                <h4 class="card-header-title">Facility Type
+                                                                    Distribution</h4>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <canvas id="facilityTypeChart"></canvas>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                    <div class="col-12 col-md-12">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header">
+                                                                <h4 class="card-header-title">Facility Province
+                                                                    Distribution</h4>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <canvas id="facilityProvinceChart"></canvas>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-12">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header">
+                                                                <h4 class="card-header-title">Facility District
+                                                                    Distribution</h4>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <canvas id="facilityDistrictChart"></canvas>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-12">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header">
+                                                                <h4 class="card-header-title">Facility Response
+                                                                    Rate</h4>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <canvas id="facilityResponseChart"></canvas>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </th:block>
+
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +262,7 @@
                                          id="collapseFour">
                                         <div class="accordion-body">
                                             <div class="row">
-                                                <div class="col-12 col-md-6">
+                                                <div class="col-12 col-md-12">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
                                                             <h4 class="card-header-title">Interviews Conducted by Each
@@ -270,7 +289,7 @@
                                          id="collapseFive">
                                         <div class="accordion-body">
                                             <div class="row">
-                                                <div class="col-12 col-md-6">
+                                                <div class="col-12 col-md-12">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
                                                             <h4 class="card-header-title">Assessment Completion
@@ -282,7 +301,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-12 col-md-6">
+                                                <div class="col-12 col-md-12">
                                                     <div class="card mb-3">
                                                         <div class="card-header">
                                                             <h4 class="card-header-title">Average Completion Time</h4>
@@ -321,6 +340,7 @@
     var facilityProvinceUrl = '/assessments/rest/facility-provinces/' + assessmentId;
     var facilityResponseUrl = '/assessments/rest/facility-response/' + assessmentId;
     var facilityDistrictUrl = '/assessments/rest/facility-districts/' + assessmentId;
+    var districtUrl = '/assessments/rest/districts/' + assessmentId;
     var assessorInterviewsUrl = '/assessments/rest/assessor-interviews/' + assessmentId;
     var completionRateUrl = '/assessments/rest/completion-rates/' + assessmentId;
     var completionTimeUrl = '/assessments/rest/average-completion-time/' + assessmentId;
@@ -335,7 +355,7 @@
             var chartId = 'chart' + labels.join('').replace(/\s+/g, '');
 
             chartsContainer.append(
-                '<div class="col-12 col-md-6" >' +
+                '<div class="col-12 col-md-12" >' +
                 '<div class="card mb-3">' +
                 '  <div class="card-header">' +
                 '    <h4 class="card-header-title">' + questionText + '</h4>' +
@@ -433,7 +453,21 @@
                         'rgba(255, 206, 86, 0.2)',
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 71, 0.2)',      // Tomato
+                        'rgba(60, 179, 113, 0.2)',     // MediumSeaGreen
+                        'rgba(123, 104, 238, 0.2)',    // MediumSlateBlue
+                        'rgba(255, 140, 0, 0.2)',      // DarkOrange
+                        'rgba(210, 105, 30, 0.2)',     // Chocolate
+                        'rgba(32, 178, 170, 0.2)',     // LightSeaGreen
+                        'rgba(100, 149, 237, 0.2)',    // CornflowerBlue
+                        'rgba(221, 160, 221, 0.2)',    // Plum
+                        'rgba(255, 127, 80, 0.2)',     // Coral
+                        'rgba(46, 139, 87, 0.2)',      // SeaGreen
+                        'rgba(75, 0, 130, 0.2)',       // Indigo
+                        'rgba(240, 128, 128, 0.2)',    // LightCoral
+                        'rgba(124, 252, 0, 0.2)',      // LawnGreen
+                        'rgba(70, 130, 180, 0.2)'      // SteelBlue
                     ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
@@ -441,7 +475,21 @@
                         'rgba(255, 206, 86, 1)',
                         'rgba(75, 192, 192, 1)',
                         'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 71, 1)',       // Tomato
+                        'rgba(60, 179, 113, 1)',      // MediumSeaGreen
+                        'rgba(123, 104, 238, 1)',     // MediumSlateBlue
+                        'rgba(255, 140, 0, 1)',       // DarkOrange
+                        'rgba(210, 105, 30, 1)',      // Chocolate
+                        'rgba(32, 178, 170, 1)',      // LightSeaGreen
+                        'rgba(100, 149, 237, 1)',     // CornflowerBlue
+                        'rgba(221, 160, 221, 1)',     // Plum
+                        'rgba(255, 127, 80, 1)',      // Coral
+                        'rgba(46, 139, 87, 1)',       // SeaGreen
+                        'rgba(75, 0, 130, 1)',        // Indigo
+                        'rgba(240, 128, 128, 1)',     // LightCoral
+                        'rgba(124, 252, 0, 1)',       // LawnGreen
+                        'rgba(70, 130, 180, 1)'       // SteelBlue
                     ],
                     borderWidth: 1
                 }]
@@ -467,7 +515,21 @@
                         'rgba(255, 206, 86, 0.2)',
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 71, 0.2)',      // Tomato
+                        'rgba(60, 179, 113, 0.2)',     // MediumSeaGreen
+                        'rgba(123, 104, 238, 0.2)',    // MediumSlateBlue
+                        'rgba(255, 140, 0, 0.2)',      // DarkOrange
+                        'rgba(210, 105, 30, 0.2)',     // Chocolate
+                        'rgba(32, 178, 170, 0.2)',     // LightSeaGreen
+                        'rgba(100, 149, 237, 0.2)',    // CornflowerBlue
+                        'rgba(221, 160, 221, 0.2)',    // Plum
+                        'rgba(255, 127, 80, 0.2)',     // Coral
+                        'rgba(46, 139, 87, 0.2)',      // SeaGreen
+                        'rgba(75, 0, 130, 0.2)',       // Indigo
+                        'rgba(240, 128, 128, 0.2)',    // LightCoral
+                        'rgba(124, 252, 0, 0.2)',      // LawnGreen
+                        'rgba(70, 130, 180, 0.2)'      // SteelBlue
                     ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
@@ -475,7 +537,21 @@
                         'rgba(255, 206, 86, 1)',
                         'rgba(75, 192, 192, 1)',
                         'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 71, 1)',       // Tomato
+                        'rgba(60, 179, 113, 1)',      // MediumSeaGreen
+                        'rgba(123, 104, 238, 1)',     // MediumSlateBlue
+                        'rgba(255, 140, 0, 1)',       // DarkOrange
+                        'rgba(210, 105, 30, 1)',      // Chocolate
+                        'rgba(32, 178, 170, 1)',      // LightSeaGreen
+                        'rgba(100, 149, 237, 1)',     // CornflowerBlue
+                        'rgba(221, 160, 221, 1)',     // Plum
+                        'rgba(255, 127, 80, 1)',      // Coral
+                        'rgba(46, 139, 87, 1)',       // SeaGreen
+                        'rgba(75, 0, 130, 1)',        // Indigo
+                        'rgba(240, 128, 128, 1)',     // LightCoral
+                        'rgba(124, 252, 0, 1)',       // LawnGreen
+                        'rgba(70, 130, 180, 1)'       // SteelBlue
                     ],
                     borderWidth: 1
                 }]
@@ -501,7 +577,21 @@
                         'rgba(255, 206, 86, 0.2)',
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 71, 0.2)',      // Tomato
+                        'rgba(60, 179, 113, 0.2)',     // MediumSeaGreen
+                        'rgba(123, 104, 238, 0.2)',    // MediumSlateBlue
+                        'rgba(255, 140, 0, 0.2)',      // DarkOrange
+                        'rgba(210, 105, 30, 0.2)',     // Chocolate
+                        'rgba(32, 178, 170, 0.2)',     // LightSeaGreen
+                        'rgba(100, 149, 237, 0.2)',    // CornflowerBlue
+                        'rgba(221, 160, 221, 0.2)',    // Plum
+                        'rgba(255, 127, 80, 0.2)',     // Coral
+                        'rgba(46, 139, 87, 0.2)',      // SeaGreen
+                        'rgba(75, 0, 130, 0.2)',       // Indigo
+                        'rgba(240, 128, 128, 0.2)',    // LightCoral
+                        'rgba(124, 252, 0, 0.2)',      // LawnGreen
+                        'rgba(70, 130, 180, 0.2)'      // SteelBlue
                     ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
@@ -509,7 +599,83 @@
                         'rgba(255, 206, 86, 1)',
                         'rgba(75, 192, 192, 1)',
                         'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 71, 1)',       // Tomato
+                        'rgba(60, 179, 113, 1)',      // MediumSeaGreen
+                        'rgba(123, 104, 238, 1)',     // MediumSlateBlue
+                        'rgba(255, 140, 0, 1)',       // DarkOrange
+                        'rgba(210, 105, 30, 1)',      // Chocolate
+                        'rgba(32, 178, 170, 1)',      // LightSeaGreen
+                        'rgba(100, 149, 237, 1)',     // CornflowerBlue
+                        'rgba(221, 160, 221, 1)',     // Plum
+                        'rgba(255, 127, 80, 1)',      // Coral
+                        'rgba(46, 139, 87, 1)',       // SeaGreen
+                        'rgba(75, 0, 130, 1)',        // Indigo
+                        'rgba(240, 128, 128, 1)',     // LightCoral
+                        'rgba(124, 252, 0, 1)',       // LawnGreen
+                        'rgba(70, 130, 180, 1)'       // SteelBlue
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+    $.get(districtUrl, function (response) {
+        var labels = Object.keys(response);
+        var data = Object.values(response);
+        var ctx = document.getElementById('districtChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 71, 0.2)',      // Tomato
+                        'rgba(60, 179, 113, 0.2)',     // MediumSeaGreen
+                        'rgba(123, 104, 238, 0.2)',    // MediumSlateBlue
+                        'rgba(255, 140, 0, 0.2)',      // DarkOrange
+                        'rgba(210, 105, 30, 0.2)',     // Chocolate
+                        'rgba(32, 178, 170, 0.2)',     // LightSeaGreen
+                        'rgba(100, 149, 237, 0.2)',    // CornflowerBlue
+                        'rgba(221, 160, 221, 0.2)',    // Plum
+                        'rgba(255, 127, 80, 0.2)',     // Coral
+                        'rgba(46, 139, 87, 0.2)',      // SeaGreen
+                        'rgba(75, 0, 130, 0.2)',       // Indigo
+                        'rgba(240, 128, 128, 0.2)',    // LightCoral
+                        'rgba(124, 252, 0, 0.2)',      // LawnGreen
+                        'rgba(70, 130, 180, 0.2)'      // SteelBlue
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 71, 1)',       // Tomato
+                        'rgba(60, 179, 113, 1)',      // MediumSeaGreen
+                        'rgba(123, 104, 238, 1)',     // MediumSlateBlue
+                        'rgba(255, 140, 0, 1)',       // DarkOrange
+                        'rgba(210, 105, 30, 1)',      // Chocolate
+                        'rgba(32, 178, 170, 1)',      // LightSeaGreen
+                        'rgba(100, 149, 237, 1)',     // CornflowerBlue
+                        'rgba(221, 160, 221, 1)',     // Plum
+                        'rgba(255, 127, 80, 1)',      // Coral
+                        'rgba(46, 139, 87, 1)',       // SeaGreen
+                        'rgba(75, 0, 130, 1)',        // Indigo
+                        'rgba(240, 128, 128, 1)',     // LightCoral
+                        'rgba(124, 252, 0, 1)',       // LawnGreen
+                        'rgba(70, 130, 180, 1)'       // SteelBlue
                     ],
                     borderWidth: 1
                 }]
@@ -604,8 +770,12 @@
             data: {
                 labels: ['Average Time', 'Min Time', 'Max Time'],
                 datasets: [{
-                    label: 'Completion Time (minutes)',
-                    data: [response.averageTime, response.minTime, response.maxTime],
+                    label: 'Completion Time',
+                    data: [
+                        parseFloat(response.averageTime.split(' ')[0]),
+                        parseFloat(response.minTime.split(' ')[0]),
+                        parseFloat(response.maxTime.split(' ')[0])
+                    ],
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -622,10 +792,20 @@
                 responsive: true,
                 legend: {
                     position: 'bottom'
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                            var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                            return label + ': ' + value.toFixed(2) + ' hours'; // Display tooltips with hours
+                        }
+                    }
                 }
             }
         });
     });
+
 </script>
 </body>
 
