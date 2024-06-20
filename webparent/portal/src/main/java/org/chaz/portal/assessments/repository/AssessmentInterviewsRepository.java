@@ -30,4 +30,13 @@ public interface AssessmentInterviewsRepository extends SearchRepository<Assessm
 
 
     long countAssessmentInterviewsByAssessmentFormAssessmentId(Integer assessmentId);
+
+    long countAssessmentInterviewsByAssessorIdAndAssessmentFormAssessmentId(Integer assessorId, Integer assessmentId);
+
+    @Query("select e from AssessmentInterview e " +
+            "where e.assessmentForm.assessment.id = ?2 " +
+            "and e.assessor.id = ?1 " +
+            "and e.createdDate >= ?3 " +
+            "order by e.id desc")
+    List<AssessmentInterview> findRecentByAssessmentAndAssessor(Integer assessorId, Integer assessmentId, Date date);
 }

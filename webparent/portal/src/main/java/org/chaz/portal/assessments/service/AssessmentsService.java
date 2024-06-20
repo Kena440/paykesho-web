@@ -224,4 +224,23 @@ public class AssessmentsService {
     public long countAssessmentInterviews(Integer id) {
         return assessmentInterviewsRepository.countAssessmentInterviewsByAssessmentFormAssessmentId(id);
     }
+
+    public List<AssessmentInterview> findRecentInterviewsByAssessor(Integer assessorId, Integer assessmentId) {
+        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(90);
+        Date date = Date.from(twoDaysAgo.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<AssessmentInterview> assessmentInterviews = assessmentInterviewsRepository.findRecentByAssessmentAndAssessor(assessorId, assessmentId, date);
+
+        for (AssessmentInterview assessmentInterview : assessmentInterviews) {
+            int size = getVerifiedAssessmentQuestions(assessmentInterview.getAssessmentForm()).size();
+            if (size > 0) {
+                assessmentInterview.setNeedsVerification(true);
+            }
+        }
+        return assessmentInterviews;
+    }
+
+    public long countAssessmentInterviewsByAssessor(Integer assessorId, Integer assessmentId) {
+        return assessmentInterviewsRepository.countAssessmentInterviewsByAssessorIdAndAssessmentFormAssessmentId(assessorId, assessmentId);
+    }
 }

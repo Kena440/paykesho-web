@@ -1,6 +1,7 @@
 package org.chaz.portal.assessments.controller;
 
 import org.chaz.portal.assessments.dto.AssessmentResponseDTO;
+import org.chaz.portal.assessments.enums.Constants;
 import org.chaz.portal.assessments.service.AssessmentsService;
 import org.chaz.portal.assessors.service.AssessorService;
 import org.chaz.portal.facilities.service.FacilityService;
@@ -93,27 +94,33 @@ public class AssessmentsController {
     }
 
     @GetMapping("/view/{id}")
-    public String viewAssessment(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
+    public String viewAssessment(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
         try {
-            Assessment assessment = assessmentsService.getAssessmentById(id);
-            List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
-            List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
-            List<AssessmentInterview> assessmentInterviews = assessmentsService.findRecentInterviews(assessment.getId());
-            List<Facility> facilityList = facilityService.getAssessmentFacilities();
-            List<String> districtList = facilityList.stream().map(Facility::getDistrict).distinct().collect(Collectors.toList());
-            long assessmentInterviewsCount = assessmentsService.countAssessmentInterviews(assessment.getId());
+            Assessor assessor = assessorService.getAuthenticatedAssessor(request);
 
-            model.addAttribute("facilityList", facilityList);
-            model.addAttribute("districtList", districtList);
-            model.addAttribute("assessmentInterviewsCount", assessmentInterviewsCount);
-            model.addAttribute("assessment", assessment);
-            model.addAttribute("assessmentQuestions", assessmentQuestions);
-            model.addAttribute("assessmentInterviews", assessmentInterviews);
-            model.addAttribute("assessmentForms", assessmentForms);
-            model.addAttribute("assessmentLink", "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
-            model.addAttribute("qrCodeContent", "/events/generateQRCode?qrContent=" + "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
+            if (assessor != null) {
+                Assessment assessment = assessmentsService.getAssessmentById(id);
+                List<AssessmentQuestion> assessmentQuestions = assessmentsService.getAssessmentQuestions(assessment);
+                List<AssessmentForm> assessmentForms = assessmentsService.getAssessmentForms(assessment);
+                List<AssessmentInterview> assessmentInterviews = assessmentsService.findRecentInterviewsByAssessor(assessor.getId(), assessment.getId());
+                List<Facility> facilityList = facilityService.getAssessmentFacilities();
+                List<String> districtList = facilityList.stream().map(Facility::getDistrict).distinct().collect(Collectors.toList());
+                long assessmentInterviewsCount = assessmentsService.countAssessmentInterviewsByAssessor(assessor.getId(), assessment.getId());
 
-            return "assessments/assessment_view";
+                model.addAttribute("facilityList", facilityList);
+                model.addAttribute("districtList", districtList);
+                model.addAttribute("assessmentInterviewsCount", assessmentInterviewsCount);
+                model.addAttribute("assessment", assessment);
+                model.addAttribute("assessmentQuestions", assessmentQuestions);
+                model.addAttribute("assessmentInterviews", assessmentInterviews);
+                model.addAttribute("assessmentForms", assessmentForms);
+                model.addAttribute("assessmentLink", "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
+                model.addAttribute("qrCodeContent", "/events/generateQRCode?qrContent=" + "https://assessment.chaz.domains/assessments/link/" + assessment.getId());
+
+                return "assessments/assessment_view";
+            } else {
+                return Constants.REDIRECT_TO_Assessments;
+            }
         } catch (AssessmentToolError assessmentToolError) {
             redirectAttributes.addFlashAttribute("message", assessmentToolError.getMessage());
             return "redirect:/assessments";
@@ -124,9 +131,7 @@ public class AssessmentsController {
     public String startAssessmentInterview(HttpServletRequest request, Model model) throws AssessmentToolError {
         Assessor assessor = assessorService.getAuthenticatedAssessor(request);
 
-        Assessment assessment = assessmentsService.getAssessmentById(
-                Integer.valueOf(RequestParamValidator.validateParam(request, "assessmentId"))
-        );
+        Assessment assessment = assessmentsService.getAssessmentById(Integer.valueOf(RequestParamValidator.validateParam(request, "assessmentId")));
         if (assessment == null) {
             throw new AssessmentToolError("No assessment");
         }
@@ -134,9 +139,7 @@ public class AssessmentsController {
             throw new AssessmentToolError("Assessment not enabled");
         }
 
-        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(
-                Integer.valueOf(RequestParamValidator.validateParam(request, "assessmentForm"))
-        );
+        AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(Integer.valueOf(RequestParamValidator.validateParam(request, "assessmentForm")));
         if (assessmentForm == null) {
             throw new AssessmentToolError("No assessment form");
         }
@@ -150,9 +153,7 @@ public class AssessmentsController {
         AssessmentInterview assessmentInterview = new AssessmentInterview();
 
         if (assessmentForm.getFormTarget() == FormTarget.FACILITY) {
-            facility = facilityService.getFacilityById(
-                    Integer.valueOf(RequestParamValidator.validateParam(request, "facility"))
-            );
+            facility = facilityService.getFacilityById(Integer.valueOf(RequestParamValidator.validateParam(request, "facility")));
             if (facility == null) {
                 throw new AssessmentToolError("No facility");
             }
