@@ -404,4 +404,12 @@ public class AssessmentsService {
     public long countAssessmentInterviews(Integer id) {
         return assessmentInterviewsRepository.countAssessmentInterviewsByAssessmentFormAssessmentId(id);
     }
+
+    public List<AssessmentQuestion> getAssessmentQuestionsByFormWithResultsQuestionStatus(AssessmentForm assessmentForm, boolean status) throws AssessmentToolError {
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("Null parameter assessmentForm");
+        }
+
+        return assessmentQuestionsRepository.findByAssessmentFormAndResultsQuestion(assessmentForm.getId(), status);
+    }
 }

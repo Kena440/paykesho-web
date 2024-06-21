@@ -42,6 +42,9 @@ public class AssessmentQuestion extends IdBasedEntity {
     @Column(name = "verification_comment", length = 500)
     private String verificationComment;
 
+    @Column(name = "results_question")
+    private boolean resultsQuestion;
+
     @Column(name = "created_date")
     private Date createdDate;
 

@@ -41,12 +41,7 @@
                                 </td>
                                 <td class="px-0 text-sm-center">
                                     <small>
-                                        <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                            <a th:href="@{'/assessments/form/reports/'+${form.id}}"
-                                               title="Reports">
                                                 [[${form.formName}]]
-                                            </a>
-                                        </th:block>
                                     </small>
                                 </td>
                                 <td class="px-0 text-sm-center">
@@ -63,6 +58,13 @@
                                         <a class="fe fe-pie-chart"
                                            th:href="@{'/assessments/form/reports/'+${form.id}}"
                                            title="Reports">
+                                            Reports
+                                        </a>
+                                        &nbsp;
+                                        <a class="fe fe-star"
+                                           th:href="@{'/assessments/form/results/'+${form.id}}"
+                                           title="Reports">
+                                            Results
                                         </a>
                                     </th:block>
                                 </td>

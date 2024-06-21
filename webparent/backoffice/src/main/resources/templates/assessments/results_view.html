@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head th:replace="fragments/fragments :: page_head('Assessment Mgt','none')"></head>
+
+<body>
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="header-pretitle">Assessment Management</h6>
+                                <h1 class="header-title text-truncate">[[${pageTitle}]]</h1>
+                            </div>
+                            <div class="col-auto">
+                                <a class="btn btn-primary ms-2" th:href="@{'/assessments/view/'+${assessmentForm.assessment.id}}">
+                                    Back
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div id="accordion">
+
+                    <!-- Header -->
+                    <div class="header mt-md-5">
+                        <div class="header-body">
+                            <h1 class="header-title">[[${assessmentForm.assessment.name}]] -</h1>
+                            <p class="header-subtitle">[[${assessmentForm.formName}]]</p>
+                        </div>
+                    </div>
+
+                    <!-- Display Questions and Responses -->
+                    <div class="row">
+                        <div class="col-12 col-md-12">
+                            <div class="accordion" id="accordionExample">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button aria-controls="collapseOne" aria-expanded="true" class="accordion-button collapsed" data-bs-target="#collapseOne" data-bs-toggle="collapse" type="button">
+                                            Data
+                                        </button>
+                                    </h2>
+                                    <div class="accordion-collapse collapse" data-bs-parent="#accordionExample" id="collapseOne">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-12 col-md-12">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Questions and Responses</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div th:each="entry : ${questionDataMap}">
+                                                                <h5 th:text="${entry.key.question}">Question</h5>
+                                                                <div th:switch="${entry.key.questionType}">
+                                                                    <!-- MULTIPLE_CHOICE Question Type -->
+                                                                    <div th:case="'MULTIPLE_CHOICE'">
+                                                                        <ul>
+                                                                            <li th:each="response : ${entry.value}">
+                                                                                <span th:text="${response.key}">Answer</span>:
+                                                                                <span th:text="${response.value}">0</span>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <!-- CHECKBOX Question Type -->
+                                                                    <div th:case="'CHECKBOX'">
+                                                                        <ul>
+                                                                            <li th:each="response : ${entry.value}">
+                                                                                <span th:text="${response.key}">Answer</span>:
+                                                                                <span th:text="${response.value}">0</span>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <!-- PRODUCT Question Type -->
+                                                                    <div th:case="'PRODUCT'">
+                                                                        <table class="table">
+                                                                            <thead>
+                                                                            <tr>
+                                                                                <th>Facility Managed</th>
+                                                                                <th>SOH Actual</th>
+                                                                                <th>SOH eLMIS FE</th>
+                                                                                <th>Variance</th>
+                                                                                <th>Percentage Error</th>
+                                                                                <th>Average Percentage Error</th>
+                                                                            </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            <tr th:each="response : ${entry.value}">
+                                                                                <td th:text="${response.managedAtFacility}">false</td>
+                                                                                <td th:text="${response.sohActual}">0</td>
+                                                                                <td th:text="${response.sohElmisFe}">0</td>
+                                                                                <td th:text="${response.variance}">0</td>
+                                                                                <td th:text="${response.percentageError}">0.0</td>
+                                                                                <td th:text="${response.averagePercentageError}">0.0</td>
+                                                                            </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    <!-- Default Case -->
+                                                                    <div th:case="*">
+                                                                        <ul>
+                                                                            <li th:each="response : ${entry.value}">
+                                                                                <span th:text="${response}">Answer</span>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+    <input id="assessmentId" name="aId" th:value="${assessmentForm.id}" type="hidden">
+
+</div><!-- / .main-content -->
+<div th:replace="fragments/modal_fragment :: modal_dialog"></div>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script th:inline="javascript">
+    var assessmentId = document.getElementById('assessmentId').value;
+</script>
+</body>
+</html>
