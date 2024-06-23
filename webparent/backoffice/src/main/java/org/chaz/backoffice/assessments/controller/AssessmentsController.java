@@ -10,6 +10,7 @@ import org.chaz.backoffice.paging.PagingAndSortingParam;
 import org.chaz.backoffice.settings.email.EmailSettingBag;
 import org.chaz.backoffice.settings.service.SettingService;
 import org.commons.entity.assessment.*;
+import org.commons.entity.facilities.Facility;
 import org.commons.enums.FormTarget;
 import org.commons.enums.FormType;
 import org.commons.enums.QuestionType;
@@ -426,40 +427,28 @@ public class AssessmentsController {
     @GetMapping("/form/results/{id}")
     public String viewAssessmentFormResult(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) throws AssessmentToolError {
         try {
-            // Fetch assessment form and related data in bulk
             AssessmentForm assessmentForm = assessmentsService.getAssessmentFormById(id);
             List<AssessmentQuestion> allQuestions = assessmentsService.getAssessmentQuestionsByForm(assessmentForm);
             List<AssessmentInterview> assessmentInterviews = assessmentsService.getAssessmentInterviews(assessmentForm.getAssessment());
 
-            // Filter questions that should be included in the results
-            List<AssessmentQuestion> resultsQuestions = allQuestions.stream()
-                    .filter(AssessmentQuestion::isResultsQuestion)
-                    .collect(Collectors.toList());
+            List<AssessmentQuestion> resultsQuestions = allQuestions.stream().filter(AssessmentQuestion::isResultsQuestion).collect(Collectors.toList());
 
-            // Fetch all responses for the relevant interviews in one call
             List<AssessmentQuestionResponse> allResponses = assessmentsService.getAssessmentQuestionResponsesByInterviews(assessmentInterviews);
 
-            // Group responses by question
-            Map<Integer, List<AssessmentQuestionResponse>> responsesByQuestionId = allResponses.stream()
-                    .collect(Collectors.groupingBy(response -> response.getAssessmentQuestion().getId()));
+            Map<Integer, List<AssessmentQuestionResponse>> responsesByQuestionId = allResponses.stream().collect(Collectors.groupingBy(response -> response.getAssessmentQuestion().getId()));
 
-            // Prepare data for each question type
             Map<AssessmentQuestion, Object> questionDataMap = new LinkedHashMap<>();
             for (AssessmentQuestion question : resultsQuestions) {
                 List<AssessmentQuestionResponse> responses = responsesByQuestionId.getOrDefault(question.getId(), Collections.emptyList());
 
-                // Handle different question types
                 switch (question.getQuestionType()) {
                     case MULTIPLE_CHOICE:
                     case CHECKBOX:
-                        // Distribution of answers
-                        Map<String, Long> distribution = responses.stream()
-                                .collect(Collectors.groupingBy(AssessmentQuestionResponse::getAnswer, Collectors.counting()));
+                        Map<String, Long> distribution = responses.stream().collect(Collectors.groupingBy(AssessmentQuestionResponse::getAnswer, Collectors.counting()));
                         questionDataMap.put(question, distribution);
                         break;
 
                     case PRODUCT:
-                        // Collect additional data
                         questionDataMap.put(question, responses);
                         break;
 
@@ -469,7 +458,17 @@ public class AssessmentsController {
                 }
             }
 
-            // Set model attributes
+            int numberOfInterviews = assessmentsService.getAssessmentInterviewsByForm(assessmentForm).size();
+
+            if (assessmentForm.getFormType().defaultDescription().equals(FormType.GENERAL.defaultDescription()) && assessmentForm.getFormTarget().defaultDescription().equals(FormTarget.FACILITY.defaultDescription())) {
+                Set<Facility> facilities = assessmentInterviews.stream().map(AssessmentInterview::getFacility).collect(Collectors.toSet());
+                model.addAttribute("facilities", facilities.size());
+            } else if (assessmentForm.getFormType().defaultDescription().equals(FormType.GENERAL.defaultDescription()) && assessmentForm.getFormTarget().defaultDescription().equals(FormTarget.DISTRICT.defaultDescription())) {
+                Set<String> districts = assessmentInterviews.stream().map(AssessmentInterview::getTargetDistrict).collect(Collectors.toSet());
+                model.addAttribute("districts", districts.size());
+            }
+
+            model.addAttribute("numberOfInterviews", numberOfInterviews);
             model.addAttribute("questionDataMap", questionDataMap);
             model.addAttribute("assessmentForm", assessmentForm);
             model.addAttribute("pageTitle", "Form Reports");
