@@ -37,4 +37,5 @@ public interface AssessmentInterviewsRepository extends SearchRepository<Assessm
 
 
     List<AssessmentInterview> findAssessmentInterviewsByAssessmentFormId(Integer id);
+    List<AssessmentInterview> findAssessmentInterviewsByAssessmentFormIdAndCompleted(Integer id, boolean completed);
 }

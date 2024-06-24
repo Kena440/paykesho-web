@@ -185,9 +185,7 @@ public class AssessmentsService {
     public List<AssessmentQuestion> getVerifiedAssessmentQuestions(AssessmentForm assessmentForm) {
         List<AssessmentQuestion> allQuestions = assessmentQuestionsRepository.findByAssessmentForm(assessmentForm.getId());
 
-        return allQuestions.stream()
-                .filter(AssessmentQuestion::isNeedsVerification)
-                .collect(Collectors.toList());
+        return allQuestions.stream().filter(AssessmentQuestion::isNeedsVerification).collect(Collectors.toList());
     }
 
     public List<Assessment> getUpcomingAssessments(int i) {
@@ -299,11 +297,9 @@ public class AssessmentsService {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findByAssessment(assessmentId);
 
         // Ensure that facilities and their IDs are not null before processing
-        Set<Integer> uniqueFacilityIds = interviews.stream()
-                .filter(interview -> interview.getFacility() != null) // Filter out null facilities
+        Set<Integer> uniqueFacilityIds = interviews.stream().filter(interview -> interview.getFacility() != null) // Filter out null facilities
                 .filter(interview -> interview.getFacility().getId() != null) // Filter out facilities with null IDs
-                .map(interview -> interview.getFacility().getId())
-                .collect(Collectors.toSet());
+                .map(interview -> interview.getFacility().getId()).collect(Collectors.toSet());
 
         return uniqueFacilityIds.size();
     }
@@ -317,11 +313,7 @@ public class AssessmentsService {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findAssessmentInterviewsByAssessmentFormId(assessmentId);
 
         // Filter out null values before grouping by assessor name
-        return interviews.stream()
-                .filter(interview -> interview != null &&
-                        interview.getAssessor() != null &&
-                        interview.getAssessor().getName() != null)
-                .collect(Collectors.groupingBy(interview -> interview.getAssessor().getName(), Collectors.counting()));
+        return interviews.stream().filter(interview -> interview != null && interview.getAssessor() != null && interview.getAssessor().getName() != null).collect(Collectors.groupingBy(interview -> interview.getAssessor().getName(), Collectors.counting()));
     }
 
     public Map<String, Long> getCompletionRates(Integer assessmentId) {
@@ -359,17 +351,13 @@ public class AssessmentsService {
         List<AssessmentInterview> interviews = assessmentInterviewsRepository.findAssessmentInterviewsByAssessmentFormId(assessmentId);
 
         // Filter out interviews with null dates and incomplete interviews
-        List<AssessmentInterview> validInterviews = interviews.stream()
-                .filter(interview -> interview.getCreatedDate() != null && interview.getCompletedDate() != null)
-                .collect(Collectors.toList());
+        List<AssessmentInterview> validInterviews = interviews.stream().filter(interview -> interview.getCreatedDate() != null && interview.getCompletedDate() != null).collect(Collectors.toList());
 
         // Calculate statistics only if there are valid interviews
-        DoubleSummaryStatistics stats = validInterviews.stream()
-                .mapToDouble(interview -> {
-                    long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
-                    return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
-                })
-                .summaryStatistics();
+        DoubleSummaryStatistics stats = validInterviews.stream().mapToDouble(interview -> {
+            long durationMillis = interview.getCompletedDate().getTime() - interview.getCreatedDate().getTime();
+            return durationMillis / (1000.0 * 60); // Convert milliseconds to minutes
+        }).summaryStatistics();
 
         // Initialize map with default values
         Map<String, String> completionTimes = new HashMap<>();
@@ -411,5 +399,13 @@ public class AssessmentsService {
         }
 
         return assessmentQuestionsRepository.findByAssessmentFormAndResultsQuestion(assessmentForm.getId(), status);
+    }
+
+    public List<AssessmentInterview> getAssessmentInterviewsByFormAndCompleted(AssessmentForm assessmentForm, boolean status) throws AssessmentToolError {
+        if (assessmentForm == null) {
+            throw new AssessmentToolError("Null parameter assessmentForm");
+        }
+
+        return assessmentInterviewsRepository.findAssessmentInterviewsByAssessmentFormIdAndCompleted(assessmentForm.getId(), status);
     }
 }

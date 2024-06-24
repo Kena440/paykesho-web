@@ -451,19 +451,24 @@ public class AssessmentsController {
                     case PRODUCT:
                         questionDataMap.put(question, responses);
                         break;
-
+                    case ESSAY:
+                        List<String> essayResponses = responses.stream()
+                                .map(AssessmentQuestionResponse::getAnswer)
+                                .collect(Collectors.toList());
+                        questionDataMap.put(question, essayResponses);
+                        break;
                     default:
                         questionDataMap.put(question, responses);
                         break;
                 }
             }
 
-            int numberOfInterviews = assessmentsService.getAssessmentInterviewsByForm(assessmentForm).size();
+            int numberOfInterviews = assessmentsService.getAssessmentInterviewsByFormAndCompleted(assessmentForm, true).size();
 
-            if (assessmentForm.getFormType().defaultDescription().equals(FormType.GENERAL.defaultDescription()) && assessmentForm.getFormTarget().defaultDescription().equals(FormTarget.FACILITY.defaultDescription())) {
+            if (assessmentForm.getFormTarget().defaultDescription().equals(FormTarget.FACILITY.defaultDescription())) {
                 Set<Facility> facilities = assessmentInterviews.stream().map(AssessmentInterview::getFacility).collect(Collectors.toSet());
                 model.addAttribute("facilities", facilities.size());
-            } else if (assessmentForm.getFormType().defaultDescription().equals(FormType.GENERAL.defaultDescription()) && assessmentForm.getFormTarget().defaultDescription().equals(FormTarget.DISTRICT.defaultDescription())) {
+            } else if (assessmentForm.getFormTarget().defaultDescription().equals(FormTarget.DISTRICT.defaultDescription())) {
                 Set<String> districts = assessmentInterviews.stream().map(AssessmentInterview::getTargetDistrict).collect(Collectors.toSet());
                 model.addAttribute("districts", districts.size());
             }

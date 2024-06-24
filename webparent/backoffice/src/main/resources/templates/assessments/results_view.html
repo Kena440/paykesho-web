@@ -54,13 +54,15 @@
                             <div class="card mb-3">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-12 col-md-6" th:if="${assessmentForm.formTarget.defaultDescription() == T(org.commons.enums.FormTarget).FACILITY.name()}">
+                                        <div class="col-12 col-md-6"
+                                             th:if="${assessmentForm.formTarget.defaultDescription() == T(org.commons.enums.FormTarget).FACILITY.name()}">
                                             <h5>Facilities</h5>
-                                            <p>[[${facilities}]]</p>
+                                            <p th:if="${facilities != null}">[[${facilities}]]</p>
                                         </div>
-                                        <div class="col-12 col-md-6" th:if="${assessmentForm.formTarget.defaultDescription() == T(org.commons.enums.FormTarget).DISTRICT.name()}">
+                                        <div class="col-12 col-md-6"
+                                             th:if="${assessmentForm.formTarget.defaultDescription() == T(org.commons.enums.FormTarget).DISTRICT.name()}">
                                             <h5>DHO</h5>
-                                            <p>[[${districts}]]</p>
+                                            <p th:if="${districts != null}">[[${districts}]]</p>
                                         </div>
                                     </div>
 
@@ -86,6 +88,30 @@
                                                 <!-- Charts will be appended here by jQuery -->
                                                 <div class="row" id="charts-container"></div>
                                             </div>
+                                            <div class="row">
+                                                <div class="col-12 col-md-12">
+                                                    <div class="card mb-3">
+                                                        <div class="card-header">
+                                                            <h4 class="card-header-title">Essay Responses</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div th:each="entry : ${questionDataMap}">
+                                                                <div th:if="${entry.key.questionType.defaultDescription() == T(org.commons.enums.QuestionType).ESSAY.name()}">
+                                                                    <h5 th:text="${entry.key.question}"></h5>
+                                                                    <ul class="list-group list-group-lg">
+                                                                        <div th:each="response, iterStat : ${entry.value}">
+
+                                                                            <li class="list-group-ite">
+                                                                                [[${iterStat.index + 1}]]. [[${response}]]
+                                                                            </li>
+                                                                        </div>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -94,9 +120,10 @@
                     </div>
                 </div>
             </div>
-        </div> <!-- / .row -->
-    </div>
-    <input id="assessmentId" name="aId" th:value="${assessmentForm.id}" type="hidden">
+        </div>
+    </div> <!-- / .row -->
+</div>
+<input id="assessmentId" name="aId" th:value="${assessmentForm.id}" type="hidden">
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
 <footer th:replace="fragments/fragments :: js_code"></footer>
@@ -106,9 +133,9 @@
     $(document).ready(function () {
         var questionDataMap = /*[[${questionDataMap}]]*/ {};
         var chartsContainer = $('#charts-container');
-
         $.each(questionDataMap, function (question, distribution) {
             var questionText = question;
+            //if (question.questionType === 'MULTIPLE_CHOICE' || question.questionType === 'CHECKBOX') {
             var labels = Object.keys(distribution);
             var data = Object.values(distribution);
             var chartId = 'chart' + labels.join('').replace(/\s+/g, '');
@@ -147,6 +174,7 @@
                     }
                 }
             });
+            //}
         });
     });
 </script>
