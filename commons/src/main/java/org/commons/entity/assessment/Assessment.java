@@ -3,11 +3,10 @@ package org.commons.entity.assessment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.entity.IdBasedEntity;
+import org.commons.enums.FormType;
+import org.commons.enums.ToolType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,7 +23,9 @@ public class Assessment extends IdBasedEntity {
     private String details;
     @Column(name = "assessment_date", length = 245, nullable = false)
     private Date assessmentDate;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tool_type", length = 20)
+    private ToolType toolType;
     private boolean enabled;
     private boolean deleted;
 

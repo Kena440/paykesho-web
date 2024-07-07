@@ -107,6 +107,31 @@
                         </div>
                         <div class="col-12 col-md-6">
 
+                            <!-- First name -->
+                            <div class="form-group">
+
+                                <!-- Label -->
+                                <label class="form-label">
+                                    Tool Type
+                                </label>
+
+                                <!-- Input -->
+                                <select class="form-select mb-3" data-choices name="toolType" required>
+                                    <option value="">Select...</option>
+
+                                    <th:block
+                                            th:each="ps : ${T(org.commons.enums.ToolType).values()}">
+                                        <option th:defaultDescription="${ps.name()}"
+                                                th:text="${ps}"
+                                                th:value="${ps}">
+                                        </option>
+                                    </th:block>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-6">
+
                             <!-- Birthday -->
                             <div class="form-group">
 

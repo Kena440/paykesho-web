@@ -11,6 +11,7 @@ import org.commons.entity.facilities.Facility;
 import org.commons.enums.FormTarget;
 import org.commons.enums.FormType;
 import org.commons.enums.QuestionType;
+import org.commons.enums.ToolType;
 import org.commons.utils.AssessmentToolError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -237,6 +238,8 @@ public class AssessmentsController {
                 answeredQuestions = getAnsweredQuestionsGeneralForm(responses, assessmentInterview, answeredQuestions);
             } else if (assessmentInterview.getAssessmentForm().getFormType().equals(FormType.PRODUCTS)) {
                 answeredQuestions = getAnsweredQuestionsProductsForm(responses, assessmentInterview, answeredQuestions);
+            } else if (assessmentInterview.getAssessmentForm().getFormType().equals(FormType.EQUIPMENT)) {
+
             }
 
             if (answeredQuestions >= totalQuestions) {
@@ -324,39 +327,20 @@ public class AssessmentsController {
 
                 int sohActual = 0;
                 int sohElmisFe = 0;
+                int monthlyPhysicalCountsEScc = 0;
+                int monthlyPhysicalCountsPhysicalScc = 0;
+                int issuesInLast3Months = 0;
                 int variance = 0;
 
                 if (productData.containsKey("managedAtFacility")) {
                     response.setManagedAtFacility((Boolean) productData.get("managedAtFacility"));
                 }
-                try {
-                    if (productData.containsKey("sohActual") && productData.get("sohActual") != null) {
-                        sohActual = convertToInteger(productData.get("sohActual"));
-                    }
-                    if (productData.containsKey("sohElmisFe") && productData.get("sohActual") != null) {
-                        sohElmisFe = convertToInteger(productData.get("sohElmisFe"));
-                    }
-                } catch (NumberFormatException e) {
-                    logger.info(e.getMessage());
-                }
 
-                response.setSohActual(sohActual);
-                response.setSohElmisFe(sohElmisFe);
-                variance = sohActual - sohElmisFe;
+                String toolType = assessmentInterview.getAssessmentForm().getAssessment().getToolType().name();
 
-                response.setVariance(variance);
+                extractAnswersAndProcess(productData, response, sohActual, sohElmisFe, monthlyPhysicalCountsEScc, monthlyPhysicalCountsPhysicalScc, issuesInLast3Months, toolType);
 
-                double percentageError = 0.0;
-                if (sohActual != 0) {
-                    percentageError = ((double) variance / sohActual) * 100;
-                }
-
-                DecimalFormat df = new DecimalFormat("#.##");
-                percentageError = Double.parseDouble(df.format(percentageError));
-
-                response.setPercentageError(percentageError);
                 response.setAnswer("size -> " + ((LinkedHashMap<?, ?>) answer).size());
-
                 assessmentsService.saveInterviewResponse(response);
                 answeredQuestions++;
             } else if (answer instanceof String) {
@@ -367,9 +351,67 @@ public class AssessmentsController {
                 assessmentsService.saveInterviewResponse(response);
                 answeredQuestions++;
             }
-
         }
         return answeredQuestions;
+    }
+
+    private void extractAnswersAndProcess(LinkedHashMap<String, Object> productData, AssessmentQuestionResponse response, int sohActual, int sohElmisFe, int monthlyPhysicalCountsEScc, int monthlyPhysicalCountsPhysicalScc, int issuesInLast3Months, String toolType) {
+        int variance;
+        try {
+            if (toolType.equals(ToolType.ASSESSMENT)) {
+                if (productData.containsKey("sohActual") && productData.get("sohActual") != null) {
+                    sohActual = convertToInteger(productData.get("sohActual"));
+                }
+                if (productData.containsKey("sohElmisFe") && productData.get("sohElmisFe") != null) {
+                    sohElmisFe = convertToInteger(productData.get("sohElmisFe"));
+                }
+            } else if (toolType.equals(ToolType.DQA)) {
+                if (productData.containsKey("monthlyPhysicalCountsPhysicalScc") && productData.get("monthlyPhysicalCountsPhysicalScc") != null) {
+                    monthlyPhysicalCountsPhysicalScc = convertToInteger(productData.get("monthlyPhysicalCountsPhysicalScc"));
+                }
+                if (productData.containsKey("monthlyPhysicalCountsEScc") && productData.get("monthlyPhysicalCountsEScc") != null) {
+                    monthlyPhysicalCountsEScc = convertToInteger(productData.get("monthlyPhysicalCountsEScc"));
+                }
+                if (productData.containsKey("issuesInLast3Months") && productData.get("issuesInLast3Months") != null) {
+                    issuesInLast3Months = convertToInteger(productData.get("issuesInLast3Months"));
+                }
+            }
+        } catch (NumberFormatException e) {
+            logger.info(e.getMessage());
+        }
+
+        if (toolType.equals(ToolType.ASSESSMENT)) {
+            response.setSohActual(sohActual);
+            response.setSohElmisFe(sohElmisFe);
+            variance = sohActual - sohElmisFe;
+            response.setVariance(variance);
+
+            double percentageError = 0.0;
+            if (sohActual != 0) {
+                percentageError = ((double) variance / sohActual) * 100;
+            }
+
+            DecimalFormat df = new DecimalFormat("#.##");
+            percentageError = Double.parseDouble(df.format(percentageError));
+
+            response.setPercentageError(percentageError);
+        } else if (toolType.equals(ToolType.DQA)) {
+            response.setIssuesInLast3Months(issuesInLast3Months);
+            response.setMonthlyPhysicalCountsPhysicalScc(monthlyPhysicalCountsPhysicalScc);
+            response.setMonthlyPhysicalCountsEScc(monthlyPhysicalCountsEScc);
+            variance = monthlyPhysicalCountsPhysicalScc - monthlyPhysicalCountsEScc;
+            response.setVariance(variance);
+
+            double percentageError = 0.0;
+            if (monthlyPhysicalCountsPhysicalScc != 0) {
+                percentageError = ((double) variance / monthlyPhysicalCountsPhysicalScc) * 100;
+            }
+
+            DecimalFormat df = new DecimalFormat("#.##");
+            percentageError = Double.parseDouble(df.format(percentageError));
+
+            response.setPercentageError(percentageError);
+        }
     }
 
     private int getAnsweredQuestionsGeneralForm(Map<String, Object> responses, AssessmentInterview assessmentInterview, int answeredQuestions) throws AssessmentToolError {

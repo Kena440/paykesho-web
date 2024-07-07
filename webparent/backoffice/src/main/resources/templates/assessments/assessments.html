@@ -138,6 +138,9 @@
                                             style="width: 15%"
                                             th:replace="fragments/fragments :: column_Link('name', 'Name','none')">
                                         </th>
+                                        <th class="list-sort text-muted" scope="col"
+                                            th:replace="fragments/fragments :: column_Link('toolType', 'Type','none')">
+                                        </th>
                                         <th scope="col"
                                             th:replace="fragments/fragments :: column_Link('details', 'Details', 'none')">
                                         </th>
@@ -164,6 +167,7 @@
                                                 [[${assessment.name}]]
                                             </a>
                                         </td>
+                                        <td>[[${assessment.toolType}]]</td>
                                         <td>[[${assessment.details}]]</td>
                                         <td>
                                             <time datetime="2018-04-23"

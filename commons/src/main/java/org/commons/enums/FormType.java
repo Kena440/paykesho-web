@@ -6,11 +6,15 @@ public enum FormType {
         public String defaultDescription() {
             return "GENERAL";
         }
-    },
-    PRODUCTS {
+    }, PRODUCTS {
         @Override
         public String defaultDescription() {
             return "PRODUCTS";
+        }
+    }, EQUIPMENT {
+        @Override
+        public String defaultDescription() {
+            return "EQUIPMENT";
         }
     };
 

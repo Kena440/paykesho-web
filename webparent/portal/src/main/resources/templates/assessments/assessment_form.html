@@ -90,7 +90,7 @@
 
                             <!-- Title -->
                             <h1 class="header-title">
-                                [[${assessmentForm.assessment.name}]] -
+                                [[${assessmentForm.assessment.name}]] - [[${assessmentForm.assessment.toolType}]]
                             </h1>
 
                             <!-- Subtitle -->
@@ -198,18 +198,43 @@
                                             </div>
                                             <hr>
                                             <div class="row">
-                                                <div class="col-sm-6">
-                                                    <label>SOH (ACTUAL)</label>
-                                                    <input class="form-control"
-                                                           th:name="'question_' + ${question.id} + '_sohActual'"
-                                                           type="number"/>
+                                                <div th:switch="${assessment.toolType.name()}">
+                                                    <div th:case="'ASSESSMENT'">
+                                                        <div class="col-sm-6">
+                                                            <label>SOH (ACTUAL)</label>
+                                                            <input class="form-control"
+                                                                   th:name="'question_' + ${question.id} + '_sohActual'"
+                                                                   type="number"/>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <label>SOH (eLMIS FE)</label>
+                                                            <input class="form-control"
+                                                                   th:name="'question_' + ${question.id} + '_sohElmisFe'"
+                                                                   type="number"/>
+                                                        </div>
+                                                    </div>
+                                                    <div th:case="'DQA'">
+                                                        <div class="col-sm-6">
+                                                            <label>Monthly Physical Counts - Physical</label>
+                                                            <input class="form-control"
+                                                                   th:name="'question_' + ${question.id} + '_monthlyPhysicalCountsPhysicalScc'"
+                                                                   type="number"/>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <label>Monthly Physical Counts - eSCC (eLMIS FE)</label>
+                                                            <input class="form-control"
+                                                                   th:name="'question_' + ${question.id} + '_monthlyPhysicalCountsEScc'"
+                                                                   type="number"/>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <label>Issues in the last 3 Months</label>
+                                                            <input class="form-control"
+                                                                   th:name="'question_' + ${question.id} + '_issuesInLast3Months'"
+                                                                   type="number"/>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="col-sm-6">
-                                                    <label>SOH (eLMIS FE)</label>
-                                                    <input class="form-control"
-                                                           th:name="'question_' + ${question.id} + '_sohElmisFe'"
-                                                           type="number"/>
-                                                </div>
+
                                             </div>
                                         </div>
                                         <div th:case="*">
@@ -255,9 +280,17 @@
     <input id="interviewId" name="interviewId" th:value="${assessmentInterview.id}" type="hidden">
     <input id="assessmentId" name="assessmentId" th:value="${assessment.id}" type="hidden">
     <input id="formType" name="formType" th:value="${assessmentForm.formType.name()}" type="hidden">
+    <input id="toolType" name="toolType" th:value="${assessment.toolType.name()}" type="hidden">
     <input id="formTypeGeneral" name="formTypeGeneral" th:value="${assessmentForm.formType.GENERAL.name()}"
            type="hidden">
     <input id="formTypeProducts" name="formTypeProducts" th:value="${assessmentForm.formType.PRODUCTS.name()}"
+           type="hidden">
+    <input id="formTypeEquipment" name="formTypeEquipment" th:value="${assessmentForm.formType.EQUIPMENT.name()}"
+           type="hidden">
+
+    <input id="toolTypeAssessment" name="toolTypeAssessment" th:value="${assessment.toolType.ASSESSMENT.name()}"
+           type="hidden">
+    <input id="toolTypeDQA" name="toolTypeDQA" th:value="${assessment.toolType.DQA.name()}"
            type="hidden">
 </div><!-- / .main-content -->
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
@@ -347,8 +380,13 @@
         });
 
         const formType = document.getElementById('formType').value;
+        const toolType = document.getElementById('toolType').value;
         const formTypeProducts = document.getElementById('formTypeProducts').value;
         const formTypeGeneral = document.getElementById('formTypeGeneral').value;
+        const formTypeEquipment = document.getElementById('formTypeEquipment').value;
+
+        const toolTypeAssessment = document.getElementById('toolTypeAssessment').value;
+        const toolTypeDQA = document.getElementById('toolTypeDQA').value;
 
         submitButton.addEventListener('click', function () {
             const answers = {};
@@ -359,6 +397,7 @@
                 // Initialize an array to store selected options for checkboxes
                 let selectedOptions = [];
                 let productData = {};
+                let equipmentData = {};
 
                 inputs.forEach(input => {
                     if (formType === formTypeGeneral) {
@@ -382,21 +421,65 @@
                             }
                         }
                     } else if (formType === formTypeProducts) {
-                        if (input.type === 'radio') {
-                            if (input.checked) {
-                                if (input.name.includes('_managedAtFacility')) {
-                                    productData['managedAtFacility'] = input.value === 'true';
+                        if (toolType === toolTypeAssessment) {
+                            if (input.type === 'radio') {
+                                if (input.checked) {
+                                    if (input.name.includes('_managedAtFacility')) {
+                                        productData['managedAtFacility'] = input.value === 'true';
+                                    } else {
+                                        answers[questionId] = input.value;
+                                    }
+                                }
+                            } else {
+                                if (input.name.includes('_sohActual')) {
+                                    productData['sohActual'] = parseInt(input.value, 10);
+                                } else if (input.name.includes('_sohElmisFe')) {
+                                    productData['sohElmisFe'] = parseInt(input.value, 10);
                                 } else {
-                                    answers[questionId] = input.value;
+                                    if (input.value.trim() !== '') {
+                                        answers[questionId] = input.value;
+                                    }
                                 }
                             }
-                        } else {
-                            if (input.name.includes('_sohActual')) {
-                                productData['sohActual'] = parseInt(input.value, 10);
-                            } else if (input.name.includes('_sohElmisFe')) {
-                                productData['sohElmisFe'] = parseInt(input.value, 10);
+                        } else if (toolType === toolTypeDQA) {
+                            if (input.type === 'radio') {
+                                if (input.checked) {
+                                    if (input.name.includes('_managedAtFacility')) {
+                                        productData['managedAtFacility'] = input.value === 'true';
+                                    } else {
+                                        answers[questionId] = input.value;
+                                    }
+                                }
                             } else {
-                                if (input.value.trim() !== '') {
+                                if (input.name.includes('_monthlyPhysicalCountsPhysicalScc')) {
+                                    productData['monthlyPhysicalCountsPhysicalScc'] = parseInt(input.value, 10);
+                                } else if (input.name.includes('_monthlyPhysicalCountsEScc')) {
+                                    productData['monthlyPhysicalCountsEScc'] = parseInt(input.value, 10);
+                                } else if (input.name.includes('_issuesInLast3Months')) {
+                                    productData['issuesInLast3Months'] = parseInt(input.value, 10);
+                                } else {
+                                    if (input.value.trim() !== '') {
+                                        answers[questionId] = input.value;
+                                    }
+                                }
+                            }
+                        }
+                    } else if (formType === formTypeEquipment) {
+                        if (input.type === 'radio') {
+                            if (input.checked) {
+                                if (input.name.includes('_distributedAtFacility')) {
+                                    equipmentData['distributedAtFacility'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedServer')) {
+                                    equipmentData['distributedServer'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedLab')) {
+                                    equipmentData['distributedLab'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedARTDispensary')) {
+                                    equipmentData['distributedARTDispensary'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedMCH')) {
+                                    equipmentData['distributedMCH'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedPharmacyDispensary')) {
+                                    equipmentData['distributedPharmacyDispensary'] = input.value === 'true';
+                                } else {
                                     answers[questionId] = input.value;
                                 }
                             }
@@ -411,6 +494,10 @@
                 } else if (formType === formTypeProducts) {
                     if (Object.keys(productData).length > 0) {
                         answers[questionId] = productData;
+                    }
+                } else if (formType === formTypeEquipment) {
+                    if (Object.keys(equipmentData).length > 0) {
+                        answers[questionId] = equipmentData;
                     }
                 }
 

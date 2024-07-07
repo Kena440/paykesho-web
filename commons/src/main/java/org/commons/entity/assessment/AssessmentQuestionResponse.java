@@ -37,6 +37,35 @@ public class AssessmentQuestionResponse extends IdBasedEntity {
     @Column(name = "average_percentage_error")
     private Double averagePercentageError;
 
+    //DQA PRODUCT FORM
+    @Column(name = "monthly_physical_counts_physical_scc")
+    private Integer monthlyPhysicalCountsPhysicalScc;
+
+    @Column(name = "monthly_physical_counts_e_scc")
+    private Integer monthlyPhysicalCountsEScc;
+
+    @Column(name = "issues_in_last_3_months")
+    private Integer issuesInLast3Months;
+
+    //EQUIPMENT FORM
+    @Column(name = "distributed_at_facility")
+    private Boolean distributedAtFacility;
+
+    @Column(name = "distributed_server")
+    private Boolean distributedServer;
+
+    @Column(name = "distributed_lab")
+    private Boolean distributedLab;
+
+    @Column(name = "distributed_art_dispensary")
+    private Boolean distributedARTDispensary;
+
+    @Column(name = "distributed_mch")
+    private Boolean distributedMCH;
+
+    @Column(name = "distributed_pharmacy_dispensary")
+    private Boolean distributedPharmacyDispensary;
+
     @Override
     public String toString() {
         return answer;
