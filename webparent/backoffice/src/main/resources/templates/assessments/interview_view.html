@@ -417,6 +417,101 @@
                                             </div>
                                         </th:block>
                                     </div>
+                                    <div class="col-12 col-md-12"
+                                         th:if="${assessmentInterview.getAssessmentForm().formType.name() == T(org.commons.enums.FormType).EQUIPMENT.name()}">
+                                        <th:block th:if="${assessmentInterview.getAssessmentForm().getAssessment().toolType.name() == T(org.commons.enums.ToolType).DQA.name()}">
+                                            <div class="card mb-3">
+                                                <div class="card-header">
+                                                    [[${assessmentInterview.assessmentForm.formName}]]
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-hover table-nowrap card-table"
+                                                               th:if="${questionResponseMap.size() > 0}">
+                                                            <thead>
+                                                            <tr>
+                                                                <th class="list-sort text-muted text-center" scope="col">
+                                                                    No.
+                                                                </th>
+                                                                <th class="list-sort text-muted question-col" scope="col">
+                                                                    Product
+                                                                </th>
+                                                                <th class="list-sort text-muted small-col text-center"
+                                                                    scope="col">>Is this distributed at this facility? (Y/N)
+                                                                </th>
+                                                                <th class="list-sort text-muted small-col text-center"
+                                                                    scope="col">Server
+                                                                </th>
+                                                                <th class="list-sort text-muted small-col text-center"
+                                                                    scope="col">Laboratory
+                                                                </th>
+                                                                <th class="list-sort text-muted small-col text-center"
+                                                                    scope="col">ART Dispensary
+                                                                </th>
+                                                                <th class="list-sort text-muted small-col text-center"
+                                                                    scope="col">
+                                                                    MCH
+                                                                </th>
+                                                                <th class="list-sort text-muted small-col text-center"
+                                                                    scope="col">
+                                                                    Pharmacy Dispensary
+                                                                </th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody class="list fs-base">
+                                                            <tr th:each="entry, iterStat : ${questionResponseMap}">
+                                                                <th:block
+                                                                        th:if="${entry.key.questionType.name() == T(org.commons.enums.QuestionType).EQUIPMENT.name()}">
+                                                                    <td class="text-center">[[${iterStat.count}]]</td>
+                                                                    <td class="question-col">[[${entry.key.question}]]</td>
+                                                                    <td class="small-col text-center"
+                                                                        th:each="response : ${entry.value}"
+                                                                        th:text="${response.distributedAtFacility ? 'Yes' : 'No'}"></td>
+                                                                    <td class="small-col text-center"
+                                                                        th:each="response : ${entry.value}"
+                                                                        th:text="${response.distributedServer}"></td>
+                                                                    <td class="small-col text-center"
+                                                                        th:each="response : ${entry.value}"
+                                                                        th:text="${response.distributedLab}"></td>
+                                                                    <td class="small-col text-center"
+                                                                        th:each="response : ${entry.value}"
+                                                                        th:text="${response.distributedARTDispensary}"></td>
+                                                                    <td class="small-col text-center"
+                                                                        th:each="response : ${entry.value}"
+                                                                        th:text="${response.distributedMCH}"></td>
+                                                                    <td class="small-col text-center"
+                                                                        th:each="response : ${entry.value}"
+                                                                        th:text="${response.distributedPharmacyDispensary}"></td>
+                                                                </th:block>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer"></div>
+                                            </div>
+                                            <div th:each="entry, iterStat : ${questionResponseMap}"
+                                                 th:unless="${entry.key.questionType.name() == T(org.commons.enums.QuestionType).PRODUCT.name()}">
+                                                <div class="card mb-3">
+                                                    <div class="card-header">
+                                                        <h4 class="card-header-title" th:text="${entry.key.question}">
+                                                            Question text</h4>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <ul class="list-group list-group-flush">
+                                                            <strong>
+                                                                <li class="list-group-item"
+                                                                    th:each="response : ${entry.value}"
+                                                                    th:text="${response.answer}">Response
+                                                                </li>
+                                                            </strong>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th:block>
+
+                                    </div>
                                 </div>
                             </div>
                         </div>

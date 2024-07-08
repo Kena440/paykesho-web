@@ -48,6 +48,12 @@ public enum QuestionType {
         public String defaultDescription() {
             return "PRODUCT";
         }
+    },
+    EQUIPMENT {
+        @Override
+        public String defaultDescription() {
+            return "EQUIPMENT";
+        }
     };
 
     public abstract String defaultDescription();

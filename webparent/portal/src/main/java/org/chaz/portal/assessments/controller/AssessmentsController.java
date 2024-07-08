@@ -239,7 +239,7 @@ public class AssessmentsController {
             } else if (assessmentInterview.getAssessmentForm().getFormType().equals(FormType.PRODUCTS)) {
                 answeredQuestions = getAnsweredQuestionsProductsForm(responses, assessmentInterview, answeredQuestions);
             } else if (assessmentInterview.getAssessmentForm().getFormType().equals(FormType.EQUIPMENT)) {
-
+                answeredQuestions = getAnsweredQuestionsEquipmentsForm(responses, assessmentInterview, answeredQuestions);
             }
 
             if (answeredQuestions >= totalQuestions) {
@@ -436,6 +436,64 @@ public class AssessmentsController {
                     assessmentsService.saveInterviewResponse(checkboxResponse);
                     answeredQuestions++;
                 }
+            }
+        }
+        return answeredQuestions;
+    }
+
+    private int getAnsweredQuestionsEquipmentsForm(Map<String, Object> responses, AssessmentInterview assessmentInterview, int answeredQuestions) throws AssessmentToolError {
+        for (Map.Entry<String, Object> entry : responses.entrySet()) {
+            String questionIdString = entry.getKey();
+            Object answer = entry.getValue();
+
+            AssessmentQuestion assessmentQuestion = assessmentsService.getAssessmentQuestionById(Integer.parseInt(questionIdString));
+            if (assessmentQuestion == null) {
+                throw new AssessmentToolError("Assessment question not found for ID: " + questionIdString);
+            }
+
+            if (answer instanceof LinkedHashMap) {
+                LinkedHashMap<String, Object> equipmentData = (LinkedHashMap<String, Object>) answer;
+                AssessmentQuestionResponse response = new AssessmentQuestionResponse();
+                response.setAssessmentQuestion(assessmentQuestion);
+                response.setAssessmentInterview(assessmentInterview);
+
+                String toolType = assessmentInterview.getAssessmentForm().getAssessment().getToolType().name();
+
+                try {
+                    if (toolType.equals(ToolType.DQA.name())) {
+                        if (equipmentData.containsKey("distributedAtFacility")) {
+                            response.setDistributedAtFacility((Boolean) equipmentData.get("distributedAtFacility"));
+                        }
+                        if (equipmentData.containsKey("distributedServer")) {
+                            response.setDistributedServer((Boolean) equipmentData.get("distributedServer"));
+                        }
+                        if (equipmentData.containsKey("distributedLab")) {
+                            response.setDistributedLab((Boolean) equipmentData.get("distributedLab"));
+                        }
+                        if (equipmentData.containsKey("distributedARTDispensary")) {
+                            response.setDistributedARTDispensary((Boolean) equipmentData.get("distributedARTDispensary"));
+                        }
+                        if (equipmentData.containsKey("distributedMCH")) {
+                            response.setDistributedMCH((Boolean) equipmentData.get("distributedMCH"));
+                        }
+                        if (equipmentData.containsKey("distributedPharmacyDispensary")) {
+                            response.setDistributedPharmacyDispensary((Boolean) equipmentData.get("distributedPharmacyDispensary"));
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    logger.info(e.getMessage());
+                }
+
+                response.setAnswer("size -> " + ((LinkedHashMap<?, ?>) answer).size());
+                assessmentsService.saveInterviewResponse(response);
+                answeredQuestions++;
+            } else if (answer instanceof String) {
+                AssessmentQuestionResponse response = new AssessmentQuestionResponse();
+                response.setAssessmentQuestion(assessmentQuestion);
+                response.setAnswer((String) answer);
+                response.setAssessmentInterview(assessmentInterview);
+                assessmentsService.saveInterviewResponse(response);
+                answeredQuestions++;
             }
         }
         return answeredQuestions;

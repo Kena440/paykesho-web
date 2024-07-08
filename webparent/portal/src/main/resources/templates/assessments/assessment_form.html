@@ -199,7 +199,7 @@
                                             <hr>
                                             <div class="row">
                                                 <div th:switch="${assessment.toolType.name()}">
-                                                    <div th:case="'ASSESSMENT'">
+                                                    <div class="row" th:case="'ASSESSMENT'">
                                                         <div class="col-sm-6">
                                                             <label>SOH (ACTUAL)</label>
                                                             <input class="form-control"
@@ -213,7 +213,7 @@
                                                                    type="number"/>
                                                         </div>
                                                     </div>
-                                                    <div th:case="'DQA'">
+                                                    <div class="row" th:case="'DQA'">
                                                         <div class="col-sm-6">
                                                             <label>Monthly Physical Counts - Physical</label>
                                                             <input class="form-control"
@@ -231,6 +231,78 @@
                                                             <input class="form-control"
                                                                    th:name="'question_' + ${question.id} + '_issuesInLast3Months'"
                                                                    type="number"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div th:case="'EQUIPMENT'">
+                                            <div>
+                                                <label>Is this distributed at this facility? (Y/N)</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           th:name="'question_' + ${question.id} + '_distributedAtFacility'"
+                                                           type="radio"
+                                                           value="true"/>
+                                                    <label class="form-check-label">Yes</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           th:name="'question_' + ${question.id} + '_distributedAtFacility'"
+                                                           type="radio"
+                                                           value="false"/>
+                                                    <label class="form-check-label">No</label>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div th:switch="${assessment.toolType.name()}">
+                                                    <div class="row" th:case="'DQA'">
+                                                        <div class="col-sm-4">
+                                                            <label>Server</label>
+                                                            <select class="form-select" data-choices
+                                                                    th:name="'question_' + ${question.id} + '_distributedServer'">
+                                                                <option value="">Select...</option>
+                                                                <option value="true">Yes</option>
+                                                                <option value="false">No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label>Laboratory</label>
+                                                            <select class="form-select" data-choices
+                                                                    th:name="'question_' + ${question.id} + '_distributedLab'">
+                                                                <option value="">Select...</option>
+                                                                <option value="true">Yes</option>
+                                                                <option value="false">No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label>ART Dispensary</label>
+                                                            <select class="form-select" data-choices
+                                                                    th:name="'question_' + ${question.id} + '_distributedARTDispensary'">
+                                                                <option value="">Select...</option>
+                                                                <option value="true">Yes</option>
+                                                                <option value="false">No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label>MCH</label>
+                                                            <select class="form-select" data-choices
+                                                                    th:name="'question_' + ${question.id} + '_distributedMCH'">
+                                                                <option value="">Select...</option>
+                                                                <option value="true">Yes</option>
+                                                                <option value="false">No</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label>Pharmacy Dispensary</label>
+                                                            <select class="form-select" data-choices
+                                                                    th:name="'question_' + ${question.id} + '_distributedPharmacyDispensary'">
+                                                                <option value="">Select...</option>
+                                                                <option value="true">Yes</option>
+                                                                <option value="false">No</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -465,11 +537,15 @@
                             }
                         }
                     } else if (formType === formTypeEquipment) {
-                        if (input.type === 'radio') {
-                            if (input.checked) {
-                                if (input.name.includes('_distributedAtFacility')) {
-                                    equipmentData['distributedAtFacility'] = input.value === 'true';
-                                } else if (input.name.includes('_distributedServer')) {
+                        if (toolType === toolTypeDQA) {
+                            if (input.type === 'radio') {
+                                if (input.checked) {
+                                    if (input.name.includes('_distributedAtFacility')) {
+                                        equipmentData['distributedAtFacility'] = input.value === 'true';
+                                    }
+                                }
+                            } else if (input.type === 'select') {
+                                if (input.name.includes('_distributedServer')) {
                                     equipmentData['distributedServer'] = input.value === 'true';
                                 } else if (input.name.includes('_distributedLab')) {
                                     equipmentData['distributedLab'] = input.value === 'true';
@@ -480,10 +556,29 @@
                                 } else if (input.name.includes('_distributedPharmacyDispensary')) {
                                     equipmentData['distributedPharmacyDispensary'] = input.value === 'true';
                                 } else {
-                                    answers[questionId] = input.value;
+                                    if (input.value.trim() !== '') {
+                                        answers[questionId] = input.value;
+                                    }
+                                }
+                            } else {
+                                if (input.name.includes('_distributedServer')) {
+                                    equipmentData['distributedServer'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedLab')) {
+                                    equipmentData['distributedLab'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedARTDispensary')) {
+                                    equipmentData['distributedARTDispensary'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedMCH')) {
+                                    equipmentData['distributedMCH'] = input.value === 'true';
+                                } else if (input.name.includes('_distributedPharmacyDispensary')) {
+                                    equipmentData['distributedPharmacyDispensary'] = input.value === 'true';
+                                } else {
+                                    if (input.value.trim() !== '') {
+                                        answers[questionId] = input.value;
+                                    }
                                 }
                             }
                         }
+
                     }
                 });
 
