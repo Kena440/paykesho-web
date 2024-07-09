@@ -460,28 +460,27 @@
                                                             </thead>
                                                             <tbody class="list fs-base">
                                                             <tr th:each="entry, iterStat : ${questionResponseMap}">
-                                                                <th:block
-                                                                        th:if="${entry.key.questionType.name() == T(org.commons.enums.QuestionType).EQUIPMENT.name()}">
+                                                                <th:block th:if="${entry.key.questionType.name() == T(org.commons.enums.QuestionType).EQUIPMENT.name()}">
                                                                     <td class="text-center">[[${iterStat.count}]]</td>
                                                                     <td class="question-col">[[${entry.key.question}]]</td>
                                                                     <td class="small-col text-center"
                                                                         th:each="response : ${entry.value}"
-                                                                        th:text="${response.distributedAtFacility ? 'Yes' : 'No'}"></td>
+                                                                        th:text="${response.distributedAtFacility != null ? (response.distributedAtFacility ? 'Yes' : 'No') : 'No'}"></td>
                                                                     <td class="small-col text-center"
                                                                         th:each="response : ${entry.value}"
-                                                                        th:text="${response.distributedServer}"></td>
+                                                                        th:text="${response.distributedServer != null ? (response.distributedServer ? 'Yes' : 'No') : 'No'}"></td>
                                                                     <td class="small-col text-center"
                                                                         th:each="response : ${entry.value}"
-                                                                        th:text="${response.distributedLab}"></td>
+                                                                        th:text="${response.distributedLab != null ? (response.distributedLab ? 'Yes' : 'No') : 'No'}"></td>
                                                                     <td class="small-col text-center"
                                                                         th:each="response : ${entry.value}"
-                                                                        th:text="${response.distributedARTDispensary}"></td>
+                                                                        th:text="${response.distributedARTDispensary != null ? (response.distributedARTDispensary ? 'Yes' : 'No') : 'No'}"></td>
                                                                     <td class="small-col text-center"
                                                                         th:each="response : ${entry.value}"
-                                                                        th:text="${response.distributedMCH}"></td>
+                                                                        th:text="${response.distributedMCH != null ? (response.distributedMCH ? 'Yes' : 'No') : 'No'}"></td>
                                                                     <td class="small-col text-center"
                                                                         th:each="response : ${entry.value}"
-                                                                        th:text="${response.distributedPharmacyDispensary}"></td>
+                                                                        th:text="${response.distributedPharmacyDispensary != null ? (response.distributedPharmacyDispensary ? 'Yes' : 'No') : 'No'}"></td>
                                                                 </th:block>
                                                             </tr>
                                                             </tbody>
@@ -491,7 +490,7 @@
                                                 <div class="card-footer"></div>
                                             </div>
                                             <div th:each="entry, iterStat : ${questionResponseMap}"
-                                                 th:unless="${entry.key.questionType.name() == T(org.commons.enums.QuestionType).PRODUCT.name()}">
+                                                 th:unless="${(entry.key.questionType.name() == T(org.commons.enums.QuestionType).PRODUCT.name()) || (entry.key.questionType.name() == T(org.commons.enums.QuestionType).EQUIPMENT.name())}">
                                                 <div class="card mb-3">
                                                     <div class="card-header">
                                                         <h4 class="card-header-title" th:text="${entry.key.question}">
