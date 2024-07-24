@@ -1,6 +1,5 @@
 package org.chaz.backoffice;
 
-import org.chaz.backoffice.assessments.service.AssessmentsService;
 import org.chaz.backoffice.config.Utility;
 import org.chaz.backoffice.events.service.EventsService;
 import org.chaz.backoffice.facilities.service.FacilityService;
@@ -35,8 +34,6 @@ public class MainController {
     @Autowired
     private EventsService eventsService;
     @Autowired
-    private AssessmentsService assessmentsService;
-    @Autowired
     private FacilityService facilityService;
 
     @GetMapping("")
@@ -46,7 +43,6 @@ public class MainController {
 
         model.addAttribute("facilityCount", facilityService.countInstitutions());
         model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
-        model.addAttribute("upcomingAssessments", assessmentsService.getUpcomingAssessments(30));
         if (country != null) model.addAttribute("country", country);
         return "index";
     }

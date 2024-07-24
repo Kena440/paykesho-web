@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('CSO Mgt','tag')"></head>
+
+<body>
+
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <!-- Header -->
+    <div class="header">
+
+        <!-- Image -->
+        <img alt="..." class="header-img-top" style="height: 120px!important;"
+             th:src="@{/assets/img/covers/profile-cover-1.jpg}">
+
+        <div class="container-fluid">
+            <input id="longitude" th:value="${cso.longitude}" type="hidden"/>
+            <input id="latitude" th:value="${cso.latitude}" type="hidden"/>
+            <!-- Body -->
+            <div class="header-body mt-n5 mt-md-n6">
+                <div class="row align-items-end">
+                    <div class="col-auto">
+
+                        <!-- Avatar -->
+                        <div class="avatar avatar-xxl header-avatar-top">
+                            <img alt="..." class="avatar-img rounded-circle border border-4 border-body"
+                                 th:src="@{/images/chazlogo.png}">
+                        </div>
+
+                    </div>
+                    <div class="col mb-3 ms-n3 ms-md-n2">
+
+                        <!-- Pretitle -->
+                        <h6 class="header-pretitle">
+                            CSO
+                        </h6>
+
+                        <!-- Title -->
+                        <h1 class="header-title">
+                            [[${cso.name}]]
+                        </h1>
+
+                    </div>
+                    <div class="col-12 col-md-auto mt-2 mt-md-0 mb-md-3" sec:authorize="hasAnyAuthority('Admin')">
+
+                        <!-- Button -->
+                        <a class="btn btn-primary d-block d-md-inline-block lift"
+                           th:href="@{'/csos/edit/' + ${cso.id}}">
+                            Edit
+                        </a>
+
+                    </div>
+                </div> <!-- / .row -->
+                <div class="row align-items-center">
+                    <div class="col">
+
+                        <!-- Nav -->
+                        <ul class="nav nav-tabs nav-overflow header-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#infoTab">
+                                    Info
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#filesTab">
+                                    Files
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+                </div>
+            </div> <!-- / .header-body -->
+
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="container-fluid">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="infoTab">
+                <div class="row">
+                    <div th:replace="csos/view_tabs/info :: content"></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="filesTab">
+                <div class="row">
+                    <div th:replace="csos/view_tabs/files :: content"></div>
+                </div>
+            </div>
+
+        </div>
+        <!-- / .row -->
+    </div>
+
+</div><!-- / .main-content -->
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 15,
+        center: [$("#longitude").val(), $("#latitude").val()]
+    });
+
+    const marker1 = new mapboxgl.Marker()
+        .setLngLat([$("#longitude").val(), $("#latitude").val()])
+        .addTo(map);
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl
+        })
+    );
+
+    currencySymbol = "[[${CURRENCY_SYMBOL}]]";
+    thousandPointType = "[[${THOUSAND_POINT_TYPE == 'COMMA' ? ',' : '.'}]]";
+    decimalPointType = "[[${DECIMAL_POINT_TYPE == 'COMMA' ? ',' : '.'}]]";
+    currencySymbolPosition = "[[${CURRENCY_SYMBOL_POSITION}]]";
+    decimalDigits = "[[${DECIMAL_DIGITS}]]";
+
+    prefixCurrencySymbol = currencySymbolPosition === 'before price' ? currencySymbol : '';
+    suffixCurrencySymbol = currencySymbolPosition === 'after price' ? currencySymbol : '';
+
+</script>
+</body>
+
+</html>

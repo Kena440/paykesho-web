@@ -25,6 +25,9 @@ public class Facility extends IdBasedEntity {
     private LevelOfCare levelOfCare;
     @Column(length = 45)
     private String email;
+    @ManyToOne
+    @JoinColumn(name = "contact_person_id")
+    private FacilityAdmin contactPerson;
     private boolean enabled;
     private boolean deleted;
     private float longitude;

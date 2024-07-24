@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.chaz</groupId>
-    <artifactId>assessmenttool</artifactId>
+    <artifactId>defaultertracer</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>chaz-assessmenttool</name>
-    <description>CHAZ Assessment Tool - Web Application</description>
+    <name>chaz-defaultertracer</name>
+    <description>CHAZ Defaulter Tracer Tool - Web Application</description>
 
     <modules>
         <module>commons</module>

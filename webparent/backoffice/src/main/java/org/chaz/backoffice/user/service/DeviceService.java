@@ -132,7 +132,7 @@ public class DeviceService {
 
         helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
         helper.setTo(user.getEmail());
-        helper.setSubject("CHAZ Assessment Tool Mgt - New Login Notification");
+        helper.setSubject("CHAZ Defaulter Tracer Mgt - New Login Notification");
 
         helper.setText(content, true);
 
