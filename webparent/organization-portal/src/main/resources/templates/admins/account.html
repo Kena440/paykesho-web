@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Monitoring and Evaluation','none')"></head>
+
+<body>
+
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Account Management
+                                </h6>
+
+                                <!-- Title -->
+                                <h1 class="header-title text-truncate">
+                                    [[${pageTitle}]]
+                                </h1>
+
+                            </div>
+                            <div class="col-auto">
+
+                                <!-- Navigation (button group) -->
+                                <div class="nav btn-group d-inline-flex d-none" role="tablist">
+                                    <button aria-controls="dealsListPane" aria-selected="true"
+                                            class="btn btn-white active"
+                                            data-bs-target="#dealsListPane" data-bs-toggle="tab" id="dealsListTab"
+                                            role="tab">
+                                        <span class="fe fe-list"></span>
+                                    </button>
+                                    <button aria-controls="dealsCardsPane" aria-selected="false" class="btn btn-white"
+                                            data-bs-target="#dealsCardsPane" data-bs-toggle="tab" id="dealsCardsTab"
+                                            role="tab">
+                                        <span class="fe fe-sidebar"></span>
+                                    </button>
+                                </div> <!-- / .nav -->
+
+                                <!-- Buttons -->
+                                <a class="btn btn-primary ms-2" th:href="@{/}">
+                                    Dashboard
+                                </a>
+
+                            </div>
+                        </div> <!-- / .row -->
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Nav -->
+                                <ul class="nav nav-tabs nav-overflow header-tabs">
+                                    <li class="nav-item d-none">
+                                        <a class="nav-link text-nowrap active" href="#!">
+                                            Total <span
+                                                class="badge rounded-pill bg-secondary-soft"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form method="post"
+                      th:action="@{/assessors/update-account}"
+                      th:object="${customer}">
+                    <input th:field="*{id}" type="hidden">
+                    <div class="row">
+                        <div class="col-12 ">
+
+                            <!-- first name -->
+                            <div class="form-group">
+                                <label class="sr-only" for="authenticationType">
+                                    Authentication Type
+                                </label>
+                                <input class="form-control =" id="authenticationType" minlength="2"
+                                       placeholder="Auth Type" readonly="readonly" th:field="*{authenticationType}"
+                                       type="text">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-6">
+
+                            <!-- first name -->
+                            <div class="form-group">
+                                <label class="sr-only" for="name">
+                                    Name *
+                                </label>
+                                <input class="form-control =" id="name" minlength="2"
+                                       placeholder="First Name *" readonly="readonly" required th:field="*{name}"
+                                       type="text">
+                            </div>
+
+                        </div>
+                        <div class="col-12">
+
+                            <!-- first name -->
+                            <div class="form-group">
+                                <label class="sr-only" for="phoneNumber">
+                                    Phone Number *
+                                </label>
+                                <input class="form-control =" id="phoneNumber" maxlength="15"
+                                       minlength="8" placeholder="Phone Number *" required
+                                       th:field="*{phoneNumber}" type="text">
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-6">
+
+                            <!-- Email -->
+                            <div class="form-group">
+                                <label class="sr-only" for="email">
+                                    Email Address *
+                                </label>
+                                <input class="form-control =" id="email" maxlength="45"
+                                       minlength="2" placeholder="Email Address *" readonly="readonly"
+                                       th:field="*{email}" type="text">
+                            </div>
+
+                        </div>
+
+                        <th:block th:if="${customer.authenticationType.name() == 'DATABASE'}">
+                            <div class="col-12 col-md-6">
+
+                                <!-- Password -->
+                                <div class="form-group">
+                                    <label class="sr-only" for="password">
+                                        Password *
+                                    </label>
+                                    <input class="form-control =" id="password"
+                                           maxlength="15" minlength="6"
+                                           oninput="checkPasswordMatch(document.getElementById('confirmPassword'))"
+                                           placeholder="Password *" th:field="*{password}"
+                                           type="password"/>
+                                </div>
+
+                            </div>
+                            <div class="col-12 col-md-6">
+
+                                <!-- Password -->
+                                <div class="form-group">
+                                    <label class="sr-only" for="passwordConfirm">
+                                        Confirm Password *
+                                    </label>
+                                    <input class="form-control =" id="passwordConfirm"
+                                           maxlength="15" minlength="6" oninput="checkPasswordMatch(this)"
+                                           placeholder="Confrm Password *"
+                                           type="password"/>
+                                </div>
+
+                            </div>
+                        </th:block>
+
+
+                        <div class="col-12">
+
+                            <!-- Button -->
+                            <button class="btn btn-sm btn-dark" type="submit">
+                                Update
+                            </button>
+
+                        </div>
+                    </div>
+                </form>
+                <br><br>
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+</div><!-- / .main-content -->
+<div th:replace="fragments/modal_fragment :: modal_dialog"></div>
+<!-- FOOTER -->
+<th:block th:replace="fragments/fragments :: js_code"></th:block>
+
+<script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
+<script th:src="@{/assets/js/customer/customer_form.js}" type="text/javascript"></script>
+<script type="text/javascript">
+    moduleURL = "[[@{/}]]";
+    MAX_FILE_SIZE = 502400; // 500KB
+
+</script>
+
+</body>
+</html>

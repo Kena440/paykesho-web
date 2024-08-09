@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="page_head(title, remove)" th:remove="${remove}">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta content="Portal for access to assessment purposes" name="description"/>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" th:href="@{/assets/favicon/favicon.ico}" type="image/x-icon"/>
+
+    <!-- Libs CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/libs.bundle.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/richTextEditor/richtext.min.css}">
+
+    <!-- Theme CSS -->
+    <link id="stylesheetLight" rel="stylesheet" th:href="@{/assets/css/theme.bundle.css}"/>
+    <link id="stylesheetDark" rel="stylesheet" th:href="@{/assets/css/theme-dark.bundle.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <style>body {
+        display: none;
+    }</style>
+
+    <style>
+        table td {
+            word-break: break-word;
+            vertical-align: top;
+            white-space: normal !important;
+        }
+
+    </style>
+    <!-- Title -->
+    <title>CHAZ Defaulter Tracer | [[${title}]]</title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156446909-1"></script>
+    <script>window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag("js", new Date());
+    gtag("config", "UA-156446909-1");</script>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet'/>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+          rel="stylesheet"
+          type="text/css">
+</head>
+
+<body>
+
+<nav class="navbar navbar-vertical fixed-start navbar-expand-md " id="sidebar" th:fragment="side_bar">
+    <div class="container-fluid">
+
+        <!-- Toggler -->
+        <button aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
+                data-bs-target="#sidebarCollapse" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Brand -->
+        <a class="navbar-brand" th:href="@{/}">
+            <img alt="..." class="navbar-brand-img mx-auto" th:src="@{/assets/img/logo.svg}">
+        </a>
+
+        <!-- Collapse -->
+        <div class="collapse navbar-collapse" id="sidebarCollapse">
+
+            <!-- Form -->
+            <form class="mt-4 mb-3 d-md-none">
+                <div class="input-group input-group-rounded input-group-merge input-group-reverse">
+                    <input aria-label="Search" class="form-control" placeholder="Search" type="search">
+                    <div class="input-group-text">
+                        <span class="fe fe-search"></span>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Navigation -->
+            <ul class="navbar-nav">
+
+                <li class="nav-item">
+                    <a class="nav-link " th:href="@{/}">
+                        <i class="fe fe-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a aria-controls="sidebarAssessmentMgt" aria-expanded="false" class="nav-link"
+                       data-bs-toggle="collapse"
+                       href="#sidebarAssessmentMgt" role="button">
+                        <i class="fe fe-folder"></i> Assessment Mgt
+                    </a>
+                    <div class="collapse" id="sidebarAssessmentMgt">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/assessments}">
+                                    All Assessments
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a aria-controls="sidebarEventsMgt" aria-expanded="false" class="nav-link" data-bs-toggle="collapse"
+                       href="#sidebarEventsMgt" role="button">
+                        <i class="fe fe-calendar"></i> Events
+                    </a>
+                    <div class="collapse" id="sidebarEventsMgt">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/events}">
+                                    All Events
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <hr class="navbar-divider my-3">
+                <li class="nav-item">
+                    <a class="nav-link " th:href="@{/active-sessions}">
+                        <i class="fe fe-radio"></i> Active Sessions
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Push content down -->
+            <div class="mt-auto"></div>
+
+            <!-- Customize -->
+            <!--  <div class="mb-4" id="popoverDemo" title="Edit Layout"
+                   data-bs-content="Switch to Dark Mode or adjust the navigation layout, icons, and colors!">
+                  <a class="btn w-100 btn-primary" data-bs-toggle="offcanvas" href="#offcanvasDemo"
+                     aria-controls="offcanvasDemo">
+                      <i class="fe fe-sliders me-2"></i> Customize
+                  </a>
+              </div>-->
+
+            <!-- User (md) -->
+            <div class="navbar-user d-none d-md-flex" id="sidebarUser">
+
+                <!-- Icon -->
+                <a aria-controls="sidebarOffcanvasActivity" class="navbar-user-link" data-bs-toggle="offcanvas"
+                   href="#sidebarOffcanvasActivity">
+                <span class="icon">
+                  <i class="fe fe-bell"></i>
+                </span>
+                </a>
+
+                <!-- Dropup -->
+                <div class="dropup">
+
+                    <!-- Toggle -->
+                    <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-bs-toggle="dropdown"
+                       href="#"
+                       id="sidebarIconCopy" role="button">
+                        <div class="avatar avatar-sm avatar-online">
+                            <img alt="..." class="avatar-img rounded-circle"
+                                 th:src="@{/images/default_user_image.jpg}">
+                        </div>
+                    </a>
+
+                    <!-- Menu -->
+                    <div aria-labelledby="sidebarIconCopy" class="dropdown-menu">
+                        <a class="dropdown-item my-account" id="accountLink4" th:href="@{/account}">Profile</a>
+                        <hr class="dropdown-divider"/>
+                        <a class="dropdown-item" id="logoutLink4">Logout</a>
+                        <form method="post" name="logoutForm4" th:action="@{/logout}" th:hidden="true">
+                            <input type="submit">
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- Icon -->
+                <a aria-controls="sidebarOffcanvasSearch" class="navbar-user-link" data-bs-toggle="offcanvas"
+                   href="#sidebarOffcanvasSearch">
+                <span class="icon">
+                  <i class="fe fe-search"></i>
+                </span>
+                </a>
+
+            </div>
+
+        </div> <!-- / .navbar-collapse -->
+
+    </div>
+</nav>
+<nav class="navbar navbar-vertical navbar-vertical-sm fixed-start navbar-expand-md " id="sidebarSmall"
+     th:fragment="side_bar_small">
+    <div class="container-fluid">
+
+        <!-- Toggler -->
+        <button aria-controls="sidebarSmallCollapse" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
+                data-bs-target="#sidebarSmallCollapse" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Brand -->
+        <a class="navbar-brand" th:href="@{/}">
+            <img alt="..." class="navbar-brand-img mx-auto" th:src="@{/assets/img/logo.svg}">
+        </a>
+
+        <!-- User (xs) -->
+        <div class="navbar-user d-md-none">
+
+            <!-- Dropdown -->
+            <div class="dropdown">
+
+                <!-- Toggle -->
+                <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                   id="sidebarSmallIcon" role="button">
+                    <div class="avatar avatar-sm avatar-online">
+                        <img alt="..." class="avatar-img rounded-circle"
+                             th:src="@{/images/default_user_image.jpg}">
+                    </div>
+                </a>
+
+                <!-- Menu -->
+                <div aria-labelledby="sidebarSmallIcon" class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item my-account" id="accountLink2" th:href="@{/account}">Profile</a>
+                    <a class="dropdown-item" th:href="@{/settings}">Settings</a>
+                    <hr class="dropdown-divider"/>
+                    <a class="dropdown-item" id="logoutLink2">Logout</a>
+                    <form method="post" name="logoutForm2" th:action="@{/logout}" th:hidden="true">
+                        <input type="submit">
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Collapse -->
+        <div class="collapse navbar-collapse" id="sidebarSmallCollapse">
+
+            <!-- Form -->
+            <form class="mt-4 mb-3 d-md-none">
+                <div class="input-group input-group-rounded input-group-merge input-group-reverse">
+                    <input aria-label="Search" class="form-control" placeholder="Search" type="search">
+                    <div class="input-group-text">
+                        <span class="fe fe-search"></span>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <hr class="navbar-divider d-none d-md-block mt-0 mb-3">
+
+            <!-- Navigation -->
+            <ul class="navbar-nav">
+                <li class="nav-item dropend">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle "
+                       data-bs-toggle="dropdown"
+                       href="#" id="sidebarSmallBasics" role="button" title="Basics">
+                        <i class="fe fe-clipboard"></i> <span class="d-md-none">Dashboard</span>
+                    </a>
+                    <ul aria-labelledby="sidebarSmallBasics" class="dropdown-menu">
+                        <li class="dropdown-header d-none d-md-block">
+                            <a class="nav-link" th:href="@{/}">
+                                Dashboard
+                            </a>
+
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropend">
+                    <a aria-expanded="true" aria-haspopup="true" class="nav-link dropdown-toggle active"
+                       data-bs-toggle="dropdown" href="#" id="sidebarSmallDashboards" role="button"
+                       title="Dashboards">
+                        <i class="fe fe-home"></i> <span class="d-md-none">Trips</span>
+                    </a>
+                    <ul aria-labelledby="sidebarSmallDashboards" class="dropdown-menu">
+                        <li class="dropdown-header d-none d-md-block">
+                            <h6 class="text-uppercase mb-0">Trip Management</h6>
+                        </li>
+                        <li>
+                            <a class="dropdown-item active" th:href="@{/trips/trip-history}">
+                                Trips
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item " th:href="@{/trips/request/new}">
+                                Request
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+
+            <!-- Divider -->
+            <hr class="navbar-divider my-3">
+
+            <!-- Navigation -->
+
+
+            <!-- Push content down -->
+            <div class="mt-auto"></div>
+
+            <!-- Customize -->
+            <!--   <div class="mb-4 d-none" data-bs-toggle="tooltip" data-bs-placement="right"
+                    data-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                    title="Customize">
+                   <a class="btn w-100 btn-primary" data-bs-toggle="offcanvas" href="#offcanvasDemo"
+                      aria-controls="offcanvasDemo">
+                       <i class="fe fe-sliders"></i> <span class="d-md-none ms-2">Customize</span>
+                   </a>
+               </div>-->
+
+            <!-- User (md) -->
+            <div class="navbar-user d-none d-md-flex flex-column" id="sidebarSmallUser">
+
+                <!-- Icon -->
+                <a aria-controls="sidebarOffcanvasSearch" class="navbar-user-link mb-3" data-bs-toggle="offcanvas"
+                   href="#sidebarOffcanvasSearch">
+                <span class="icon">
+                  <i class="fe fe-search"></i>
+                </span>
+                </a>
+
+                <!-- Icon -->
+                <a class="navbar-user-link mb-3" data-bs-toggle="offcanvas" href="#sidebarOffcanvasActivity"
+                   ria-controls="sidebarOffcanvasActivity">
+                <span class="icon">
+                  <i class="fe fe-bell"></i>
+                </span>
+                </a>
+
+                <!-- Dropup -->
+                <div class="dropend">
+
+                    <!-- Toggle -->
+                    <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-bs-toggle="dropdown"
+                       href="#" id="sidebarSmallIconCopy" role="button">
+                        <div class="avatar avatar-sm avatar-online">
+                            <img alt="..." class="avatar-img rounded-circle"
+                                 th:src="@{/images/default_user_image.jpg}">
+                        </div>
+                    </a>
+
+                    <!-- Menu -->
+                    <div aria-labelledby="sidebarSmallIconCopy" class="dropdown-menu">
+                        <a class="dropdown-item my-account" id="accountLink3" th:href="@{/account}">Profile</a>
+                        <hr class="dropdown-divider"/>
+                        <a class="dropdown-item" id="logoutLink3">Logout</a>
+                        <form method="post" name="logoutForm3" th:action="@{/logout}" th:hidden="true">
+                            <input type="submit">
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div> <!-- / .navbar-collapse -->
+
+    </div>
+</nav>
+<nav class="navbar navbar-expand-lg " id="topnav" th:fragment="topnav">
+    <div class="container">
+
+        <!-- Toggler -->
+        <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler me-auto"
+                data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Brand -->
+        <a class="navbar-brand me-auto" href="index-2.html">
+            <img alt="..." class="navbar-brand-img" th:src="@{/assets/img/logo.svg}">
+        </a>
+
+        <!-- Form -->
+        <form class="form-inline me-4 d-none d-lg-flex">
+            <div class="input-group input-group-rounded input-group-merge input-group-reverse"
+                 data-list='{"valueNames": ["name"]}'>
+
+                <!-- Input -->
+                <input aria-label="Search" class="form-control dropdown-toggle list-search" data-bs-toggle="dropdown"
+                       placeholder="Search" type="search">
+
+                <!-- Icon -->
+                <div class="input-group-text">
+                    <i class="fe fe-search"></i>
+                </div>
+
+                <!-- Menu -->
+                <div class="dropdown-menu dropdown-menu-card">
+                    <div class="card-body">
+
+                    </div>
+                </div> <!-- / .dropdown-menu -->
+
+            </div>
+        </form>
+
+        <!-- User -->
+        <div class="navbar-user">
+
+            <!-- Dropdown -->
+            <div class="dropdown me-4 d-none d-lg-flex">
+
+                <!-- Toggle -->
+                <a aria-expanded="false" aria-haspopup="true" class="navbar-user-link" data-bs-toggle="dropdown"
+                   href="#"
+                   role="button">
+              <span class="icon active">
+                <i class="fe fe-bell"></i>
+              </span>
+                </a>
+
+                <!-- Menu -->
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-card">
+                    <div class="card-header">
+
+                        <!-- Title -->
+                        <h5 class="card-header-title">
+                            Notifications
+                        </h5>
+
+                        <!-- Link -->
+                        <a class="small" href="#!">
+                            View all
+                        </a>
+
+                    </div> <!-- / .card-header -->
+                    <div class="card-body">
+
+                        <!-- List group -->
+                        <div class="list-group list-group-flush list-group-activity my-n3">
+                            <a class="list-group-item text-reset" href="#!">
+                                <div class="row">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar avatar-sm">
+                                            <img alt="..." class="avatar-img rounded-circle"
+                                                 th:src="@{/images/default_user_image.jpg}">
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Content -->
+                                        <div class="small">
+                                            <strong>Test</strong>
+                                        </div>
+
+                                        <!-- Time -->
+                                        <small class="text-muted">
+                                            2m ago
+                                        </small>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div> <!-- / .dropdown-menu -->
+
+            </div>
+
+            <!-- Dropdown -->
+            <div class="dropdown">
+
+                <!-- Toggle -->
+                <a aria-expanded="false" aria-haspopup="true" class="avatar avatar-sm avatar-online dropdown-toggle"
+                   data-bs-toggle="dropdown" href="#" role="button">
+                    <img alt="..." class="avatar-img rounded-circle"
+                         th:src="@{/images/default_user_image.jpg}">
+                </a>
+
+                <!-- Menu -->
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item my-account" id="accountLink1" th:href="@{/account}">Profile</a>
+                    <a class="dropdown-item" th:href="@{/settings}">Settings</a>
+                    <hr class="dropdown-divider"/>
+                    <a class="dropdown-item" id="logoutLink1">Logout</a>
+                    <form method="post" name="logoutForm1" th:action="@{/logout}" th:hidden="true">
+                        <input type="submit">
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Collapse -->
+        <div class="collapse navbar-collapse me-lg-auto order-lg-first" id="navbar">
+
+            <!-- Form -->
+            <form class="mt-4 mb-3 d-md-none">
+                <input aria-label="Search" class="form-control form-control-rounded" placeholder="Search" type="search">
+            </form>
+
+            <!-- Navigation -->
+            <ul class="navbar-nav me-lg-auto">
+                <li class="nav-item dropdown">
+                    <a aria-expanded="true" aria-haspopup="true" class="nav-link dropdown-toggle active"
+                       data-bs-toggle="dropdown"
+                       href="#" id="topnavDashboards" role="button">
+                        Dashboard
+                    </a>
+                    <ul aria-labelledby="topnavDashboards" class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" th:href="@{/}">
+                                Dashboard
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle "
+                       data-bs-auto-close="outside"
+                       data-bs-toggle="dropdown" href="#" id="topnavPages"
+                       role="button">
+                        Trips
+                    </a>
+                    <ul aria-labelledby="topnavPages" class="dropdown-menu">
+                        <li class="dropend">
+                            <a aria-expanded="false" aria-haspopup="true" class="dropdown-item dropdown-toggle "
+                               data-bs-toggle="dropdown"
+                               href="#" id="topnavAccount" role="button">
+                                Trip Management
+                            </a>
+                            <div aria-labelledby="topnavAccount" class="dropdown-menu">
+                                <a class="dropdown-item active" th:href="@{/trips/trip-history}">
+                                    Trips
+                                </a>
+                                <a class="dropdown-item " th:href="@{/trips/request/new}">
+                                    Request
+                                </a>
+
+                            </div>
+                        </li>
+
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a aria-controls="offcanvasDemo" class="nav-link" data-bs-toggle="offcanvas" href="#offcanvasDemo">
+                        Customize
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+
+    </div> <!-- / .container -->
+</nav>
+
+<nav class="navbar navbar-expand-md navbar-light d-none d-md-flex" id="topbar" th:fragment="topbar">
+    <div class="container-fluid">
+
+        <!-- Form -->
+        <form class="form-inline me-4 d-none d-md-flex">
+            <div class="input-group input-group-flush input-group-merge input-group-reverse"
+                 data-list='{"valueNames": ["name"]}'>
+
+                <!-- Input -->
+                <input aria-label="Search" class="form-control dropdown-toggle list-search" data-bs-toggle="dropdown"
+                       placeholder="Search" type="search"/>
+
+                <!-- Prepend -->
+                <div class="input-group-text">
+                    <i class="fe fe-search"></i>
+                </div>
+
+                <!-- Menu -->
+                <div class="dropdown-menu dropdown-menu-card">
+                    <div class="card-body">
+
+                        <!-- List group -->
+                        <div class="list-group list-group-flush list-group-focus list my-n3">
+                            <a class="list-group-item" href="team-overview.html">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar">
+                                            <img alt="..." class="avatar-img rounded"
+                                                 th:src="@{/assets/img/avatars/teams/team-logo-1.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Title -->
+                                        <h4 class="text-body text-focus mb-1 name">
+                                            Airbnb
+                                        </h4>
+
+                                        <!-- Time -->
+                                        <p class="small text-muted mb-0">
+                                            <span class="fe fe-clock"></span>
+                                            <time datetime="2018-05-24">Updated 2hr ago</time>
+                                        </p>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+                            <a class="list-group-item" href="team-overview.html">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar">
+                                            <img alt="..." class="avatar-img rounded"
+                                                 th:src="@{/assets/img/avatars/teams/team-logo-2.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Title -->
+                                        <h4 class="text-body text-focus mb-1 name">
+                                            Medium Corporation
+                                        </h4>
+
+                                        <!-- Time -->
+                                        <p class="small text-muted mb-0">
+                                            <span class="fe fe-clock"></span>
+                                            <time datetime="2018-05-24">Updated 2hr ago</time>
+                                        </p>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+                            <a class="list-group-item" href="project-overview.html">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar avatar-4by3">
+                                            <img alt="..." class="avatar-img rounded"
+                                                 th:src="@{/assets/img/avatars/projects/project-1.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Title -->
+                                        <h4 class="text-body text-focus mb-1 name">
+                                            Homepage Redesign
+                                        </h4>
+
+                                        <!-- Time -->
+                                        <p class="small text-muted mb-0">
+                                            <span class="fe fe-clock"></span>
+                                            <time datetime="2018-05-24">Updated 4hr ago</time>
+                                        </p>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+                            <a class="list-group-item" href="project-overview.html">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar avatar-4by3">
+                                            <img alt="..." class="avatar-img rounded"
+                                                 th:src="@{/assets/img/avatars/projects/project-2.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Title -->
+                                        <h4 class="text-body text-focus mb-1 name">
+                                            Travels & Time
+                                        </h4>
+
+                                        <!-- Time -->
+                                        <p class="small text-muted mb-0">
+                                            <span class="fe fe-clock"></span>
+                                            <time datetime="2018-05-24">Updated 4hr ago</time>
+                                        </p>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+                            <a class="list-group-item" href="project-overview.html">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar avatar-4by3">
+                                            <img alt="..." class="avatar-img rounded"
+                                                 th:src="@{/assets/img/avatars/projects/project-3.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Title -->
+                                        <h4 class="text-body text-focus mb-1 name">
+                                            Safari Exploration
+                                        </h4>
+
+                                        <!-- Time -->
+                                        <p class="small text-muted mb-0">
+                                            <span class="fe fe-clock"></span>
+                                            <time datetime="2018-05-24">Updated 4hr ago</time>
+                                        </p>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+                            <a class="list-group-item" href="profile-posts.html">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar">
+                                            <img alt="..." class="avatar-img rounded-circle"
+                                                 th:src="@{/images/default_user_image.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Title -->
+                                        <h4 class="text-body text-focus mb-1 name">
+                                            Dianna Smiley
+                                        </h4>
+
+                                        <!-- Status -->
+                                        <p class="text-body small mb-0"><span class="text-success">●</span> Online
+                                        </p>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+                            <a class="list-group-item" href="profile-posts.html">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar">
+                                            <img alt="..." class="avatar-img rounded-circle"
+                                                 th:src="@{/assets/img/avatars/profiles/avatar-2.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Title -->
+                                        <h4 class="text-body text-focus mb-1 name">
+                                            Ab Hadley
+                                        </h4>
+
+                                        <!-- Status -->
+                                        <p class="text-body small mb-0"><span class="text-danger">●</span> Offline
+                                        </p>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+                        </div>
+                    </div>
+                </div> <!-- / .dropdown-menu -->
+
+            </div>
+        </form>
+
+        <!-- User -->
+        <div class="navbar-user">
+
+            <!-- Dropdown -->
+            <div class="dropdown me-4 d-none d-md-flex">
+                <th:block sec:authorize="isAuthenticated()">
+                    <a class="navbar-user-link mr-2" sec:authentication="principal.username" th:href="@{/account}"></a>
+                </th:block>
+                <br>
+                <!-- Toggle -->
+                <a aria-expanded="false" aria-haspopup="true" class="navbar-user-link" data-bs-toggle="dropdown"
+                   href="#"
+                   role="button">
+          <span class="icon active">
+            <i class="fe fe-bell"></i>
+          </span>
+                </a>
+
+                <!-- Menu -->
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-card">
+                    <div class="card-header">
+
+                        <!-- Title -->
+                        <h5 class="card-header-title">
+                            Notifications
+                        </h5>
+
+                        <!-- Link -->
+                        <a class="small" href="#!">
+                            View all
+                        </a>
+
+                    </div> <!-- / .card-header -->
+                    <div class="card-body">
+
+                        <!-- List group -->
+                        <div class="list-group list-group-flush list-group-activity my-n3">
+                            <a class="list-group-item text-reset" href="#!">
+                                <div class="row">
+                                    <div class="col-auto">
+
+                                        <!-- Avatar -->
+                                        <div class="avatar avatar-sm">
+                                            <img alt="..." class="avatar-img rounded-circle"
+                                                 th:src="@{/images/default_user_image.jpg}"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="col ms-n2">
+
+                                        <!-- Content -->
+                                        <div class="small">
+                                            <strong>Ganizani</strong> test announcement
+                                        </div>
+
+                                        <!-- Time -->
+                                        <small class="text-muted">
+                                            2m ago
+                                        </small>
+
+                                    </div>
+                                </div> <!-- / .row -->
+                            </a>
+
+                        </div>
+                    </div>
+                </div> <!-- / .dropdown-menu -->            </div>
+
+            <!-- Dropdown -->
+            <div class="dropdown">
+
+                <!-- Toggle -->
+                <a aria-expanded="false" aria-haspopup="true" class="avatar avatar-sm avatar-online dropdown-toggle"
+                   data-bs-toggle="dropdown" href="#" role="button">
+                    <img alt="..." class="avatar-img rounded-circle"
+                         th:src="@{/images/default_user_image.jpg}"/>
+                </a>
+
+                <!-- Menu -->
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item my-account" id="accountLink" th:href="@{/account}">Profile</a>
+                    <a class="dropdown-item" th:href="@{/settings}">Settings</a>
+                    <hr class="dropdown-divider"/>
+                    <a class="dropdown-item" id="logoutLink">Logout</a>
+                    <form method="post" name="logoutForm" th:action="@{/logout}" th:hidden="true">
+                        <input type="submit">
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</nav>
+
+<th th:fragment="column_Link(fieldName, columnLabel, removeTag)" th:remove="${removeTag}">
+    <a class="list-sort text-muted"
+       th:href="@{${moduleURL}+'/page/'+ ${currentPage} + '?sortField=' + ${fieldName}  +'&sortDir=' + ${sortField != fieldName ? sortDir : reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+        [[${columnLabel}]]
+    </a>
+    <span th:class="${sortDir == 'asc' ? 'fe fe-chevron-up' : 'fe fe-chevron-down'}"
+          th:if="${sortField == fieldName}"></span>
+</th>
+
+<a class="page-link"
+   th:fragment="page_link(pageNum, label)"
+   th:href="@{${moduleURL} + '/page/' + ${pageNum} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''} }">[[${label}]]
+</a>
+
+<a class="page-link"
+   th:fragment="page_link_caret(pageNum,label)"
+   th:href="@{${moduleURL} +'/page/' + ${pageNum} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''} }">
+    <i th:class="${label == 'Previous' ? 'fe fe-arrow-left me-1' : 'fe fe-arrow-right ms-1' }"></i>
+</a>
+
+<div th:fragment="edit(entityName, editURL)" th:remove="tag">
+    <a class="fe fe-edit"
+       th:href="@{${editURL}}"
+       th:title="'Edit ' + ${entityName}">
+    </a>
+</div>
+
+<div th:fragment="delete(entityId, entityName, deleteURL, visible)" th:remove="tag">
+    <th:block th:if="${visible}">
+        <a class="fe fe-trash-2 link-delete"
+           th:entityId="${entityId}"
+           th:href="@{${deleteURL}}"
+           th:title="'Delete this' + ${entityName}"></a>
+    </th:block>
+</div>
+
+<div th:fragment="pagnation(entityName)" th:remove="tag">
+    <div th:if="${totalItems > 0}">
+        <span class="mb-3 mb-md-0 font-size-xxs text-muted text-center ">Listing [[${entityName}]] # [[${startCount}]] to [[${endCount}]] of [[${totalItems}]] </span>
+    </div>
+    <div>
+        <div class="row alert alert-danger text-center" th:unless="${totalItems > 0}">
+            No [[${entityName}]] Found. Contact Admin 😢
+        </div>
+    </div>
+    <div th:if="${totalItems > 0}">
+        <!-- Pagination -->
+        <nav class="d-flex justify-content-center justify-content-md-end">
+            <ul class="pagination pagination-sm text-gray-400 flex-wrap">
+                <li class="page-item" th:classappend="${currentPage} == 1 ? 'disabled' : ''">
+                    <a class="page-link ps-0 pe-4 border-end"
+                       th:replace="fragments/fragments :: page_link_caret(${previousPage}, 'Previous')">
+                        <i class="fe fe-arrow-left me-1"></i>
+                    </a>
+                </li>
+                <li class="page-item"
+                    th:classappend="${currentPage} == ${i} ? 'active' : ''"
+                    th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a class="page-link"
+                       th:replace="fragments/fragments :: page_link(${i}, ${i})"></a>
+                </li>
+                <li class="page-item"
+                    th:classappend="${currentPage} == ${totalPages} ? 'disabled' : ''">
+                    <a class="page-link ps-4 pe-0 border-start"
+                       th:replace="fragments/fragments :: page_link_caret(${nextPage}, 'Next')">
+                        <i class="fe fe-arrow-right ms-1"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div th:fragment="format_time(dateTime)" th:remove="tag">
+    <span th:text="${#dates.format(dateTime, 'dd-MM-yyyy HH:mm:ss')}"></span>
+</div>
+
+<div th:fragment="format_date(dateTime)" th:remove="tag">
+    <span th:text="${#dates.format(dateTime, 'dd-MM-yyyy')}"></span>
+</div>
+
+<div th:fragment="format_currency(amount)" th:remove="tag">
+    <span th:if="${CURRENCY_SYMBOL_POSITION == 'before price'}" th:remove="tag">[[${CURRENCY_SYMBOL}]]</span>
+    [[${#numbers.formatDecimal(amount, 1, THOUSAND_POINT_TYPE, DECIMAL_DIGITS, DECIMAL_POINT_TYPE)}]]
+    <span th:if="${CURRENCY_SYMBOL_POSITION == 'after price'}" th:remove="tag">[[${CURRENCY_SYMBOL}]]</span>
+</div>
+
+<div th:fragment="format_number(amount)" th:remove="tag">
+    [[${#numbers.formatDecimal(amount, 1, THOUSAND_POINT_TYPE, 0, DECIMAL_POINT_TYPE)}]]
+</div>
+
+<div th:fragment="currency_input(amount)" th:remove="tag">
+    <input class="form-control" readonly
+           th:value="${(CURRENCY_SYMBOL_POSITION == 'before price' ? CURRENCY_SYMBOL : '') + #numbers.formatDecimal(amount, 1, THOUSANDS_POINT_TYPE, DECIMAL_DIGITS, DECIMAL_POINT_TYPE) + (CURRENCY_SYMBOL_POSITION == 'after price' ? CURRENCY_SYMBOL : '')}"
+           type="text">
+</div>
+
+<div class="col" th:fragment="search_form()">
+
+    <!-- Form -->
+    <form th:action="@{${moduleURL} + '/page/1'}">
+        <div class="input-group input-group-flush input-group-merge input-group-reverse">
+            <input name="sortField" th:value="${sortField}" type="hidden">
+            <input name="sortDir" th:value="${sortDir}" type="hidden">
+            <input class="form-control list-search" name="keyword" placeholder="Search"
+                   th:value="${keyword}" type="search">
+            <span class="input-group-text">
+                <button class="btn btn-outline-border btn-xxs" type="submit">
+                    <i class="fe fe-search"></i>
+                </button>
+            </span>
+        </div>
+    </form>
+
+</div>
+
+<th:block th:fragment="js_code">
+    <!-- JAVASCRIPT -->
+    <!-- Vendor JS -->
+    <script th:src="@{/assets/js/vendor.bundle.js}"></script>
+
+    <!-- Theme JS -->
+    <script th:src="@{/assets/js/theme.bundle.js}"></script>
+    <script th:src="@{/assets/libs/jquery/dist/jquery.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/richTextEditor/jquery.richtext.min.js}"></script>
+    <script th:src="@{/assets/js/pdf/html2canvas.min.js}"></script>
+    <script th:src="@{/assets/js/pdf/jqueryhtml2canvas.js}"></script>
+    <script th:src="@{/assets/js/pdf/jspdf.debug.js}"></script>
+    <script th:src="@{/assets/js/common.js}" type="text/javascript"></script>
+    <script th:src="@{/assets/js/jquery.number.min.js}" type="text/javascript"></script>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="divLoanItemDetails" th:fragment="content">
+    <th:block th:each="detail, status : ${igaLoan.igaLoanRepaymentItems}">
+        <div class="row" th:id="'divDetail' + ${status.index}">
+            <input name="detailIDs" th:value="${detail.id}" type="hidden">
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Period
+                    </label>
+                    <input class="form-control" name="period" th:value="${detail.period}"
+                           type="date">
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Principal Paid
+                    </label>
+                    <input class="form-control" name="principalPaid" th:value="${detail.principalPaid}"
+                           type="number">
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Interest Paid
+                    </label>
+                    <input class="form-control" name="interestPaid" th:value="${detail.interestPaid}"
+                           type="number">
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group">
+                    <label class="form-label">
+                        Action
+                    </label>
+                    <br>
+                    <button class="btn fe fe-delete fa-3x icon-dark float-right"
+                            name="linkRemoveDetail"
+                            title="Remove this detail"
+                            type="button">
+                        Remove
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        <hr>
+    </th:block>
+
+    <div class="row" th:id="'divDetail' + ${#lists.size(igaLoan.igaLoanRepaymentItems)}">
+        <input name="detailIDs" type="hidden" value="0">
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label class="form-label">
+                    Period
+                </label>
+                <input class="form-control" name="period" type="date">
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label class="form-label">
+                    Principal Paid
+                </label>
+                <input class="form-control" name="principalPaid" type="number">
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label class="form-label">
+                    Interest Paid
+                </label>
+                <input class="form-control" name="interestPaid" type="number">
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
