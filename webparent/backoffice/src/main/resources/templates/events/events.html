@@ -159,43 +159,44 @@
                                     </tr>
                                     </thead>
                                     <tbody class="list fs-base">
-                                    <tr th:each="event, eventStat : ${eventList}">
+                                    <tr th:each="announcement, eventStat : ${eventList}">
                                         <td class="hideable-column">[[${eventStat.count}]]</td>
                                         <td class="avatar avatar-xxl">
-                                            <span class="fas fa-portrait fa-3x" th:if="${event.photos == null}"></span>
+                                            <span class="fas fa-portrait fa-3x"
+                                                  th:if="${announcement.photos == null}"></span>
                                             <img alt=""
                                                  class="avatar-img rounded img-fluid"
-                                                 th:if="${event.photos != null}"
-                                                 th:src="@{${event.photosImagePath}}">
+                                                 th:if="${announcement.photos != null}"
+                                                 th:src="@{${announcement.photosImagePath}}">
                                         </td>
                                         <td class="hideable-column">
-                                            <a th:href="@{'/events/view/'+${event.id}}"
+                                            <a th:href="@{'/events/view/'+${announcement.id}}"
                                                title="Event View">
-                                                [[${event.name}]]
+                                                [[${announcement.name}]]
                                             </a>
                                         </td>
-                                        <td>[[${event.details}]]</td>
+                                        <td>[[${announcement.details}]]</td>
                                         <td>
                                             <time datetime="2018-04-23"
-                                                  th:replace="fragments/fragments :: format_date(${event.eventDate})"></time>
+                                                  th:replace="fragments/fragments :: format_date(${announcement.eventDate})"></time>
                                         </td>
-                                        <td>[[${event.eventDays}]]</td>
+                                        <td>[[${announcement.eventDays}]]</td>
                                         <td>
                                             <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                                <div th:replace="fragments/fragments :: status(${event.enabled}, 'event', '/events/' + ${event.id})"></div>
+                                                <div th:replace="fragments/fragments :: status(${announcement.enabled}, 'announcement', '/events/' + ${announcement.id})"></div>
                                             </th:block>
                                         </td>
                                         <td>
                                             <a class="fe fe-file"
-                                               th:href="@{'/events/view/'+${event.id}}"
+                                               th:href="@{'/events/view/'+${announcement.id}}"
                                                title="Event View">
                                                 View
                                             </a>
                                             &nbsp;
                                             <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                                <div th:replace="fragments/fragments :: edit('event', '/events/edit/' + ${event.id})"></div>
+                                                <div th:replace="fragments/fragments :: edit('announcement', '/events/edit/' + ${announcement.id})"></div>
                                                 &nbsp;
-                                                <div th:replace="fragments/fragments :: delete(${event.id}, 'event', '/events/delete/' + ${event.id}, true)"></div>
+                                                <div th:replace="fragments/fragments :: delete(${announcement.id}, 'announcement', '/events/delete/' + ${announcement.id}, true)"></div>
                                             </th:block>
                                         </td>
                                     </tr>
@@ -225,7 +226,7 @@
     $(document).ready(function () {
         $(".link-delete").on("click", function (e) {
             e.preventDefault();
-            showDeleteConfirmModal($(this), 'event');
+            showDeleteConfirmModal($(this), 'announcement');
         });
     });
 </script>

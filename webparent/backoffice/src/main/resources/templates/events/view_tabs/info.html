@@ -8,8 +8,8 @@
 
             <!-- Title -->
             <h2 class="mb-2">
-                <a th:href="@{'/events/view/'+${event.id}}">
-                    [[${event.name}]]
+                <a th:href="@{'/events/view/'+${announcement.id}}">
+                    [[${announcement.name}]]
                 </a>
             </h2>
         </div>
@@ -25,10 +25,10 @@
 
             <!-- Text -->
             <p class="text-muted mb-4">
-                <strong class="text-body">[[${event.name}]]</strong>
+                <strong class="text-body">[[${announcement.name}]]</strong>
             </p>
 
-            <th:block th:if="${event.requiresResponse == true}">
+            <th:block th:if="${announcement.requiresResponse == true}">
                 <a class="fe fe-link" th:href="@{${eventLink}}"
                    title="Go to link">
                     [[${eventLink}]]
@@ -49,16 +49,16 @@
 
             <!-- Text -->
             <p class="text-muted mb-4">
-                <strong class="text-body">[[${event.details}]]</strong>
+                <strong class="text-body">[[${announcement.details}]]</strong>
             </p>
             <!-- Text -->
             <p class="mb-4">
                 <time datetime="2018-04-23"
-                      th:replace="fragments/fragments :: format_date(${event.eventDate})"></time>
+                      th:replace="fragments/fragments :: format_date(${announcement.eventDate})"></time>
             </p>
 
             <p>
-                <strong class="text-body">[[${event.eventDays}]] Day(s)</strong>
+                <strong class="text-body">[[${announcement.eventDays}]] Day(s)</strong>
             </p>
 
 

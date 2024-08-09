@@ -66,7 +66,7 @@
 
                                 <!-- Title -->
                                 <h6 class="text-uppercase text-muted mb-2">
-                                    Facility
+                                    Organization
                                 </h6>
 
                                 <!-- Heading -->
@@ -111,17 +111,17 @@
                                     </tr>
                                     </thead>
                                     <tbody class="list">
-                                    <tr th:each="event, eventStat : ${upcomingEvents}">
+                                    <tr th:each="announcement, eventStat : ${upcomingEvents}">
                                         <th class="tables-row" scope="row">[[${eventStat.count}]]</th>
                                         <td class="tables-first">
-                                            <a th:href="@{'/events/view/'+${event.id}}"
+                                            <a th:href="@{'/events/view/'+${announcement.id}}"
                                                title="Event View">
-                                                [[${event.name}]]
+                                                [[${announcement.name}]]
                                             </a>
                                         </td>
                                         <td class="tables-last">
                                             <time datetime="2018-04-23"
-                                                  th:replace="fragments/fragments :: format_date(${event.eventDate})"></time>
+                                                  th:replace="fragments/fragments :: format_date(${announcement.eventDate})"></time>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -183,7 +183,7 @@
 
                         <!-- Title -->
                         <h4 class="card-header-title">
-                            Facility Types
+                            Organization Types
                         </h4>
 
 
@@ -201,7 +201,7 @@
 
                         <!-- Title -->
                         <h4 class="card-header-title">
-                            Facility Map
+                            Organization Map
                         </h4>
 
 
@@ -231,8 +231,8 @@
 
     $(document).ready(function () {
 
-        const facilityTypesDataRequestUrl = contextPath + "facilities/rest/get-facility-types-data/true";
-        const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-facility-gps-data/true";
+        const facilityTypesDataRequestUrl = contextPath + "facilities/rest/get-organization-types-data/true";
+        const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-organization-gps-data/true";
 
         $.get(facilityTypesDataRequestUrl, function (responseJSON) {
             $.each(responseJSON, function (index, reportItem) {
@@ -240,7 +240,7 @@
                 facilityTypesData.push(reportItem.itemCount);
             });
 
-            generateFacilityTypeChart();
+            generateOrganizationTypeChart();
         });
 
         $.get(facilityGPSDataRequestUrl, function (responseJSON) {
@@ -263,12 +263,12 @@
                 facilityGPSMapFeatures.push(element);
             })
 
-            generateFacilityGPSMap();
+            generateOrganizationGPSMap();
         });
 
     });
 
-    function generateFacilityTypeChart() {
+    function generateOrganizationTypeChart() {
         var barColors = [
             "#b91d47",
             "#00aba9",
@@ -294,7 +294,7 @@
         });
     }
 
-    function generateFacilityGPSMap() {
+    function generateOrganizationGPSMap() {
         mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
         var map = new mapboxgl.Map({
             container: 'map',

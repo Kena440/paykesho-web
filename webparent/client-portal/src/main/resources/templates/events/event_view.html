@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dashkit.goodthemes.co/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:04:22 GMT -->
+<!-- Added by HTTrack -->
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
+<head th:replace="fragments/fragments :: page_head('Events','none')"></head>
+
+<body>
+
+
+<!-- NAVIGATION -->
+<nav th:replace="fragments/fragments :: side_bar"></nav>
+<nav th:replace="fragments/fragments :: side_bar_small"></nav>
+<nav th:replace="fragments/fragments :: topnav"></nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <nav th:replace="fragments/fragments :: topbar"></nav>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 ">
+
+                <!-- Header -->
+                <div class="header mt-md-5">
+                    <div class="header-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+
+                                <!-- Pretitle -->
+                                <h6 class="header-pretitle">
+                                    Events
+                                </h6>
+
+                            </div>
+                            <div class="col-auto">
+
+
+                            </div>
+                        </div> <!-- / .row -->
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="card card-body p-5">
+                    <div class="row">
+                        <div class="col text-end">
+
+                            <!-- Badge -->
+
+
+                            <th:block th:if="${announcement.enabled == true}">
+                                <div class="badge bg-success">
+                                    Enabled
+                                </div>
+                            </th:block>
+                            <th:block th:if="${announcement.enabled == false}">
+                                <div class="badge bg-danger">
+                                    Not enabled
+                                </div>
+                            </th:block>
+                        </div>
+                    </div> <!-- / .row -->
+                    <div class="row">
+                        <div class="col text-center">
+
+                            <!-- Title -->
+                            <h2 class="mb-2">
+                                <a th:href="@{'/events/view/'+${announcement.id}}">
+                                    [[${announcement.name}]]
+                                </a>
+                            </h2>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+
+                            <!-- Heading -->
+                            <h6 class="text-uppercase text-muted">
+                                Name
+                            </h6>
+
+                            <!-- Text -->
+                            <p class="text-muted mb-4">
+                                <strong class="text-body">[[${announcement.name}]]</strong>
+                            </p>
+
+                        </div>
+                        <div class="col-12 col-md-4 text-center">
+
+                            <img alt="..." class="img-fluid mb-4" style="max-width: 8.5rem;"
+                                 th:src="@{${qrCodeContent}}">
+
+
+                        </div>
+                        <div class="col-12 col-md-4 text-md-end">
+                            <!-- Heading -->
+                            <h6 class="text-uppercase text-muted">
+                                Details
+                            </h6>
+
+                            <!-- Text -->
+                            <p class="text-muted mb-4">
+                                <strong class="text-body">[[${announcement.details}]]</strong>
+                            </p>
+                            <!-- Text -->
+                            <p class="mb-4">
+                                <time datetime="2018-04-23"
+                                      th:replace="fragments/fragments :: format_date(${announcement.eventDate})"></time>
+                            </p>
+
+
+                        </div>
+                    </div>
+                    <hr>
+                    <th:block th:if="${announcement.requiresResponse == true}">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+
+                                <!-- Heading -->
+                                <h6 class="text-uppercase text-muted">
+                                    Registered Attendees ([[${organization}]])
+                                </h6>
+                            </div>
+                            <div class="col-12 col-md-6 text-md-end">
+                                <button class="btn btn-primary" data-bs-target="#exampleModal" data-bs-toggle="modal"
+                                        type="button">
+                                    <span class="fe fe-file-plus"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${attendeeRegistrations.size() > 0}">
+                            <div class="col-12">
+
+                                <!-- Table -->
+                                <div class="table-responsive">
+                                    <table class="table my-4">
+                                        <thead>
+                                        <tr>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Event Reg</span>
+                                            </th>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Name</span>
+                                            </th>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Phone</span>
+                                            </th>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Email</span>
+                                            </th>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Date</span>
+                                            </th>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Accommodation Allocated</span>
+                                            </th>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Accommodation</span>
+                                            </th>
+                                            <th class="px-0 bg-transparent border-top-0">
+                                                <span class="h6">Sharing</span>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="attendee, eventStat : ${attendeeRegistrations}">
+                                            <td class="px-0 text-center">
+                                                <th:block th:if="${attendee.qrCode != null}">
+                                                    <img alt="QR Code" height="50" th:src="${attendee.qrCode}"
+                                                         width="50"/>
+                                                </th:block>
+                                                <th:block th:unless="${attendee.qrCode != null}">
+                                                    <span class="fe fe-loader"></span>
+                                                </th:block>
+                                            </td>
+                                            <td class="px-0">
+                                                [[${attendee.name}]]
+                                            </td>
+                                            <td class="px-0">
+                                                [[${attendee.phoneNumber}]]
+                                            </td>
+                                            <td class="px-0">
+                                                [[${attendee.email}]]
+                                            </td>
+                                            <td class="px-0">
+                                                <time datetime="2018-04-23"
+                                                      th:replace="fragments/fragments :: format_date(${attendee.registrationDate})"></time>
+                                            </td>
+                                            <td class="px-0 text-center">
+                                                <th:block th:if="${attendee.approved == true}">
+                                                    <div class="badge bg-success">
+                                                        Yes
+                                                    </div>
+                                                </th:block>
+                                                <th:block th:if="${attendee.approved == false}">
+                                                    <div class="badge bg-danger">
+                                                        No
+                                                    </div>
+                                                </th:block>
+                                            </td>
+                                            <td class="px-0">
+                                                <th:block th:if="${attendee.eventAccomodationOption != null}">
+                                                    [[${attendee.eventAccomodationOption}]]
+                                                </th:block>
+                                            </td>
+                                            <td class="px-0 text-center">
+                                                <th:block th:if="${attendee.accomodationSharing != null}">
+                                                    <th:block th:if="${attendee.accomodationSharing == true}">
+                                                        <div class="badge bg-success">
+                                                            Yes
+                                                        </div>
+                                                    </th:block>
+                                                    <th:block th:if="${attendee.accomodationSharing == false}">
+                                                        <div class="badge bg-danger">
+                                                            No
+                                                        </div>
+                                                    </th:block>
+                                                </th:block>
+
+                                            </td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+
+                </div>
+
+            </div>
+        </div> <!-- / .row -->
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Attendee Record</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+
+                <form method="post"
+                      th:action="@{/events/save-attendee}">
+                    <input id="eventId" name="eventId" th:value="${announcement.id}"
+                           type="hidden"/>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Name
+                                    </label>
+                                    <input class="form-control" name="attendeeName" required type="text">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Phone Number
+                                    </label>
+                                    <input class="form-control" name="attendeePhoneNumber" required type="text">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Email
+                                    </label>
+                                    <input class="form-control" name="attendeeEmail" required type="email">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Accommodation
+                                    </label>
+                                    <select class="form-select" data-choices id="requiresAccomodation"
+                                            name="requiresAccomodation" required>
+                                        <option value="">Select...</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="accommodationDetails" style="display: none;">
+                                <div class="col-12 col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Preferred Accomodation
+                                        </label>
+                                        <select class="form-select" data-choices name="accomodationOption">
+                                            <option value="">Select...</option>
+                                            <th:block th:each="vh : ${eventAccomodationOptions}">
+                                                <option th:value="${vh.id}">
+                                                    [[${vh}]]
+                                                </option>
+                                            </th:block>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Sharing
+                                        </label>
+                                        <select class="form-select" data-choices id="accomodationSharing"
+                                                name="accomodationSharing">
+                                            <option value="">Select...</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div><!-- / .main-content -->
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script type="text/javascript">
+    contextPath = "[[@{/}]]";
+    const requiresAccommodationSelect = document.getElementById('requiresAccomodation');
+    const accommodationDetailsDiv = document.getElementById('accommodationDetails');
+    const accomodationOptionSelect = document.getElementById('accomodationOption');
+    const accomodationSharingSelect = document.getElementById('accomodationSharing');
+
+
+    requiresAccommodationSelect.addEventListener('change', function () {
+        const selectedValue = requiresAccommodationSelect.value;
+        if (selectedValue === 'true') {
+            accommodationDetailsDiv.style.display = 'block';
+            accomodationOptionSelect.required = true;
+            accomodationSharingSelect.required = true;
+        } else {
+            accommodationDetailsDiv.style.display = 'none';
+            accomodationOptionSelect.required = false;
+            accomodationSharingSelect.required = false;
+        }
+    });
+
+
+</script>
+<script th:src="@{/assets/js/announcement/event_attendee_details.js}" type="text/javascript"></script>
+
+</body>
+
+</html>

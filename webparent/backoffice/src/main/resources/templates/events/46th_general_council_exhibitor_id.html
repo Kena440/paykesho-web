@@ -51,8 +51,8 @@
                         <div class="col-6 text-start">
                             <!-- Badge -->
                             <a class="fe fe-chevron-left"
-                               th:href="@{'/events/view/'+${eventVendorRegistration.event.id}}"
-                               title="Back to event...">
+                               th:href="@{'/events/view/'+${eventVendorRegistration.announcement.id}}"
+                               title="Back to announcement...">
                                 ...Back
                             </a>
                         </div>
@@ -78,8 +78,8 @@
 
                             <!-- Title -->
                             <h2 class="mb-2">
-                                <a th:href="@{'/events/view/'+${eventVendorRegistration.event.id}}">
-                                    [[${eventVendorRegistration.event.name}]]
+                                <a th:href="@{'/events/view/'+${eventVendorRegistration.announcement.id}}">
+                                    [[${eventVendorRegistration.announcement.name}]]
                                 </a>
                             </h2>
                         </div>

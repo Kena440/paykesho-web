@@ -24,8 +24,8 @@
              th:src="@{/assets/img/covers/profile-cover-1.jpg}">
 
         <div class="container-fluid">
-            <input id="longitude" th:value="${facility.longitude}" type="hidden"/>
-            <input id="latitude" th:value="${facility.latitude}" type="hidden"/>
+            <input id="longitude" th:value="${organization.longitude}" type="hidden"/>
+            <input id="latitude" th:value="${organization.latitude}" type="hidden"/>
             <!-- Body -->
             <div class="header-body mt-n5 mt-md-n6">
                 <div class="row align-items-end">
@@ -42,12 +42,12 @@
 
                         <!-- Pretitle -->
                         <h6 class="header-pretitle">
-                            Facility
+                            Organization
                         </h6>
 
                         <!-- Title -->
                         <h1 class="header-title">
-                            [[${facility.name}]]
+                            [[${organization.name}]]
                         </h1>
 
                     </div>
@@ -55,7 +55,7 @@
 
                         <!-- Button -->
                         <a class="btn btn-primary d-block d-md-inline-block lift"
-                           th:href="@{'/facilities/edit/' + ${facility.id}}">
+                           th:href="@{'/facilities/edit/' + ${organization.id}}">
                             Edit
                         </a>
 

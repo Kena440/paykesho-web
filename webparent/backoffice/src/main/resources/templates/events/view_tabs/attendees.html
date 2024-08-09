@@ -17,7 +17,7 @@
                 <span class="fe fe-file-plus"></span>
                 Attendee
             </button>
-            <a class="btn btn-primary" th:href="@{'/events/export/excel/attendees/' + ${event.id}}">
+            <a class="btn btn-primary" th:href="@{'/events/export/excel/attendees/' + ${announcement.id}}">
                 <span class="fe fe-printer"></span>
                 Export
             </a>
@@ -53,7 +53,7 @@
                             <span class="h6">Email</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
-                            <span class="h6">Organization/Facility</span>
+                            <span class="h6">Organization/Organization</span>
                         </th>
                         <th class="px-0 bg-transparent border-top-0 text-center">
                             <span class="h6">District</span>

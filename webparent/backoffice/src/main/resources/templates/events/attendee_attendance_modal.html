@@ -7,11 +7,11 @@
 </div>
 <form method="post"
       th:action="@{/events/attendance/save-attendance}">
-    <input id="eventId" name="eventId" th:value="${eventAttendeeRegistration.event.id}"
+    <input id="eventId" name="eventId" th:value="${eventAttendeeRegistration.announcement.id}"
            type="hidden"/>
     <input id="eventAttendeeId" name="eventAttendeeId" th:value="${eventAttendeeRegistration.id}"
            type="hidden"/>
-    <input id="eventDays" name="eventDays" th:value="${eventAttendeeRegistration.event.eventDays}"
+    <input id="eventDays" name="eventDays" th:value="${eventAttendeeRegistration.announcement.eventDays}"
            type="hidden"/>
     <div class="modal-body">
         <div class="row">
@@ -20,7 +20,7 @@
 
                     <div class="card-body text-center">
                         <h2 class="card-title">
-                            <a th:href="@{'/events/view/' + ${eventAttendeeRegistration.event.id}}">[[${eventAttendeeRegistration.name}]]</a>
+                            <a th:href="@{'/events/view/' + ${eventAttendeeRegistration.announcement.id}}">[[${eventAttendeeRegistration.name}]]</a>
                         </h2>
 
                         <!-- Text -->
@@ -73,7 +73,7 @@
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label class="form-label">
-                                    Event Day (of [[${eventAttendeeRegistration.event.eventDays}]] Day(s))
+                                    Event Day (of [[${eventAttendeeRegistration.announcement.eventDays}]] Day(s))
                                 </label>
 
                                 <select class="form-control" id="daySelect" name="daySelect" required></select>

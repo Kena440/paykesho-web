@@ -84,7 +84,7 @@
                       method="post"
                       onsubmit="return checkEventUnique(this)"
                       th:action="@{/events/save}"
-                      th:object="${event}">
+                      th:object="${announcement}">
                     <input id="id" th:field="*{id}" type="hidden"/>
 
                     <div class="row justify-content-between align-items-center">
@@ -95,7 +95,7 @@
                                     <!-- Avatar -->
                                     <div class="avatar">
                                         <img alt="..." class="avatar-img rounded-circle"
-                                             id="thumbnail" th:src="@{${event.photosImagePath}}">
+                                             id="thumbnail" th:src="@{${announcement.photosImagePath}}">
                                     </div>
 
                                 </div>
@@ -109,9 +109,9 @@
                                     <!-- Text -->
                                     <small class="text-muted">
                                         <p class="font-size-xs text-muted" id="fileImageName"
-                                           th:if="${event.photos == null}">
+                                           th:if="${announcement.photos == null}">
                                         <p class="font-size-xs text-muted" id="fileImageName"
-                                           th:if="${event.photos != null}" th:text="${event.photos}">
+                                           th:if="${announcement.photos != null}" th:text="${announcement.photos}">
                                         </p>
                                     </small>
 
@@ -255,7 +255,7 @@
     MAX_FILE_SIZE = 502400; // 500KB
 
     function checkEventUnique(form) {
-        url = "[[@{/events/rest/check-event}]]";
+        url = "[[@{/events/rest/check-announcement}]]";
         eventName = $("#name").val();
         eventId = $("#id").val();
         csrfValue = $("input[name='_csrf']").val();
@@ -266,7 +266,7 @@
             if (response === "OK") {
                 form.submit();
             } else if (response === "Duplicated") {
-                showWarningModal("There is another event having the email " + eventName);
+                showWarningModal("There is another announcement having the email " + eventName);
             } else {
                 showErrorModal("Unknown response from server");
             }

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
       xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
-<head th:replace="fragments/fragments :: page_head('Facility Mgt','none')"></head>
+<head th:replace="fragments/fragments :: page_head('Organization Mgt','none')"></head>
 
 <body>
 
@@ -29,7 +29,7 @@
 
                                 <!-- Pretitle -->
                                 <h6 class="header-pretitle">
-                                    Facility Management
+                                    Organization Management
                                 </h6>
 
                                 <!-- Title -->
@@ -57,7 +57,7 @@
 
                                 <!-- Buttons -->
                                 <a class="btn btn-primary ms-2" th:href="@{/facilities/new}">
-                                    Add Facility
+                                    Add Organization
                                 </a>
 
                             </div>
@@ -156,32 +156,32 @@
                                     </tr>
                                     </thead>
                                     <tbody class="list fs-base">
-                                    <tr th:each="facility, facilityStat : ${facilityList}">
+                                    <tr th:each="organization, facilityStat : ${facilityList}">
                                         <td class="hideable-column">[[${facilityStat.count}]]</td>
                                         <td class="hideable-column">
-                                            <a th:href="@{'/facilities/view/'+${facility.id}}"
+                                            <a th:href="@{'/facilities/view/'+${organization.id}}"
                                                title="View Institution">
-                                                [[${facility.name}]]
+                                                [[${organization.name}]]
                                             </a>
                                         </td>
-                                        <td>[[${facility.levelOfCare}]]</td>
-                                        <td>[[${facility.district}]]</td>
-                                        <td>[[${facility.province}]]</td>
+                                        <td>[[${organization.levelOfCare}]]</td>
+                                        <td>[[${organization.district}]]</td>
+                                        <td>[[${organization.province}]]</td>
                                         <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                             <td>
-                                                <div th:replace="fragments/fragments :: status(${facility.enabled}, 'facility', '/facilities/' + ${facility.id})"></div>
+                                                <div th:replace="fragments/fragments :: status(${organization.enabled}, 'organization', '/facilities/' + ${organization.id})"></div>
                                             </td>
                                         </th:block>
                                         <td>
                                             <a class="fe fe-eye"
-                                               th:href="@{'/facilities/view/'+${facility.id}}"
+                                               th:href="@{'/facilities/view/'+${organization.id}}"
                                                title="View Institution">
                                             </a>
                                             <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
                                                 &nbsp;
-                                                <div th:replace="fragments/fragments :: edit('facility', '/facilities/edit/' + ${facility.id})"></div>
+                                                <div th:replace="fragments/fragments :: edit('organization', '/facilities/edit/' + ${organization.id})"></div>
                                                 &nbsp;
-                                                <!--<div th:replace="fragments/fragments :: delete(${facility.id}, 'facility', '/facilities/delete/' + ${facility.id}, true)"></div>-->
+                                                <!--<div th:replace="fragments/fragments :: delete(${organization.id}, 'organization', '/facilities/delete/' + ${organization.id}, true)"></div>-->
                                             </th:block>
                                         </td>
                                     </tr>
@@ -211,7 +211,7 @@
     $(document).ready(function () {
         $(".link-delete").on("click", function (e) {
             e.preventDefault();
-            showDeleteConfirmModal($(this), 'facility');
+            showDeleteConfirmModal($(this), 'organization');
         });
     });
 </script>

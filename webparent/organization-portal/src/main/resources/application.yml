@@ -1,0 +1,44 @@
+server:
+  port: 8083
+  servlet:
+  context-path: /organization-portal
+
+spring:
+  datasource:
+    password: p@ssw0rd
+    url: jdbc:mysql://localhost:3306/paykesho_db
+    username: root
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 40
+      connection-timeout: 10000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+      leak-detection-threshold: 2000
+      pool-name: SpringBootHikariCP
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: false
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 827368659610-1qt3difhpegg4qr12df9p9oqu9uo1s2h.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+          facebook:
+            client-id: 970438970542534
+            client-secret: 86a05c013fa166eceb5f3e4e95821e98
+            scope:
+              - email
+              - public_profile

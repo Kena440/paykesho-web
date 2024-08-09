@@ -2,7 +2,7 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
       xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/><!-- /Added by HTTrack -->
-<head th:replace="fragments/fragments :: page_head('Facility Mgt','none')"></head>
+<head th:replace="fragments/fragments :: page_head('Organization Mgt','none')"></head>
 
 <body>
 
@@ -28,7 +28,7 @@
 
                                 <!-- Pretitle -->
                                 <h6 class="header-pretitle">
-                                    Facility Management
+                                    Organization Management
                                 </h6>
 
                                 <!-- Title -->
@@ -56,7 +56,7 @@
 
                                 <!-- Buttons -->
                                 <a class="btn btn-primary ms-2" th:href="@{/facilities}">
-                                    Facility
+                                    Organization
                                 </a>
 
                             </div>
@@ -84,7 +84,7 @@
                       method="post"
                       onsubmit="return checkInstitutionUnique(this)"
                       th:action="@{/facilities/save}"
-                      th:object="${facility}">
+                      th:object="${organization}">
                     <input id="id" th:field="*{id}" type="hidden"/>
                     <input id="longitude" th:field="*{longitude}" type="hidden"/>
                     <input id="latitude" th:field="*{latitude}" type="hidden"/>
@@ -121,7 +121,7 @@
                                 <select class="form-select mb-3" data-choices th:field="*{province}">
                                     <option value="">Select...</option>
                                     <th:block th:each="vh : ${stateList}">
-                                        <option th:selected="(${vh.id} == ${facility.province})"
+                                        <option th:selected="(${vh.id} == ${organization.province})"
                                                 th:value="${vh.id}">
                                             [[${vh.name}]] ([[${vh.country.name}]])
                                         </option>
@@ -162,7 +162,7 @@
                                 <select class="form-select mb-3" data-choices th:field="*{levelOfCare}">
                                     <option value="">Select...</option>
                                     <th:block th:each="vh : ${levelOfCareList}">
-                                        <option th:selected="(${vh.id} == ${facility.levelOfCare})"
+                                        <option th:selected="(${vh.id} == ${organization.levelOfCare})"
                                                 th:value="${vh.id}">
                                             [[${vh.name}]]
                                         </option>
@@ -180,7 +180,7 @@
 
                                 <!-- Label -->
                                 <label class="form-label">
-                                    Facility Email
+                                    Organization Email
                                 </label>
 
                                 <!-- Input -->
@@ -251,7 +251,7 @@
     MAX_FILE_SIZE = 2502400; // 2502.4KB
 
     function checkInstitutionUnique(form) {
-        url = "[[@{/facilities/rest/check-facility}]]";
+        url = "[[@{/facilities/rest/check-organization}]]";
         facilityName = $("#nameInput").val();
         levelOfCare = $("#levelOfCare").val();
         provinceId = $("#province").val();
@@ -270,7 +270,7 @@
             if (response === "OK") {
                 form.submit();
             } else if (response === "Duplicated") {
-                showWarningModal("There is another facility having the provided details");
+                showWarningModal("There is another organization having the provided details");
             } else {
                 showErrorModal("Unknown response from server");
             }
@@ -306,14 +306,14 @@
         document.getElementById('info').innerHTML =
             JSON.stringify(e.point) +
             '<br />' +
-            // `e.lngLat` is the longitude, latitude geographical position of the event.
+            // `e.lngLat` is the longitude, latitude geographical position of the announcement.
             JSON.stringify(e.lngLat.wrap());
     });
 
     var marker = new mapboxgl.Marker();
 
-    function add_marker(event) {
-        var coordinates = event.lngLat;
+    function add_marker(announcement) {
+        var coordinates = announcement.lngLat;
 
         $("#longitude").val(coordinates.lng);
         $("#latitude").val(coordinates.lat);
