@@ -1,27 +1,31 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Login','none')"></head>
 <body>
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-THQTXJ7" height="0" width="0"
-                  style="display:none;visibility:hidden"></iframe></noscript>
 <main>
-    <div class="preloader bg-soft flex-column justify-content-center align-items-center"><img class="loader-element"
-                                                                                              th:src="@{/assets/img/brand/dark.svg}"
-                                                                                              height="50"
-                                                                                              alt="Rocket logo"></div>
+    <div th:replace="fragments/fragments :: loader"></div>
     <section class="vh-100 d-flex align-items-center section-image overlay-soft-dark"
              th:data-background="@{/assets/img/saas-form-image.jpg}">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-12 d-flex align-items-center justify-content-center">
-                    <div
-                            class="signin-inner mt-3 mt-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
-                        <div class="text-center text-md-center mb-4 mt-md-0">
-                            <h1 class="mb-0 h3">Paykesho | Merchant Portal</h1>
+
+                    <div class="signin-inner mt-3 mt-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <img class="logo-img mb-4" th:src="@{/images/paykeshologo.png}"
+                                     alt="logo"
+                                     width="120" height="80">
+                            </div>
+                            <div class="col-md-7">
+                                <div class="text-center text-md-center mb-4 mt-md-0">
+                                    <h1 class="mb-0 h3"> Merchant Portal</h1>
+                                </div>
+                            </div>
                         </div>
-                        <form th:action="@{/login}" class="mt-4">
-                            <div class="position-relative mb-4">
+                        <form th:action="@{/login}" method="post" class="mt-4">
+                            <div class="mb-4">
                                 <div class="alert alert-warning" role="alert" th:if="${param.error}">
                                     [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
                                 </div>
@@ -36,7 +40,6 @@
                                     </div>
                                     <input class="form-control" id="email" name="email" placeholder="name@address.com"
                                            type="email">
-
                                 </div>
                             </div>
                             <div class="form-group">
@@ -44,8 +47,7 @@
                                     <div class="input-group-prepend"><span class="input-group-text"><i
                                             class="fas fa-unlock-alt"></i></span></div>
                                     <input class="form-control" id="password" name="password"
-                                           placeholder="Enter your password"
-                                           type="password" required>
+                                           placeholder="Enter your password" type="password" required>
                                     <div class="input-group-append"><span class="input-group-text"><i
                                             class="far fa-eye"></i></span>
                                     </div>
@@ -93,5 +95,4 @@
 
 </body>
 
-<!-- Mirrored from dashkit.goodthemes.co/sign-in.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 11 May 2022 13:05:06 GMT -->
 </html>
