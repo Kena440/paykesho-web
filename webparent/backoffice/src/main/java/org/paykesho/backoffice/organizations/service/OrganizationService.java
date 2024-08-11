@@ -145,11 +145,11 @@ public class OrganizationService {
         }
     }
 
-    public boolean isOrganizationUnique(Integer id, Integer provinceId, String facilityName, Integer levelOfCareId) {
-        if (provinceId == null || facilityName == null || levelOfCareId == null) {
+    public boolean isOrganizationUnique(Integer id, Integer provinceId, String facilityName, Integer organizationTypeId) {
+        if (provinceId == null || facilityName == null || organizationTypeId == null) {
             return false;
         }
-        Organization institution = organizationRepository.getOrganizationByIdAndProvinceAndNameAndLevelOfCare(id, provinceId, facilityName, levelOfCareId);
+        Organization institution = organizationRepository.getOrganizationByIdAndProvinceAndNameAndLevelOfCare(id, provinceId, facilityName, organizationTypeId);
 
         if (institution == null) return true;
         boolean isCreatingNew = (id == null);
@@ -167,7 +167,7 @@ public class OrganizationService {
         List<DataItem> dataItemList = new ArrayList<>();
 
         for (Organization detail : memberInstitutions) {
-            String identifier = levelOfCare.getName();
+            String identifier = organizationType.getName();
 
             DataItem dataItem = new DataItem(identifier);
 

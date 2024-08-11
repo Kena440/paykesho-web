@@ -159,10 +159,10 @@
                                 </label>
 
                                 <!-- Input -->
-                                <select class="form-select mb-3" data-choices th:field="*{levelOfCare}">
+                                <select class="form-select mb-3" data-choices th:field="*{organizationType}">
                                     <option value="">Select...</option>
-                                    <th:block th:each="vh : ${levelOfCareList}">
-                                        <option th:selected="(${vh.id} == ${organization.levelOfCare})"
+                                    <th:block th:each="vh : ${organizationTypeList}">
+                                        <option th:selected="(${vh.id} == ${organization.organizationType})"
                                                 th:value="${vh.id}">
                                             [[${vh.name}]]
                                         </option>
@@ -253,7 +253,7 @@
     function checkInstitutionUnique(form) {
         url = "[[@{/facilities/rest/check-organization}]]";
         facilityName = $("#nameInput").val();
-        levelOfCare = $("#levelOfCare").val();
+        organizationType = $("#organizationType").val();
         provinceId = $("#province").val();
         memberId = $("#id").val();
         csrfValue = $("input[name='_csrf']").val();
@@ -262,7 +262,7 @@
             id: memberId,
             provinceId: provinceId,
             facilityName: facilityName,
-            levelOfCare: levelOfCare,
+            organizationType: organizationType,
             _csrf: csrfValue
         };
 

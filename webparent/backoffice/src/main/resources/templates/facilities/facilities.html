@@ -137,7 +137,7 @@
                                             th:replace="fragments/fragments :: column_Link('name', 'Name','none')">
                                         </th>
                                         <th scope="col"
-                                            th:replace="fragments/fragments :: column_Link('levelOfCare', 'Level of Care', 'none')">
+                                            th:replace="fragments/fragments :: column_Link('organizationType', 'Level of Care', 'none')">
                                         </th>
                                         <th scope="col"
                                             th:replace="fragments/fragments :: column_Link('district', 'District', 'none')">
@@ -164,7 +164,7 @@
                                                 [[${organization.name}]]
                                             </a>
                                         </td>
-                                        <td>[[${organization.levelOfCare}]]</td>
+                                        <td>[[${organization.organizationType}]]</td>
                                         <td>[[${organization.district}]]</td>
                                         <td>[[${organization.province}]]</td>
                                         <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">

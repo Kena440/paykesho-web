@@ -29,4 +29,9 @@ public interface ClientRepository extends CrudRepository<Client, Integer> {
     @Modifying
     public void updateFailedAttempts(int failAttempts, String email);
 
+    @Query("select count(c.id) as total from Client c")
+    public Long countAllClients();
+
+    @Query("select c from Client c where c.code = ?1")
+    public Client findByCode(String code);
 }

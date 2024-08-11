@@ -2,49 +2,53 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
       xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="page_head(title, remove)" th:remove="${remove}">
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <meta content="Portal for access to assessment purposes" name="description"/>
-
     <!-- Favicon -->
     <link rel="shortcut icon" th:href="@{/assets/favicon/favicon.ico}" type="image/x-icon"/>
 
-    <!-- Libs CSS -->
-    <link rel="stylesheet" th:href="@{/assets/css/libs.bundle.css}"/>
-    <link rel="stylesheet" th:href="@{/assets/richTextEditor/richtext.min.css}">
+    <title>Paykesho | Organization Portal | [[${title}]]</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta name="title" content="Buy now, Pay Later - Paykesho">
+    <meta name="author" content="KAE Digital">
+    <meta name="description" content="Buy now, Pay Later - Paykesho">
+    <meta name="keywords" content="Buy now, Pay Later - Paykesho">
+    <link rel="canonical" href="https://themesberg.com/product/bootstrap/rocket-saas-dashboard-bootstrap-template">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://demo.themesberg.com/rocket">
+    <meta property="og:title" content="Paykesho - Buy now, Pay later">
+    <meta property="og:description" content="Buy now, Pay Later - Paykesho">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://demo.themesberg.com/rocket">
+    <meta property="twitter:title" content="Buy now, Pay Later - Paykesho">
+    <meta property="twitter:description" content="Buy now, Pay Later - Paykesho">
+    <link rel="apple-touch-icon" sizes="120x120" th:href="@{/assets/img/favicon/apple-touch-icon.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/assets/img/favicon/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/assets/img/favicon/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/assets/img/favicon/site.webmanifest}">
+    <link rel="mask-icon" th:href="@{/assets/img/favicon/safari-pinned-tab.svg}" color="#ffffff">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    <link type="text/css" th:href="@{/assets/vendor/fortawesome/fontawesome-free/css/all.min.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/assets/vendor/prismjs/themes/prism.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets/vendor/jqvmap/dist/jqvmap.min.css}">
+    <link type="text/css" th:href="@{/assets/css/rocket.css}" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141734189-6"></script>
+    <script>window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-    <!-- Theme CSS -->
-    <link id="stylesheetLight" rel="stylesheet" th:href="@{/assets/css/theme.bundle.css}"/>
-    <link id="stylesheetDark" rel="stylesheet" th:href="@{/assets/css/theme-dark.bundle.css}"/>
+    gtag('config', 'UA-141734189-6');</script>
+    <script>(function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+            'gtm.start':
+                new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            '../../www.googletagmanager.com/gtm5445.html?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-THQTXJ7');</script>
+
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
-    <style>body {
-        display: none;
-    }</style>
-
-    <style>
-        table td {
-            word-break: break-word;
-            vertical-align: top;
-            white-space: normal !important;
-        }
-
-    </style>
-    <!-- Title -->
-    <title>CHAZ Defaulter Tracer | [[${title}]]</title>
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156446909-1"></script>
-    <script>window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-
-    gtag("js", new Date());
-    gtag("config", "UA-156446909-1");</script>
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet'/>
@@ -57,823 +61,189 @@
 
 <body>
 
-<nav class="navbar navbar-vertical fixed-start navbar-expand-md " id="sidebar" th:fragment="side_bar">
-    <div class="container-fluid">
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-THQTXJ7" height="0" width="0"
+                  style="display:none;visibility:hidden"></iframe></noscript>
 
-        <!-- Toggler -->
-        <button aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle navigation"
-                class="navbar-toggler"
-                data-bs-target="#sidebarCollapse" data-bs-toggle="collapse" type="button">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Brand -->
-        <a class="navbar-brand" th:href="@{/}">
-            <img alt="..." class="navbar-brand-img mx-auto" th:src="@{/assets/img/logo.svg}">
+<header th:fragment="header" class="header-global">
+    <nav id="navbar-main"
+         class="navbar navbar-main navbar-expand-lg navbar-dark navbar-theme-primary headroom py-lg-2 px-lg-6">
+        <div class="container"><a class="navbar-brand d-none" href="index-2.html">
+            <div class="d-flex align-items-center"><img class="navbar-brand-dark rotate-logo"
+                                                        src="assets/img/brand/light.svg" alt="Logo light"> <img class="navbar-brand-light rotate-logo"
+                                                                                                                src="assets/img/brand/dark.svg" alt="Logo dark"></div>
         </a>
-
-        <!-- Collapse -->
-        <div class="collapse navbar-collapse" id="sidebarCollapse">
-
-            <!-- Form -->
-            <form class="mt-4 mb-3 d-md-none">
-                <div class="input-group input-group-rounded input-group-merge input-group-reverse">
-                    <input aria-label="Search" class="form-control" placeholder="Search" type="search">
-                    <div class="input-group-text">
-                        <span class="fe fe-search"></span>
+            <div class="navbar-collapse collapse" id="navbar_global">
+                <div class="navbar-collapse-header">
+                    <div class="row">
+                        <div class="col-6 collapse-brand"><a class="d-flex align-items-center" href="index-2.html"><img
+                                src="assets/img/brand/dark.svg" alt="Logo dark"></a></div>
+                        <div class="col-6 collapse-close"><a href="#navbar_global" class="fas fa-times" data-toggle="collapse"
+                                                             data-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false"
+                                                             aria-label="Toggle navigation"></a></div>
                     </div>
                 </div>
-            </form>
-
-            <!-- Navigation -->
-            <ul class="navbar-nav">
-
-                <li class="nav-item">
-                    <a class="nav-link " th:href="@{/}">
-                        <i class="fe fe-home"></i> Dashboard
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a aria-controls="sidebarAssessmentMgt" aria-expanded="false" class="nav-link"
-                       data-bs-toggle="collapse"
-                       href="#sidebarAssessmentMgt" role="button">
-                        <i class="fe fe-folder"></i> Assessment Mgt
-                    </a>
-                    <div class="collapse" id="sidebarAssessmentMgt">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/assessments}">
-                                    All Assessments
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a aria-controls="sidebarEventsMgt" aria-expanded="false" class="nav-link" data-bs-toggle="collapse"
-                       href="#sidebarEventsMgt" role="button">
-                        <i class="fe fe-calendar"></i> Events
-                    </a>
-                    <div class="collapse" id="sidebarEventsMgt">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" th:href="@{/events}">
-                                    All Events
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <hr class="navbar-divider my-3">
-                <li class="nav-item">
-                    <a class="nav-link " th:href="@{/active-sessions}">
-                        <i class="fe fe-radio"></i> Active Sessions
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Push content down -->
-            <div class="mt-auto"></div>
-
-            <!-- Customize -->
-            <!--  <div class="mb-4" id="popoverDemo" title="Edit Layout"
-                   data-bs-content="Switch to Dark Mode or adjust the navigation layout, icons, and colors!">
-                  <a class="btn w-100 btn-primary" data-bs-toggle="offcanvas" href="#offcanvasDemo"
-                     aria-controls="offcanvasDemo">
-                      <i class="fe fe-sliders me-2"></i> Customize
-                  </a>
-              </div>-->
-
-            <!-- User (md) -->
-            <div class="navbar-user d-none d-md-flex" id="sidebarUser">
-
-                <!-- Icon -->
-                <a aria-controls="sidebarOffcanvasActivity" class="navbar-user-link" data-bs-toggle="offcanvas"
-                   href="#sidebarOffcanvasActivity">
-                <span class="icon">
-                  <i class="fe fe-bell"></i>
-                </span>
-                </a>
-
-                <!-- Dropup -->
-                <div class="dropup">
-
-                    <!-- Toggle -->
-                    <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-bs-toggle="dropdown"
-                       href="#"
-                       id="sidebarIconCopy" role="button">
-                        <div class="avatar avatar-sm avatar-online">
-                            <img alt="..." class="avatar-img rounded-circle"
-                                 th:src="@{/images/default_user_image.jpg}">
-                        </div>
-                    </a>
-
-                    <!-- Menu -->
-                    <div aria-labelledby="sidebarIconCopy" class="dropdown-menu">
-                        <a class="dropdown-item my-account" id="accountLink4" th:href="@{/account}">Profile</a>
-                        <hr class="dropdown-divider"/>
-                        <a class="dropdown-item" id="logoutLink4">Logout</a>
-                        <form method="post" name="logoutForm4" th:action="@{/logout}" th:hidden="true">
-                            <input type="submit">
-                        </form>
-                    </div>
-
-                </div>
-
-                <!-- Icon -->
-                <a aria-controls="sidebarOffcanvasSearch" class="navbar-user-link" data-bs-toggle="offcanvas"
-                   href="#sidebarOffcanvasSearch">
-                <span class="icon">
-                  <i class="fe fe-search"></i>
-                </span>
-                </a>
-
-            </div>
-
-        </div> <!-- / .navbar-collapse -->
-
-    </div>
-</nav>
-<nav class="navbar navbar-vertical navbar-vertical-sm fixed-start navbar-expand-md " id="sidebarSmall"
-     th:fragment="side_bar_small">
-    <div class="container-fluid">
-
-        <!-- Toggler -->
-        <button aria-controls="sidebarSmallCollapse" aria-expanded="false" aria-label="Toggle navigation"
-                class="navbar-toggler"
-                data-bs-target="#sidebarSmallCollapse" data-bs-toggle="collapse" type="button">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Brand -->
-        <a class="navbar-brand" th:href="@{/}">
-            <img alt="..." class="navbar-brand-img mx-auto" th:src="@{/assets/img/logo.svg}">
-        </a>
-
-        <!-- User (xs) -->
-        <div class="navbar-user d-md-none">
-
-            <!-- Dropdown -->
-            <div class="dropdown">
-
-                <!-- Toggle -->
-                <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-bs-toggle="dropdown" href="#"
-                   id="sidebarSmallIcon" role="button">
-                    <div class="avatar avatar-sm avatar-online">
-                        <img alt="..." class="avatar-img rounded-circle"
-                             th:src="@{/images/default_user_image.jpg}">
-                    </div>
-                </a>
-
-                <!-- Menu -->
-                <div aria-labelledby="sidebarSmallIcon" class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item my-account" id="accountLink2" th:href="@{/account}">Profile</a>
-                    <a class="dropdown-item" th:href="@{/settings}">Settings</a>
-                    <hr class="dropdown-divider"/>
-                    <a class="dropdown-item" id="logoutLink2">Logout</a>
-                    <form method="post" name="logoutForm2" th:action="@{/logout}" th:hidden="true">
-                        <input type="submit">
-                    </form>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Collapse -->
-        <div class="collapse navbar-collapse" id="sidebarSmallCollapse">
-
-            <!-- Form -->
-            <form class="mt-4 mb-3 d-md-none">
-                <div class="input-group input-group-rounded input-group-merge input-group-reverse">
-                    <input aria-label="Search" class="form-control" placeholder="Search" type="search">
-                    <div class="input-group-text">
-                        <span class="fe fe-search"></span>
-                    </div>
-                </div>
-            </form>
-
-            <!-- Divider -->
-            <hr class="navbar-divider d-none d-md-block mt-0 mb-3">
-
-            <!-- Navigation -->
-            <ul class="navbar-nav">
-                <li class="nav-item dropend">
-                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle "
-                       data-bs-toggle="dropdown"
-                       href="#" id="sidebarSmallBasics" role="button" title="Basics">
-                        <i class="fe fe-clipboard"></i> <span class="d-md-none">Dashboard</span>
-                    </a>
-                    <ul aria-labelledby="sidebarSmallBasics" class="dropdown-menu">
-                        <li class="dropdown-header d-none d-md-block">
-                            <a class="nav-link" th:href="@{/}">
-                                Dashboard
-                            </a>
-
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item dropend">
-                    <a aria-expanded="true" aria-haspopup="true" class="nav-link dropdown-toggle active"
-                       data-bs-toggle="dropdown" href="#" id="sidebarSmallDashboards" role="button"
-                       title="Dashboards">
-                        <i class="fe fe-home"></i> <span class="d-md-none">Trips</span>
-                    </a>
-                    <ul aria-labelledby="sidebarSmallDashboards" class="dropdown-menu">
-                        <li class="dropdown-header d-none d-md-block">
-                            <h6 class="text-uppercase mb-0">Trip Management</h6>
-                        </li>
-                        <li>
-                            <a class="dropdown-item active" th:href="@{/trips/trip-history}">
-                                Trips
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item " th:href="@{/trips/request/new}">
-                                Request
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-            </ul>
-
-            <!-- Divider -->
-            <hr class="navbar-divider my-3">
-
-            <!-- Navigation -->
-
-
-            <!-- Push content down -->
-            <div class="mt-auto"></div>
-
-            <!-- Customize -->
-            <!--   <div class="mb-4 d-none" data-bs-toggle="tooltip" data-bs-placement="right"
-                    data-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                    title="Customize">
-                   <a class="btn w-100 btn-primary" data-bs-toggle="offcanvas" href="#offcanvasDemo"
-                      aria-controls="offcanvasDemo">
-                       <i class="fe fe-sliders"></i> <span class="d-md-none ms-2">Customize</span>
-                   </a>
-               </div>-->
-
-            <!-- User (md) -->
-            <div class="navbar-user d-none d-md-flex flex-column" id="sidebarSmallUser">
-
-                <!-- Icon -->
-                <a aria-controls="sidebarOffcanvasSearch" class="navbar-user-link mb-3" data-bs-toggle="offcanvas"
-                   href="#sidebarOffcanvasSearch">
-                <span class="icon">
-                  <i class="fe fe-search"></i>
-                </span>
-                </a>
-
-                <!-- Icon -->
-                <a class="navbar-user-link mb-3" data-bs-toggle="offcanvas" href="#sidebarOffcanvasActivity"
-                   ria-controls="sidebarOffcanvasActivity">
-                <span class="icon">
-                  <i class="fe fe-bell"></i>
-                </span>
-                </a>
-
-                <!-- Dropup -->
-                <div class="dropend">
-
-                    <!-- Toggle -->
-                    <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-bs-toggle="dropdown"
-                       href="#" id="sidebarSmallIconCopy" role="button">
-                        <div class="avatar avatar-sm avatar-online">
-                            <img alt="..." class="avatar-img rounded-circle"
-                                 th:src="@{/images/default_user_image.jpg}">
-                        </div>
-                    </a>
-
-                    <!-- Menu -->
-                    <div aria-labelledby="sidebarSmallIconCopy" class="dropdown-menu">
-                        <a class="dropdown-item my-account" id="accountLink3" th:href="@{/account}">Profile</a>
-                        <hr class="dropdown-divider"/>
-                        <a class="dropdown-item" id="logoutLink3">Logout</a>
-                        <form method="post" name="logoutForm3" th:action="@{/logout}" th:hidden="true">
-                            <input type="submit">
-                        </form>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div> <!-- / .navbar-collapse -->
-
-    </div>
-</nav>
-<nav class="navbar navbar-expand-lg " id="topnav" th:fragment="topnav">
-    <div class="container">
-
-        <!-- Toggler -->
-        <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"
-                class="navbar-toggler me-auto"
-                data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Brand -->
-        <a class="navbar-brand me-auto" href="index-2.html">
-            <img alt="..." class="navbar-brand-img" th:src="@{/assets/img/logo.svg}">
-        </a>
-
-        <!-- Form -->
-        <form class="form-inline me-4 d-none d-lg-flex">
-            <div class="input-group input-group-rounded input-group-merge input-group-reverse"
-                 data-list='{"valueNames": ["name"]}'>
-
-                <!-- Input -->
-                <input aria-label="Search" class="form-control dropdown-toggle list-search" data-bs-toggle="dropdown"
-                       placeholder="Search" type="search">
-
-                <!-- Icon -->
-                <div class="input-group-text">
-                    <i class="fe fe-search"></i>
-                </div>
-
-                <!-- Menu -->
-                <div class="dropdown-menu dropdown-menu-card">
-                    <div class="card-body">
-
-                    </div>
-                </div> <!-- / .dropdown-menu -->
-
-            </div>
-        </form>
-
-        <!-- User -->
-        <div class="navbar-user">
-
-            <!-- Dropdown -->
-            <div class="dropdown me-4 d-none d-lg-flex">
-
-                <!-- Toggle -->
-                <a aria-expanded="false" aria-haspopup="true" class="navbar-user-link" data-bs-toggle="dropdown"
-                   href="#"
-                   role="button">
-              <span class="icon active">
-                <i class="fe fe-bell"></i>
-              </span>
-                </a>
-
-                <!-- Menu -->
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-card">
-                    <div class="card-header">
-
-                        <!-- Title -->
-                        <h5 class="card-header-title">
-                            Notifications
-                        </h5>
-
-                        <!-- Link -->
-                        <a class="small" href="#!">
-                            View all
-                        </a>
-
-                    </div> <!-- / .card-header -->
-                    <div class="card-body">
-
-                        <!-- List group -->
-                        <div class="list-group list-group-flush list-group-activity my-n3">
-                            <a class="list-group-item text-reset" href="#!">
-                                <div class="row">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar avatar-sm">
-                                            <img alt="..." class="avatar-img rounded-circle"
-                                                 th:src="@{/images/default_user_image.jpg}">
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Content -->
-                                        <div class="small">
-                                            <strong>Test</strong>
-                                        </div>
-
-                                        <!-- Time -->
-                                        <small class="text-muted">
-                                            2m ago
-                                        </small>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-
-                        </div>
-
-                    </div>
-                </div> <!-- / .dropdown-menu -->
-
-            </div>
-
-            <!-- Dropdown -->
-            <div class="dropdown">
-
-                <!-- Toggle -->
-                <a aria-expanded="false" aria-haspopup="true" class="avatar avatar-sm avatar-online dropdown-toggle"
-                   data-bs-toggle="dropdown" href="#" role="button">
-                    <img alt="..." class="avatar-img rounded-circle"
-                         th:src="@{/images/default_user_image.jpg}">
-                </a>
-
-                <!-- Menu -->
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item my-account" id="accountLink1" th:href="@{/account}">Profile</a>
-                    <a class="dropdown-item" th:href="@{/settings}">Settings</a>
-                    <hr class="dropdown-divider"/>
-                    <a class="dropdown-item" id="logoutLink1">Logout</a>
-                    <form method="post" name="logoutForm1" th:action="@{/logout}" th:hidden="true">
-                        <input type="submit">
-                    </form>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Collapse -->
-        <div class="collapse navbar-collapse me-lg-auto order-lg-first" id="navbar">
-
-            <!-- Form -->
-            <form class="mt-4 mb-3 d-md-none">
-                <input aria-label="Search" class="form-control form-control-rounded" placeholder="Search" type="search">
-            </form>
-
-            <!-- Navigation -->
-            <ul class="navbar-nav me-lg-auto">
-                <li class="nav-item dropdown">
-                    <a aria-expanded="true" aria-haspopup="true" class="nav-link dropdown-toggle active"
-                       data-bs-toggle="dropdown"
-                       href="#" id="topnavDashboards" role="button">
-                        Dashboard
-                    </a>
-                    <ul aria-labelledby="topnavDashboards" class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" th:href="@{/}">
-                                Dashboard
-                            </a>
-                        </li>
-
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle "
-                       data-bs-auto-close="outside"
-                       data-bs-toggle="dropdown" href="#" id="topnavPages"
-                       role="button">
-                        Trips
-                    </a>
-                    <ul aria-labelledby="topnavPages" class="dropdown-menu">
-                        <li class="dropend">
-                            <a aria-expanded="false" aria-haspopup="true" class="dropdown-item dropdown-toggle "
-                               data-bs-toggle="dropdown"
-                               href="#" id="topnavAccount" role="button">
-                                Trip Management
-                            </a>
-                            <div aria-labelledby="topnavAccount" class="dropdown-menu">
-                                <a class="dropdown-item active" th:href="@{/trips/trip-history}">
-                                    Trips
-                                </a>
-                                <a class="dropdown-item " th:href="@{/trips/request/new}">
-                                    Request
-                                </a>
-
+                <ul class="navbar-nav navbar-nav-hover justify-content-center">
+                    <li class="nav-item"><a href="index-2.html" class="nav-link">Overview</a></li>
+                    <li class="nav-item dropdown"><a href="#" class="nav-link dropdown-toggle" id="frontPagesDropdown"
+                                                     aria-expanded="false" data-toggle="dropdown"><span class="nav-link-inner-text mr-1">All pages</span> <i
+                            class="fas fa-angle-down nav-link-arrow"></i></a>
+                        <div class="dropdown-menu dropdown-megamenu pl-3 py-3 p-lg-4" aria-labelledby="frontPagesDropdown">
+                            <div class="row no-gutters">
+                                <div class="col-6 col-lg-3">
+                                    <h6 class="d-block mb-3 text-primary">Landings</h6>
+                                    <ul class="list-style-none mb-4">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/index.html">Landing 1</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/index-2.html">Landing 2</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/index-3.html">Landing 3</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/index-4.html">Landing 4</a>
+                                        </li>
+                                    </ul>
+                                    <h6 class="d-block mb-3 text-primary">Main pages</h6>
+                                    <ul class="list-style-none">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/about.html">About</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/team.html">Team</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/testimonials.html">Testimonials</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/contact.html">Contact</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <h6 class="d-block mb-3 text-primary">Support</h6>
+                                    <ul class="list-style-none mb-4">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/support.html">Support
+                                            center</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/support-2.html">Support center
+                                            2</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/support-topic.html">Support
+                                            topic</a></li>
+                                    </ul>
+                                    <h6 class="d-block mb-3 text-primary">Blog</h6>
+                                    <ul class="list-style-none mb-4">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/blog.html">Blog</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/blog-post.html">Blog post</a>
+                                        </li>
+                                    </ul>
+                                    <h6 class="d-block mb-3 text-primary">Careers</h6>
+                                    <ul class="list-style-none mb-4 mb-lg-0">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/careers.html">Careers</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/career-single.html">Job
+                                            description</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <h6 class="d-block mb-3 text-primary">Auth</h6>
+                                    <ul class="list-style-none mb-4">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/sign-in.html">Sign in</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/sign-in-illustration.html">Sign in 2</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/sign-up.html">Sign up</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/sign-up-illustration.html">Sign up 2</a></li>
+                                    </ul>
+                                    <h6 class="d-block mb-3 text-primary">Specials</h6>
+                                    <ul class="list-style-none">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/404.html">404 Not Found</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/500.html">500 Server Error</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/download-extension.html">Browser extension</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <h6 class="d-block mb-3 text-primary">Payment</h6>
+                                    <ul class="list-style-none mb-3">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/pricing.html">Pricing</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/checkout.html">Checkout</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/checkout-completed.html">Order
+                                            completed</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/invoice.html">Invoice</a></li>
+                                    </ul>
+                                    <h6 class="d-block mb-3 text-primary">Legal</h6>
+                                    <ul class="list-style-none">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/legal.html">Legal center</a>
+                                        </li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/terms.html">Terms &
+                                            agreement</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                        </li>
-
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a aria-controls="offcanvasDemo" class="nav-link" data-bs-toggle="offcanvas" href="#offcanvasDemo">
-                        Customize
-                    </a>
-                </li>
-            </ul>
-
-        </div>
-
-    </div> <!-- / .container -->
-</nav>
-
-<nav class="navbar navbar-expand-md navbar-light d-none d-md-flex" id="topbar" th:fragment="topbar">
-    <div class="container-fluid">
-
-        <!-- Form -->
-        <form class="form-inline me-4 d-none d-md-flex">
-            <div class="input-group input-group-flush input-group-merge input-group-reverse"
-                 data-list='{"valueNames": ["name"]}'>
-
-                <!-- Input -->
-                <input aria-label="Search" class="form-control dropdown-toggle list-search" data-bs-toggle="dropdown"
-                       placeholder="Search" type="search"/>
-
-                <!-- Prepend -->
-                <div class="input-group-text">
-                    <i class="fe fe-search"></i>
-                </div>
-
-                <!-- Menu -->
-                <div class="dropdown-menu dropdown-menu-card">
-                    <div class="card-body">
-
-                        <!-- List group -->
-                        <div class="list-group list-group-flush list-group-focus list my-n3">
-                            <a class="list-group-item" href="team-overview.html">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar">
-                                            <img alt="..." class="avatar-img rounded"
-                                                 th:src="@{/assets/img/avatars/teams/team-logo-1.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Title -->
-                                        <h4 class="text-body text-focus mb-1 name">
-                                            Airbnb
-                                        </h4>
-
-                                        <!-- Time -->
-                                        <p class="small text-muted mb-0">
-                                            <span class="fe fe-clock"></span>
-                                            <time datetime="2018-05-24">Updated 2hr ago</time>
-                                        </p>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-                            <a class="list-group-item" href="team-overview.html">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar">
-                                            <img alt="..." class="avatar-img rounded"
-                                                 th:src="@{/assets/img/avatars/teams/team-logo-2.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Title -->
-                                        <h4 class="text-body text-focus mb-1 name">
-                                            Medium Corporation
-                                        </h4>
-
-                                        <!-- Time -->
-                                        <p class="small text-muted mb-0">
-                                            <span class="fe fe-clock"></span>
-                                            <time datetime="2018-05-24">Updated 2hr ago</time>
-                                        </p>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-                            <a class="list-group-item" href="project-overview.html">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar avatar-4by3">
-                                            <img alt="..." class="avatar-img rounded"
-                                                 th:src="@{/assets/img/avatars/projects/project-1.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Title -->
-                                        <h4 class="text-body text-focus mb-1 name">
-                                            Homepage Redesign
-                                        </h4>
-
-                                        <!-- Time -->
-                                        <p class="small text-muted mb-0">
-                                            <span class="fe fe-clock"></span>
-                                            <time datetime="2018-05-24">Updated 4hr ago</time>
-                                        </p>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-                            <a class="list-group-item" href="project-overview.html">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar avatar-4by3">
-                                            <img alt="..." class="avatar-img rounded"
-                                                 th:src="@{/assets/img/avatars/projects/project-2.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Title -->
-                                        <h4 class="text-body text-focus mb-1 name">
-                                            Travels & Time
-                                        </h4>
-
-                                        <!-- Time -->
-                                        <p class="small text-muted mb-0">
-                                            <span class="fe fe-clock"></span>
-                                            <time datetime="2018-05-24">Updated 4hr ago</time>
-                                        </p>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-                            <a class="list-group-item" href="project-overview.html">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar avatar-4by3">
-                                            <img alt="..." class="avatar-img rounded"
-                                                 th:src="@{/assets/img/avatars/projects/project-3.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Title -->
-                                        <h4 class="text-body text-focus mb-1 name">
-                                            Safari Exploration
-                                        </h4>
-
-                                        <!-- Time -->
-                                        <p class="small text-muted mb-0">
-                                            <span class="fe fe-clock"></span>
-                                            <time datetime="2018-05-24">Updated 4hr ago</time>
-                                        </p>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-                            <a class="list-group-item" href="profile-posts.html">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar">
-                                            <img alt="..." class="avatar-img rounded-circle"
-                                                 th:src="@{/images/default_user_image.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Title -->
-                                        <h4 class="text-body text-focus mb-1 name">
-                                            Dianna Smiley
-                                        </h4>
-
-                                        <!-- Status -->
-                                        <p class="text-body small mb-0"><span class="text-success">●</span> Online
-                                        </p>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-                            <a class="list-group-item" href="profile-posts.html">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar">
-                                            <img alt="..." class="avatar-img rounded-circle"
-                                                 th:src="@{/assets/img/avatars/profiles/avatar-2.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Title -->
-                                        <h4 class="text-body text-focus mb-1 name">
-                                            Ab Hadley
-                                        </h4>
-
-                                        <!-- Status -->
-                                        <p class="text-body small mb-0"><span class="text-danger">●</span> Offline
-                                        </p>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
                         </div>
-                    </div>
-                </div> <!-- / .dropdown-menu -->
-
-            </div>
-        </form>
-
-        <!-- User -->
-        <div class="navbar-user">
-
-            <!-- Dropdown -->
-            <div class="dropdown me-4 d-none d-md-flex">
-                <th:block sec:authorize="isAuthenticated()">
-                    <a class="navbar-user-link mr-2" sec:authentication="principal.username" th:href="@{/account}"></a>
-                </th:block>
-                <br>
-                <!-- Toggle -->
-                <a aria-expanded="false" aria-haspopup="true" class="navbar-user-link" data-bs-toggle="dropdown"
-                   href="#"
-                   role="button">
-          <span class="icon active">
-            <i class="fe fe-bell"></i>
-          </span>
-                </a>
-
-                <!-- Menu -->
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-card">
-                    <div class="card-header">
-
-                        <!-- Title -->
-                        <h5 class="card-header-title">
-                            Notifications
-                        </h5>
-
-                        <!-- Link -->
-                        <a class="small" href="#!">
-                            View all
-                        </a>
-
-                    </div> <!-- / .card-header -->
-                    <div class="card-body">
-
-                        <!-- List group -->
-                        <div class="list-group list-group-flush list-group-activity my-n3">
-                            <a class="list-group-item text-reset" href="#!">
-                                <div class="row">
-                                    <div class="col-auto">
-
-                                        <!-- Avatar -->
-                                        <div class="avatar avatar-sm">
-                                            <img alt="..." class="avatar-img rounded-circle"
-                                                 th:src="@{/images/default_user_image.jpg}"/>
-                                        </div>
-
-                                    </div>
-                                    <div class="col ms-n2">
-
-                                        <!-- Content -->
-                                        <div class="small">
-                                            <strong>Ganizani</strong> test announcement
-                                        </div>
-
-                                        <!-- Time -->
-                                        <small class="text-muted">
-                                            2m ago
-                                        </small>
-
-                                    </div>
-                                </div> <!-- / .row -->
-                            </a>
-
+                    </li>
+                    <li class="nav-item dropdown"><a href="#" class="nav-link dropdown-toggle" id="dashboardPagesDropdown"
+                                                     aria-expanded="false" data-toggle="dropdown"><span class="nav-link-inner-text mr-1">Dashboard</span> <i
+                            class="fas fa-angle-down nav-link-arrow"></i></a>
+                        <div class="dropdown-menu dropdown-megamenu dropdown-megamenu-sm pl-3 py-3 p-lg-4"
+                             aria-labelledby="dashboardPagesDropdown">
+                            <div class="row no-gutters">
+                                <div class="col-6">
+                                    <h6 class="d-block mb-3 text-primary">Main pages</h6>
+                                    <ul class="list-style-none">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/dashboard/dashboard.html">Overview</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/dashboard/users.html">User
+                                            List</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/dashboard/tasks.html">Task
+                                            List</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/dashboard/settings.html">Settings</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="d-block mb-3 text-primary">Secondary pages</h6>
+                                    <ul class="list-style-none">
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/dashboard/app-analysis.html">App analysis</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/dashboard/transactions.html">Transactions</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/dashboard/traffic-sources.html">Traffic & Engagement</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/dashboard/messages.html">Messages</a></li>
+                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
+                                                                          href="pages/dashboard/single-message.html">Chat</a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div> <!-- / .dropdown-menu -->            </div>
-
-            <!-- Dropdown -->
-            <div class="dropdown">
-
-                <!-- Toggle -->
-                <a aria-expanded="false" aria-haspopup="true" class="avatar avatar-sm avatar-online dropdown-toggle"
-                   data-bs-toggle="dropdown" href="#" role="button">
-                    <img alt="..." class="avatar-img rounded-circle"
-                         th:src="@{/images/default_user_image.jpg}"/>
-                </a>
-
-                <!-- Menu -->
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item my-account" id="accountLink" th:href="@{/account}">Profile</a>
-                    <a class="dropdown-item" th:href="@{/settings}">Settings</a>
-                    <hr class="dropdown-divider"/>
-                    <a class="dropdown-item" id="logoutLink">Logout</a>
-                    <form method="post" name="logoutForm" th:action="@{/logout}" th:hidden="true">
-                        <input type="submit">
-                    </form>
-                </div>
-
+                    </li>
+                    <li class="nav-item dropdown"><a href="#" class="nav-link dropdown-toggle" id="supportDropdown"
+                                                     data-toggle="dropdown" aria-expanded="false"><span class="nav-link-inner-text mr-1">Support</span> <i
+                            class="fas fa-angle-down nav-link-arrow"></i></a>
+                        <div class="dropdown-menu dropdown-menu-lg" aria-labelledby="supportDropdown">
+                            <div class="col-auto px-0">
+                                <div class="list-group list-group-flush"><a
+                                        href="https://themesberg.com/docs/rocket/getting-started/overview/" target="_blank"
+                                        class="list-group-item list-group-item-action d-flex align-items-center p-0 py-3 px-lg-4"><span
+                                        class="icon icon-sm icon-secondary"><span class="fas fa-file-alt"></span></span>
+                                    <div class="ml-4"><span class="text-dark d-block">Documentation<span
+                                            class="badge badge-sm badge-secondary ml-2">v2.0</span></span> <span class="small">Examples
+                          and guides</span></div>
+                                </a><a href="https://themesberg.com/contact" target="_blank"
+                                       class="list-group-item list-group-item-action d-flex align-items-center p-0 py-3 px-lg-4"><span
+                                        class="icon icon-sm icon-primary"><span class="fas fa-microphone-alt"></span></span>
+                                    <div class="ml-4"><span class="text-dark d-block">Support</span> <span class="small">Looking for
+                          answers? Ask us!</span></div>
+                                </a></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             </div>
-
+            <div class="d-none d-lg-block"><a
+                    href="https://themesberg.com/product/bootstrap/rocket-saas-dashboard-bootstrap-template#pricing"
+                    target="_blank" class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3">Pricing plan</a> <a
+                    href="https://themesberg.com/docs/rocket/getting-started/overview/" target="_blank"
+                    class="btn btn-outline-white btn-docs animate-up-2"><i class="fas fa-book mr-2"></i> Docs v2.0</a></div>
+            <div class="d-flex d-lg-none align-items-center ml-auto"><button class="navbar-toggler" type="button"
+                                                                             data-toggle="collapse" data-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false"
+                                                                             aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button></div>
         </div>
-
-    </div>
-</nav>
+    </nav>
+</header>
 
 <th th:fragment="column_Link(fieldName, columnLabel, removeTag)" th:remove="${removeTag}">
     <a class="list-sort text-muted"
@@ -894,6 +264,17 @@
    th:href="@{${moduleURL} +'/page/' + ${pageNum} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''} }">
     <i th:class="${label == 'Previous' ? 'fe fe-arrow-left me-1' : 'fe fe-arrow-right ms-1' }"></i>
 </a>
+
+<div th:fragment="status(enabled, entityName, entityURL)" th:remove="tag">
+    <a class="fe fe-check-circle fe-2x"
+       th:href="@{${entityURL}+'/enabled/false'}"
+       th:if="${enabled == true}"
+       th:title="'Disable ' + ${entityName}"></a>
+    <a class="fe fe-check-circle icon-dark fa-2x"
+       th:href="@{${entityURL}+'/enabled/true'}"
+       th:if="${enabled == false}"
+       th:title="'Enable ' + ${entityName}"></a>
+</div>
 
 <div th:fragment="edit(entityName, editURL)" th:remove="tag">
     <a class="fe fe-edit"
@@ -972,6 +353,7 @@
            type="text">
 </div>
 
+
 <div class="col" th:fragment="search_form()">
 
     <!-- Form -->
@@ -979,7 +361,7 @@
         <div class="input-group input-group-flush input-group-merge input-group-reverse">
             <input name="sortField" th:value="${sortField}" type="hidden">
             <input name="sortDir" th:value="${sortDir}" type="hidden">
-            <input class="form-control list-search" name="keyword" placeholder="Search"
+            <input class="form-control" name="keyword" placeholder="Search"
                    th:value="${keyword}" type="search">
             <span class="input-group-text">
                 <button class="btn btn-outline-border btn-xxs" type="submit">
@@ -993,17 +375,25 @@
 
 <th:block th:fragment="js_code">
     <!-- JAVASCRIPT -->
-    <!-- Vendor JS -->
-    <script th:src="@{/assets/js/vendor.bundle.js}"></script>
-
-    <!-- Theme JS -->
-    <script th:src="@{/assets/js/theme.bundle.js}"></script>
-    <script th:src="@{/assets/libs/jquery/dist/jquery.min.js}"></script>
-    <script th:src="@{/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/vendor/jquery/dist/jquery.min.js}"></script>
+    <script th:src="@{/assets/vendor/popper.js/dist/umd/popper.min.js}"></script>
+    <script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
+    <script th:src="@{/assets/vendor/headroom.js/dist/headroom.min.js}"></script>
+    <script th:src="@{/assets/vendor/countup.js/dist/countUp.min.js}"></script>
+    <script th:src="@{/assets/vendor/jquery-countdown/dist/jquery.countdown.min.js}"></script>
+    <script th:src="@{/assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js}"></script>
+    <script th:src="@{/assets/vendor/prismjs/prism.js}"></script>
+    <script th:src="@{/assets/vendor/chartist/dist/chartist.min.js}"></script>
+    <script th:src="@{/assets/vendor/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js}"></script>
+    <script th:src="@{/assets/vendor/jqvmap/dist/jquery.vmap.min.js}"></script>
+    <script th:src="@{/assets/vendor/jqvmap/dist/maps/jquery.vmap.world.js}"></script>
+    <script th:src="@{/assets/js/rocket.js}"></script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+            integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+            data-cf-beacon='{"rayId":"8b0f52b73d0495ed","version":"2024.7.0","r":1,"serverTiming":{"name":{"cfL4":true}},"token":"3a2c60bab7654724a0f7e5946db4ea5a","b":1}'
+            crossorigin="anonymous"></script>
     <script th:src="@{/assets/richTextEditor/jquery.richtext.min.js}"></script>
-    <script th:src="@{/assets/js/pdf/html2canvas.min.js}"></script>
-    <script th:src="@{/assets/js/pdf/jqueryhtml2canvas.js}"></script>
-    <script th:src="@{/assets/js/pdf/jspdf.debug.js}"></script>
+
     <script th:src="@{/assets/js/common.js}" type="text/javascript"></script>
     <script th:src="@{/assets/js/jquery.number.min.js}" type="text/javascript"></script>
 

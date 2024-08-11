@@ -19,9 +19,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ROLE_ADMIN = "Admin";
     private static final String ROLE_SUPERADMIN = "SuperAdmin";
     private static final String ROLE_GENERAL = "General";
-
-//    @Autowired
-//    private CustomLoginFailureHandler loginFailureHandler;
+    private static final String ROLE_MERCHANT = "Merchant";
+    private static final String ROLE_ORGANIZATION_ADMIN = "OrganizationAdmin";
 
     @Bean
     public UserDetailsService userDetailsService() {

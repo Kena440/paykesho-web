@@ -2,6 +2,7 @@ package org.commons.entity.merchant;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
 import org.commons.entity.State;
 import org.commons.enums.MerchantType;
@@ -22,6 +23,8 @@ public class Merchant extends IdBasedEntity {
     protected String physicalAddress;
     @Column(name = "services_offered")
     protected String servicesOffered;
+    @Column(name = "code", length = 128, nullable = false, unique = true)
+    private String code;
     @Column(name = "name", length = 50, nullable = false, unique = true)
     private String name;
     @Column(name = "details", length = 128, nullable = false)
@@ -44,10 +47,20 @@ public class Merchant extends IdBasedEntity {
     private boolean deleted;
     private float longitude;
     private float latitude;
+    @Column(length = 64)
+    private String photos;
 
     @Override
     public String toString() {
         return name + " ~ " + merchantType;
+    }
+
+    @Transient
+    public String getPhotosImagePath() {
+        if (id == null || photos == null) {
+            return "/images/default_image.png";
+        }
+        return Constants.S3_BASE_URI + "/merchant_logos/" + this.id + "/" + this.photos;
     }
 
 }

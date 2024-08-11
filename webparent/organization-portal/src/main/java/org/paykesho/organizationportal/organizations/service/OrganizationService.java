@@ -153,8 +153,8 @@ public class OrganizationService {
         List<DataItem> dataItemList = new ArrayList<>();
 
         for (Organization detail : memberInstitutions) {
-            LevelOfCare levelOfCare = settingService.findLevelOfCareById(detail.getLevelOfCare().getId());
-            String identifier = levelOfCare.getName();
+            LevelOfCare organizationType = settingService.findLevelOfCareById(detail.getLevelOfCare().getId());
+            String identifier = organizationType.getName();
 
             DataItem dataItem = new DataItem(identifier);
 

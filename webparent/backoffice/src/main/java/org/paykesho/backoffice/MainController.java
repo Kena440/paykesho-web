@@ -39,7 +39,6 @@ public class MainController {
     @GetMapping("")
     public String viewHomePage(Model model, HttpServletRequest request) {
         Country country = settingService.getCountryByName("Zambia");
-        loadCurrencySetting(request);
 
         model.addAttribute("facilityCount", facilityService.countInstitutions());
         model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
@@ -57,62 +56,4 @@ public class MainController {
         return "redirect:/";
     }
 
-    //@GetMapping("/test-email")
-    public String sendTestEmail(HttpServletRequest request) {
-        new Thread(() -> {
-            try {
-                sendAdminCreationEmail(request);
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-            }
-        }).start();
-        return "empty_page";
-    }
-
-    private void sendAdminCreationEmail(HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettingBag = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBag);
-
-        mailSender.setDefaultEncoding("utf-8");
-
-        String toAddress = "mwamba.kaenga@chaz.org.zm";
-        String subject = emailSettingBag.getAssessorCreationSubject();
-        String content = emailSettingBag.getAssessorCreationContent();
-        String systemURL = Utility.getSiteUrl(request);
-
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-
-        helper.setFrom(emailSettingBag.getFromAddress(), emailSettingBag.getSenderName());
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
-
-        content = content.replace("[[name]]", "mwamba");
-        content = content.replace("[[link]]", systemURL);
-        content = content.replace("[[email]]", "kaengamwamba@gmail.com");
-        content = content.replace("[[password]]", "12345");
-
-        helper.setText(content, true);
-        mailSender.send(mimeMessage);
-    }
-
-    private void loadCurrencySetting(HttpServletRequest request) {
-        List<Setting> currencySettings = settingService.getCurrencySettings();
-
-        for (Setting setting : currencySettings) {
-            request.setAttribute(setting.getKey(), setting.getValue());
-        }
-    }
-
-/*    private void loginNotification(Authentication authentication,
-                                   HttpServletRequest request) {
-        try {
-            if (authentication.getPrincipal() instanceof MembershipMgtUserDetails) {
-                deviceService.verifyDevice((((MembershipMgtUserDetails) authentication.getPrincipal()).getUser()), request);
-            }
-        } catch(Exception e) {
-            LOGGER.error("An error occurred verifying device or location");
-            throw new RuntimeException(e);
-        }
-    }*/
 }

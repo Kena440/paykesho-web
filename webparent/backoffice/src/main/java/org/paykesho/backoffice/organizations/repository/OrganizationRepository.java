@@ -20,15 +20,15 @@ public interface OrganizationRepository extends SearchRepository<Organization, I
 
     public Long countById(Integer id);
 
-    @Query("select m from Organization m where concat(m.name, ' ', m.latitude, ' ', m.levelOfCare.name, ' ', m.district, ' ', m.province.name, ' ', m.email) like %?1%")
+    @Query("select m from Organization m where concat(m.name, ' ', m.latitude, ' ', m.organizationType, ' ', m.district, ' ', m.province.name, ' ', m.email) like %?1%")
     public Page<Organization> findAll(String keyword, Pageable pageable);
 
     @Query("update Organization m set m.enabled = ?2 where m.id = ?1")
     @Modifying
     public void updateEnableStatus(Integer id, boolean enabled);
 
-    @Query("select m from Organization m where m.id = :id and m.province.id = :provinceId and m.name = :facilityName and m.levelOfCare.id = :levelOfCareId")
-    public Organization getOrganizationByIdAndProvinceAndNameAndLevelOfCare(@Param("id") Integer id, @Param("provinceId") Integer provinceId, @Param("facilityName") String facilityName, @Param("levelOfCareId") Integer levelOfCareId);
+    @Query("select m from Organization m where m.id = :id and m.province.id = :provinceId and m.name = :facilityName and m.organizationType = :organizationTypeId")
+    public Organization getOrganizationByIdAndProvinceAndNameAndLevelOfCare(@Param("id") Integer id, @Param("provinceId") Integer provinceId, @Param("facilityName") String facilityName, @Param("organizationTypeId") Integer organizationTypeId);
 
     @Query("select m " + "from Organization m " + "where m.enabled = ?1 ")
     List<Organization> findOrganizationTypesEnabled(boolean enabled);
