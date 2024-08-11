@@ -312,7 +312,7 @@ $(document).ready(function () {
                 showGrid: true,
                 showLabel: true,
                 labelInterpolationFnc: function(value) {
-                    return '$' + (value / 1) + 'k';
+                    return 'K' + (value / 1) + 'k';
                 }
             }
             });

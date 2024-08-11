@@ -40,26 +40,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll();
         http.authorizeRequests()
-                .antMatchers("/forgot-password", "/reset-password", "/reset-password-action").permitAll()
-                .antMatchers("/", "/account", "/cso-admins/update-account")
-                .authenticated()
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/client").authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
                 .usernameParameter("email")
-                .successHandler(databaseLoginSuccessHandler)
-                .failureHandler(loginFailureHandler)
-                .permitAll().and()
+                .permitAll()
+                .and()
                 .oauth2Login()
                 .loginPage("/login")
                 .userInfoEndpoint()
                 .userService(oAuth2UserService)
-                .and().
-                successHandler(oAuth2LoginSuccessHandler)
-                .and().logout().permitAll().and().rememberMe().key("1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ").tokenValiditySeconds(14 * 24 * 60 * 60);
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+                .and()
+                .and()
+                .logout()
+                .permitAll()
+                .and()
+                .rememberMe()
+                .key("1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ")
+                .tokenValiditySeconds(14 * 24 * 60 * 60);
+
+        http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
     }
 
     @Override

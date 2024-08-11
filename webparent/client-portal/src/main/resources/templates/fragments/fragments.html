@@ -61,8 +61,11 @@
 
 <body>
 
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-THQTXJ7" height="0" width="0"
-                  style="display:none;visibility:hidden"></iframe></noscript>
+<div th:fragment="loader" class="preloader bg-soft flex-column justify-content-center align-items-center"><img
+        class="loader-element"
+        th:src="@{/assets/img/brand/paykeshologo.svg}"
+        height="50"
+        alt="Rocket logo"></div>
 
 <header th:fragment="header" class="header-global">
     <nav id="navbar-main"
