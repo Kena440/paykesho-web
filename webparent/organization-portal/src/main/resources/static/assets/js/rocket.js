@@ -20,7 +20,7 @@ $(document).ready(function () {
 
     // preloader
     var $preloader = $('.preloader');
-    if($preloader.length) {
+    if ($preloader.length) {
         $preloader.delay(500).fadeOut('slow');
     }
 
@@ -61,48 +61,48 @@ $(document).ready(function () {
 
     });
 
-    $('.dropdown-menu a.dropdown-toggle').on('click', function(e) {
+    $('.dropdown-menu a.dropdown-toggle').on('click', function (e) {
         if (!$(this).next().hasClass('show')) {
-          $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+            $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
         }
         var $subMenu = $(this).next(".dropdown-menu");
         $subMenu.toggleClass('show');
-      
-        $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function(e) {
-          $('.dropdown-submenu .show').removeClass("show");
+
+        $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function (e) {
+            $('.dropdown-submenu .show').removeClass("show");
         });
-      
+
         return false;
     });
 
     if ($(document).width() >= breakpoints.lg) {
-        $('.nav-item.dropdown').hover(function() {
-            $(this).find('> .dropdown-toggle').dropdown('toggle');
-        },
-        function () {
-            $(this).removeClass('show');
-            $(this).find('.dropdown-menu').removeClass('show');
-            $(this).find('> .dropdown-toggle').attr('aria-expanded', 'false');
-        });
-    
-        $('.dropdown-menu a.dropdown-toggle').hover(function() {
-            if (!$(this).next().hasClass('show')) {
-                $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
-              }
-              var $subMenu = $(this).next(".dropdown-menu");
-              $subMenu.toggleClass('show');
-            
-              $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function(e) {
-                $('.dropdown-submenu .show').removeClass("show");
-              });
-            
-              return false;
-        },
-        function () {
-            $(this).removeClass('show');
-            $(this).find('.dropdown-menu').removeClass('show');
-            $(this).attr('aria-expanded', false);
-        });
+        $('.nav-item.dropdown').hover(function () {
+                $(this).find('> .dropdown-toggle').dropdown('toggle');
+            },
+            function () {
+                $(this).removeClass('show');
+                $(this).find('.dropdown-menu').removeClass('show');
+                $(this).find('> .dropdown-toggle').attr('aria-expanded', 'false');
+            });
+
+        $('.dropdown-menu a.dropdown-toggle').hover(function () {
+                if (!$(this).next().hasClass('show')) {
+                    $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+                }
+                var $subMenu = $(this).next(".dropdown-menu");
+                $subMenu.toggleClass('show');
+
+                $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function (e) {
+                    $('.dropdown-submenu .show').removeClass("show");
+                });
+
+                return false;
+            },
+            function () {
+                $(this).removeClass('show');
+                $(this).find('.dropdown-menu').removeClass('show');
+                $(this).attr('aria-expanded', false);
+            });
     }
 
     // Headroom - show/hide navbar on scroll
@@ -159,13 +159,13 @@ $(document).ready(function () {
     }).trigger('blur');
 
     var e = document.querySelector('[data-toggle="price"]');
-    "undefined" != typeof CountUp && e && e.addEventListener("change", function(e) {
-        ! function(e) {
+    "undefined" != typeof CountUp && e && e.addEventListener("change", function (e) {
+        !function (e) {
             var t = e.target,
                 d = t.checked,
                 a = t.dataset.target,
                 o = document.querySelectorAll(a);
-            [].forEach.call(o, function(e) {
+            [].forEach.call(o, function (e) {
                 var t = e.dataset.annual,
                     a = e.dataset.monthly,
                     o = e.dataset.decimals ? e.dataset.decimals : null,
@@ -241,15 +241,15 @@ $(document).ready(function () {
 
     //Chartist
 
-    if($('.ct-chart-ranking').length) {
+    if ($('.ct-chart-ranking').length) {
         //Chart 5
-            new Chartist.Bar('.ct-chart-ranking', {
+        new Chartist.Bar('.ct-chart-ranking', {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             series: [
                 [5, 4, 3, 7, 5, 10, 3],
                 [3, 2, 9, 5, 4, 6, 4]
             ]
-            }, {
+        }, {
             low: 0,
             showArea: true,
             plugins: [
@@ -268,17 +268,19 @@ $(document).ready(function () {
         });
     }
 
-    if($('.ct-chart-traffic-source').length) {
+    if ($('.ct-chart-traffic-source').length) {
         var data = {
             series: [80, 20, 10]
-            };
-            
-            var sum = function(a, b) { return a + b };
-            
-            new Chartist.Pie('.ct-chart-traffic-source', data, {
-            labelInterpolationFnc: function(value) {
+        };
+
+        var sum = function (a, b) {
+            return a + b
+        };
+
+        new Chartist.Pie('.ct-chart-traffic-source', data, {
+            labelInterpolationFnc: function (value) {
                 return Math.round(value / data.series.reduce(sum) * 100) + '%';
-            },            
+            },
             low: 0,
             high: 8,
             fullWidth: false,
@@ -286,16 +288,16 @@ $(document).ready(function () {
             plugins: [
                 Chartist.plugins.tooltip()
             ],
-        });         
+        });
     }
 
-    if($('.ct-chart-sales-value').length) {
+    if ($('.ct-chart-sales-value').length) {
         new Chartist.Line('.ct-chart-sales-value', {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             series: [
                 [0, 10, 30, 50, 80, 50, 30]
             ]
-            }, {
+        }, {
             low: 0,
             showArea: true,
             fullWidth: true,
@@ -311,14 +313,14 @@ $(document).ready(function () {
                 // On the y-axis start means left and end means right
                 showGrid: true,
                 showLabel: true,
-                labelInterpolationFnc: function(value) {
+                labelInterpolationFnc: function (value) {
                     return '$' + (value / 1) + 'k';
                 }
             }
-            });
+        });
     }
 
-    if($('.ct-chart-volumes').length) {
+    if ($('.ct-chart-volumes').length) {
         new Chartist.Line('.ct-chart-volumes', {
             labels: ['Mar 16', 'Apr 16', 'May 16', 'Jun 16', 'Jul 16', 'Aug 16', 'Sept 16'],
             series: [
@@ -328,7 +330,7 @@ $(document).ready(function () {
                 [10, 15, 13, 17, 14, 18, 20],
                 [16, 18, 18, 20, 20, 20, 23]
             ]
-            }, {
+        }, {
             low: 0,
             showArea: false,
             fullWidth: true,
@@ -344,23 +346,23 @@ $(document).ready(function () {
                 // On the y-axis start means left and end means right
                 showGrid: true,
                 showLabel: true,
-                labelInterpolationFnc: function(value) {
+                labelInterpolationFnc: function (value) {
                     return (value / 1) + 'M';
                 }
             }
-            });
+        });
     }
 
-    if($('.ct-chart-app-ranking').length) {
+    if ($('.ct-chart-app-ranking').length) {
         //Chart 5
-            new Chartist.Bar('.ct-chart-app-ranking', {
+        new Chartist.Bar('.ct-chart-app-ranking', {
             labels: ['21 Apr', '21 Ap', '22 Ap', '23 Ap', '24 Ap', '25 Ap', '26 Ap'],
             series: [
                 [5, 4, 3, 7, 5, 10, 3],
                 [2, 2, 1, 5, 3, 4, 2],
                 [3, 2, 9, 5, 4, 6, 4]
             ]
-            }, {
+        }, {
             low: 0,
             showArea: true,
             plugins: [
@@ -379,17 +381,19 @@ $(document).ready(function () {
         });
     }
 
-    if($('.ct-chart-traffic-share').length) {
+    if ($('.ct-chart-traffic-share').length) {
         var data = {
             series: [30, 70]
-            };
-            
-            var sum = function(a, b) { return a + b };
-            
-            new Chartist.Pie('.ct-chart-traffic-share', data, {
-            labelInterpolationFnc: function(value) {
+        };
+
+        var sum = function (a, b) {
+            return a + b
+        };
+
+        new Chartist.Pie('.ct-chart-traffic-share', data, {
+            labelInterpolationFnc: function (value) {
                 return Math.round(value / data.series.reduce(sum) * 100) + '%';
-            },            
+            },
             low: 0,
             high: 8,
             fullWidth: true,
@@ -401,20 +405,22 @@ $(document).ready(function () {
             plugins: [
                 Chartist.plugins.tooltip()
             ],
-        });         
+        });
     }
 
-    if($('.ct-chart-traffic-share-2').length) {
+    if ($('.ct-chart-traffic-share-2').length) {
         var data = {
             series: [51.5, 29.4, 9.10, 6.5, 3.5]
-            };
-            
-            var sum = function(a, b) { return a + b };
-            
-            new Chartist.Pie('.ct-chart-traffic-share-2', data, {
-            labelInterpolationFnc: function(value) {
+        };
+
+        var sum = function (a, b) {
+            return a + b
+        };
+
+        new Chartist.Pie('.ct-chart-traffic-share-2', data, {
+            labelInterpolationFnc: function (value) {
                 return Math.round(value / data.series.reduce(sum) * 100) + '%';
-            },            
+            },
             low: 0,
             high: 8,
             donut: true,
@@ -424,13 +430,13 @@ $(document).ready(function () {
             plugins: [
                 Chartist.plugins.tooltip()
             ],
-        });         
+        });
     }
 
-    if($('.ct-chart-10').length) {
+    if ($('.ct-chart-10').length) {
         new Chartist.Pie('.ct-chart-10', {
             series: [20, 10, 30, 40]
-            }, {
+        }, {
             donut: true,
             donutWidth: 60,
             donutSolid: true,
@@ -440,20 +446,22 @@ $(document).ready(function () {
                 Chartist.plugins.tooltip()
             ],
             showLabel: true
-        });         
+        });
     }
 
-    if($('.ct-chart-distribution').length) {
+    if ($('.ct-chart-distribution').length) {
         var data = {
             series: [30, 50, 20]
-            };
-            
-            var sum = function(a, b) { return a + b };
-            
-            new Chartist.Pie('.ct-chart-distribution', data, {
-            labelInterpolationFnc: function(value) {
+        };
+
+        var sum = function (a, b) {
+            return a + b
+        };
+
+        new Chartist.Pie('.ct-chart-distribution', data, {
+            labelInterpolationFnc: function (value) {
                 return Math.round(value / data.series.reduce(sum) * 100) + '%';
-            },            
+            },
             low: 0,
             high: 8,
             fullWidth: true,
@@ -465,11 +473,11 @@ $(document).ready(function () {
             plugins: [
                 Chartist.plugins.tooltip()
             ],
-        });         
+        });
     }
 
     //vmap
-    if($('#vmap').length) {
+    if ($('#vmap').length) {
         $('#vmap').vectorMap(
             {
                 map: 'world_en',
@@ -486,9 +494,8 @@ $(document).ready(function () {
                 selectedColor: '#0E1B48',
                 selectedRegions: null,
                 showTooltip: true,
-                onLabelShow: function(event, label, code)
-                {
-                label.text(label.text() + ': ' + Math.floor((Math.random() * 10000) + 1) + ' session');
+                onLabelShow: function (event, label, code) {
+                    label.text(label.text() + ': ' + Math.floor((Math.random() * 10000) + 1) + ' session');
                 }
             });
     }

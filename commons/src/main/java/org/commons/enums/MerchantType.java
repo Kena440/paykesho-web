@@ -4,121 +4,102 @@ public enum MerchantType {
     GROCERY_STORE {
         @Override
         public String defaultDescription() {
-            return "Grocery Store";
+            return "GROCERY_STORE";
         }
-    },
-    ELECTRONICS_STORE {
+    }, ELECTRONICS_STORE {
         @Override
         public String defaultDescription() {
-            return "Electronics Store";
+            return "ELECTRONICS_STORE";
         }
-    },
-    CLOTHING_STORE {
+    }, CLOTHING_STORE {
         @Override
         public String defaultDescription() {
-            return "Clothing Store";
+            return "CLOTHING_STORE";
         }
-    },
-    PHARMACY {
+    }, PHARMACY {
         @Override
         public String defaultDescription() {
-            return "Pharmacy";
+            return "PHARMACY";
         }
-    },
-    RESTAURANT {
+    }, RESTAURANT {
         @Override
         public String defaultDescription() {
-            return "Restaurant";
+            return "RESTAURANT";
         }
-    },
-    CAFE {
+    }, CAFE {
         @Override
         public String defaultDescription() {
-            return "Cafe";
+            return "CAFE";
         }
-    },
-    BOOK_STORE {
+    }, BOOK_STORE {
         @Override
         public String defaultDescription() {
-            return "Book Store";
+            return "BOOK_STORE";
         }
-    },
-    FURNITURE_STORE {
+    }, FURNITURE_STORE {
         @Override
         public String defaultDescription() {
-            return "Furniture Store";
+            return "FURNITURE_STORE";
         }
-    },
-    GAS_STATION {
+    }, GAS_STATION {
         @Override
         public String defaultDescription() {
-            return "Gas Station";
+            return "GAS_STATION";
         }
-    },
-    CONVENIENCE_STORE {
+    }, CONVENIENCE_STORE {
         @Override
         public String defaultDescription() {
-            return "Convenience Store";
+            return "CONVENIENCE_STORE";
         }
-    },
-    HARDWARE_STORE {
+    }, HARDWARE_STORE {
         @Override
         public String defaultDescription() {
-            return "Hardware Store";
+            return "HARDWARE_STORE";
         }
-    },
-    BAKERY {
+    }, BAKERY {
         @Override
         public String defaultDescription() {
-            return "Bakery";
+            return "BAKERY";
         }
-    },
-    JEWELRY_STORE {
+    }, JEWELRY_STORE {
         @Override
         public String defaultDescription() {
-            return "Jewelry Store";
+            return "JEWELRY_STORE";
         }
-    },
-    TOY_STORE {
+    }, TOY_STORE {
         @Override
         public String defaultDescription() {
-            return "Toy Store";
+            return "TOY_STORE";
         }
-    },
-    SPORTS_STORE {
+    }, SPORTS_STORE {
         @Override
         public String defaultDescription() {
-            return "Sports Store";
+            return "SPORTS_STORE";
         }
-    },
-    BEAUTY_SALON {
+    }, BEAUTY_SALON {
         @Override
         public String defaultDescription() {
-            return "Beauty Salon";
+            return "BEAUTY_SALON";
         }
-    },
-    BARBERSHOP {
+    }, BARBERSHOP {
         @Override
         public String defaultDescription() {
-            return "Barbershop";
+            return "BARBERSHOP";
         }
-    },
-    PET_STORE {
+    }, PET_STORE {
         @Override
         public String defaultDescription() {
-            return "Pet Store";
+            return "PET_STORE";
         }
-    },
-    ART_GALLERY {
+    }, ART_GALLERY {
         @Override
         public String defaultDescription() {
-            return "Art Gallery";
+            return "ART_GALLERY";
         }
-    },
-    FLOWER_SHOP {
+    }, FLOWER_SHOP {
         @Override
         public String defaultDescription() {
-            return "Flower Shop";
+            return "FLOWER_SHOP";
         }
     };
 

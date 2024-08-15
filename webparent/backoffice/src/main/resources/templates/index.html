@@ -1,36 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Dashboard','none')"></head>
 <body>
 <div th:replace="fragments/fragments :: loader"></div>
+<!--
 <nav th:replace="fragments/fragments :: nav"></nav>
+-->
 <div class="container-fluid bg-soft">
     <div class="row">
         <div class="col-12">
             <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
             <main class="content">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                    <div class="btn-toolbar">
-                        <button class="btn btn-primary btn-sm mr-2 dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false"><span class="fas fa-plus mr-2"></span>Quick Actions
-                        </button>
+                <div th:replace="fragments/fragments :: topbar" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+                    <div><button class="btn btn-secondary mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                                 aria-expanded="false"><span class="fas fa-plus mr-2"></span>New</button>
                         <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2"><a
-                                class="dropdown-item font-weight-bold" href="#"><span class="fas fa-tasks mr-2"></span>New
-                            Merchant</a> <a
-                                class="dropdown-item font-weight-bold" href="#"><span
-                                class="fas fa-money-check mr-2"></span>Transactions</a> <a
-                                class="dropdown-item font-weight-bold" href="#"><span
-                                class="fas fa-cogs mr-2"></span>Settings</a>
-                            <div role="separator" class="dropdown-divider"></div>
-                            <a class="dropdown-item font-weight-bold"
-                               href="#"><span class="fas fa-user-cog text-danger mr-2"></span>User Mgt</a>
+                                class="dropdown-item font-weight-bold" href="#"><span class="far fa-file-alt mr-2"></span>Document</a>
+                            <a class="dropdown-item font-weight-bold" href="#"><span
+                                    class="far fa-comment-dots mr-2"></span>Message</a> <a class="dropdown-item font-weight-bold"
+                                                                                           href="#"><span class="fas fa-box-open mr-2"></span>Product</a>
+                            <div role="separator" class="dropdown-divider"></div><a class="dropdown-item font-weight-bold"
+                                                                                    href="#"><span class="fas fa-rocket text-danger mr-2"></span>Subscription Plan</a>
                         </div>
                     </div>
-                    <div class="btn-group mr-2">
-                        <span class="mr-2">Back Office</span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                    <div>
+                        <button
+                                class="btn btn-primary mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false"><span class="fas fa-user-circle mr-2"></span><a class="h6 text-white" sec:authentication="principal.fullname" th:href="@{/my-account}"></a> <span
+                                class="icon icon-small ml-1"><span class="fas fa-chevron-down"></span></span></button>
+                        <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2"><a
+                                class="dropdown-item font-weight-bold" href="#"><span class="fas fa-box-open mr-2"></span>Products</a>
+                            <a class="dropdown-item font-weight-bold" href="#"><span class="fas fa-store mr-2"></span>Customers</a>
+                            <a class="dropdown-item font-weight-bold" href="#"><span
+                                    class="fas fa-cart-arrow-down mr-2"></span>Orders</a> <a class="dropdown-item font-weight-bold"
+                                                                                             href="#"><span class="fas fa-chart-pie mr-2"></span>Console</a>
+                            <div role="separator" class="dropdown-divider"></div><a class="dropdown-item font-weight-bold"
+                                                                                    href="#"><span class="fas fa-rocket text-success mr-2"></span>All Reports</a>
+                        </div>
                     </div>
                 </div>
                 <div class="row justify-content-md-center">
@@ -105,12 +113,13 @@
                                         </div>
                                         <h6 class="font-weight-normal text-gray"><span
                                                 class="icon w-20 icon-xs icon-secondary mr-1"><span
-                                                class="fas fa-shopping-cart"></span></span> FMCG <a href="#"
-                                                                                                 class="h6">70%</a></h6>
+                                                class="fas fa-shopping-cart"></span></span> FMCG <a class="h6"
+                                                                                                    href="#">70%</a>
+                                        </h6>
                                         <h6 class="font-weight-normal text-gray"><span
                                                 class="icon w-20 icon-xs icon-primary mr-1"><span
-                                                class="fas fa-bolt"></span></span> Utilities <a href="#"
-                                                                                                       class="h6">30%</a>
+                                                class="fas fa-bolt"></span></span> Utilities <a class="h6"
+                                                                                                href="#">30%</a>
                                         </h6>
                                     </div>
                                 </div>
@@ -206,9 +215,9 @@
                                                 <span
                                                         class="text-success font-weight-bold">K10.57%</span></div>
                                         </div>
-                                        <div class="d-flex ml-auto"><a href="#" class="btn btn-tertiary btn-sm mr-3">Month</a>
-                                            <a href="#"
-                                               class="btn btn-white border-light btn-sm mr-3">Week</a></div>
+                                        <div class="d-flex ml-auto"><a class="btn btn-tertiary btn-sm mr-3" href="#">Month</a>
+                                            <a class="btn btn-white border-light btn-sm mr-3"
+                                               href="#">Week</a></div>
                                     </div>
                                     <div class="card-body p-2">
                                         <div class="ct-chart-sales-value ct-major-tenth ct-series-b"></div>
@@ -227,7 +236,7 @@
                                             <h6 class="mb-0"><span class="icon icon-xs mr-3"><span
                                                     class="fas fa-globe-africa"></span></span>Global Rank</h6>
                                         </div>
-                                        <div><a href="#" class="text-primary font-weight-bold">#755<span
+                                        <div><a class="text-primary font-weight-bold" href="#">#755<span
                                                 class="fas fa-chart-line ml-2"></span></a></div>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between border-bottom border-light py-3">
@@ -238,17 +247,17 @@
                                                     class="icon icon-xs text-success ml-2"><span
                                                     class="fas fa-angle-up"></span></span></div>
                                         </div>
-                                        <div><a href="#" class="text-primary font-weight-bold">#32<span
+                                        <div><a class="text-primary font-weight-bold" href="#">#32<span
                                                 class="fas fa-chart-line ml-2"></span></a></div>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between pt-3">
                                         <div>
                                             <h6 class="mb-0"><span class="icon icon-xs mr-3"><span
                                                     class="fas fa-folder-open"></span></span>Category Rank</h6><a
-                                                href="#"
-                                                class="small card-stats">Grocery > FMCG</a>
+                                                class="small card-stats"
+                                                href="#">Grocery > FMCG</a>
                                         </div>
-                                        <div><a href="#" class="text-primary font-weight-bold">#16<span
+                                        <div><a class="text-primary font-weight-bold" href="#">#16<span
                                                 class="fas fa-chart-line ml-2"></span></a></div>
                                     </div>
                                 </div>

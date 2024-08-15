@@ -42,6 +42,7 @@ public class UserController {
             @PathVariable("pageNum") int pageNum,
             Model model) throws PaykeshoError {
         userService.listByPage(pageNum, helper);
+        model.addAttribute("pageTitle", "User List");
 
         return "users/users";
     }

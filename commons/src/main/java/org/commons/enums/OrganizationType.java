@@ -4,85 +4,72 @@ public enum OrganizationType {
     HEALTHCARE {
         @Override
         public String defaultDescription() {
-            return "Healthcare";
+            return "HEALTHCARE";
         }
-    },
-    EDUCATION {
+    }, EDUCATION {
         @Override
         public String defaultDescription() {
-            return "Education";
+            return "EDUCATION";
         }
-    },
-    FINANCE {
+    }, FINANCE {
         @Override
         public String defaultDescription() {
-            return "Finance";
+            return "FINANCE";
         }
-    },
-    MANUFACTURING {
+    }, MANUFACTURING {
         @Override
         public String defaultDescription() {
-            return "Manufacturing";
+            return "MANUFACTURING";
         }
-    },
-    RETAIL {
+    }, RETAIL {
         @Override
         public String defaultDescription() {
-            return "Retail";
+            return "RETAIL";
         }
-    },
-    TECHNOLOGY {
+    }, TECHNOLOGY {
         @Override
         public String defaultDescription() {
-            return "Technology";
+            return "TECHNOLOGY";
         }
-    },
-    GOVERNMENT {
+    }, GOVERNMENT {
         @Override
         public String defaultDescription() {
-            return "Government";
+            return "GOVERNMENT";
         }
-    },
-    NON_PROFIT {
+    }, NON_PROFIT {
         @Override
         public String defaultDescription() {
-            return "Non-Profit";
+            return "NON_PROFIT";
         }
-    },
-    TRANSPORTATION {
+    }, TRANSPORTATION {
         @Override
         public String defaultDescription() {
-            return "Transportation";
+            return "TRANSPORTATION";
         }
-    },
-    ENERGY {
+    }, ENERGY {
         @Override
         public String defaultDescription() {
-            return "Energy";
+            return "ENERGY";
         }
-    },
-    CONSTRUCTION {
+    }, CONSTRUCTION {
         @Override
         public String defaultDescription() {
-            return "Construction";
+            return "CONSTRUCTION";
         }
-    },
-    HOSPITALITY {
+    }, HOSPITALITY {
         @Override
         public String defaultDescription() {
-            return "Hospitality";
+            return "HOSPITALITY";
         }
-    },
-    TELECOMMUNICATION {
+    }, TELECOMMUNICATION {
         @Override
         public String defaultDescription() {
-            return "Telecommunication";
+            return "TELECOMMUNICATION";
         }
-    },
-    AGRICULTURE {
+    }, AGRICULTURE {
         @Override
         public String defaultDescription() {
-            return "Agriculture";
+            return "AGRICULTURE";
         }
     };
 

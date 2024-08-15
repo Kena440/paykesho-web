@@ -19,10 +19,10 @@ import java.util.Objects;
 @Entity
 @Table(name = "clients")
 public class Client extends IdBasedEntity {
-    @Column(name = "code", length = 128, nullable = false, unique = true)
-    private String code;
     @Column(length = 15, nullable = false, name = "phone_number")
     protected String phoneNumber;
+    @Column(name = "code", length = 128, nullable = false, unique = true)
+    private String code;
     @Column(length = 64, nullable = false)
     private String salutation;
     @Column(name = "name", length = 245, nullable = false)
