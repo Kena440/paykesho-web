@@ -10,11 +10,7 @@ body {
     color: green;
 }
 
-.btn-primary {
-    background-color: green !important;
-    border-color: white !important;
-    color: #fff !important
-}
+
 
 @media screen and (max-width: 768px) {
     /*small screen*/

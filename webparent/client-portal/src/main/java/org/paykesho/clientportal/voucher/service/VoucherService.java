@@ -62,6 +62,6 @@ public class VoucherService {
     }*/
 
     public Voucher getVoucherByCode(String voucherCode) {
-        return voucherRepository.getVoucherByPaykeshoReference(voucherCode);
+        return voucherRepository.getVoucherByReference(voucherCode);
     }
 }

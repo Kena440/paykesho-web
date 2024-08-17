@@ -29,6 +29,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
   /*  @Query("select new org.paykesho.clientportal.api.dto.VoucherDto(v.reference, v.amount, v.availableAmount, v.repaymentAmount, v.interestPercent, v.repaymentCycle, v.repaymentDate, v.requestDate, v.approved) from Voucher v where v.client = :client and v.merchant.paykeshoId = :merchantCode")
     List<VoucherDto> getVouchersByClientAndMerchantFlat(Client client, String merchantCode);
 */
-    Voucher getVoucherByPaykeshoReference(String voucherCode);
+    Voucher getVoucherByReference(String voucherCode);
 }
 

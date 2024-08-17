@@ -1,689 +1,175 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
-
-<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
-<head th:replace="fragments/fragments :: page_head('Home','none')"></head>
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: page_head('Home', 'none')"></head>
 <body>
 <header th:replace="fragments/fragments :: header"></header>
 <main>
     <div th:replace="fragments/fragments :: loader"></div>
-    <section class="section-header pb-11 pb-lg-13 bg-primary text-white">
+    <section class="section-header pb-7 pb-lg-11 bg-soft">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-10 text-center">
-                    <h1 class="display-1 mb-4">Imagine what we will accomplish together</h1>
-                    <p class="lead mb-5 px-lg-5">Powerful analytics tools for your business. See the exact keywords for
-                        which
-                        your competitors rank in organic search and the amount of traffic driven by each of them.</p>
-                    <button
-                            class="btn btn-secondary" data-target="#pricing-modal" data-toggle="modal"
-                            type="button"><span
-                            class="mr-2"><i class="fas fa-hand-pointer"></i></span> Start <span
-                            class="d-none d-md-inline">a
-                30-days</span> trial
-                    </button>
-                    <a class="btn btn-white text-primary animate-up-2 ml-3"
-                       href="dashboard/dashboard.html">Quick demo</a>
+            <div class="row justify-content-between align-items-center">
+                <div class="col-12 col-lg-6 order-2 order-lg-1">
+                    <img th:src="@{/assets/img/brand/paykeshologo.svg}" class="w-100" alt="Paykesho Illustration">
+                </div>
+                <div class="col-12 col-lg-5 order-1 order-lg-2">
+                    <h1 class="display-2 mb-3">Effortless Payments, Empowered Tomorrow</h1>
+                    <p class="lead">With Paykesho, "Get lelo, Pay mailo" becomes a reality. Manage your payments effortlessly and securely while aligning transactions with your schedule.</p>
+                    <div class="mt-4">
+                        <form action="#" class="d-flex flex-column mb-5 mb-lg-0">
+                            <input class="form-control" type="text" name="full-name" placeholder="Full name" required>
+                            <input class="form-control my-3" type="email" name="email" placeholder="Your email" required>
+                            <button class="btn btn-primary" type="submit">Create Your Account</button>
+                            <div class="form-group form-check mt-3">
+                                <input type="checkbox" class="form-check-input" id="termsCheck">
+                                <label class="form-check-label form-check-sign-white" for="termsCheck">I agree to the <a href="terms.html">Terms & Conditions</a></label>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="pattern bottom"></div>
     </section>
-    <div class="section pt-0 pb-3">
-        <div class="container mt-n9 mt-lg-n12 z-2">
-            <div class="row justify-content-center">
-                <div class="col-12"><img alt="illustration" src="../assets/img/index-mockup.png"></div>
-            </div>
-        </div>
-    </div>
-    <section class="section section-lg pt-0">
+    <section class="section section-lg pt-6">
         <div class="container">
-            <div class="row justify-content-center mb-5 mb-lg-6">
+            <div class="row justify-content-center mb-5 mb-md-7">
                 <div class="col-12 col-md-8 text-center">
-                    <h2 class="h1 font-weight-bolder mb-4">Meet our intuitive platform</h2>
-                    <p class="lead">Self-Service Analytics or ad hoc reporting gives users the ability to develop rapid
-                        reports,
-                        empowering users to analyze their data.</p>
+                    <h2 class="h1 font-weight-bolder mb-4">Discover the Power of Paykesho</h2>
+                    <p class="lead">Our platform ensures seamless payment management across all devices, making your financial life as mobile as you are.</p>
                 </div>
             </div>
-            <div class="row mb-4 mb-lg-7">
-                <div class="col-12 col-md-6 col-lg-3 mb-5 mb-lg-0 text-center">
-                    <div class="icon icon-shape icon-shape-primary rounded-circle"><span
-                            class="fas fa-chart-pie"></span></div>
-                    <h5 class="mt-4 mb-3">Analyze your data</h5>
-                    <p class="px-0 px-sm-4 px-lg-0">Create reports with an easy to use drag-and drop cards.</p><a
-                        class="btn btn-link text-primary" href="about.html">Learn more <span
-                        class="icon icon-xs ml-2"><span
-                        class="fas fa-arrow-right"></span></span></a>
+
+            <!-- Automated Payment Scheduling -->
+            <div class="row row-grid align-items-center mb-5 mb-md-7">
+                <div class="col-12 col-md-5">
+                    <h2 class="font-weight-bolder mb-4">Automated Payment Scheduling</h2>
+                    <p class="lead">Set up automated payments for daily, weekly, or monthly bills with Paykesho. Never miss a due date again!</p>
+                    <a href="about.html" class="btn btn-primary mt-3 animate-up-2">Learn More <span class="icon icon-xs ml-2"><i class="fas fa-external-link-alt"></i></span></a>
                 </div>
-                <div class="col-12 col-md-6 col-lg-3 mb-5 mb-lg-0 text-center">
-                    <div class="icon icon-shape icon-shape-primary rounded-circle"><span
-                            class="fas fa-shield-alt"></span></div>
-                    <h5 class="mt-4 mb-3">Collaborate securely</h5>
-                    <p class="px-0 px-sm-4 px-lg-0">Share or publish your reports with your teammates.</p><a
-                        class="btn btn-link text-primary"
-                        href="about.html">Learn more <span class="icon icon-xs ml-2"><span
-                        class="fas fa-arrow-right"></span></span></a>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3 mb-5 mb-lg-0 text-center">
-                    <div class="icon icon-shape icon-shape-primary rounded-circle"><span class="fas fa-rocket"></span>
-                    </div>
-                    <h5 class="mt-4 mb-3">Features released regularly</h5>
-                    <p class="px-0 px-sm-4 px-lg-0">Create reports with an easy to use drag-and drop cards.</p><a
-                        class="btn btn-link text-primary" href="about.html">Learn more <span
-                        class="icon icon-xs ml-2"><span
-                        class="fas fa-arrow-right"></span></span></a>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3 mb-5 mb-lg-0 text-center">
-                    <div class="icon icon-shape icon-shape-primary rounded-circle"><span class="fas fa-headset"></span>
-                    </div>
-                    <h5 class="mt-4 mb-3">24/7 support</h5>
-                    <p class="px-0 px-sm-4 px-lg-0">Our support team is a quick chat or email away — 24 hours a day.</p>
-                    <a
-                            class="btn btn-link text-primary" href="about.html">Learn more <span
-                            class="icon icon-xs ml-2"><span
-                            class="fas fa-arrow-right"></span></span></a>
+                <div class="col-12 col-md-6 ml-md-auto">
+                    <img th:src="@{/assets/img/brand/paykeshologo.svg}" class="w-100" alt="Automated Payments">
                 </div>
             </div>
-            <div class="row justify-content-center mb-4">
-                <div class="col-12">
-                    <div class="position-relative">
-                        <button class="hotspot-popover bg-white" data-container="body"
-                                data-content="Use this menu to find the majority of a platform's essential functions." data-toggle="popover" style="top: 35%; left: 2%;" title="Menu"
-                                type="button"></button>
-                        <button
-                                class="hotspot-popover bg-primary" data-container="body" data-content="We track your desktop and mobile keyword rankings from any location and plot your full ranking history on a handy graph."
-                                data-toggle="popover"
-                                style="top: 55%; left: 35%;" title="Rank Tracker"
-                                type="button"></button>
-                        <button class="hotspot-popover bg-secondary" data-container="body" data-content="We track your desktop and mobile keyword rankings from any location and plot your full ranking history on a handy graph."
-                                data-toggle="popover" style="top: 15%; left: 83%;" title="Traffic Share"
-                                type="button"></button>
-                        <img alt="SaaS preview" class="shadow-box rounded" src="../assets/img/saas-platform.png"></div>
+
+            <!-- Secure and Transparent Transactions -->
+            <div class="row row-grid align-items-center mb-5 mb-md-7">
+                <div class="col-12 col-md-5 order-md-2">
+                    <h2 class="font-weight-bolder mb-4">Secure and Transparent Transactions</h2>
+                    <p>Track your spending and income with detailed insights while keeping your financial data secure and private.</p>
+                    <a href="dashboard/app-analysis.html" class="btn btn-primary mt-3 animate-up-2">View Insights <span class="icon icon-xs ml-2"><i class="fas fa-external-link-alt"></i></span></a>
+                </div>
+                <div class="col-12 col-md-6 mr-lg-auto">
+                    <img th:src="@{/assets/img/brand/paykeshologo.svg}" class="w-100" alt="Secure Transactions">
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="section section-lg bg-primary text-white">
-        <div class="container">
-            <div class="row row-grid align-items-center">
-                <div class="col-12 col-lg-5"><span class="h5 text-muted font-weight-normal mb-2 d-block">Customer
-              service</span>
-                    <h2 class="h1 font-weight-bolder mb-4">Discover effortless customer support</h2>
-                    <p class="lead text-muted">Convert your emails into tickets and keep them all organized in one
-                        place. Never
-                        leave customers' questions unanswered.</p><a class="btn btn-secondary mt-3 animate-up-2"
-                                                                     href="about.html">View
-                        more<span class="icon icon-xs ml-2"><span
-                                class="fas fa-arrow-right"></span></span></a>
-                </div>
-                <div class="col-12 col-lg-6 ml-lg-auto">
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <div class="card bg-white shadow-soft text-primary rounded mb-4">
-                                <div class="px-3 px-lg-4 py-5 text-center"><span class="icon icon-lg mb-4"><span
-                                        class="fas fa-hand-pointer"></span></span>
-                                    <h5 class="font-weight-normal text-primary">Customer service</h5>
-                                    <p>Create low-effort customer service experiences.</p>
-                                </div>
-                            </div>
-                            <div class="card bg-white shadow-soft text-primary rounded mb-4">
-                                <div class="px-3 px-lg-4 py-5 text-center"><span class="icon icon-lg mb-4"><span
-                                        class="fas fa-poll"></span></span>
-                                    <h5 class="font-weight-normal text-primary">Predictive service</h5>
-                                    <p>Drive revenue and offset costs in engagement centers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 pt-lg-5">
-                            <div class="card bg-white shadow-soft text-primary rounded mb-4">
-                                <div class="px-3 px-lg-4 py-5 text-center"><span class="icon icon-lg mb-4"><span
-                                        class="fas fa-file-invoice-dollar"></span></span>
-                                    <h5 class="font-weight-normal text-primary">Service to sales</h5>
-                                    <p>Drive revenue and offset costs in engagement centers</p>
-                                </div>
-                            </div>
-                            <div class="card bg-white shadow-soft text-primary rounded mb-4">
-                                <div class="px-3 px-lg-4 py-5 text-center"><span class="icon icon-lg mb-4"><span
-                                        class="fab fa-discourse"></span></span>
-                                    <h5 class="font-weight-normal text-primary">Make it simple</h5>
-                                    <p>Drive revenue and offset costs in engagement centers</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="section section-lg line-bottom-light">
-        <div class="container">
-            <div class="row justify-content-center mb-4 mb-lg-6">
-                <div class="col-12 text-center">
-                    <h1 class="display-3 mb-3 mb-lg-4">The tools you get with Rocket</h1>
-                    <p class="lead">We add new tools and features regularly.</p>
-                </div>
-            </div>
+
+            <!-- Statistics Section -->
             <div class="row">
-                <div class="col-12">
-                    <nav>
-                        <div
-                                class="nav nav-tabs flex-column flex-md-row bg-white shadow-soft border border-light justify-content-around rounded mb-lg-3 py-3"
-                                id="nav-tab" role="tablist"><a aria-controls="nav-content-research"
-                                                               aria-selected="true" class="nav-item nav-link rounded mr-md-3 active"
-                                                               data-toggle="tab" href="#nav-content-research"
-                                                               id="nav-content-research-tab"
-                                                               role="tab"><span class="d-block"><span
-                                class="fas fa-file-alt mr-2"></span><span class="font-weight-normal">Content
-                      Research</span></span></a> <a aria-controls="nav-rank-track" aria-selected="false"
-                                                    class="nav-item nav-link rounded mr-md-3" data-toggle="tab" href="#nav-rank-track"
-                                                    id="nav-rank-track-tab"
-                                                    role="tab"><span
-                                class="fas fa-chart-line mr-2"></span><span
-                                class="font-weight-normal">Traffic Rank</span></a> <a
-                                aria-controls="nav-web-monitor"
-                                aria-selected="false" class="nav-item nav-link rounded mr-md-3" data-toggle="tab" href="#nav-web-monitor"
-                                id="nav-web-monitor-tab" role="tab"><span
-                                class="far fa-bell mr-2"></span><span
-                                class="font-weight-normal">App Monitoring</span></a> <a
-                                aria-controls="nav-backlink-research"
-                                aria-selected="false" class="nav-item nav-link rounded mr-md-3" data-toggle="tab"
-                                href="#nav-backlink-research"
-                                id="nav-backlink-research-tab" role="tab"><span
-                                class="fas fa-link mr-2"></span><span class="font-weight-normal">Tasks</span></a></div>
-                    </nav>
-                    <div class="tab-content mt-5 mt-lg-6" id="nav-tabContent">
-                        <div aria-labelledby="nav-content-research-tab" class="tab-pane fade show active" id="nav-content-research"
-                             role="tabpanel">
-                            <div class="row justify-content-between align-items-center">
-                                <div class="col-12 col-md-5">
-                                    <h3 class="mb-4">Content Explorer</h3>
-                                    <p>Put any keyword into this tool to see which content has performed best in terms
-                                        of social buzz,
-                                        number of backlinks and organic search traffic.</p>
-                                    <p>Find all articles that mentioned your target keyword and use the "Highlight
-                                        unlinked domains"
-                                        feature to see which of these websites have never linked to you.</p><a
-                                        class="my-4 mb-5 d-block font-weight-bold" href="dashboard/dashboard.html"><span
-                                        class="fas fa-external-link-alt mr-2"></span>Content Explorer Tool</a>
-                                </div>
-                                <div class="col-12 col-md-6"><img alt="image"
-                                                                  class="shadow rounded"
-                                                                  src="../assets/img/saas-platform.png"></div>
-                            </div>
+                <div class="col-12 col-md-6 col-lg-4 mb-4">
+                    <div class="card border-light p-4">
+                        <div class="card-body">
+                            <h2 class="display-2 mb-2">95%</h2>
+                            <span>User Satisfaction Rate</span>
                         </div>
-                        <div aria-labelledby="nav-rank-track-tab" class="tab-pane fade" id="nav-rank-track"
-                             role="tabpanel">
-                            <div class="row justify-content-between align-items-center">
-                                <div class="col-12 col-md-5">
-                                    <h3 class="mb-4">Traffic Rank</h3>
-                                    <p class="lead">We track your desktop and mobile keyword rankings from any location
-                                        and plot your
-                                        full ranking history on a handy graph.</p>
-                                    <p class="lead">You can set up automated ranking reports to be sent to your email
-                                        address, so you’ll
-                                        never forget to check your ranking progress.</p><a
-                                        class="my-4 mb-5 d-block font-weight-bold"
-                                        href="dashboard/traffic-sources.html"><span
-                                        class="fas fa-external-link-alt mr-2"></span>Traffic Rank Tool</a>
-                                </div>
-                                <div class="col-12 col-md-6"><img alt="image"
-                                                                  class="shadow rounded"
-                                                                  src="../assets/img/saas-platform-2.png"></div>
-                            </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4 mb-4">
+                    <div class="card border-light p-4">
+                        <div class="card-body">
+                            <h2 class="display-2 mb-2">24/7</h2>
+                            <span>Support Available Round the Clock</span>
                         </div>
-                        <div aria-labelledby="nav-web-monitor-tab" class="tab-pane fade" id="nav-web-monitor"
-                             role="tabpanel">
-                            <div class="row justify-content-between align-items-center">
-                                <div class="col-12 col-md-5">
-                                    <h3 class="mb-4">App Monitoring</h3>
-                                    <p class="lead">Get an email notification whenever you or your competitors win or
-                                        lose a backlink.
-                                        This is a great way to track their PR and linkbuilding activities and your own,
-                                        almost in real
-                                        time.</p>
-                                    <p class="lead">Set up alerts for any keywords related to your brand, business,
-                                        product or service.
-                                        Whenever someone mentions one of these keywords on their website, you get an
-                                        email notification
-                                        with a link to that page.</p><a class="my-4 mb-5 d-block font-weight-bold"
-                                                                        href="dashboard/app-analysis.html"><span
-                                        class="fas fa-external-link-alt mr-2"></span>App
-                                    Monitoring</a>
-                                </div>
-                                <div class="col-12 col-md-6"><img alt="image"
-                                                                  class="shadow rounded"
-                                                                  src="../assets/img/saas-platform-3.png"></div>
-                            </div>
-                        </div>
-                        <div aria-labelledby="nav-backlink-research-tab" class="tab-pane fade" id="nav-backlink-research"
-                             role="tabpanel">
-                            <div class="row justify-content-between align-items-center">
-                                <div class="col-12 col-md-5">
-                                    <h3 class="mb-4">Tasks</h3>
-                                    <p class="lead">Get an email notification whenever you or your competitors win or
-                                        lose a backlink.
-                                        This is a great way to track their PR and linkbuilding activities and your own,
-                                        almost in real
-                                        time.</p>
-                                    <p class="lead">Set up alerts for any keywords related to your brand, business,
-                                        product or service.
-                                        Whenever someone mentions one of these keywords on their website, you get an
-                                        email notification
-                                        with a link to that page.</p><a class="my-4 mb-5 d-block font-weight-bold"
-                                                                        href="dashboard/tasks.html"><span
-                                        class="fas fa-external-link-alt mr-2"></span>Other reports in Site Explorer tool</a>
-                                </div>
-                                <div class="col-12 col-md-6"><img alt="image"
-                                                                  class="shadow rounded"
-                                                                  src="../assets/img/saas-platform-4.png"></div>
-                            </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4 mb-4">
+                    <div class="card border-light p-4">
+                        <div class="card-body">
+                            <h2 class="display-2 mb-2">150k+</h2>
+                            <span>Transactions Processed Daily</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <div class="section section-sm line-bottom-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-gray text-center"><a class="icon icon-xl mr-3 mr-sm-5" href="#"><span
-                        class="fab fa-stripe"></span> </a><a class="icon icon-xl mr-3 mr-sm-5" href="#"><span
-                        class="fab fa-digg"></span> </a><a class="icon icon-xl mr-3 mr-sm-5" href="#"><span
-                        class="fab fa-fedex"></span> </a><a class="icon icon-xl mr-3 mr-sm-5" href="#"><span
-                        class="fab fa-ember"></span> </a><a class="icon icon-xl mr-3 mr-sm-5" href="#"><span
-                        class="fab fa-d-and-d-beyond"></span> </a><a class="icon icon-xl" href="#"><span
-                        class="fab fa-angrycreative"></span></a></div>
-            </div>
-        </div>
-    </div>
-    <section class="section">
+
+    <!-- Key Features Section -->
+    <section class="section section-lg">
         <div class="container">
             <div class="row justify-content-center mb-5 mb-lg-7">
                 <div class="col-12 col-md-8 text-center">
-                    <h1 class="h1 font-weight-bolder mb-4">Recommended by leading experts in marketing and SEO</h1>
-                    <p class="lead">Our products are loved by users worldwide</p>
-                </div>
-            </div>
-            <div class="row mb-lg-5">
-                <div class="col-12 col-lg-6">
-                    <div class="customer-testimonial d-flex mb-5"><img alt
-                                                                       class="image image-sm mr-3 rounded-circle shadow"
-                                                                       src="../assets/img/team/profile-picture-1.jpg">
-                        <div class="content-wrapper bg-soft shadow-soft border border-light rounded position-relative p-4">
-                            <div class="d-flex mb-4"><span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span></div>
-                            <p class="mt-2">"We use Rocket mainly for its site explorer, and it’s immensely improved how
-                                we find
-                                link targets. We use it both for getting quick analysis of a site, as well as utilizing
-                                its extensive
-                                index when we want to dive deep."</p><span class="h6">- James Curran <small
-                                class="ml-0 ml-md-2">General Manager Spotify</small></span>
-                        </div>
-                    </div>
-                    <div class="customer-testimonial d-flex mb-5"><img alt
-                                                                       class="image image-sm mr-3 rounded-circle shadow"
-                                                                       src="../assets/img/team/profile-picture-2.jpg">
-                        <div class="content-wrapper bg-soft shadow-soft border border-light rounded position-relative p-4">
-                            <div class="d-flex mb-4"><span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span></div>
-                            <p class="mt-2">"We use Rocket mainly for its site explorer, and it’s immensely improved how
-                                we find
-                                link targets. We use it both for getting quick analysis of a site, as well as utilizing
-                                its extensive
-                                index when we want to dive deep."</p><span class="h6">- Richard Thomas <small
-                                class="ml-0 ml-md-2">Front-end developer Oracle</small></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-6 pt-lg-6">
-                    <div class="customer-testimonial d-flex mb-5"><img alt
-                                                                       class="image image-sm mr-3 rounded-circle shadow"
-                                                                       src="../assets/img/team/profile-picture-4.jpg">
-                        <div class="content-wrapper bg-soft shadow-soft border border-light rounded position-relative p-4">
-                            <div class="d-flex mb-4"><span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span></div>
-                            <p class="mt-2">"We use Rocket mainly for its site explorer, and it’s immensely improved how
-                                we find
-                                link targets. We use it both for getting quick analysis of a site, as well as utilizing
-                                its extensive
-                                index when we want to dive deep."</p><span class="h6">- Jose Evans <small
-                                class="ml-0 ml-md-2">Chief
-                    Engineer Apple</small></span>
-                        </div>
-                    </div>
-                    <div class="customer-testimonial d-flex mb-5"><img alt
-                                                                       class="image image-sm mr-3 rounded-circle shadow"
-                                                                       src="../assets/img/team/profile-picture-6.jpg">
-                        <div class="content-wrapper bg-soft shadow-soft border border-light rounded position-relative p-4">
-                            <div class="d-flex mb-4"><span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i class="star fas fa-star"></i></span> <span
-                                    class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span> <span class="text-warning mr-2"><i
-                                    class="star fas fa-star"></i></span></div>
-                            <p class="mt-2">"We use Rocket mainly for its site explorer, and it’s immensely improved how
-                                we find
-                                link targets. We use it both for getting quick analysis of a site, as well as utilizing
-                                its extensive
-                                index when we want to dive deep."</p><span class="h6">- Richard Thomas <small
-                                class="ml-0 ml-md-2">Designer Google</small></span>
-                        </div>
-                    </div>
+                    <h2 class="h1 font-weight-bolder mb-4">Why Choose Paykesho?</h2>
+                    <p class="lead">Here’s why Paykesho stands out in the world of payment management:</p>
                 </div>
             </div>
             <div class="row">
-                <div class="col text-center"><a class="btn btn-primary animate-up-2" href="testimonials.html"><span
-                        class="mr-2"><i class="fas fa-book-open"></i></span> See all stories</a></div>
+                <div class="col-12 col-md-4 mb-4">
+                    <div class="card border-light p-4">
+                        <div class="card-body text-center">
+                            <h3 class="h4 mb-3">Easy Integration</h3>
+                            <p>Integrate Paykesho with your existing systems effortlessly and streamline your financial operations.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 mb-4">
+                    <div class="card border-light p-4">
+                        <div class="card-body text-center">
+                            <h3 class="h4 mb-3">Customizable Solutions</h3>
+                            <p>Tailor Paykesho’s features to meet your specific needs and preferences for optimal performance.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 mb-4">
+                    <div class="card border-light p-4">
+                        <div class="card-body text-center">
+                            <h3 class="h4 mb-3">User-Friendly Interface</h3>
+                            <p>Navigate and manage your payments with ease using our intuitive and user-friendly interface.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
+
+    <!-- Contact Us Section -->
+    <section class="section section-lg bg-gradient-primary text-white">
+        <div class="container">
+            <div class="row justify-content-center mb-2 mb-lg-3">
+                <div class="col-12 col-md-6 text-center">
+                    <h2 class="h1 font-weight-bolder mb-4">Get in Touch</h2>
+                    <p class="lead">Have questions or need support? Reach out to us anytime.</p>
+                    <a href="contact.html" class="btn btn-secondary">Contact Us</a>
+                </div>
+                <div class="col-12 col-md-6 text-center">
+                    <h2 class="h1 font-weight-bolder mb-4">Frequently Asked Questions</h2>
+                    <p class="lead">Find answers to the most common questions about Paykesho.</p>
+                    <a href="faq.html" class="btn btn-secondary">Read FAQs</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="section section-lg pb-5 bg-soft">
         <div class="container">
             <div class="row">
                 <div class="col-12 text-center mb-5">
-                    <h2 class="mb-4">Faster growth starts with Rocket</h2>
-                    <p class="lead mb-5">Join over <span class="font-weight-bolder">300,000+</span> users</p><a class="icon icon-lg text-gray mr-3"
-                                                                                                                href="#"><span
-                        class="fab fa-mailchimp"></span> </a><a class="icon icon-lg text-gray mr-3"
-                                                                href="#"><span
-                        class="fab fa-cpanel"></span> </a><a class="icon icon-lg text-gray mr-3"
-                                                             href="#"><span
-                        class="fab fa-dhl"></span> </a><a class="icon icon-lg text-gray mr-3"
-                                                          href="#"><span
-                        class="fab fa-github-alt"></span> </a><a class="icon icon-lg text-gray mr-3"
-                                                                 href="#"><span
-                        class="fab fa-aws"></span> </a><a class="icon icon-lg text-gray"
-                                                          href="#"><span
-                        class="fab fa-node"></span></a>
+                    <h2 class="mb-4">Faster Growth Starts with Paykesho</h2>
+                    <p class="lead mb-5">Join over <span class="font-weight-bolder">300,000+</span> users experiencing seamless payments</p>
+                    <a href="#" class="icon icon-lg text-gray mr-3"><span class="fab fa-facebook"></span> </a>
+                    <a href="#" class="icon icon-lg text-gray mr-3"><span class="fab fa-twitter"></span> </a>
+                    <a href="#" class="icon icon-lg text-gray mr-3"><span class="fab fa-instagram"></span> </a>
+                    <a href="#" class="icon icon-lg text-gray mr-3"><span class="fab fa-youtube"></span> </a>
+                    <a href="#" class="icon icon-lg text-gray mr-3"><span class="fab fa-telegram"></span> </a>
+                    <a href="#" class="icon icon-lg text-gray"><span class="fab fa-linkedin"></span></a>
                 </div>
                 <div class="col-12 text-center">
-                    <button class="btn btn-secondary animate-up-2" data-target=".pricing-modal"
-                            data-toggle="modal" type="button"><span class="mr-2"><i
-                            class="fas fa-hand-pointer"></i></span>Start 30-days trial
-                    </button>
+                    <button type="button" class="btn btn-secondary animate-up-2" data-toggle="modal" data-target=".pricing-modal"><span class="mr-2"><i class="fas fa-hand-pointer"></i></span> Start Your Journey</button>
                 </div>
             </div>
         </div>
     </section>
-    <div aria-hidden="true" class="modal fade pricing-modal" id="pricing-modal" role="dialog" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content py-4">
-                <div class="px-3">
-                    <div class="col-12 d-flex justify-content-end d-lg-none"><i aria-label="Close"
-                                                                                class="fas fa-times"
-                                                                                data-dismiss="modal"></i></div>
-                </div>
-                <div class="modal-header text-center text-black">
-                    <div class="col-12">
-                        <h4 class="px-lg-6">Our 30-days trial gives you full access to all tools and features of your
-                            chosen plan.
-                        </h4>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 col-lg-6 text-left">
-                            <div class="form-check card border-light p-3"><input class="form-check-input" id="exampleRadios1"
-                                                                                 name="exampleRadios"
-                                                                                 type="radio" value="option1">
-                                <label class="form-check-label"
-                                       for="exampleRadios1"><span class="h6 text-black d-block">Free</span> <span
-                                        class="small text-gray">30 days for free, then $99/mo</span> <span
-                                        class="text-gray mt-3 d-block p">Suits freelance marketers and solopreneurs. Get full access to
-                      Ahrefs' core tools and features with enough data to do SEO for your personal
-                      projects.</span></label></div>
-                        </div>
-                        <div class="col-12 col-lg-6 text-left">
-                            <div class="form-check card border-light p-3"><input checked="checked" class="form-check-input"
-                                                                                 id="exampleRadios2"
-                                                                                 name="exampleRadios" type="radio"
-                                                                                 value="option2"> <label
-                                    class="form-check-label" for="exampleRadios2"><span class="h6 text-black d-block">Premium</span>
-                                <span class="small text-gray">200$/mo</span> <span class="text-gray mt-3 d-block p">Perfect for SEO
-                      consultants and in-house marketers. Get everything in Lite with more features and increased data
-                      limits to research a large number of websites.</span></label></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 text-center">
-                    <div class="col text-gray"><a class="btn btn-primary mb-4" href="checkout.html">Continue</a>
-                        <p class="small mb-0">You can upgrade, downgrade, or cancel your subscription anytime.<br>No
-                            contracts, no
-                            hidden charges.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <footer class="footer section pt-6 pt-md-8 pt-lg-10 pb-3 bg-primary text-white overflow-hidden">
-        <div class="pattern top pattern-soft"></div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0"><a class="footer-brand mr-lg-5 d-flex" href="../index-2.html"><img
-                        alt="Footer logo" class="mr-3" src="../assets/img/brand/light.svg">
-                    <h4>Rocket</h4>
-                </a>
-                    <p class="my-4">Create, prototype, collaborate and turn your ideas into incredible products with the
-                        definitive platform for digital design.</p>
-                    <div class="dropdown mb-4 mb-lg-0"><a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle footer-language-link pb-2"
-                                                          data-toggle="dropdown" href="#"
-                                                          id="langsDropdown"><img
-                            alt="USA Flag" class="language-flag" src="../assets/img/flags/united-states-of-america.svg">
-                        United
-                        States <i class="fas fa-chevron-down ml-1"></i></a>
-                        <div aria-labelledby="langsDropdown" class="dropdown-menu dropdown-menu-center mt-0"><a class="dropdown-item text-gray text-sm"
-                                                                                                                href="#"><img
-                                alt="Germany Flag" class="language-flag"
-                                src="../assets/img/flags/germany.svg"> German</a> <a class="dropdown-item text-gray text-sm"
-                                                                     href="#"><img
-                                alt="Spain Flag" class="language-flag" src="../assets/img/flags/spain.svg"> Spanish</a>
-                            <a class="dropdown-item text-gray text-sm"
-                               href="#"><img alt="France Flag"
-                                                                            class="language-flag"
-                                                                            src="../assets/img/flags/france.svg"> French</a></div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0">
-                    <h5>Themesberg</h5>
-                    <ul class="links-vertical">
-                        <li><a href="https://themesberg.com/blog" target="_blank">Blog</a></li>
-                        <li><a href="https://themesberg.com/products" target="_blank">Products</a></li>
-                        <li><a href="https://themesberg.com/contact" target="_blank">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0">
-                    <h5>Rocket</h5>
-                    <ul class="links-vertical">
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="pricing.html">Pricing</a></li>
-                        <li><a href="https://themesberg.com/docs/rocket/getting-started/overview/">Documentation</a>
-                        </li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <h5>Subscribe</h5>
-                    <p class="font-small">The latest Rocket news, articles, and resources, sent straight to your inbox
-                        every
-                        month.</p>
-                    <form action="#">
-                        <div class="form-row">
-                            <div class="col-8"><input class="form-control mb-2" name="email" placeholder="Email Address"
-                                                      required type="email"></div>
-                            <div class="col-4">
-                                <button class="btn btn-secondary" type="submit"><span>Subscribe</span></button>
-                            </div>
-                        </div>
-                    </form>
-                    <small class="mt-2 form-text">We’ll never share your details. See our <a class="font-weight-bold text-underline"
-                                                                                             href="terms.html">Privacy
-                        Policy</a></small>
-                </div>
-            </div>
-            <hr class="my-4 my-lg-5">
-            <div class="row">
-                <div class="col pb-4 mb-md-0"><a class="d-flex justify-content-center" href="https://themesberg.com/"
-                                                 target="_blank"><img
-                        alt="Themesberg Logo" class="mb-3" height="25"
-                        src="../assets/img/themesberg.svg" width="25"></a>
-                    <div class="d-flex text-center justify-content-center align-items-center">
-                        <p class="font-weight-normal font-small mb-0">Copyright © <a href="https://themesberg.com/"
-                                                                                     target="_blank">Themesberg</a>
-                            <span class="current-year"></span>. All rights reserved.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <footer th:replace="fragments/fragments :: footer"></footer>
 </main>
-
 <footer th:replace="fragments/fragments :: js_code"></footer>
-<!--<script type="text/javascript">
-    let currYearTripData = [];
-    let lastYearTripData = [];
-    let facilityTypes = [];
-    let monthLabels = [];
-    let facilityTypesData = [];
-    let facilityGPSData = [];
-    let facilityGPSMapFeatures = [];
-    contextPath = "[[@{/}]]";
-
-    $(document).ready(function () {
-
-        const facilityTypesDataRequestUrl = contextPath + "facilities/rest/get-organization-types-data/true";
-        const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-organization-gps-data/true";
-
-        $.get(facilityTypesDataRequestUrl, function (responseJSON) {
-            $.each(responseJSON, function (index, reportItem) {
-                facilityTypes.push(reportItem.identifier);
-                facilityTypesData.push(reportItem.itemCount);
-            });
-
-            generateOrganizationTypeChart();
-        });
-
-        $.get(facilityGPSDataRequestUrl, function (responseJSON) {
-            $.each(responseJSON, function (index, reportItem) {
-                facilityGPSData.push(reportItem);
-            });
-
-            $.each(facilityGPSData, function (index, item) {
-                var element = {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Point',
-                        'coordinates': [item.longitude, item.latitude]
-                    },
-                    'properties': {
-                        'title': item.title
-                    }
-                }
-
-                facilityGPSMapFeatures.push(element);
-            })
-
-            generateOrganizationGPSMap();
-        });
-
-    });
-
-    function generateOrganizationTypeChart() {
-        var barColors = [
-            "#b91d47",
-            "#00aba9",
-            "#2b5797",
-            "#e8c3b9"
-        ];
-
-        new Chart("facilityTypeChart", {
-            type: "doughnut",
-            data: {
-                labels: facilityTypes,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: facilityTypesData
-                }]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: "Legend"
-                }
-            }
-        });
-    }
-
-    function generateOrganizationGPSMap() {
-        mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-        var map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            zoom: 5.0,
-            center: [28.5589884, -13.1189121]
-        });
-
-        map.on('load', () => {
-            map.loadImage(
-                contextPath + 'assets/img/marker.png',
-                (error, image) => {
-                    if (error) throw error;
-                    map.addImage('custom-marker', image);
-                    map.addSource('points', {
-                        'type': 'geojson',
-                        'data': {
-                            'type': 'FeatureCollection',
-                            'features': facilityGPSMapFeatures
-                        }
-                    });
-
-                    map.addLayer({
-                        'id': 'points',
-                        'type': 'symbol',
-                        'source': 'points',
-                        'layout': {
-                            'icon-image': 'custom-marker',
-                            'text-field': [
-                                'format',
-                                ['downcase', ['get', 'title']],
-                                {'font-scale': 0.6},
-                            ],
-                            'text-font': [
-                                'Open Sans Semibold',
-                                'Arial Unicode MS Bold'
-                            ],
-                            'text-offset': [0, 0.60],
-                            'text-anchor': 'top'
-                        },
-                        'paint': {
-                            "text-color": "#000"
-                        }
-                    });
-                }
-            );
-        });
-        map.addControl(new mapboxgl.FullscreenControl());
-    }
-
-</script>-->
 </body>
-
 </html>
