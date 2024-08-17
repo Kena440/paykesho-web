@@ -1,19 +1,20 @@
 package org.paykesho.backoffice.merchants.controller;
 
+import org.paykesho.backoffice.merchants.service.MerchantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/csos/rest")
+@RequestMapping("/merchants/rest")
 public class MerchantRestController {
 
     @Autowired
-    private org.paykesho.backoffice.merchants.service.CSOService CSOService;
+    private MerchantService merchantService;
 
-    @PostMapping("/check-cso")
-    public String checkDuplicateCivilSocietyOrganization(Integer id, Integer provinceId, String csoName, String district) {
-        return CSOService.isCivilSocietyOrganizationUnique(id, provinceId, csoName, district) ? "OK" : "Duplicated";
+    @PostMapping("/check-merchant")
+    public String checkDuplicateCivilSocietyOrganization(Integer id, String merchantName, String merchantType) {
+        return merchantService.isMerchantUnique(id, merchantName, merchantType) ? "OK" : "Duplicated";
     }
 }

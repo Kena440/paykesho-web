@@ -5,7 +5,7 @@ import org.commons.entity.merchant.Merchant;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchants.enums.Constants;
-import org.paykesho.backoffice.merchants.service.CSOService;
+import org.paykesho.backoffice.merchants.service.MerchantService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.paging.PagingAndSortingParam;
 import org.paykesho.backoffice.settings.service.SettingService;
@@ -23,11 +23,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
-@RequestMapping("/csos")
+@RequestMapping("/merchants")
 public class MerchantController {
 
     @Autowired
-    private CSOService csoService;
+    private MerchantService merchantService;
 
     @Autowired
     private SettingService settingService;
@@ -38,56 +38,56 @@ public class MerchantController {
     }
 
     @GetMapping("/page/{pageNum}")
-    public String listAllCivilSocietyOrganizationsByPage(@PagingAndSortingParam(listName = "csoList", moduleURL = "/csos") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum) throws PaykeshoError {
-        csoService.listByPage(pageNum, helper);
+    public String listAllMerchantsByPage(@PagingAndSortingParam(listName = "merchantList", moduleURL = "/merchants") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum) throws PaykeshoError {
+        merchantService.listByPage(pageNum, helper);
 
-        return "csos/csos";
+        return "merchants/merchants";
     }
 
     @GetMapping("/new")
-    public String newCivilSocietyOrganization(Model model) {
-        String pageTitle = "New Civil Society Organization";
-        Merchant cso = new Merchant();
+    public String newMerchant(Model model) {
+        String pageTitle = "New Merchant";
+        Merchant merchant = new Merchant();
         List<State> stateList = settingService.listStatesByCountry("Zambia");
 
-        cso.setEnabled(true);
+        merchant.setEnabled(true);
 
-        model.addAttribute("cso", cso);
+        model.addAttribute("merchant", merchant);
         model.addAttribute("stateList", stateList);
         model.addAttribute("pageTitle", pageTitle);
-        return "csos/cso_form";
+        return "merchants/merchant_form";
     }
 
     @PostMapping("/save")
-    public String saveCivilSocietyOrganization(Merchant merchant, RedirectAttributes redirectAttributes) throws PaykeshoError {
-        csoService.save(merchant);
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Civil Society Organization Operation Successful: " + merchant.getEmail());
-        return getRedirectURLtoAffectedCivilSocietyOrganization(merchant);
+    public String saveMerchant(Merchant merchant, RedirectAttributes redirectAttributes) throws PaykeshoError {
+        merchantService.save(merchant);
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant Operation Successful: " + merchant.getEmail());
+        return getRedirectURLtoAffectedMerchant(merchant);
     }
 
     @GetMapping("/view/{id}")
-    public String viewCivilSocietyOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
+    public String viewMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
         if (id == null) {
             return Constants.REDIRECT_MERCHANTS;
         }
-        String pageTitle = "View Civil Society Organization";
+        String pageTitle = "View Merchant";
 
         try {
 
-            Merchant merchant = csoService.getCivilSocietyOrganizationById(id);
+            Merchant merchant = merchantService.getMerchantById(id);
 
             loadCurrencySetting(request);
-            model.addAttribute("cso", merchant);
+            model.addAttribute("merchant", merchant);
             model.addAttribute("pageTitle", pageTitle);
 
-            return "csos/cso_view";
+            return "merchants/merchant_view";
         } catch (PaykeshoError paykeshoError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
             return Constants.REDIRECT_MERCHANTS;
         }
     }
 
-    private String getRedirectURLtoAffectedCivilSocietyOrganization(Merchant merchant) throws PaykeshoError {
+    private String getRedirectURLtoAffectedMerchant(Merchant merchant) throws PaykeshoError {
         if (merchant == null) {
             throw new PaykeshoError("no member provided");
         }
@@ -101,22 +101,22 @@ public class MerchantController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editCivilSocietyOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) {
+    public String editMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) {
         if (id == null) {
             return Constants.REDIRECT_MERCHANTS;
         }
-        String pageTitle = "Edit CivilSocietyOrganization";
+        String pageTitle = "Edit Merchant";
 
         try {
-            Merchant merchant = csoService.getCivilSocietyOrganizationById(id);
+            Merchant merchant = merchantService.getMerchantById(id);
 
             List<State> stateList = settingService.listStatesByCountry("Zambia");
 
-            model.addAttribute("civilSocietyOrganization", merchant);
+            model.addAttribute("merchant", merchant);
             model.addAttribute("stateList", stateList);
             model.addAttribute("pageTitle", pageTitle);
 
-            return "csos/cso_form";
+            return "merchants/merchant_form";
         } catch (PaykeshoError paykeshoError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
             return Constants.REDIRECT_MERCHANTS;
@@ -125,14 +125,14 @@ public class MerchantController {
     }
 
     @GetMapping("delete/{id}")
-    public String deleteCivilSocietyOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+    public String deleteMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("no parameter id");
         }
 
         try {
-            csoService.delete(id);
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "CivilSocietyOrganization deleted successfully");
+            merchantService.delete(id);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant deleted successfully");
         } catch (PaykeshoError paykeshoError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
         }
@@ -140,15 +140,15 @@ public class MerchantController {
     }
 
     @GetMapping("/{id}/enabled/{status}")
-    public String updateCivilSocietyOrganizationEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+    public String updateMerchantEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
 
         if (id == null) {
             throw new PaykeshoError("no parameter id");
         }
 
         try {
-            Merchant merchant = csoService.getCivilSocietyOrganizationById(id);
-            csoService.updateCivilSocietyOrganizationStatus(id, enabled);
+            Merchant merchant = merchantService.getMerchantById(id);
+            merchantService.updateMerchantStatus(id, enabled);
             String status = enabled ? "enabled" : "has been disabled";
             String operationMSG = merchant.getName() + " has been " + status;
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
@@ -160,17 +160,17 @@ public class MerchantController {
     }
 
     @GetMapping("/details/{id}")
-    public String viewCivilSocietyOrganizationDetails(@PathVariable("id") Integer id, Model model) throws PaykeshoError {
+    public String viewMerchantDetails(@PathVariable("id") Integer id, Model model) throws PaykeshoError {
 
-        Merchant merchant = csoService.getCivilSocietyOrganizationById(id);
-        model.addAttribute("civilSocietyOrganization", merchant);
-        return "csos/civilSocietyOrganization_details_modal";
+        Merchant merchant = merchantService.getMerchantById(id);
+        model.addAttribute("merchant", merchant);
+        return "merchants/merchant_details_modal";
 
     }
 
 
     @GetMapping("/export/{format}")
-    public void exportCivilSocietyOrganizationsByFormat(@PathVariable(name = "format") String format, HttpServletResponse response) throws PaykeshoError {
+    public void exportMerchantsByFormat(@PathVariable(name = "format") String format, HttpServletResponse response) throws PaykeshoError {
         switch (format) {
             case "csv":
                 //(response);

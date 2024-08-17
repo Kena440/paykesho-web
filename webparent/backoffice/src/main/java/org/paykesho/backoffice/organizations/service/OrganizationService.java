@@ -2,6 +2,7 @@ package org.paykesho.backoffice.organizations.service;
 
 import org.commons.dto.GeneralStatsDto;
 import org.commons.entity.organization.Organization;
+import org.commons.enums.OrganizationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.organizations.dto.GPSDataItem;
 import org.paykesho.backoffice.organizations.repository.OrganizationRepository;
@@ -145,19 +146,20 @@ public class OrganizationService {
         }
     }
 
-    public boolean isOrganizationUnique(Integer id, Integer provinceId, String facilityName, Integer organizationTypeId) {
-        if (provinceId == null || facilityName == null || organizationTypeId == null) {
+    public boolean isOrganizationUnique(Integer id, String organizationName, String organizationType) {
+        if (organizationName == null || organizationType == null) {
             return false;
         }
-        Organization institution = organizationRepository.getOrganizationByIdAndProvinceAndNameAndLevelOfCare(id, provinceId, facilityName, organizationTypeId);
 
-        if (institution == null) return true;
+        Organization organization = organizationRepository.getOrganizationByIdAndNameAndOrganizationType(id, organizationName, OrganizationType.valueOf(organizationType));
+
+        if (organization == null) return true;
         boolean isCreatingNew = (id == null);
 
         if (isCreatingNew) {
             return false;
         } else {
-            return Objects.equals(institution.getId(), id);
+            return Objects.equals(organization.getId(), id);
         }
     }
 

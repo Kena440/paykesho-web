@@ -14,8 +14,8 @@ public class OrganizationRestController {
     private OrganizationService organizationService;
 
     @PostMapping("/check-organization")
-    public String checkDuplicateOrganization(Integer id, Integer provinceId, String facilityName, Integer organizationType) {
-        return organizationService.isOrganizationUnique(id, provinceId, facilityName, organizationType) ? "OK" : "Duplicated";
+    public String checkDuplicateCivilSocietyOrganization(Integer id, String organizationName, String organizationType) {
+        return organizationService.isOrganizationUnique(id, organizationName, organizationType) ? "OK" : "Duplicated";
     }
 
 }

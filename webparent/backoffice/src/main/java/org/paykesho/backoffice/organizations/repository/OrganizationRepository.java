@@ -2,6 +2,7 @@ package org.paykesho.backoffice.organizations.repository;
 
 import org.commons.dto.GeneralStatsDto;
 import org.commons.entity.organization.Organization;
+import org.commons.enums.OrganizationType;
 import org.paykesho.backoffice.paging.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +28,8 @@ public interface OrganizationRepository extends SearchRepository<Organization, I
     @Modifying
     public void updateEnableStatus(Integer id, boolean enabled);
 
-    @Query("select m from Organization m where m.id = :id and m.province.id = :provinceId and m.name = :facilityName and m.organizationType = :organizationTypeId")
-    public Organization getOrganizationByIdAndProvinceAndNameAndLevelOfCare(@Param("id") Integer id, @Param("provinceId") Integer provinceId, @Param("facilityName") String facilityName, @Param("organizationTypeId") Integer organizationTypeId);
+    @Query("select m from Organization m where m.id = :id and m.name = :organizationName and m.organizationType = :organizationType")
+    public Organization getOrganizationByIdAndNameAndOrganizationType(@Param("id") Integer id, @Param("organizationName") String organizationName, @Param("organizationType") OrganizationType organizationType);
 
     @Query("select m " + "from Organization m " + "where m.enabled = ?1 ")
     List<Organization> findOrganizationTypesEnabled(boolean enabled);

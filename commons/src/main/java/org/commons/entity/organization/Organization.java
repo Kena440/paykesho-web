@@ -2,6 +2,7 @@ package org.commons.entity.organization;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
 import org.commons.entity.State;
 import org.commons.enums.OrganizationType;
@@ -26,6 +27,8 @@ public class Organization extends IdBasedEntity {
     private OrganizationType organizationType;
     @Column(length = 45)
     private String email;
+    @Column(length = 15, name = "phone_number")
+    protected String phoneNumber;
     @ManyToOne
     @JoinColumn(name = "contact_person_id")
     private OrganizationAdmin contactPerson;
@@ -33,10 +36,19 @@ public class Organization extends IdBasedEntity {
     private boolean deleted;
     private float longitude;
     private float latitude;
+    @Column(length = 64)
+    private String photos;
 
     @Override
     public String toString() {
         return name + " ~ " + organizationType;
     }
 
+    @Transient
+    public String getPhotosImagePath() {
+        if (id == null || photos == null) {
+            return "/images/default_image.png";
+        }
+        return Constants.S3_BASE_URI + "/organization_logos/" + this.id + "/" + this.photos;
+    }
 }

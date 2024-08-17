@@ -1,6 +1,7 @@
 package org.paykesho.backoffice.merchants.service;
 
 import org.commons.entity.merchant.Merchant;
+import org.commons.enums.MerchantType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchants.repository.MerchantRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
@@ -20,7 +21,7 @@ import java.util.Objects;
 
 @Service
 @Transactional
-public class CSOService {
+public class MerchantService {
 
     public static final int MEMBERS_PER_PAGE = 20;
     protected DateFormat dateFormat;
@@ -50,7 +51,7 @@ public class CSOService {
         if (email == null) {
             return false;
         }
-        Merchant merchant = merchantRepository.getCivilSocietyOrganizationByEmail(email);
+        Merchant merchant = merchantRepository.getMerchantByEmail(email);
 
         if (merchant == null) return true;
         boolean isCreatingNew = (id == null);
@@ -70,7 +71,7 @@ public class CSOService {
         if (email == null) {
             return false;
         }
-        Merchant merchant = merchantRepository.getCivilSocietyOrganizationByName(email);
+        Merchant merchant = merchantRepository.getMerchantByName(email);
 
         if (merchant == null) return true;
         boolean isCreatingNew = (id == null);
@@ -86,7 +87,7 @@ public class CSOService {
         return true;
     }
 
-    public Merchant getCivilSocietyOrganizationById(Integer id) throws PaykeshoError {
+    public Merchant getMerchantById(Integer id) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("Null parameter id");
         }
@@ -109,7 +110,7 @@ public class CSOService {
             throw new PaykeshoError("Could not find any member");
         }
 
-        Merchant merchant = getCivilSocietyOrganizationById(id);
+        Merchant merchant = getMerchantById(id);
         if (merchant.getId() == null)
             throw new PaykeshoError("Could not find any civilSocietyOrganization");
         merchant.setDeleted(true);
@@ -118,7 +119,7 @@ public class CSOService {
     }
 
     @Transactional(rollbackOn = {Exception.class})
-    public void updateCivilSocietyOrganizationStatus(Integer id, boolean enabled) throws PaykeshoError {
+    public void updateMerchantStatus(Integer id, boolean enabled) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("Null parameter id");
         }
@@ -131,23 +132,24 @@ public class CSOService {
         merchantRepository.updateEnableStatus(id, enabled);
     }
 
-    public Merchant getCivilSocietyOrganizationByEmail(String email) throws PaykeshoError {
+    public Merchant getMerchantByEmail(String email) throws PaykeshoError {
         if (email == null) {
             throw new PaykeshoError("Null parameter email");
         }
 
         try {
-            return merchantRepository.getCivilSocietyOrganizationByEmail(email);
+            return merchantRepository.getMerchantByEmail(email);
         } catch (NoSuchElementException exception) {
             throw new PaykeshoError("Could not find any user");
         }
     }
 
-    public boolean isCivilSocietyOrganizationUnique(Integer id, Integer provinceId, String civilSocietyOrganizationName, String district) {
-        if (provinceId == null || civilSocietyOrganizationName == null || district == null) {
+    public boolean isMerchantUnique(Integer id, String merchantName, String merchantType) {
+        if (merchantName == null || merchantType == null) {
             return false;
         }
-        Merchant merchant = merchantRepository.getCivilSocietyOrganizationByIdAndProvinceAndNameAndDistrict(id, provinceId, civilSocietyOrganizationName, district);
+
+        Merchant merchant = merchantRepository.getMerchantByIdAndNameAndMerchantType(id, merchantName, MerchantType.valueOf(merchantType));
 
         if (merchant == null) return true;
         boolean isCreatingNew = (id == null);
@@ -163,7 +165,7 @@ public class CSOService {
         return merchantRepository.count();
     }
 
-    public Page<Merchant> listForCivilSocietyOrganizationByPage(int pageNum, String sortField, String sortDir, String keyword) {
+    public Page<Merchant> listForMerchantByPage(int pageNum, String sortField, String sortDir, String keyword) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
 
