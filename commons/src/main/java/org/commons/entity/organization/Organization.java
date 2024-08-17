@@ -16,6 +16,8 @@ import java.util.Date;
 @Table(name = "organizations")
 public class Organization extends IdBasedEntity {
 
+    @Column(length = 15, name = "phone_number")
+    protected String phoneNumber;
     @Column(name = "name", length = 245, nullable = false, unique = true)
     private String name;
     @ManyToOne
@@ -28,8 +30,6 @@ public class Organization extends IdBasedEntity {
     private OrganizationType organizationType;
     @Column(length = 45)
     private String email;
-    @Column(length = 15, name = "phone_number")
-    protected String phoneNumber;
     @ManyToOne
     @JoinColumn(name = "contact_person_id")
     private OrganizationAdmin contactPerson;
@@ -40,6 +40,7 @@ public class Organization extends IdBasedEntity {
     @Column(length = 64)
     private String photos;
     private Date registrationDate;
+
     @Override
     public String toString() {
         return name + " ~ " + organizationType;

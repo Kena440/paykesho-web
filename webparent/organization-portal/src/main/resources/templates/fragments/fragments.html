@@ -150,14 +150,14 @@
     </div>
 </nav>
 
-<div th:fragment="topbar" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4" th:fragment="topbar">
     <div>
         <h3>Organization Portal | [[${pageTitle}]]</h3>
     </div>
     <div>
         <button
-                class="btn btn-primary mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false"><span class="fas fa-user-circle mr-2"></span><a class="h6 text-white"
+                aria-expanded="false" aria-haspopup="true" class="btn btn-primary mr-2 dropdown-toggle"
+                data-toggle="dropdown"><span class="fas fa-user-circle mr-2"></span><a class="h6 text-white"
                                                                                       sec:authentication="principal.fullName"
                                                                                       th:href="@{/my-account}"></a>
             <span
@@ -165,7 +165,7 @@
         <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2">
             <a class="dropdown-item font-weight-bold" th:href="@{/my-account}"><span
                     class="fas fa-user-cog mr-2"></span>My Profile</a>
-            <div role="separator" class="dropdown-divider"></div>
+            <div class="dropdown-divider" role="separator"></div>
             <a class="dropdown-item font-weight-bold"
                id="logoutLink"><span class="fas fa-lock text-success mr-2"></span>Sign out</a>
 
@@ -238,11 +238,13 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination circle-pagination">
                 <li class="page-item" th:classappend="${currentPage} == 1 ? 'disabled' : ''">
-                    <a class="page-link" th:replace="fragments/fragments :: page_link_caret(${previousPage}, 'Previous')">
+                    <a class="page-link"
+                       th:replace="fragments/fragments :: page_link_caret(${previousPage}, 'Previous')">
                         <i class="fas fa-angle-double-left"></i>
                     </a>
                 </li>
-                <li class="page-item" th:classappend="${currentPage} == ${i} ? 'active' : ''" th:each="i : ${#numbers.sequence(1, 3)}">
+                <li class="page-item" th:classappend="${currentPage} == ${i} ? 'active' : ''"
+                    th:each="i : ${#numbers.sequence(1, 3)}">
                     <a class="page-link" th:replace="fragments/fragments :: page_link(${i}, ${i})"></a>
                 </li>
                 <li class="page-item">
@@ -293,17 +295,17 @@
                             <span class="fas fa-search"></span>
                         </span>
                     </div>
-                    <input class="form-control" name="keyword" th:value="${keyword}" placeholder="Search" type="search"
-                           aria-label="Search">
+                    <input aria-label="Search" class="form-control" name="keyword" placeholder="Search" th:value="${keyword}"
+                           type="search">
                 </div>
             </form>
         </div>
         <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
             <div class="btn-group mr-2">
                 <button
-                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
-                        data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false"><span class="icon icon-sm icon-gray"><span
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
                         class="fas fa-sliders-h"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
                 <div class="dropdown-menu dropdown-menu-right"><span
                         class="dropdown-item font-weight-bold text-dark">Show</span> <a
@@ -314,9 +316,9 @@
             </div>
             <div class="btn-group">
                 <button
-                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
-                        data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false"><span class="icon icon-sm icon-gray"><span
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
                         class="fas fa-cog"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
                 <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right"><span
                         class="dropdown-item font-weight-bold text-dark">Show</span> <a

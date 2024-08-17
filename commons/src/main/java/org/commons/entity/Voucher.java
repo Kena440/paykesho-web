@@ -3,7 +3,6 @@ package org.commons.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.entity.client.Client;
-import org.commons.entity.merchant.Merchant;
 
 import javax.persistence.*;
 import java.math.BigDecimal;

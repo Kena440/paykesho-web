@@ -18,16 +18,16 @@
                             <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                                 <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
                                 <li class="breadcrumb-item"><a href="#">Client Mgt</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Clients List</li>
+                                <li aria-current="page" class="breadcrumb-item active">Clients List</li>
                             </ol>
                         </nav>
                     </div>
-                    <div class="btn-toolbar mb-2 mb-md-0"><a th:href="@{/clients/new}"
-                                                             class="btn btn-sm btn-primary"><span
+                    <div class="btn-toolbar mb-2 mb-md-0"><a class="btn btn-sm btn-primary"
+                                                             th:href="@{/clients/new}"><span
                             class="fas fa-plus"></span> <span>Add New Client</span></a>
                         <div class="btn-group ml-3">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Share</button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Export</button>
                         </div>
                     </div>
                 </div>
@@ -71,9 +71,9 @@
                         <tr th:each="client, clientStat : ${clientList}">
                             <td class="hideable-column">[[${clientStat.count}]]</td>
                             <td>
-                                <a href="#" class="d-flex align-items-center">
-                                    <img th:if="${client.photos != null}" th:src="@{${client.photosImagePath}}"
-                                         class="client-avatar rounded-circle mr-3" alt="Avatar">
+                                <a class="d-flex align-items-center" href="#">
+                                    <img alt="Avatar" class="client-avatar rounded-circle mr-3"
+                                         th:if="${client.photos != null}" th:src="@{${client.photosImagePath}}">
                                 </a>
                             </td>
                             <td><span class="font-weight-normal">[[${client.code}]]</span></td>

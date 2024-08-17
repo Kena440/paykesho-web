@@ -29,6 +29,7 @@ public interface OrganizationRepository extends CrudRepository<Organization, Int
 
     @Query("select m " + "from Organization m " + "where m.enabled = ?1 ")
     List<Organization> findOrganizationTypesEnabled(boolean enabled);
+
     @Query("select m from Organization m where m.contactPerson.id = :id")
     Organization getOrganizationByContactPerson(Integer id);
 }

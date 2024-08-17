@@ -1,6 +1,5 @@
 package org.paykesho.organizationportal;
 
-import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Country;
@@ -17,7 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Controller
 public class MainController {

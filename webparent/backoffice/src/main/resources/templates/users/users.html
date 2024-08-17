@@ -18,16 +18,16 @@
                             <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                                 <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
                                 <li class="breadcrumb-item"><a href="#">User Mgt</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Users List</li>
+                                <li aria-current="page" class="breadcrumb-item active">Users List</li>
                             </ol>
                         </nav>
                     </div>
-                    <div class="btn-toolbar mb-2 mb-md-0"><a th:href="@{/users/new}"
-                                                             class="btn btn-sm btn-primary"><span
+                    <div class="btn-toolbar mb-2 mb-md-0"><a class="btn btn-sm btn-primary"
+                                                             th:href="@{/users/new}"><span
                             class="fas fa-plus"></span> <span>Add New User</span></a>
                         <div class="btn-group ml-3">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Share</button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Export</button>
                         </div>
                     </div>
                 </div>
@@ -69,9 +69,9 @@
                         <tr th:each="user, userStat : ${userList}">
                             <td class="hideable-column">[[${userStat.count}]]</td>
                             <td>
-                                <a href="#" class="d-flex align-items-center">
-                                    <img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}"
-                                         class="user-avatar rounded-circle mr-3" alt="Avatar">
+                                <a class="d-flex align-items-center" href="#">
+                                    <img alt="Avatar" class="user-avatar rounded-circle mr-3"
+                                         th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}">
                                 </a>
                             </td>
                             <td><span class="font-weight-normal">[[${user.email}]]</span></td>

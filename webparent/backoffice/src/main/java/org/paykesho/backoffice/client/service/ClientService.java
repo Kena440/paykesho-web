@@ -17,13 +17,12 @@ import java.util.List;
 @Transactional
 public class ClientService {
     public static final int CUSTOMERS_PER_PAGE = 10;
-
+    @Autowired
+    PasswordEncoder passwordEncoder;
     @Autowired
     private ClientRepository clientRepository;
     @Autowired
     private CountryRepository countryRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);

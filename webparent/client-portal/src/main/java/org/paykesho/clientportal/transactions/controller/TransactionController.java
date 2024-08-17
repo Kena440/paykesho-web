@@ -71,7 +71,7 @@ public class TransactionController {
         Client client = clientService.getClientByCode(loggedInUser.getClient().getCode());
         List<Voucher> voucherList = voucherService.getApprovedAndValidClientVouchers(client);
         model.addAttribute("voucherList", voucherList);
-       // model.addAttribute("payment", new PaymentDto());
+        // model.addAttribute("payment", new PaymentDto());
         return "merchants/pay_merchant";
     }
 
@@ -114,13 +114,13 @@ public class TransactionController {
 
         Transaction transaction = new Transaction();
         transaction.setClient(client);
-       // transaction.setMerchant(voucher.getMerchant());
+        // transaction.setMerchant(voucher.getMerchant());
         transaction.setAmount(paymentAmount);
         transaction.setReference(paykeshoRef);
         transaction.setVoucher(updateVoucher);
         transaction.setTxnDate(new Date());
         transaction.setNaration(transactionNarration);
-       // if (!meterAccountNumber.isEmpty()) transaction.setMeterAccountNumber(meterAccountNumber);
+        // if (!meterAccountNumber.isEmpty()) transaction.setMeterAccountNumber(meterAccountNumber);
 
      /*   try {
             //sendNotifications(transaction, paykeshoRef);

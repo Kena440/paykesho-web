@@ -57,6 +57,6 @@ public class ClientUserDetails implements UserDetails {
     }
 
     public String getCode() {
-        return client.getCode() ;
+        return client.getCode();
     }
 }

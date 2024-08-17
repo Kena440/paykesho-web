@@ -18,16 +18,16 @@
                             <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                                 <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
                                 <li class="breadcrumb-item"><a href="#">Merchant Mgt</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Merchants List</li>
+                                <li aria-current="page" class="breadcrumb-item active">Merchants List</li>
                             </ol>
                         </nav>
                     </div>
-                    <div class="btn-toolbar mb-2 mb-md-0"><a th:href="@{/merchants/new}"
-                                                             class="btn btn-sm btn-primary"><span
+                    <div class="btn-toolbar mb-2 mb-md-0"><a class="btn btn-sm btn-primary"
+                                                             th:href="@{/merchants/new}"><span
                             class="fas fa-plus"></span> <span>Add New Merchant</span></a>
                         <div class="btn-group ml-3">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Share</button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Export</button>
                         </div>
                     </div>
                 </div>
@@ -66,9 +66,9 @@
                         <tr th:each="merchant, merchantStat : ${merchantList}">
                             <td class="hideable-column">[[${merchantStat.count}]]</td>
                             <td>
-                                <a href="#" class="d-flex align-items-center">
-                                    <img th:if="${merchant.photos != null}" th:src="@{${merchant.photosImagePath}}"
-                                         class="merchant-avatar rounded-circle mr-3" alt="Avatar">
+                                <a class="d-flex align-items-center" href="#">
+                                    <img alt="Avatar" class="merchant-avatar rounded-circle mr-3"
+                                         th:if="${merchant.photos != null}" th:src="@{${merchant.photosImagePath}}">
                                 </a>
                             </td>
                             <td><span class="font-weight-normal">[[${merchant.name}]]</span></td>
