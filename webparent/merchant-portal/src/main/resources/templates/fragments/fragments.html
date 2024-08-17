@@ -32,7 +32,7 @@
     <link rel="stylesheet" th:href="@{/assets/vendor/prismjs/themes/prism.css}" type="text/css">
     <link rel="stylesheet" th:href="@{/assets/vendor/jqvmap/dist/jqvmap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/rocket.css}" type="text/css">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141734189-6"></script>
+    <!--<script async src="https://www.googletagmanager.com/gtag/js?id=UA-141734189-6"></script>
     <script>window.dataLayer = window.dataLayer || [];
 
     function gtag() {
@@ -54,7 +54,7 @@
         j.src =
             '../../www.googletagmanager.com/gtm5445.html?id=' + i + dl;
         f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-THQTXJ7');</script>
+    })(window, document, 'script', 'dataLayer', 'GTM-THQTXJ7');</script>-->
 
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
@@ -70,251 +70,118 @@
 
 <body>
 
-<noscript>
-    <iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-THQTXJ7" style="display:none;visibility:hidden"
-            width="0"></iframe>
-</noscript>
+<div class="preloader bg-soft flex-column justify-content-center align-items-center" th:fragment="loader"><img
+        alt="Rocket logo"
+        class="loader-element"
+        height="50"
+        th:src="@{/assets/img/brand/paykeshologo.svg}"></div>
 
-<header class="header-global" th:fragment="header">
-    <nav class="navbar navbar-main navbar-expand-lg navbar-dark navbar-theme-primary headroom py-lg-2 px-lg-6"
-         id="navbar-main">
-        <div class="container"><a class="navbar-brand d-none" href="index-2.html">
-            <div class="d-flex align-items-center"><img alt="Logo light"
-                                                        class="navbar-brand-dark rotate-logo" src="assets/img/brand/light.svg"> <img
-                    alt="Logo dark"
-                    class="navbar-brand-light rotate-logo" src="assets/img/brand/dark.svg"></div>
-        </a>
-            <div class="navbar-collapse collapse" id="navbar_global">
-                <div class="navbar-collapse-header">
-                    <div class="row">
-                        <div class="col-6 collapse-brand"><a class="d-flex align-items-center" href="index-2.html"><img
-                                alt="Logo dark" src="assets/img/brand/dark.svg"></a></div>
-                        <div class="col-6 collapse-close"><a aria-controls="navbar_global" aria-expanded="false"
-                                                             aria-label="Toggle navigation"
-                                                             class="fas fa-times" data-target="#navbar_global"
-                                                             data-toggle="collapse"
-                                                             href="#navbar_global"></a></div>
-                    </div>
+<!--
+<nav class="navbar navbar-dark navbar-theme-primary col-12 d-md-none" th:fragment="nav"><a class="navbar-brand mr-lg-5"
+                                                                                           th:href="@{/}"><img
+        alt="Pixel logo" class="navbar-brand-dark" th:src="@{/images/paykeshologo.png}">
+    <img alt="Pixel Logo Dark" class="navbar-brand-light" th:src="@{/images/paykeshologo.png}"></a>
+    <div class="d-flex align-items-center">
+        <button aria-controls="sidebarMenu" aria-expanded="false"
+                aria-label="Toggle navigation" class="navbar-toggler d-md-none collapsed" data-target="#sidebarMenu"
+                data-toggle="collapse"
+                type="button"><span class="navbar-toggler-icon"></span></button>
+    </div>
+</nav>
+-->
+
+<nav class="sidebar d-md-block bg-primary text-white collapse px-4" id="sidebarMenu" th:fragment="sidebarMenu">
+    <div class="sidebar-sticky pt-4 mx-auto">
+        <div class="user-card d-flex align-items-center justify-content-between justify-content-md-center pb-4">
+            <div class="d-flex align-items-center">
+                <div class="user-avatar lg-avatar mr-4" style="background-color: white">
+                    <img alt="User Profile"
+                         class="card-img-top rounded-circle border-white" th:src="@{/images/paykeshologo.png}">
                 </div>
-                <ul class="navbar-nav navbar-nav-hover justify-content-center">
-                    <li class="nav-item"><a class="nav-link" href="index-2.html">Overview</a></li>
-                    <li class="nav-item dropdown"><a aria-expanded="false" class="nav-link dropdown-toggle" data-toggle="dropdown"
-                                                     href="#" id="frontPagesDropdown"><span
-                            class="nav-link-inner-text mr-1">All pages</span> <i
-                            class="fas fa-angle-down nav-link-arrow"></i></a>
-                        <div aria-labelledby="frontPagesDropdown"
-                             class="dropdown-menu dropdown-megamenu pl-3 py-3 p-lg-4">
-                            <div class="row no-gutters">
-                                <div class="col-6 col-lg-3">
-                                    <h6 class="d-block mb-3 text-primary">Landings</h6>
-                                    <ul class="list-style-none mb-4">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/index.html">Landing
-                                            1</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/index-2.html">Landing 2</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/index-3.html">Landing 3</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/index-4.html">Landing 4</a>
-                                        </li>
-                                    </ul>
-                                    <h6 class="d-block mb-3 text-primary">Main pages</h6>
-                                    <ul class="list-style-none">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/about.html">About</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/team.html">Team</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/testimonials.html">Testimonials</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/contact.html">Contact</a></li>
-                                    </ul>
-                                </div>
-                                <div class="col-6 col-lg-3">
-                                    <h6 class="d-block mb-3 text-primary">Support</h6>
-                                    <ul class="list-style-none mb-4">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/support.html">Support
-                                            center</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/support-2.html">Support center
-                                            2</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/support-topic.html">Support
-                                            topic</a></li>
-                                    </ul>
-                                    <h6 class="d-block mb-3 text-primary">Blog</h6>
-                                    <ul class="list-style-none mb-4">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/blog.html">Blog</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/blog-post.html">Blog post</a>
-                                        </li>
-                                    </ul>
-                                    <h6 class="d-block mb-3 text-primary">Careers</h6>
-                                    <ul class="list-style-none mb-4 mb-lg-0">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/careers.html">Careers</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/career-single.html">Job
-                                            description</a></li>
-                                    </ul>
-                                </div>
-                                <div class="col-6 col-lg-3">
-                                    <h6 class="d-block mb-3 text-primary">Auth</h6>
-                                    <ul class="list-style-none mb-4">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/sign-in.html">Sign in</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/sign-in-illustration.html">Sign in
-                                            2</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/sign-up.html">Sign up</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/sign-up-illustration.html">Sign up
-                                            2</a></li>
-                                    </ul>
-                                    <h6 class="d-block mb-3 text-primary">Specials</h6>
-                                    <ul class="list-style-none">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/404.html">404
-                                            Not Found</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/500.html">500
-                                            Server Error</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/download-extension.html">Browser
-                                            extension</a></li>
-                                    </ul>
-                                </div>
-                                <div class="col-6 col-lg-3">
-                                    <h6 class="d-block mb-3 text-primary">Payment</h6>
-                                    <ul class="list-style-none mb-3">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/pricing.html">Pricing</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/checkout.html">Checkout</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/checkout-completed.html">Order
-                                            completed</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/invoice.html">Invoice</a></li>
-                                    </ul>
-                                    <h6 class="d-block mb-3 text-primary">Legal</h6>
-                                    <ul class="list-style-none">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/legal.html">Legal
-                                            center</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link" href="pages/terms.html">Terms
-                                            &
-                                            agreement</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown"><a aria-expanded="false" class="nav-link dropdown-toggle"
-                                                     data-toggle="dropdown"
-                                                     href="#" id="dashboardPagesDropdown"><span
-                            class="nav-link-inner-text mr-1">Dashboard</span> <i
-                            class="fas fa-angle-down nav-link-arrow"></i></a>
-                        <div aria-labelledby="dashboardPagesDropdown"
-                             class="dropdown-menu dropdown-megamenu dropdown-megamenu-sm pl-3 py-3 p-lg-4">
-                            <div class="row no-gutters">
-                                <div class="col-6">
-                                    <h6 class="d-block mb-3 text-primary">Main pages</h6>
-                                    <ul class="list-style-none">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/dashboard.html">Overview</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/users.html">User
-                                            List</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/tasks.html">Task
-                                            List</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/settings.html">Settings</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-6">
-                                    <h6 class="d-block mb-3 text-primary">Secondary pages</h6>
-                                    <ul class="list-style-none">
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/app-analysis.html">App
-                                            analysis</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/transactions.html">Transactions</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/traffic-sources.html">Traffic
-                                            & Engagement</a></li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/messages.html">Messages</a>
-                                        </li>
-                                        <li class="mb-2 megamenu-item"><a class="megamenu-link"
-                                                                          href="pages/dashboard/single-message.html">Chat</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown"><a aria-expanded="false" class="nav-link dropdown-toggle" data-toggle="dropdown"
-                                                     href="#" id="supportDropdown"><span
-                            class="nav-link-inner-text mr-1">Support</span> <i
-                            class="fas fa-angle-down nav-link-arrow"></i></a>
-                        <div aria-labelledby="supportDropdown" class="dropdown-menu dropdown-menu-lg">
-                            <div class="col-auto px-0">
-                                <div class="list-group list-group-flush"><a
-                                        class="list-group-item list-group-item-action d-flex align-items-center p-0 py-3 px-lg-4"
-                                        href="https://themesberg.com/docs/rocket/getting-started/overview/"
-                                        target="_blank"><span
-                                        class="icon icon-sm icon-secondary"><span class="fas fa-file-alt"></span></span>
-                                    <div class="ml-4"><span class="text-dark d-block">Documentation<span
-                                            class="badge badge-sm badge-secondary ml-2">v2.0</span></span> <span
-                                            class="small">Examples
-                          and guides</span></div>
-                                </a><a class="list-group-item list-group-item-action d-flex align-items-center p-0 py-3 px-lg-4" href="https://themesberg.com/contact"
-                                       target="_blank"><span
-                                        class="icon icon-sm icon-primary"><span
-                                        class="fas fa-microphone-alt"></span></span>
-                                    <div class="ml-4"><span class="text-dark d-block">Support</span> <span
-                                            class="small">Looking for
-                          answers? Ask us!</span></div>
-                                </a></div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+                <div class="d-block">
+                    <a class="h6" sec:authentication="principal.fullName" th:href="@{/my-account}"></a>
+                </div>
             </div>
-            <div class="d-none d-lg-block"><a
-                    class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3"
-                    href="https://themesberg.com/product/bootstrap/rocket-saas-dashboard-bootstrap-template#pricing" target="_blank">Pricing plan</a> <a
-                    class="btn btn-outline-white btn-docs animate-up-2" href="https://themesberg.com/docs/rocket/getting-started/overview/"
-                    target="_blank"><i class="fas fa-book mr-2"></i> Docs v2.0</a>
-            </div>
-            <div class="d-flex d-lg-none align-items-center ml-auto">
-                <button aria-controls="navbar_global" aria-expanded="false"
-                        aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar_global"
-                        data-toggle="collapse"
-                        type="button"><span class="navbar-toggler-icon"></span></button>
-            </div>
+
+            <div class="collapse-close d-md-none"><a aria-controls="sidebarMenu" aria-expanded="true"
+                                                     aria-label="Toggle navigation"
+                                                     class="fas fa-times" data-target="#sidebarMenu"
+                                                     data-toggle="collapse"
+                                                     href="#sidebarMenu"></a></div>
         </div>
-    </nav>
-</header>
+        <ul class="nav flex-column mt-4">
+            <li class="nav-item"><a class="nav-link d-flex align-items-center"
+                                    th:href="@{/}"><span
+                    class="sidebar-icon"><span
+                    class="fas fa-home"></span> </span><span>Dashboard</span></a>
+            </li>
+
+            <li class="nav-item"><a
+                    class="nav-link collapsed d-flex justify-content-between align-items-center"
+                    data-target="#financialsMenu" data-toggle="collapse" href="#financialsMenu"><span><span
+                    class="sidebar-icon"><span class="fas fa-chart-area"></span></span> Finance </span><span
+                    class="link-arrow"><span class="fas fa-chevron-right"></span></span></a>
+                <div aria-expanded="false" class="multi-level collapse" id="financialsMenu" role="list">
+                    <ul class="flex-column nav">
+                        <li class="nav-item"><a class="nav-link" href="#"><span>Repayment Schedule</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#"><span>Configurations</span></a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item"><a
+                    class="nav-link collapsed d-flex justify-content-between align-items-center"
+                    data-target="#clientsMenu" data-toggle="collapse" href="#clientsMenu"><span><span
+                    class="sidebar-icon"><span class="fas fa-users"></span></span> Clients </span><span
+                    class="link-arrow"><span class="fas fa-chevron-right"></span></span></a>
+                <div aria-expanded="false" class="multi-level collapse" id="clientsMenu" role="list">
+                    <ul class="flex-column nav">
+                        <li class="nav-item"><a class="nav-link" th:href="@{/clients}"><span>View All</span></a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="dropdown-divider mt-4 mb-3 border-blue" role="separator"></li>
+            <li class="nav-item"><a class="nav-link d-flex align-items-center"
+                                    th:href="@{/help-support}"><span
+                    class="sidebar-icon"><span
+                    class="fas fa-hands-helping"></span> </span><span>Help & Support</span></a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+<div th:fragment="topbar" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+    <div>
+        <h3>Merchant Portal | [[${pageTitle}]]</h3>
+    </div>
+    <div>
+        <button
+                class="btn btn-primary mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false"><span class="fas fa-user-circle mr-2"></span><a class="h6 text-white"
+                                                                                      sec:authentication="principal.fullName"
+                                                                                      th:href="@{/my-account}"></a>
+            <span
+                    class="icon icon-small ml-1"><span class="fas fa-chevron-down"></span></span></button>
+        <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2">
+            <a class="dropdown-item font-weight-bold" th:href="@{/my-account}"><span
+                    class="fas fa-user-cog mr-2"></span>My Profile</a>
+            <div role="separator" class="dropdown-divider"></div>
+            <a class="dropdown-item font-weight-bold"
+               id="logoutLink"><span class="fas fa-lock text-success mr-2"></span>Sign out</a>
+
+            <form method="post" name="logoutForm" th:action="@{/logout}" th:hidden="true">
+                <input type="submit">
+            </form>
+        </div>
+    </div>
+</div>
 
 <th th:fragment="column_Link(fieldName, columnLabel, removeTag)" th:remove="${removeTag}">
     <a class="list-sort text-muted"
        th:href="@{${moduleURL}+'/page/'+ ${currentPage} + '?sortField=' + ${fieldName}  +'&sortDir=' + ${sortField != fieldName ? sortDir : reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
         [[${columnLabel}]]
     </a>
-    <span th:class="${sortDir == 'asc' ? 'fe fe-chevron-up' : 'fe fe-chevron-down'}"
+    <span th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"
           th:if="${sortField == fieldName}"></span>
 </th>
 
@@ -326,22 +193,22 @@
 <a class="page-link"
    th:fragment="page_link_caret(pageNum,label)"
    th:href="@{${moduleURL} +'/page/' + ${pageNum} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''} }">
-    <i th:class="${label == 'Previous' ? 'fe fe-arrow-left me-1' : 'fe fe-arrow-right ms-1' }"></i>
+    <i th:class="${label == 'Previous' ? 'fas fa-chevron-left me-1' : 'fas fa-chevron-right ms-1' }"></i>
 </a>
 
 <div th:fragment="status(enabled, entityName, entityURL)" th:remove="tag">
-    <a class="fe fe-check-circle fe-2x"
+    <a class="fas fa-check-circle fa-2x"
        th:href="@{${entityURL}+'/enabled/false'}"
        th:if="${enabled == true}"
        th:title="'Disable ' + ${entityName}"></a>
-    <a class="fe fe-check-circle icon-dark fa-2x"
+    <a class="fas fa-check-circle icon-dark fa-2x"
        th:href="@{${entityURL}+'/enabled/true'}"
        th:if="${enabled == false}"
        th:title="'Enable ' + ${entityName}"></a>
 </div>
 
 <div th:fragment="edit(entityName, editURL)" th:remove="tag">
-    <a class="fe fe-edit"
+    <a class="fas fa-edit"
        th:href="@{${editURL}}"
        th:title="'Edit ' + ${entityName}">
     </a>
@@ -349,10 +216,11 @@
 
 <div th:fragment="delete(entityId, entityName, deleteURL, visible)" th:remove="tag">
     <th:block th:if="${visible}">
-        <a class="fe fe-trash-2 link-delete"
+        <a class="fas fa-trash link-delete"
            th:entityId="${entityId}"
            th:href="@{${deleteURL}}"
-           th:title="'Delete this' + ${entityName}"></a>
+           th:title="'Delete this' + ${entityName}">
+        </a>
     </th:block>
 </div>
 
@@ -367,25 +235,21 @@
     </div>
     <div th:if="${totalItems > 0}">
         <!-- Pagination -->
-        <nav class="d-flex justify-content-center justify-content-md-end">
-            <ul class="pagination pagination-sm text-gray-400 flex-wrap">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination circle-pagination">
                 <li class="page-item" th:classappend="${currentPage} == 1 ? 'disabled' : ''">
-                    <a class="page-link ps-0 pe-4 border-end"
+                    <a class="page-link"
                        th:replace="fragments/fragments :: page_link_caret(${previousPage}, 'Previous')">
-                        <i class="fe fe-arrow-left me-1"></i>
+                        <i class="fas fa-angle-double-left"></i>
                     </a>
                 </li>
-                <li class="page-item"
-                    th:classappend="${currentPage} == ${i} ? 'active' : ''"
-                    th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <a class="page-link"
-                       th:replace="fragments/fragments :: page_link(${i}, ${i})"></a>
+                <li class="page-item" th:classappend="${currentPage} == ${i} ? 'active' : ''"
+                    th:each="i : ${#numbers.sequence(1, 3)}">
+                    <a class="page-link" th:replace="fragments/fragments :: page_link(${i}, ${i})"></a>
                 </li>
-                <li class="page-item"
-                    th:classappend="${currentPage} == ${totalPages} ? 'disabled' : ''">
-                    <a class="page-link ps-4 pe-0 border-start"
-                       th:replace="fragments/fragments :: page_link_caret(${nextPage}, 'Next')">
-                        <i class="fe fe-arrow-right ms-1"></i>
+                <li class="page-item">
+                    <a class="page-link" th:replace="fragments/fragments :: page_link_caret(${nextPage}, 'Next')">
+                        <i class="fas fa-angle-double-right"></i>
                     </a>
                 </li>
             </ul>
@@ -418,24 +282,79 @@
 </div>
 
 
-<div class="col" th:fragment="search_form()">
+<div class="table-settings mb-4" th:fragment="search_form()">
 
-    <!-- Form -->
-    <form th:action="@{${moduleURL} + '/page/1'}">
-        <div class="input-group input-group-flush input-group-merge input-group-reverse">
-            <input name="sortField" th:value="${sortField}" type="hidden">
-            <input name="sortDir" th:value="${sortDir}" type="hidden">
-            <input class="form-control" name="keyword" placeholder="Search"
-                   th:value="${keyword}" type="search">
-            <span class="input-group-text">
-                <button class="btn btn-outline-border btn-xxs" type="submit">
-                    <i class="fe fe-search"></i>
-                </button>
-            </span>
+    <div class="row justify-content-between align-items-center">
+        <div class="col-12 col-md-6 col-lg-3 align-items-center d-none d-md-flex">
+            <form th:action="@{${moduleURL} + '/page/1'}">
+                <div class="input-group">
+                    <input name="sortField" th:value="${sortField}" type="hidden">
+                    <input name="sortDir" th:value="${sortDir}" type="hidden">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <span class="fas fa-search"></span>
+                        </span>
+                    </div>
+                    <input class="form-control" name="keyword" th:value="${keyword}" placeholder="Search" type="search"
+                           aria-label="Search">
+                </div>
+            </form>
         </div>
-    </form>
-
+        <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
+            <div class="btn-group mr-2">
+                <button
+                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false"><span class="icon icon-sm icon-gray"><span
+                        class="fas fa-sliders-h"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
+                <div class="dropdown-menu dropdown-menu-right"><span
+                        class="dropdown-item font-weight-bold text-dark">Show</span> <a
+                        class="dropdown-item d-flex font-weight-bold" href="#">10 <span
+                        class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a> <a
+                        class="dropdown-item font-weight-bold" href="#">20</a> <a class="dropdown-item font-weight-bold"
+                                                                                  href="#">30</a></div>
+            </div>
+            <div class="btn-group">
+                <button
+                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false"><span class="icon icon-sm icon-gray"><span
+                        class="fas fa-cog"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
+                <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right"><span
+                        class="dropdown-item font-weight-bold text-dark">Show</span> <a
+                        class="dropdown-item d-flex font-weight-bold" href="#">10 <span
+                        class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a> <a
+                        class="dropdown-item font-weight-bold" href="#">20</a> <a class="dropdown-item font-weight-bold"
+                                                                                  href="#">30</a></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<footer class="footer section py-5" th:fragment="footer()">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                <p class="mb-0 text-center text-xl-left">Copyright © 2024-<span
+                        class="current-year"></span> <a
+                        class="text-primary font-weight-normal" href="https://kaedigital.tech/"
+                        target="_blank">KAE Digital</a></p>
+            </div>
+            <div class="col-12 col-lg-6">
+                <ul class="list-inline list-group-flush list-group-borderless text-center text-xl-right mb-0">
+                    <li class="list-inline-item px-0 px-sm-2"><a href="">Support</a>
+                    </li>
+                    <li class="list-inline-item px-0 px-sm-2"><a href="">Manuals</a>
+                    </li>
+                    <li class="list-inline-item px-0 px-sm-2"><a
+                            href="">Home</a></li>
+                    <li class="list-inline-item px-0 px-sm-2"><a href="">Site</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
 
 <th:block th:fragment="js_code">
     <!-- JAVASCRIPT -->

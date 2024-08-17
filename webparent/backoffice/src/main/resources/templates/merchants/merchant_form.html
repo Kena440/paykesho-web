@@ -53,8 +53,8 @@
                                                             type="text"></div>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <div class="form-group"><label for="merchantType">Type</label>
-                                                    <select class="custom-select" id="merchantType">
+                                                <div class="form-group"><label>Type</label>
+                                                    <select class="custom-select" th:field="*{merchantType}">
                                                         <option value="">Select...</option>
                                                         <th:block
                                                                 th:each="ps : ${T(org.commons.enums.MerchantType).values()}">

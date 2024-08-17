@@ -1,6 +1,7 @@
 package org.paykesho.organizationportal.organizations.service;
 
 import org.commons.entity.organization.Organization;
+import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.organizations.dto.GPSDataItem;
 import org.paykesho.organizationportal.organizations.repository.OrganizationRepository;
@@ -192,5 +193,10 @@ public class OrganizationService {
 
     public List<Organization> getAssessmentFacilities() {
         return organizationRepository.findOrganizationEnabled(true);
+    }
+
+
+    public Organization getOrganizationByOrganizationAdmin(OrganizationAdmin organizationAdmin) {
+        return organizationRepository.getOrganizationByContactPerson(organizationAdmin.getId());
     }
 }

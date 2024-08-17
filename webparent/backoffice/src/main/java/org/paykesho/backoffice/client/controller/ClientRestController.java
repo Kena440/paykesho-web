@@ -1,6 +1,6 @@
 package org.paykesho.backoffice.client.controller;
 
-import com.paykesho.paykeshobackoffice.client.service.ClientService;
+import org.paykesho.backoffice.client.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

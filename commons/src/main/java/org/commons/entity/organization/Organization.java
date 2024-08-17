@@ -8,6 +8,7 @@ import org.commons.entity.State;
 import org.commons.enums.OrganizationType;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +21,7 @@ public class Organization extends IdBasedEntity {
     @ManyToOne
     @JoinColumn(name = "province_id")
     private State province;
-    @Column(name = "district", length = 45, nullable = false)
+    @Column(name = "district", length = 45)
     private String district;
     @Enumerated(EnumType.STRING)
     @Column(name = "organization_type", length = 50)
@@ -38,7 +39,7 @@ public class Organization extends IdBasedEntity {
     private float latitude;
     @Column(length = 64)
     private String photos;
-
+    private Date registrationDate;
     @Override
     public String toString() {
         return name + " ~ " + organizationType;

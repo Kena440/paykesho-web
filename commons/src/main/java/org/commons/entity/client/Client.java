@@ -3,6 +3,7 @@ package org.commons.entity.client;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
 import org.commons.entity.organization.Organization;
 import org.commons.enums.AuthenticationType;
@@ -63,6 +64,8 @@ public class Client extends IdBasedEntity {
     @OneToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
+    @Column(length = 64)
+    private String photos;
 
     public Client() {
     }
@@ -94,5 +97,11 @@ public class Client extends IdBasedEntity {
         return salutation + ". " + name;
     }
 
-
+    @Transient
+    public String getPhotosImagePath() {
+        if (id == null || photos == null) {
+            return "/images/default_image.png";
+        }
+        return Constants.S3_BASE_URI + "/client_logos/" + this.id + "/" + this.photos;
+    }
 }

@@ -9,6 +9,7 @@ import org.paykesho.backoffice.merchants.service.MerchantService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.paging.PagingAndSortingParam;
 import org.paykesho.backoffice.settings.service.SettingService;
+import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -28,7 +30,8 @@ public class MerchantController {
 
     @Autowired
     private MerchantService merchantService;
-
+    @Autowired
+    private PaykeshoReferenceService paykeshoReferenceService;
     @Autowired
     private SettingService settingService;
 
@@ -60,6 +63,12 @@ public class MerchantController {
 
     @PostMapping("/save")
     public String saveMerchant(Merchant merchant, RedirectAttributes redirectAttributes) throws PaykeshoError {
+
+        String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_MNT");
+        if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
+
+        merchant.setCode(paykeshoRef);
+        merchant.setRegistrationDate(new Date());
         merchantService.save(merchant);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant Operation Successful: " + merchant.getEmail());
         return getRedirectURLtoAffectedMerchant(merchant);

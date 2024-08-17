@@ -1,9 +1,11 @@
 package org.paykesho.clientportal.clients.controller;
 
 import org.commons.entity.client.Client;
+import org.commons.entity.merchant.Merchant;
 import org.commons.entity.settings.Country;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.config.Utility;
+import org.paykesho.clientportal.merchant.service.MerchantService;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2User;
 import org.paykesho.clientportal.settings.service.SettingService;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +30,28 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
     @Autowired
+    private MerchantService merchantService;
+    @Autowired
     private SettingService settingService;
+
+    @GetMapping("/clients/dashboard")
+    public String showDashboard(Model model) {
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Client client;
+
+        if (principal instanceof UserDetails) {
+            String paykeshoId = ((ClientUserDetails) principal).getCode();
+            client = clientService.getClientByCode(paykeshoId);
+            model.addAttribute("client", client);
+        }
+
+        List<Merchant> merchantList = merchantService.listAllEnabledMerchants();
+        model.addAttribute("merchantList", merchantList);
+        model.addAttribute("pageTitle", "Dashboard");
+        return "clients/dashboard";
+    }
 
     @GetMapping("/sign-up-customer")
     public String showSignUpForm(Model model) {

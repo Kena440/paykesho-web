@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('Dashboard','none')"></head>
+<body>
+<div th:replace="fragments/fragments :: loader"></div>
+<!--
+<nav th:replace="fragments/fragments :: nav"></nav>
+-->
+<div class="container-fluid bg-soft">
+    <div class="row">
+        <div class="col-12">
+            <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+            <main class="content">
+                <div th:replace="fragments/fragments :: topbar">
+                </div>
+                <div class="row">
+                    <div class="col-12 col-xl-6 mb-4">
+                        <div class="card border-light shadow-sm">
+                            <div class="card-body">
+                                <div class="row d-block d-xl-flex align-items-center">
+                                    <div
+                                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                                        <div class="icon icon-shape icon-md icon-shape-primary rounded mr-4 mr-sm-0"><span
+                                                class="fas fa-chart-line"></span></div>
+                                        <div class="d-sm-none">
+                                            <h2 class="h5">Total Vouchers</h2>
+                                            <h3 class="mb-1">345,678</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-xl-7 px-xl-0">
+                                        <div class="d-none d-sm-block">
+                                            <h2 class="h5">Total Vouchers</h2>
+                                            <h3 class="mb-1">345,678</h3>
+                                        </div>
+                                        <small>Feb 1 - Apr 1, <span class="icon icon-small"><span
+                                                class="fas fa-globe-africa"></span></span> Lusaka</small>
+                                        <div class="small mt-2"><span class="fas fa-angle-up text-success"></span> <span
+                                                class="text-success font-weight-bold">18.2%</span> Since last month
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-6 mb-4">
+                        <div class="card border-light shadow-sm">
+                            <div class="card-body">
+                                <div class="row d-block d-xl-flex align-items-center">
+                                    <div
+                                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                                        <div class="icon icon-shape icon-md icon-shape-tertiary rounded mr-4"><span
+                                                class="fas fa-users"></span></div>
+                                        <div class="d-sm-none">
+                                            <h2 class="h5">Transactions</h2>
+                                            <h3 class="mb-1">5,342</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-xl-7 px-xl-0">
+                                        <div class="d-none d-sm-block">
+                                            <h2 class="h5">Transactions</h2>
+                                            <h3 class="mb-1">5,342</h3>
+                                        </div>
+                                        <small>Feb 1 - Apr 1, <span class="icon icon-small"><span
+                                                class="fas fa-globe-africa"></span></span> Zambia</small>
+                                        <div class="small mt-2"><span class="fas fa-angle-up text-success"></span> <span
+                                                class="text-success font-weight-bold">28.2%</span> Since last month
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<footer th:replace="fragments/fragments ::footer"></footer>-->
+            </main>
+        </div>
+    </div>
+</div>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<!--<script type="text/javascript">
+    let currYearTripData = [];
+    let lastYearTripData = [];
+    let facilityTypes = [];
+    let monthLabels = [];
+    let facilityTypesData = [];
+    let facilityGPSData = [];
+    let facilityGPSMapFeatures = [];
+    contextPath = "[[@{/}]]";
+
+    $(document).ready(function () {
+
+        const facilityTypesDataRequestUrl = contextPath + "facilities/rest/get-organization-types-data/true";
+        const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-organization-gps-data/true";
+
+        $.get(facilityTypesDataRequestUrl, function (responseJSON) {
+            $.each(responseJSON, function (index, reportItem) {
+                facilityTypes.push(reportItem.identifier);
+                facilityTypesData.push(reportItem.itemCount);
+            });
+
+            generateOrganizationTypeChart();
+        });
+
+        $.get(facilityGPSDataRequestUrl, function (responseJSON) {
+            $.each(responseJSON, function (index, reportItem) {
+                facilityGPSData.push(reportItem);
+            });
+
+            $.each(facilityGPSData, function (index, item) {
+                var element = {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [item.longitude, item.latitude]
+                    },
+                    'properties': {
+                        'title': item.title
+                    }
+                }
+
+                facilityGPSMapFeatures.push(element);
+            })
+
+            generateOrganizationGPSMap();
+        });
+
+    });
+
+    function generateOrganizationTypeChart() {
+        var barColors = [
+            "#b91d47",
+            "#00aba9",
+            "#2b5797",
+            "#e8c3b9"
+        ];
+
+        new Chart("facilityTypeChart", {
+            type: "doughnut",
+            data: {
+                labels: facilityTypes,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: facilityTypesData
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Legend"
+                }
+            }
+        });
+    }
+
+    function generateOrganizationGPSMap() {
+        mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            zoom: 5.0,
+            center: [28.5589884, -13.1189121]
+        });
+
+        map.on('load', () => {
+            map.loadImage(
+                contextPath + 'assets/img/marker.png',
+                (error, image) => {
+                    if (error) throw error;
+                    map.addImage('custom-marker', image);
+                    map.addSource('points', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'FeatureCollection',
+                            'features': facilityGPSMapFeatures
+                        }
+                    });
+
+                    map.addLayer({
+                        'id': 'points',
+                        'type': 'symbol',
+                        'source': 'points',
+                        'layout': {
+                            'icon-image': 'custom-marker',
+                            'text-field': [
+                                'format',
+                                ['downcase', ['get', 'title']],
+                                {'font-scale': 0.6},
+                            ],
+                            'text-font': [
+                                'Open Sans Semibold',
+                                'Arial Unicode MS Bold'
+                            ],
+                            'text-offset': [0, 0.60],
+                            'text-anchor': 'top'
+                        },
+                        'paint': {
+                            "text-color": "#000"
+                        }
+                    });
+                }
+            );
+        });
+        map.addControl(new mapboxgl.FullscreenControl());
+    }
+
+</script>-->
+</body>
+
+</html>

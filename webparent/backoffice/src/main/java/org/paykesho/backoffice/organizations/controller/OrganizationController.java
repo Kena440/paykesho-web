@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -60,6 +61,8 @@ public class OrganizationController {
 
     @PostMapping("/save")
     public String saveOrganization(Organization organization, RedirectAttributes redirectAttributes) throws PaykeshoError {
+        organization.setDistrict("N/A");
+        organization.setRegistrationDate(new Date());
         organizationService.save(organization);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization Operation Successful: " + organization.getEmail());
         return getRedirectURLtoAffectedOrganization(organization);
@@ -91,7 +94,7 @@ public class OrganizationController {
         if (organization == null) {
             throw new PaykeshoError("no member provided");
         }
-        String firstPartOfEmail = organization.getEmail().split("@")[0];
+        String firstPartOfEmail = organization.getName();
 
         if (organization.getEmail() == null) {
             return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization.getId();
