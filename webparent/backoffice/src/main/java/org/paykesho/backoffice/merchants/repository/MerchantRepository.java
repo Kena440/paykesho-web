@@ -27,7 +27,8 @@ public interface MerchantRepository extends SearchRepository<Merchant, Integer> 
     @Query("update Merchant m set m.enabled = ?2 where m.id = ?1")
     @Modifying
     public void updateEnableStatus(Integer id, boolean enabled);
-
+    @Query("select count(c.id) from Merchant c")
+    public Long countAllMerchants();
     @Query("select m from Merchant m where m.id = :id and m.name = :merchantName and m.merchantType = :merchantType")
     public Merchant getMerchantByIdAndNameAndMerchantType(@Param("id") Integer id, @Param("merchantName") String merchantName, @Param("merchantType") MerchantType merchantType);
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.commons.entity.IdBasedEntity;
+import org.commons.entity.organization.Organization;
 import org.commons.enums.AuthenticationType;
 import org.commons.enums.ClientType;
 import org.commons.enums.GenderType;
@@ -21,6 +22,8 @@ import java.util.Objects;
 public class Client extends IdBasedEntity {
     @Column(length = 15, nullable = false, name = "phone_number")
     protected String phoneNumber;
+    @Column(length = 150, nullable = false, name = "address")
+    protected String address;
     @Column(name = "code", length = 128, nullable = false, unique = true)
     private String code;
     @Column(length = 64, nullable = false)
@@ -57,6 +60,9 @@ public class Client extends IdBasedEntity {
 
     @Column(name = "lock_time")
     private Date lockTime;
+    @OneToOne
+    @JoinColumn(name = "organization_id")
+    private Organization organization;
 
     public Client() {
     }

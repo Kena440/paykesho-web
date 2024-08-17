@@ -42,12 +42,12 @@ public class OrganizationService {
     }
 
     @Transactional(rollbackOn = {Exception.class})
-    public Organization save(Organization memberInstitution) {
-        if (memberInstitution == null) {
+    public Organization save(Organization organization) {
+        if (organization == null) {
             return null;
         }
 
-        return organizationRepository.save(memberInstitution);
+        return organizationRepository.save(organization);
     }
 
     public boolean isEmailUnique(Integer id, String email) {

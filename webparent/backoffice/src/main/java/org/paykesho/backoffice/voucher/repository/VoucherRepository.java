@@ -18,7 +18,7 @@ public interface VoucherRepository extends SearchRepository<Voucher, Integer> {
 
     public Long countById(Integer id);
 
-    @Query("select v from Voucher v where concat(v.client, ' ', v.merchant.name, ' ', v.reference ) like %?1%")
+    @Query("select v from Voucher v where concat(v.client, ' ', v.amount, ' ', v.reference ) like %?1%")
     public Page<Voucher> findAll(String keyword, Pageable pageable);
 
     @Query("select count(v.id) as total from Voucher v")
@@ -31,7 +31,5 @@ public interface VoucherRepository extends SearchRepository<Voucher, Integer> {
     @Modifying
     void updateApprovedStatus(Integer id, boolean approved);
 
-    @Query("select v from Voucher v where v.merchant.id = ?1")
-    List<Voucher> getVouchersByMerchantId(int id);
 }
 

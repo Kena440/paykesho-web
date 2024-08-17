@@ -67,11 +67,11 @@ public class VoucherController {
     public String listAllVouchersByMerchant(
             @PathVariable("id") int id, Model model) throws PaykeshoError {
 
-        List<Voucher> voucherList = voucherService.getMerchantVouchers(id);
+       // List<Voucher> voucherList = voucherService.getMerchantVouchers(id);
 
-        model.addAttribute("voucherList", voucherList);
+       // model.addAttribute("voucherList", voucherList);
 
-        model.addAttribute("totalItems", voucherList.size());
+     //   model.addAttribute("totalItems", voucherList.size());
         model.addAttribute("currentPage", 1);
         model.addAttribute("previousPage", 1);
         model.addAttribute("nextPage", 1);

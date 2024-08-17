@@ -59,11 +59,11 @@ public class VoucherService {
         return voucherRepository.save(voucher);
     }
 
-    public List<Voucher> getMerchantVouchers(int id) throws PaykeshoError {
+/*    public List<Voucher> getMerchantVouchers(int id) throws PaykeshoError {
         if (id == 0) {
             throw new PaykeshoError("Null parameter id");
         }
 
         return voucherRepository.getVouchersByMerchantId(id);
-    }
+    }*/
 }
