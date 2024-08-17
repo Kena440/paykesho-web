@@ -3,6 +3,8 @@ package org.paykesho.clientportal.utils;
 import net.bytebuddy.utility.RandomString;
 import org.paykesho.clientportal.clients.repository.ClientRepository;
 import org.paykesho.clientportal.merchant.repository.MerchantRepository;
+import org.paykesho.clientportal.transactions.repository.TransactionRepository;
+import org.paykesho.clientportal.voucher.repository.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +18,12 @@ public class PaykeshoReferenceService {
     private MerchantRepository merchantRepository;
     @Autowired
     private ClientRepository clientRepository;
-/*
     @Autowired
     private VoucherRepository voucherRepository;
     @Autowired
     private TransactionRepository transactionRepository;
-*/
 
-    public String generatePaykeshoId(String itemRequest) {
+    public String generateCode(String itemRequest) {
         String reference = "";
         String itemPrefix = "";
         Long count;
@@ -41,7 +41,7 @@ public class PaykeshoReferenceService {
                 reference = getReference(itemPrefix, count);
                 break;
 
-   /*         case "ITEM_REQ_VCR":
+            case "ITEM_REQ_VCR":
                 itemPrefix = "V";
                 count = voucherRepository.countAllVouchers() + 1;
                 reference = getReference(itemPrefix, count);
@@ -51,7 +51,7 @@ public class PaykeshoReferenceService {
                 itemPrefix = "T";
                 count = transactionRepository.countAllTransactions() + 1;
                 reference = getReference(itemPrefix, count);
-                break;*/
+                break;
 
             default:
 

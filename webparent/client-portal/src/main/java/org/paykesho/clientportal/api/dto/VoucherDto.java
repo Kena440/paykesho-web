@@ -9,8 +9,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class VoucherDto {
-    private String paykeshoReference;
-    private String merchant;
+    private String reference;
     private BigDecimal voucherAmount;
     private BigDecimal voucherAvailableAmount;
     private BigDecimal voucherRepaymentAmount;
@@ -18,6 +17,5 @@ public class VoucherDto {
     private String voucherRepaymentCycle;
     private Date voucherRepaymentDate;
     private Date voucherRequestDate;
-    private String payslipFile;
     private boolean approved;
 }
