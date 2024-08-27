@@ -66,10 +66,16 @@
                                 <a class="d-flex align-items-center" href="#">
                                     <img alt="Avatar"
                                          class="organization-avatar rounded-circle mr-3"
-                                         th:if="${organization.photos != null}" th:src="@{${organization.photosImagePath}}">
+                                         th:if="${organization.photos != null}"
+                                         th:src="@{${organization.photosImagePath}}">
                                 </a>
                             </td>
-                            <td><span class="font-weight-normal">[[${organization.name}]]</span></td>
+                            <td>
+                                <a th:href="@{'/organizations/view/'+${organization.id}}"
+                                   title="Assessment View">
+                                    <span class="font-weight-normal">[[${organization.name}]]</span>
+                                </a>
+                            </td>
                             <td><span class="font-weight-normal">[[${organization.organizationType}]]</span></td>
                             <td>
                                 <div th:replace="fragments/fragments :: status(${organization.enabled}, 'organization', '/organizations/' + ${organization.id})"></div>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('Organization Mgt','none')"></head>
+<body>
+<div th:replace="fragments/fragments :: loader"></div>
+<!--<nav th:replace="fragments/fragments :: nav"></nav>-->
+<div class="container-fluid bg-soft">
+    <div class="row">
+        <div class="col-12">
+            <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+            <main class="content">
+                <input id="longitude" th:value="${organization.longitude}" type="hidden"/>
+                <input id="latitude" th:value="${organization.latitude}" type="hidden"/>
+                <div th:replace="fragments/fragments :: topbar"></div>
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+                    <div class="d-block mb-4 mb-md-0">
+                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                                <li class="breadcrumb-item"><a href="#">Organization Mgt</a></li>
+                                <li aria-current="page" class="breadcrumb-item active">Organization View</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="btn-toolbar mb-2 mb-md-0"><a class="btn btn-sm btn-primary"
+                                                             th:href="@{/organizations}"><span
+                            class="fas fa-list"></span> <span>Organizations</span></a>
+                        <div class="btn-group ml-3">
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Share</button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button">Export</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-xl-12">
+                        <div class="card card-body bg-white border-light shadow-sm mb-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h2 class="h5 mb-4">Organization information</h2>
+                                    <div class="row">
+                                        <div class="col-md-12 mb-1">
+                                            <div class="card card-body bg-white border-light shadow-sm mb-1">
+                                                <div class="d-xl-flex align-items-center">
+                                                    <div>
+                                                        <div class="organization-avatar xl-avatar mb-3"><img
+                                                                alt="change avatar"
+                                                                class="rounded"
+                                                                id="thumbnail"
+                                                                style="height: 100px; width: 140px"
+                                                                th:src="@{${organization.photosImagePath}}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="file-field">
+                                                        <div class="d-flex justify-content-xl-center ml-xl-3">
+                                                            <div class="d-flex">
+                                                                <div class="d-md-block text-left">
+                                                                    <div class="font-weight-normal text-dark mb-1">
+                                                                        [[${organization.name}]]
+                                                                        ([[${organization.organizationType}]])
+                                                                    </div>
+                                                                    <div class="font-weight-normal text-dark mb-1">
+                                                                        [[${organization.phoneNumber}]],
+                                                                        [[${organization.email}]]
+                                                                    </div>
+                                                                    <div class="font-weight-normal text-dark mb-1">
+                                                                        [[${organization.district}]],
+                                                                        [[${organization.province}]]
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="col-md-12 mb-3">
+                                            <div class="card card-body bg-white border-light shadow-sm mb-4">
+                                                <div id="map" style='width: 100%; height: 400px'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h2 class="h5 mb-4">Staff Data</h2>
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-xl-12">
+                                            <div class="accordion" id="accordionExample1">
+                                                <div class="card card-sm card-body border-light mb-0">
+                                                    <a href="#panel-1" data-target="#panel-1"
+                                                       class="accordion-panel-header" data-toggle="collapse"
+                                                       role="button" aria-expanded="false" aria-controls="panel-1">
+                                                        <span class="h6 mb-0 font-weight-bold">MOU</span>
+                                                        <span class="icon"><i class="fas fa-plus"></i></span>
+                                                    </a>
+                                                    <div class="collapse" id="panel-1">
+                                                        <div class="pt-3">
+                                                            <p class="mb-0">
+                                                                At Themesberg, our mission has always been focused on
+                                                                bringing openness and transparency to the design
+                                                                process. We've always believed that by providing a space
+                                                                where designers can share ongoing work not only empowers
+                                                                them to make better products, it also
+                                                                helps them grow. We're proud to be a part of creating a
+                                                                more open culture and to continue building a product
+                                                                that supports this vision.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card card-sm card-body border-light mb-0">
+                                                    <a href="#panel-2" data-target="#panel-2"
+                                                       class="accordion-panel-header" data-toggle="collapse"
+                                                       role="button" aria-expanded="false" aria-controls="panel-1">
+                                                        <span class="h6 mb-0 font-weight-bold">Clients (Registered Staff)</span>
+                                                        <span class="icon"><i class="fas fa-plus"></i></span>
+                                                    </a>
+                                                    <div class="collapse" id="panel-2">
+                                                        <div class="pt-3">
+
+                                                            <p>Clients - Staff Members who are registered on the
+                                                                platfrom.</p>
+                                                            <div class="d-block">
+                                                                <div class="d-flex align-items-center pt-3 mr-5">
+                                                                    <div class="icon icon-shape icon-sm icon-shape-primary rounded mr-3">
+                                                                        <span class="fas fa-chart-bar"></span></div>
+                                                                    <div class="d-block"><label
+                                                                            class="mb-0">Total</label><h4 class="mb-0">
+                                                                        33</h4>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="d-flex align-items-center pt-3">
+                                                                    <div class="icon icon-shape icon-sm icon-shape-secondary rounded mr-3">
+                                                                        <span class="fas fa-chart-area"></span>
+                                                                    </div>
+                                                                    <div class="d-block"><label
+                                                                            class="mb-0">Transactions</label>
+                                                                        <h4 class="mb-0">9,567</h4></div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card card-sm card-body border-light">
+                                                    <a href="#panel-3" data-target="#panel-3"
+                                                       class="accordion-panel-header" data-toggle="collapse"
+                                                       role="button" aria-expanded="false" aria-controls="panel-1">
+                                                        <span class="h6 mb-0 font-weight-bold">Employee Records (Database)</span>
+                                                        <span class="icon"><i class="fas fa-plus"></i></span>
+                                                    </a>
+                                                    <div class="collapse" id="panel-3">
+                                                        <div class="pt-3">
+                                                            <p>Staff Members database for registration verification.</p>
+                                                            <div class="d-block">
+                                                                <div class="d-flex align-items-center pt-3 mr-5">
+                                                                    <div class="icon icon-shape icon-sm icon-shape-primary rounded mr-3">
+                                                                        <span class="fas fa-chart-bar"></span></div>
+                                                                    <div class="d-block"><label
+                                                                            class="mb-0">Total</label><h4 class="mb-0">
+                                                                        33</h4>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-4 mb-xl-0">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+<footer th:replace="fragments/modal_fragment :: confirm_modal"></footer>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
+<script>
+    moduleURL = "[[@{/organizations}]]";
+    $(document).ready(function () {
+        $(".link-delete").on("click", function (e) {
+            e.preventDefault();
+            showDeleteConfirmModal($(this), 'organization');
+        });
+    });
+</script>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 15,
+        center: [$("#longitude").val(), $("#latitude").val()]
+    });
+
+    const marker1 = new mapboxgl.Marker()
+        .setLngLat([$("#longitude").val(), $("#latitude").val()])
+        .addTo(map);
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl
+        })
+    );
+
+</script>
+
+</body>
+
+</html>

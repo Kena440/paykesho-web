@@ -116,6 +116,10 @@
                     <a class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3" th:href="@{/login}">
                         <i class="fas fa-lock mr-2"></i> Login
                     </a>
+                    &nbsp;
+                    <a class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3" th:href="@{/register}">
+                        <i class="fas fa-lock mr-2"></i> Register
+                    </a>
 
                 </th:block>
 
@@ -138,7 +142,8 @@
                 </a>
             </div>
             <div class="d-flex d-lg-none align-items-center ml-auto">
-                <button aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+                <button aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation"
+                        class="navbar-toggler"
                         data-target="#navbar_global" data-toggle="collapse" type="button">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -215,8 +220,8 @@
         <button
                 aria-expanded="false" aria-haspopup="true" class="btn btn-primary mr-2 dropdown-toggle"
                 data-toggle="dropdown"><span class="fas fa-user-circle mr-2"></span><a class="h6 text-white"
-                                                                                      sec:authentication="principal.fullName"
-                                                                                      th:href="@{/my-account}"></a>
+                                                                                       sec:authentication="principal.fullName"
+                                                                                       th:href="@{/my-account}"></a>
             <span
                     class="icon icon-small ml-1"><span class="fas fa-chevron-down"></span></span></button>
         <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2">
@@ -246,7 +251,8 @@
                             <span class="fas fa-search"></span>
                         </span>
                     </div>
-                    <input aria-label="Search" class="form-control" name="keyword" placeholder="Search" th:value="${keyword}"
+                    <input aria-label="Search" class="form-control" name="keyword" placeholder="Search"
+                           th:value="${keyword}"
                            type="search">
                 </div>
             </form>
@@ -256,7 +262,8 @@
                 <button
                         aria-expanded="false"
                         aria-haspopup="true"
-                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
+                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
+                        data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
                         class="fas fa-sliders-h"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
                 <div class="dropdown-menu dropdown-menu-right"><span
                         class="dropdown-item font-weight-bold text-dark">Show</span> <a
@@ -269,7 +276,8 @@
                 <button
                         aria-expanded="false"
                         aria-haspopup="true"
-                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
+                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
+                        data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
                         class="fas fa-cog"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
                 <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right"><span
                         class="dropdown-item font-weight-bold text-dark">Show</span> <a
@@ -295,17 +303,20 @@
                 <p class="my-4">Manage your payments effortlessly with Paykesho. Our platform ensures seamless, secure,
                     and automated payment solutions for a smoother financial experience.</p>
                 <div class="dropdown mb-4 mb-lg-0">
-                    <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle footer-language-link pb-2" data-toggle="dropdown" href="#"
+                    <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle footer-language-link pb-2"
+                       data-toggle="dropdown" href="#"
                        id="langsDropdown">
                         <img alt="USA Flag" class="language-flag"
-                             th:src="@{/assets/img/flags/united-states-of-america.svg}"> United States <i class="fas fa-chevron-down ml-1"></i>
+                             th:src="@{/assets/img/flags/united-states-of-america.svg}"> United States <i
+                            class="fas fa-chevron-down ml-1"></i>
                     </a>
                     <div aria-labelledby="langsDropdown" class="dropdown-menu dropdown-menu-center mt-0">
                         <a class="dropdown-item text-gray text-sm" href="#"><img
                                 alt="Germany Flag" class="language-flag" th:src="@{/assets/img/flags/germany.svg}">
                             German</a>
                         <a class="dropdown-item text-gray text-sm" href="#"><img alt="Spain Flag"
-                                                                                 class="language-flag" th:src="@{/assets/img/flags/spain.svg}">
+                                                                                 class="language-flag"
+                                                                                 th:src="@{/assets/img/flags/spain.svg}">
                             Spanish</a>
                         <a class="dropdown-item text-gray text-sm" href="#"><img
                                 alt="France Flag" class="language-flag" th:src="@{/assets/img/flags/france.svg}"> French</a>
@@ -344,8 +355,9 @@
                         </div>
                     </div>
                 </form>
-                <small class="mt-2 form-text">We’ll never share your details. See our <a class="font-weight-bold text-underline"
-                                                                                         href="privacy.html">Privacy
+                <small class="mt-2 form-text">We’ll never share your details. See our <a
+                        class="font-weight-bold text-underline"
+                        href="privacy.html">Privacy
                     Policy</a></small>
             </div>
         </div>
@@ -505,11 +517,7 @@
     <script th:src="@{/assets/vendor/jqvmap/dist/jquery.vmap.min.js}"></script>
     <script th:src="@{/assets/vendor/jqvmap/dist/maps/jquery.vmap.world.js}"></script>
     <script th:src="@{/assets/js/rocket.js}"></script>
-    <script crossorigin="anonymous"
-            data-cf-beacon='{"rayId":"8b0f52b73d0495ed","version":"2024.7.0","r":1,"serverTiming":{"name":{"cfL4":true}},"token":"3a2c60bab7654724a0f7e5946db4ea5a","b":1}'
-            defer
-            integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
-            src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"></script>
+
     <script th:src="@{/assets/richTextEditor/jquery.richtext.min.js}"></script>
 
     <script th:src="@{/assets/js/common.js}" type="text/javascript"></script>

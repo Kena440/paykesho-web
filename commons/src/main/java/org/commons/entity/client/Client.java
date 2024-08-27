@@ -27,6 +27,8 @@ public class Client extends IdBasedEntity {
     protected String address;
     @Column(name = "code", length = 128, nullable = false, unique = true)
     private String code;
+    @Column(name = "tpin", length = 128, nullable = false, unique = true)
+    private String tpin;
     @Column(length = 64, nullable = false)
     private String salutation;
     @Column(name = "name", length = 245, nullable = false)
