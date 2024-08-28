@@ -18932,7 +18932,7 @@ a.text-github:focus, a.text-github:hover {
 }
 
 .headroom--not-top.navbar-theme-primary {
-    background-color: #1576c5
+    background-color: #fff
 }
 
 .headroom--not-top.navbar-theme-primary .navbar-brand-light {
@@ -18948,7 +18948,7 @@ a.text-github:focus, a.text-github:hover {
 }
 
 .headroom--not-top.navbar-theme-primary .nav-link {
-    color: rgba(255, 255, 255, .9)
+    color: rgb(0, 0, 0)
 }
 
 .headroom--not-top.navbar-theme-primary .nav-link:hover {

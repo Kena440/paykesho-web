@@ -1,6 +1,7 @@
 package org.paykesho.clientportal.clients.repository;
 
 import org.commons.entity.client.Client;
+import org.commons.entity.organization.Organization;
 import org.commons.enums.AuthenticationType;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,4 +35,7 @@ public interface ClientRepository extends CrudRepository<Client, Integer> {
 
     @Query("select c from Client c where c.code = ?1")
     public Client findByCode(String code);
+
+    boolean existsByNrcAndTpinAndManNumberAndOrganization(String nrc, String tpin, String manNumber, Organization organization);
+
 }

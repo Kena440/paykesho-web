@@ -42,11 +42,11 @@ public class EmailSettingBag extends SettingBag {
         return super.getValue("MAIL_SENDER_NAME");
     }
 
-    public String getAssessorVerificationSubject() {
+    public String getClientVerificationSubject() {
         return super.getValue("CUSTOMER_VERIFY_SUBJECT");
     }
 
-    public String getAssessorVerificationContent() {
+    public String getClientVerificationContent() {
         return super.getValue("CUSTOMER_VERIFY_CONTENT");
     }
 }

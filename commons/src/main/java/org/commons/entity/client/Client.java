@@ -25,10 +25,12 @@ public class Client extends IdBasedEntity {
     protected String phoneNumber;
     @Column(length = 150, nullable = false, name = "address")
     protected String address;
-    @Column(name = "code", length = 128, nullable = false, unique = true)
+    @Column(name = "code", length = 128, unique = true)
     private String code;
     @Column(name = "tpin", length = 128, nullable = false, unique = true)
     private String tpin;
+    @Column(name = "man_number", length = 128, nullable = false, unique = true)
+    private String manNumber;
     @Column(length = 64, nullable = false)
     private String salutation;
     @Column(name = "name", length = 245, nullable = false)

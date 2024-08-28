@@ -3,12 +3,15 @@ package org.paykesho.clientportal.clients.service;
 
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.client.Client;
+import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.repository.ClientRepository;
+import org.paykesho.clientportal.clients.repository.EmployeeRecordRepository;
 import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.settings.repository.CountryRepository;
+import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,8 +33,10 @@ public class ClientService {
     private CountryRepository countryRepository;
     @Autowired
     private ClientRepository clientRepository;
-
     @Autowired
+    private EmployeeRecordRepository employeeRecordRepository;
+    @Autowired
+    private PaykeshoReferenceService paykeshoReferenceService;
 
     public List<Country> countryList() {
         return countryRepository.findAllByOrderByNameDesc();
@@ -58,12 +63,16 @@ public class ClientService {
         client.setPassword(encodedPassword);
     }
 
-    public boolean verifyClient(String verificationCode) {
+    public boolean verifyClient(String verificationCode) throws PaykeshoError {
         Client client = clientRepository.findByVerificationCode(verificationCode);
+        String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_CLT");
+        if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
         if (client == null || client.isEnabled()) {
             return false;
         } else {
+
+            client.setCode(paykeshoRef);
             clientRepository.enable(client.getId());
             return true;
         }
@@ -199,5 +208,19 @@ public class ClientService {
         }
 
         return false;
+    }
+
+    public String checkClientStatus(String name, String nrc, String tpin, String manNumber, Organization organization) {
+        boolean clientExists = clientRepository.existsByNrcAndTpinAndManNumberAndOrganization(nrc, tpin, manNumber, organization);
+        if (clientExists) {
+            return "Duplicated";
+        }
+
+        boolean employeeExists = employeeRecordRepository.existsByNameAndNrcAndTpinAndManNumberAndOrganization(name, nrc, tpin, manNumber, organization);
+        if (employeeExists) {
+            return "OK";
+        }
+
+        return "Not Found";
     }
 }

@@ -57,20 +57,20 @@
     <nav class="navbar navbar-main navbar-expand-lg navbar-light navbar-theme-primary headroom py-lg-2 px-lg-6"
          id="navbar-main">
         <div class="container">
-            <a class="navbar-brand @@logo_classes" href="../index.html">
+            <a class="navbar-brand @@logo_classes" th:href="@{/}">
                 <div class="d-flex align-items-center">
                     <img alt="Paykesho Logo"
-                         class="navbar-brand-dark rotate-logo" th:src="@{assets/img/brand/paykeshologo.svg}">
+                         class="navbar-brand-dark rotate-logo" th:src="@{/assets/img/brand/paykeshologo.svg}">
                     <img alt="Paykesho Logo"
-                         class="navbar-brand-light rotate-logo" th:src="@{assets/img/brand/paykeshologo.svg}">
+                         class="navbar-brand-light rotate-logo" th:src="@{/assets/img/brand/paykeshologo.svg}">
                 </div>
             </a>
             <div class="navbar-collapse collapse" id="navbar_global">
                 <div class="navbar-collapse-header">
                     <div class="row">
                         <div class="col-6 collapse-brand">
-                            <a class="d-flex align-items-center" href="../index.html">
-                                <img alt="Paykesho Logo" th:src="@{assets/img/brand/paykeshologo.svg}">
+                            <a class="d-flex align-items-center" th:href="@{/}">
+                                <img alt="Paykesho Logo" th:src="@{/assets/img/brand/paykeshologo.svg}">
                             </a>
                         </div>
                         <div class="col-6 collapse-close">
@@ -129,7 +129,8 @@
     </nav>
 </header>
 
-<nav class="sidebar d-md-block bg-primary text-white collapse px-4" id="sidebarMenu" th:fragment="sidebarMenu" sec:authorize="isAuthenticated()">
+<nav class="sidebar d-md-block bg-primary text-white collapse px-4" id="sidebarMenu" sec:authorize="isAuthenticated()"
+     th:fragment="sidebarMenu">
     <div class="sidebar-sticky pt-4 mx-auto">
         <div class="user-card d-flex align-items-center justify-content-between justify-content-md-center pb-4">
             <div class="d-flex align-items-center">
@@ -189,7 +190,8 @@
     </div>
 </nav>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4" th:fragment="topbar" sec:authorize="isAuthenticated()">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4" sec:authorize="isAuthenticated()"
+     th:fragment="topbar">
     <div>
         <h3>Client Portal | [[${pageTitle}]]</h3>
     </div>
@@ -272,7 +274,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-4 mb-4 mb-lg-0">
-                <a class="footer-brand mr-lg-5 d-flex" href="../index.html">
+                <a class="footer-brand mr-lg-5 d-flex" th:href="@{/}">
                     <img alt="Paykesho Logo" class="mr-3" th:src="@{/assets/img/brand/paykeshologo.svg}">
                     <h4>Paykesho</h4>
                 </a>
@@ -341,7 +343,7 @@
         <div class="row">
             <div class="col pb-4 mb-md-0">
                 <div class="d-flex text-center justify-content-center align-items-center">
-                    <p class="font-weight-normal font-small mb-0">Copyright © <a href="../index.html">Paykesho</a> <span
+                    <p class="font-weight-normal font-small mb-0">Copyright © <a th:href="@{/}">Paykesho</a> <span
                             class="current-year"></span>. All rights reserved.</p>
                 </div>
             </div>
