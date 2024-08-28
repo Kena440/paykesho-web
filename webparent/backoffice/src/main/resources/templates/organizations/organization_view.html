@@ -158,10 +158,30 @@
                                                                 <div class="d-flex align-items-center pt-3 mr-5">
                                                                     <div class="icon icon-shape icon-sm icon-shape-primary rounded mr-3">
                                                                         <span class="fas fa-chart-bar"></span></div>
-                                                                    <div class="d-block"><label
-                                                                            class="mb-0">Total</label><h4 class="mb-0">
-                                                                        33</h4>
+                                                                    <div class="d-block"
+                                                                         th:if="${employeeRecordsSize != null}"><label
+                                                                            class="mb-0">Total</label>
+                                                                        <h4 class="mb-0">[[${employeeRecordsSize}]]</h4>
                                                                     </div>
+                                                                </div>
+                                                                <hr>
+                                                                <div class="d-flex align-items-center pt-3 mr-5">
+                                                                    <button type="button" class="btn btn-primary mr-2"
+                                                                            data-toggle="modal"
+                                                                            data-target="#modal-add-record"><i
+                                                                            class="fab fa-user-plus"></i> Add Record
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-primary mr-2"
+                                                                            data-toggle="modal"
+                                                                            data-target="#modal-add-record"><i
+                                                                            class="fab fa-user-friends"></i> Add Record
+                                                                        (Bulk)
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-primary"
+                                                                            data-toggle="modal"
+                                                                            data-target="#modal-list-database"><i
+                                                                            class="fab fa-database"></i> List Database
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -179,6 +199,79 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modal-add-record" tabindex="-1" role="dialog" aria-labelledby="modal-add-record"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Add Record</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post"
+                  th:action="@{/organizations/employee-record/save}">
+                <input id="organization"
+                       name="organization" th:value="${organization.id}"
+                       type="hidden"/>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" class="form-control" required
+                               name="name" placeholder="Enter full name">
+                    </div>
+                    <div class="form-group">
+                        <label>NRC</label>
+                        <input type="text" class="form-control" required
+                               name="nrc" placeholder="Enter NRC">
+                    </div>
+                    <div class="form-group">
+                        <label>Tax Payer Identification Number</label>
+                        <input type="text" class="form-control" required
+                               name="tpin" placeholder="Enter TPIN">
+                    </div>
+                    <div class="form-group">
+                        <label>Man Number</label>
+                        <input type="text" class="form-control" required
+                               name="manNumber" placeholder="Enter Man Number">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-danger ml-auto" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-secondary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-list-database" tabindex="-1" role="dialog" aria-labelledby="modal-list-database"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">List Database</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>With less than a month to go before the European Union enacts new consumer privacy laws for its
+                    citizens, companies around the world are updating their terms of service agreements to comply.</p>
+                <p>The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is
+                    meant to ensure a common set of data rights in the European Union. It requires organizations to
+                    notify users as
+                    soon as possible of high-risk data breaches that could personally affect them.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary">I Got It</button>
+                <button type="button" class="btn btn-link text-danger ml-auto" data-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

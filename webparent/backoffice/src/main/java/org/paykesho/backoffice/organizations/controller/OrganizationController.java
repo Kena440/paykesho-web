@@ -1,6 +1,7 @@
 package org.paykesho.backoffice.organizations.controller;
 
 import org.commons.entity.State;
+import org.commons.entity.organization.EmployeeRecord;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
@@ -78,10 +79,17 @@ public class OrganizationController {
         try {
 
             Organization organization = organizationService.getOrganizationById(id);
+            List<EmployeeRecord> employeeRecords = null;
+
+            if (organization != null) {
+                employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
+            }
 
             loadCurrencySetting(request);
             model.addAttribute("organization", organization);
             model.addAttribute("pageTitle", pageTitle);
+            if (employeeRecords != null) model.addAttribute("employeeRecords", employeeRecords);
+            if (employeeRecords != null) model.addAttribute("employeeRecordsSize", employeeRecords.size());
 
             return "organizations/organization_view";
         } catch (PaykeshoError paykeshoError) {
@@ -187,6 +195,48 @@ public class OrganizationController {
             default:
                 throw new PaykeshoError("no format provided");
         }
+    }
+
+    @PostMapping("/employee-record/save")
+    public String saveEmployeeRecord(HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError {
+
+        String organizationIdParam = request.getParameter("organization");
+        if (organizationIdParam == null || organizationIdParam.isEmpty()) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization ID is required.");
+            return null;
+        }
+
+        int organizationId;
+        try {
+            organizationId = Integer.parseInt(organizationIdParam);
+        } catch (NumberFormatException e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid Organization ID.");
+            return null;
+        }
+
+        Organization organization = organizationService.getOrganizationById(organizationId);
+        if (organization == null) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization not found.");
+            return null;
+        }
+
+        EmployeeRecord employeeRecord = new EmployeeRecord();
+        employeeRecord.setName(request.getParameter("name"));
+        employeeRecord.setNrc(request.getParameter("nrc"));
+        employeeRecord.setTpin(request.getParameter("tpin"));
+        employeeRecord.setManNumber(request.getParameter("manNumber"));
+        employeeRecord.setOrganization(organization);
+        employeeRecord.setRegistrationDate(new Date());
+
+        try {
+            organizationService.saveEmployeeRecord(employeeRecord);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization Operation Successful: " + organization.getEmail());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Error saving employee record: " + e.getMessage());
+            return null;
+        }
+
+        return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization.getId();
     }
 
 

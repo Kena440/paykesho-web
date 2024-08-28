@@ -1,10 +1,12 @@
 package org.paykesho.backoffice.organizations.service;
 
 import org.commons.dto.GeneralStatsDto;
+import org.commons.entity.organization.EmployeeRecord;
 import org.commons.entity.organization.Organization;
 import org.commons.enums.OrganizationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.organizations.dto.GPSDataItem;
+import org.paykesho.backoffice.organizations.repository.EmployeeRecordRepository;
 import org.paykesho.backoffice.organizations.repository.OrganizationRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.service.SettingService;
@@ -30,6 +32,8 @@ public class OrganizationService {
     protected DateFormat dateFormat;
     @Autowired
     private OrganizationRepository organizationRepository;
+    @Autowired
+    private EmployeeRecordRepository employeeRecordRepository;
     @Autowired
     private SettingService settingService;
 
@@ -219,6 +223,23 @@ public class OrganizationService {
 
     public List<GeneralStatsDto> getOrganizationsCountByProvince(Integer countryId, boolean enabled) {
         return organizationRepository.getOrganizationsCountByProvince(countryId, enabled);
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    public EmployeeRecord saveEmployeeRecord(EmployeeRecord employeeRecord) {
+        if (employeeRecord == null) {
+            return null;
+        }
+
+        return employeeRecordRepository.save(employeeRecord);
+    }
+
+    public List<EmployeeRecord> listEmployeeRecordsAll(Integer id) {
+        if (id == null) {
+            return null;
+        }
+
+        return employeeRecordRepository.getEmployeeRecordsByOrganizationId(id);
     }
 
 /*    public List<GeneralStatsDto> getOrganizationsCountByLevelOfCare(Integer countryId, boolean enabled) {
