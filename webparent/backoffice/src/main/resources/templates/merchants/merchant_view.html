@@ -19,14 +19,14 @@
                         <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
                             <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                                 <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
-                                <li class="breadcrumb-item"><a href="#">Organization Mgt</a></li>
-                                <li aria-current="page" class="breadcrumb-item active">Organization View</li>
+                                <li class="breadcrumb-item"><a href="#">Merchant Mgt</a></li>
+                                <li aria-current="page" class="breadcrumb-item active">Merchant View</li>
                             </ol>
                         </nav>
                     </div>
                     <div class="btn-toolbar mb-2 mb-md-0"><a class="btn btn-sm btn-primary"
                                                              th:href="@{/merchants}"><span
-                            class="fas fa-list"></span> <span>Organizations</span></a>
+                            class="fas fa-list"></span> <span>Merchants</span></a>
                         <div class="btn-group ml-3">
                             <button class="btn btn-sm btn-outline-secondary" type="button">Share</button>
                             <button class="btn btn-sm btn-outline-secondary" type="button">Export</button>
@@ -61,7 +61,8 @@
                                                                         ([[${merchant.merchantType}]])
                                                                     </div>
                                                                     <div class="font-weight-normal text-dark mb-1">
-                                                                        [[${merchant.phoneNumber}]], [[${merchant.email}]]
+                                                                        [[${merchant.phoneNumber}]],
+                                                                        [[${merchant.email}]]
                                                                     </div>
                                                                     <div class="font-weight-normal text-dark mb-1">
                                                                         [[${merchant.district}]],
@@ -76,8 +77,33 @@
                                         </div>
                                         <hr>
                                         <div class="col-md-12 mb-3">
-                                            <div class="card card-body bg-white border-light shadow-sm mb-4">
-                                                <div id="map" style='width: 100%; height: 400px'></div>
+                                            <div class="card card-body bg-white border-light shadow-sm mb-1">
+                                                <div class="d-xl-flex align-items-center">
+                                                    <div>
+                                                        <div class="merchant-avatar xl-avatar mb-3"><img
+                                                                alt="change avatar"
+                                                                style="max-width: 8.5rem;"
+                                                                th:src="@{${qrCodeContent}}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="file-field">
+                                                        <div class="d-flex justify-content-xl-center ml-xl-3">
+                                                            <div class="d-flex">
+                                                                <div class="d-md-block text-left">
+                                                                    <div class="font-weight-normal text-dark mb-1">
+                                                                        [[${merchant.name}]]
+                                                                    </div>
+                                                                    <div class="font-weight-normal text-dark mb-1">
+                                                                        [[${merchant.servicesOffered}]]
+                                                                    </div>
+                                                                    <div class="font-weight-normal text-dark mb-1">
+                                                                        [[${merchant.details}]]
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -86,7 +112,9 @@
                                     <h2 class="h5 my-4"></h2>
                                     <div class="row">
                                         <div class="col-12 col-sm-6 col-xl-12">
-
+                                            <div class="card card-body bg-white border-light shadow-sm mb-4">
+                                                <div id="map" style='width: 100%; height: 400px'></div>
+                                            </div>
                                         </div>
                                         <div class="col-12 mb-4 mb-xl-0">
 

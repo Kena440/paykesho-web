@@ -5,6 +5,7 @@ import org.commons.entity.merchant.Merchant;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchants.enums.Constants;
+import org.paykesho.backoffice.merchants.service.MerchantCodeService;
 import org.paykesho.backoffice.merchants.service.MerchantService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.paging.PagingAndSortingParam;
@@ -21,6 +22,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +37,8 @@ public class MerchantController {
     private PaykeshoReferenceService paykeshoReferenceService;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private MerchantCodeService merchantCodeService;
 
     @GetMapping("")
     public String listFirstPage() {
@@ -41,8 +46,9 @@ public class MerchantController {
     }
 
     @GetMapping("/page/{pageNum}")
-    public String listAllMerchantsByPage(@PagingAndSortingParam(listName = "merchantList", moduleURL = "/merchants") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum) throws PaykeshoError {
+    public String listAllMerchantsByPage(@PagingAndSortingParam(listName = "merchantList", moduleURL = "/merchants") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum, Model model) throws PaykeshoError {
         merchantService.listByPage(pageNum, helper);
+        model.addAttribute("pageTitle", "List Merchants");
 
         return "merchants/merchants";
     }
@@ -86,6 +92,7 @@ public class MerchantController {
             Merchant merchant = merchantService.getMerchantById(id);
 
             loadCurrencySetting(request);
+            model.addAttribute("qrCodeContent", "/merchants/generateQRCode?qrContent=" + merchant.getCode());
             model.addAttribute("merchant", merchant);
             model.addAttribute("pageTitle", pageTitle);
 
@@ -100,12 +107,12 @@ public class MerchantController {
         if (merchant == null) {
             throw new PaykeshoError("no member provided");
         }
-        String name = merchant.getName();
+        String code = merchant.getCode();
 
         if (merchant.getEmail() == null) {
             return Constants.REDIRECT_MERCHANTS_VIEW + merchant.getId();
         } else {
-            return Constants.REDIRECT_TO_MERCHANTS_KEYWORD + name;
+            return Constants.REDIRECT_TO_MERCHANTS_KEYWORD + code;
         }
     }
 
@@ -195,6 +202,13 @@ public class MerchantController {
         }
     }
 
+    @GetMapping("/generateQRCode")
+    public void generateQRCode(String qrContent, HttpServletResponse response) throws IOException {
+        response.setContentType("image/png");
+        byte[] qrCode = merchantCodeService.generateQRCode(qrContent, 500, 500);
+        OutputStream outputStream = response.getOutputStream();
+        outputStream.write(qrCode);
+    }
 
     private void loadCurrencySetting(HttpServletRequest request) {
         List<Setting> currencySettings = settingService.getCurrencySettings();

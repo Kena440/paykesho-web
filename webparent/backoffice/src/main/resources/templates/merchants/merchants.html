@@ -71,7 +71,13 @@
                                          th:if="${merchant.photos != null}" th:src="@{${merchant.photosImagePath}}">
                                 </a>
                             </td>
-                            <td><span class="font-weight-normal">[[${merchant.name}]]</span></td>
+                            <td><span class="font-weight-normal">
+                                  <a th:href="@{'/merchants/view/'+${merchant.id}}"
+                                     title="Assessment View">
+                                    <span class="font-weight-normal"> [[${merchant.name}]]</span>
+                                </a>
+                               </span>
+                            </td>
                             <td><span class="font-weight-normal">[[${merchant.code}]]</span></td>
                             <td><span class="font-weight-normal">[[${merchant.merchantType}]]</span></td>
                             <td>
