@@ -32,29 +32,6 @@
     <link rel="stylesheet" th:href="@{/assets/vendor/prismjs/themes/prism.css}" type="text/css">
     <link rel="stylesheet" th:href="@{/assets/vendor/jqvmap/dist/jqvmap.min.css}">
     <link rel="stylesheet" th:href="@{/assets/css/rocket.css}" type="text/css">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141734189-6"></script>
-    <script>window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag('config', 'UA-141734189-6');</script>
-    <script>(function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({
-            'gtm.start':
-                new Date().getTime(), event: 'gtm.js'
-        });
-        var f = d.getElementsByTagName(s)[0],
-            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
-        j.async = true;
-        j.src =
-            '../../www.googletagmanager.com/gtm5445.html?id=' + i + dl;
-        f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-THQTXJ7');</script>
 
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
@@ -117,7 +94,7 @@
                         <i class="fas fa-lock mr-2"></i> Login
                     </a>
                     &nbsp;
-                    <a class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3" th:href="@{/register}">
+                    <a class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3" th:href="@{/clients/register}">
                         <i class="fas fa-lock mr-2"></i> Register
                     </a>
 
@@ -152,7 +129,7 @@
     </nav>
 </header>
 
-<nav class="sidebar d-md-block bg-primary text-white collapse px-4" id="sidebarMenu" th:fragment="sidebarMenu">
+<nav class="sidebar d-md-block bg-primary text-white collapse px-4" id="sidebarMenu" th:fragment="sidebarMenu" sec:authorize="isAuthenticated()">
     <div class="sidebar-sticky pt-4 mx-auto">
         <div class="user-card d-flex align-items-center justify-content-between justify-content-md-center pb-4">
             <div class="d-flex align-items-center">
@@ -212,7 +189,7 @@
     </div>
 </nav>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4" th:fragment="topbar">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4" th:fragment="topbar" sec:authorize="isAuthenticated()">
     <div>
         <h3>Client Portal | [[${pageTitle}]]</h3>
     </div>
@@ -291,8 +268,7 @@
 </div>
 
 <!-- Footer -->
-<footer class="footer section pt-6 pt-md-8 pt-lg-10 pb-3 bg-soft text-primary overflow-hidden" th:fragment="footer">
-    <div class="pattern top pattern-soft"></div>
+<footer class="footer section pt-2 pt-md-3 pt-lg-5 pb-3 bg-soft text-primary overflow-hidden" th:fragment="footer">
     <div class="container">
         <div class="row">
             <div class="col-lg-4 mb-4 mb-lg-0">

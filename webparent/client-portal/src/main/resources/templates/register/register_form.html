@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: page_head('Home', 'none')"></head>
+<body>
+<header th:replace="fragments/fragments :: header"></header>
+<main>
+    <div th:replace="fragments/fragments :: loader"></div>
+    <section class="section-header pb-2 pb-lg-4 bg-soft">
+        <div class="container">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-12 col-lg-6 order-2 order-lg-1">
+                    <h1 class="display-2 mb-3">Effortless Payments, Empowered Tomorrow</h1>
+                </div>
+                <div class="col-12 col-lg-5 order-1 order-lg-2">
+                    <h1 class="display-2 mb-3">Effortless Payments, Empowered Tomorrow</h1>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Contact Us Section -->
+
+
+    <footer th:replace="fragments/fragments :: footer"></footer>
+</main>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+</body>
+</html>

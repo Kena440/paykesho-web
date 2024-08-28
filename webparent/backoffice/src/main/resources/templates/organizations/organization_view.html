@@ -89,9 +89,9 @@
                                         <div class="col-12 col-sm-6 col-xl-12">
                                             <div class="accordion" id="accordionExample1">
                                                 <div class="card card-sm card-body border-light mb-0">
-                                                    <a href="#panel-1" data-target="#panel-1"
-                                                       class="accordion-panel-header" data-toggle="collapse"
-                                                       role="button" aria-expanded="false" aria-controls="panel-1">
+                                                    <a aria-controls="panel-1" aria-expanded="false"
+                                                       class="accordion-panel-header" data-target="#panel-1"
+                                                       data-toggle="collapse" href="#panel-1" role="button">
                                                         <span class="h6 mb-0 font-weight-bold">MOU</span>
                                                         <span class="icon"><i class="fas fa-plus"></i></span>
                                                     </a>
@@ -111,9 +111,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="card card-sm card-body border-light mb-0">
-                                                    <a href="#panel-2" data-target="#panel-2"
-                                                       class="accordion-panel-header" data-toggle="collapse"
-                                                       role="button" aria-expanded="false" aria-controls="panel-1">
+                                                    <a aria-controls="panel-1" aria-expanded="false"
+                                                       class="accordion-panel-header" data-target="#panel-2"
+                                                       data-toggle="collapse" href="#panel-2" role="button">
                                                         <span class="h6 mb-0 font-weight-bold">Clients (Registered Staff)</span>
                                                         <span class="icon"><i class="fas fa-plus"></i></span>
                                                     </a>
@@ -145,9 +145,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="card card-sm card-body border-light">
-                                                    <a href="#panel-3" data-target="#panel-3"
-                                                       class="accordion-panel-header" data-toggle="collapse"
-                                                       role="button" aria-expanded="false" aria-controls="panel-1">
+                                                    <a aria-controls="panel-1" aria-expanded="false"
+                                                       class="accordion-panel-header" data-target="#panel-3"
+                                                       data-toggle="collapse" href="#panel-3" role="button">
                                                         <span class="h6 mb-0 font-weight-bold">Employee Records (Database)</span>
                                                         <span class="icon"><i class="fas fa-plus"></i></span>
                                                     </a>
@@ -166,20 +166,20 @@
                                                                 </div>
                                                                 <hr>
                                                                 <div class="d-flex align-items-center pt-3 mr-5">
-                                                                    <button type="button" class="btn btn-primary mr-2"
+                                                                    <button class="btn btn-primary mr-2" data-target="#modal-add-record"
                                                                             data-toggle="modal"
-                                                                            data-target="#modal-add-record"><i
+                                                                            type="button"><i
                                                                             class="fab fa-user-plus"></i> Add Record
                                                                     </button>
-                                                                    <button type="button" class="btn btn-primary mr-2"
+                                                                    <button class="btn btn-primary mr-2" data-target="#modal-add-record"
                                                                             data-toggle="modal"
-                                                                            data-target="#modal-add-record"><i
+                                                                            type="button"><i
                                                                             class="fab fa-user-friends"></i> Add Record
                                                                         (Bulk)
                                                                     </button>
-                                                                    <button type="button" class="btn btn-primary"
+                                                                    <button class="btn btn-primary" data-target="#modal-list-database"
                                                                             data-toggle="modal"
-                                                                            data-target="#modal-list-database"><i
+                                                                            type="button"><i
                                                                             class="fab fa-database"></i> List Database
                                                                     </button>
                                                                 </div>
@@ -204,13 +204,13 @@
 </div>
 
 
-<div class="modal fade" id="modal-add-record" tabindex="-1" role="dialog" aria-labelledby="modal-add-record"
-     aria-hidden="true">
+<div aria-hidden="true" aria-labelledby="modal-add-record" class="modal fade" id="modal-add-record" role="dialog"
+     tabindex="-1">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h6 class="modal-title">Add Record</h6>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -223,40 +223,40 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" class="form-control" required
-                               name="name" placeholder="Enter full name">
+                        <input class="form-control" name="name" placeholder="Enter full name"
+                               required type="text">
                     </div>
                     <div class="form-group">
                         <label>NRC</label>
-                        <input type="text" class="form-control" required
-                               name="nrc" placeholder="Enter NRC">
+                        <input class="form-control" name="nrc" placeholder="Enter NRC"
+                               required type="text">
                     </div>
                     <div class="form-group">
                         <label>Tax Payer Identification Number</label>
-                        <input type="text" class="form-control" required
-                               name="tpin" placeholder="Enter TPIN">
+                        <input class="form-control" name="tpin" placeholder="Enter TPIN"
+                               required type="text">
                     </div>
                     <div class="form-group">
                         <label>Man Number</label>
-                        <input type="text" class="form-control" required
-                               name="manNumber" placeholder="Enter Man Number">
+                        <input class="form-control" name="manNumber" placeholder="Enter Man Number"
+                               required type="text">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-link text-danger ml-auto" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-sm btn-secondary">Save</button>
+                    <button class="btn btn-link text-danger ml-auto" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-sm btn-secondary" type="submit">Save</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<div class="modal fade" id="modal-list-database" tabindex="-1" role="dialog" aria-labelledby="modal-list-database"
-     aria-hidden="true">
+<div aria-hidden="true" aria-labelledby="modal-list-database" class="modal fade" id="modal-list-database" role="dialog"
+     tabindex="-1">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h6 class="modal-title">List Database</h6>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -269,8 +269,8 @@
                     soon as possible of high-risk data breaches that could personally affect them.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-secondary">I Got It</button>
-                <button type="button" class="btn btn-link text-danger ml-auto" data-dismiss="modal">Close</button>
+                <button class="btn btn-sm btn-secondary" type="button">I Got It</button>
+                <button class="btn btn-link text-danger ml-auto" data-dismiss="modal" type="button">Close</button>
             </div>
         </div>
     </div>
