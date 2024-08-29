@@ -1,95 +1,81 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Login','none')"></head>
 <body>
 <main>
-    <div th:replace="fragments/fragments :: loader"></div>
-    <section class="vh-100 d-flex align-items-center section-image overlay-soft-dark"
-             th:data-background="@{/assets/img/saas-form-image.jpg}">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 d-flex align-items-center justify-content-center">
-
-                    <div class="signin-inner mt-3 mt-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
-                        <div class="row">
+    <div class="auth-full-page d-flex">
+        <div class="auth-form p-3">
+            <div class="card card-body">
+                <div class="mb-3">
+                    <div class="d-grid gap-2 mb-3 text-center">
+                        <div class="row align-middle">
                             <div class="col-md-5">
                                 <img alt="logo" class="logo-img mb-4"
                                      height="80"
                                      th:src="@{/images/paykeshologo.png}" width="120">
                             </div>
                             <div class="col-md-7">
-                                <div class="text-center text-md-center mb-4 mt-md-0">
-                                    <h1 class="mb-0 h3"> Merchant Portal</h1>
+                                <div class="text-md-center mb-4 mt-md-0">
+                                    <h1 class="mb-0 h3"> Back Office Portal</h1>
+                                    <p class="text-warning">Sign in to your admin account.</p>
                                 </div>
                             </div>
                         </div>
-                        <form class="mt-4" method="post" th:action="@{/login}">
-                            <div class="mb-4">
-                                <div class="alert alert-warning" role="alert" th:if="${param.error}">
-                                    [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
-                                </div>
-                                <div class="alert alert-success" role="alert" th:if="${param.logout}">
-                                    You have been logged out
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i
-                                            class="far fa-user"></i></span>
-                                    </div>
-                                    <input class="form-control" id="email" name="email" placeholder="name@address.com"
-                                           type="email">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i
-                                            class="fas fa-unlock-alt"></i></span></div>
-                                    <input class="form-control" id="password" name="password"
-                                           placeholder="Enter your password" required type="password">
-                                    <div class="input-group-append"><span class="input-group-text"><i
-                                            class="far fa-eye"></i></span>
-                                    </div>
-                                </div>
-                                <div class="d-block d-sm-flex justify-content-between align-items-center mt-2">
-                                    <div class="form-group form-check mt-3"><input class="form-check-input"
-                                                                                   id="exampleCheck1"
-                                                                                   name="remember-me"
-                                                                                   type="checkbox"> <label
-                                            class="form-check-label form-check-sign-white"
-                                            for="exampleCheck1">Remember me</label></div>
-                                    <div><a class="small text-right" href="forgot-password.html">Lost password?</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <button class="btn btn-block btn-primary" type="submit">Sign in</button>
-                            </div>
-                        </form>
-                        <div class="mt-3 mb-4 text-center"><span class="font-weight-normal">or login with</span></div>
-                        <div class="btn-wrapper my-4 text-center">
-                            <button class="btn mr-2 btn-icon-only btn-pill btn-twitter"
-                                    type="button"><span class="btn-inner-icon"><i class="fab fa-twitter"></i></span>
-                            </button>
-                            <button
-                                    class="btn mr-2 btn-icon-only btn-pill btn-facebook" type="button"><span
-                                    class="btn-inner-icon"><i
-                                    class="fab fa-facebook-f"></i></span></button>
-                            <button
-                                    class="btn mr-2 btn-icon-only btn-pill btn-google" type="button"><span
-                                    class="btn-inner-icon"><i
-                                    class="fab fa-google"></i></span></button>
-                        </div>
-                        <div class="d-block d-sm-flex justify-content-center align-items-center mt-4"><span
-                                class="font-weight-normal">Not registered? <a class="font-weight-bold"
-                                                                              th:href="@{/clients/register}">Create
-                    account</a></span></div>
                     </div>
+                    <form method="post" th:action="@{/login}">
+                        <div class="mb-4">
+                            <div class="alert alert-warning alert-dismissible" role="alert" th:if="${param.error}">
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
+                                        type="button"></button>
+                                <div class="alert-icon">
+                                    <i class="far fa-fw fa-lock"></i>
+                                </div>
+                                <div class="alert-message">
+                                    <strong>Hello there!</strong> [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]!
+                                </div>
+                            </div>
+                            <div class="alert alert-success alert-dismissible" role="alert" th:if="${param.logout}">
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
+                                        type="button"></button>
+                                <div class="alert-icon">
+                                    <i class="far fa-fw fa-unlock"></i>
+                                </div>
+                                <div class="alert-message">
+                                    <strong>Hi!</strong> You have been logged out
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input class="form-control form-control-lg" id="email" name="email"
+                                   placeholder="Enter your email"
+                                   type="email"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input class="form-control form-control-lg" id="password" name="password"
+                                   placeholder="Enter your password"
+                                   type="password"/>
+                            <small>
+                                <a href='auth-reset-password.html'>Forgot password?</a>
+                            </small>
+                        </div>
+                        <div>
+                            <div class="form-check align-items-center">
+                                <input checked class="form-check-input" id="customControlInline"
+                                       name="remember-me"
+                                       type="checkbox" value="remember-me">
+                                <label class="form-check-label text-small" for="customControlInline">Remember me</label>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class='btn btn-lg btn-primary' type="submit">Sign in</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </main>
 <footer th:replace="fragments/fragments :: js_code"></footer>
 

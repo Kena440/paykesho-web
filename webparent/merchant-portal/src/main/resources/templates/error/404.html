@@ -1,167 +1,45 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html data-bs-theme="dark"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
-<head th:replace="fragments/fragments :: page_head('404','none')"></head>
+<head th:replace="fragments/fragments :: page_head('Oops! 404','none')"></head>
 <body>
-<div th:replace="fragments/fragments :: loader"></div>
-<nav th:replace="fragments/fragments :: nav"></nav>
-<div class="container-fluid bg-soft">
-    <div class="row">
-        <div class="col-12">
-            <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
-            <main>
-                <section class="vh-100 d-flex align-items-center justify-content-center">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-12 text-center d-flex align-items-center justify-content-center">
-                                <div><a th:href="@{/}"><img alt="404 Page not found"
-                                                            class="img-fluid w-75"
-                                                            th:src="@{/assets/img/illustrations/404.svg}"></a>
-                                    <h1 class="mt-5"><span
-                                            class="font-weight-bolder text-primary">Page not found </span>
-                                    </h1>
-                                    <p class="lead my-4">Oops! Looks like you followed a bad link. If you think this is
-                                        a problem with us,
-                                        please tell us.</p><a class="btn btn-primary animate-hover"
-                                                              th:href="@{/}"><i
-                                            class="fas fa-chevron-left mr-3 pl-2 animate-left-3"></i>Go back home</a>
-                                </div>
-                            </div>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Oops!</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 text-center d-flex align-items-center justify-content-center">
+                        <div><a th:href="@{/}"><img alt="404 Page not found"
+                                                    class="img-fluid w-75"
+                                                    th:src="@{/assets/img/illustrations/404.svg}"></a>
+                            <h1 class="mt-5"><span
+                                    class="font-weight-bolder text-primary">Page not found </span>
+                            </h1>
+                            <p class="lead my-4">Oops! Looks like you followed a bad link. If you think this is
+                                a problem with us,
+                                please tell us.</p><a class="btn btn-primary animate-hover"
+                                                      th:href="@{/}"><i
+                                    class="fas fa-chevron-left mr-3 pl-2 animate-left-3"></i>Go back home</a>
                         </div>
                     </div>
-                </section>
-            </main>
-        </div>
+                </div>
+            </div>
+        </main>
     </div>
 </div>
+
 <footer th:replace="fragments/fragments :: js_code"></footer>
-<!--<script type="text/javascript">
-    let currYearTripData = [];
-    let lastYearTripData = [];
-    let facilityTypes = [];
-    let monthLabels = [];
-    let facilityTypesData = [];
-    let facilityGPSData = [];
-    let facilityGPSMapFeatures = [];
-    contextPath = "[[@{/}]]";
 
-    $(document).ready(function () {
 
-        const facilityTypesDataRequestUrl = contextPath + "facilities/rest/get-organization-types-data/true";
-        const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-organization-gps-data/true";
-
-        $.get(facilityTypesDataRequestUrl, function (responseJSON) {
-            $.each(responseJSON, function (index, reportItem) {
-                facilityTypes.push(reportItem.identifier);
-                facilityTypesData.push(reportItem.itemCount);
-            });
-
-            generateOrganizationTypeChart();
-        });
-
-        $.get(facilityGPSDataRequestUrl, function (responseJSON) {
-            $.each(responseJSON, function (index, reportItem) {
-                facilityGPSData.push(reportItem);
-            });
-
-            $.each(facilityGPSData, function (index, item) {
-                var element = {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Point',
-                        'coordinates': [item.longitude, item.latitude]
-                    },
-                    'properties': {
-                        'title': item.title
-                    }
-                }
-
-                facilityGPSMapFeatures.push(element);
-            })
-
-            generateOrganizationGPSMap();
-        });
-
-    });
-
-    function generateOrganizationTypeChart() {
-        var barColors = [
-            "#b91d47",
-            "#00aba9",
-            "#2b5797",
-            "#e8c3b9"
-        ];
-
-        new Chart("facilityTypeChart", {
-            type: "doughnut",
-            data: {
-                labels: facilityTypes,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: facilityTypesData
-                }]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: "Legend"
-                }
-            }
-        });
-    }
-
-    function generateOrganizationGPSMap() {
-        mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-        var map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            zoom: 5.0,
-            center: [28.5589884, -13.1189121]
-        });
-
-        map.on('load', () => {
-            map.loadImage(
-                contextPath + 'assets/img/marker.png',
-                (error, image) => {
-                    if (error) throw error;
-                    map.addImage('custom-marker', image);
-                    map.addSource('points', {
-                        'type': 'geojson',
-                        'data': {
-                            'type': 'FeatureCollection',
-                            'features': facilityGPSMapFeatures
-                        }
-                    });
-
-                    map.addLayer({
-                        'id': 'points',
-                        'type': 'symbol',
-                        'source': 'points',
-                        'layout': {
-                            'icon-image': 'custom-marker',
-                            'text-field': [
-                                'format',
-                                ['downcase', ['get', 'title']],
-                                {'font-scale': 0.6},
-                            ],
-                            'text-font': [
-                                'Open Sans Semibold',
-                                'Arial Unicode MS Bold'
-                            ],
-                            'text-offset': [0, 0.60],
-                            'text-anchor': 'top'
-                        },
-                        'paint': {
-                            "text-color": "#000"
-                        }
-                    });
-                }
-            );
-        });
-        map.addControl(new mapboxgl.FullscreenControl());
-    }
-
-</script>-->
 </body>
 
 </html>
