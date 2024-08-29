@@ -71,7 +71,6 @@ public class ClientService {
         if (client == null || client.isEnabled()) {
             return false;
         } else {
-
             client.setCode(paykeshoRef);
             clientRepository.enable(client.getId());
             return true;

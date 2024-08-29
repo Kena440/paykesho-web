@@ -15,7 +15,7 @@ public interface ClientRepository extends CrudRepository<Client, Integer> {
     @Query("select c from Client c where c.verificationCode = ?1")
     public Client findByVerificationCode(String code);
 
-    @Query("update Client c set c.enabled = true, c.verificationCode = null where c.id = ?1")
+    @Query("update Client c set c.enabled = true, c.accountNonLocked = true, c.verificationCode = null where c.id = ?1")
     @Modifying
     public void enable(Integer id);
 

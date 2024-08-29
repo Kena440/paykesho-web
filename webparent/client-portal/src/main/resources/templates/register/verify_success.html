@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: page_head('Home', 'none')"></head>
+<body>
+<header th:replace="fragments/fragments :: header"></header>
+<main>
+    <div th:replace="fragments/fragments :: loader"></div>
+    <section class="vh-100 d-flex align-items-center justify-content-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6 order-2 order-lg-1 text-center text-lg-left">
+                    <h1 class="mt-5">Client verification successful <span class="text-primary">Congrats!</span>
+                    </h1>
+                    <p class="lead my-4">
+                        Congratulations! You have verified your account
+                    </p><a class="btn btn-primary animate-hover" th:href="@{/login}"><i
+                        class="fas fa-chevron-left mr-3 pl-2 animate-left-3"></i>Login</a>
+                </div>
+                <div class="col-12 col-lg-6 order-1 order-lg-2 text-center d-flex align-items-center justify-content-center">
+                    <img alt="500 Server Error" class="img-fluid w-75"
+                         th:src="@{/assets/img/illustrations/verified.png}"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer th:replace="fragments/fragments :: footer"></footer>
+</main>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+</html>

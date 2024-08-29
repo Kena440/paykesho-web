@@ -121,15 +121,15 @@ public class ClientController {
         model.addAttribute("pageTitle", pageTitle);
         model.addAttribute("countryList", countryList);
         model.addAttribute("client", client);
-        return "admins/account";
+        return "clients/account";
     }
 
     private void updateNameForAuthenticatedClient(Client client, HttpServletRequest request) {
         Object principal = request.getUserPrincipal();
 
         if (principal instanceof UsernamePasswordAuthenticationToken || principal instanceof RememberMeAuthenticationToken) {
-            ClientUserDetails ClientUserDetails = getClientUserDetailsObject(principal);
-            Client authClient = ClientUserDetails.getClient();
+            ClientUserDetails clientUserDetails = getClientUserDetailsObject(principal);
+            Client authClient = clientUserDetails.getClient();
             authClient.setName(client.getName());
         } else if (principal instanceof OAuth2AuthenticationToken) {
             OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) principal;
@@ -140,17 +140,17 @@ public class ClientController {
     }
 
     private ClientUserDetails getClientUserDetailsObject(Object principal) {
-        ClientUserDetails ClientUserDetails = null;
+        ClientUserDetails clientUserDetails = null;
         if (principal instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
-            ClientUserDetails = (ClientUserDetails) token.getPrincipal();
+            clientUserDetails = (ClientUserDetails) token.getPrincipal();
         } else if (principal instanceof RememberMeAuthenticationToken) {
             RememberMeAuthenticationToken token = (RememberMeAuthenticationToken) principal;
         }
-        return ClientUserDetails;
+        return clientUserDetails;
     }
 
-    private void sendVerificationEmail(HttpServletRequest request, Client client) throws MessagingException, UnsupportedEncodingException, UnsupportedEncodingException {
+    private void sendVerificationEmail(HttpServletRequest request, Client client) throws MessagingException, UnsupportedEncodingException {
         EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
         JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBags);
 
