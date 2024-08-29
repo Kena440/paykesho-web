@@ -1,132 +1,145 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark" data-layout="fluid" data-sidebar-theme="dark"
+      data-sidebar-position="left" data-sidebar-behavior="sticky">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Merchant Mgt','none')"></head>
 <body>
-<div th:replace="fragments/fragments :: loader"></div>
-<!--<nav th:replace="fragments/fragments :: nav"></nav>-->
-<div class="container-fluid bg-soft">
-    <div class="row">
-        <div class="col-12">
-            <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
-            <main class="content">
-                <input id="longitude" th:value="${merchant.longitude}" type="hidden"/>
-                <input id="latitude" th:value="${merchant.latitude}" type="hidden"/>
-                <div th:replace="fragments/fragments :: topbar"></div>
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                    <div class="d-block mb-4 mb-md-0">
-                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
-                            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
-                                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
-                                <li class="breadcrumb-item"><a href="#">Merchant Mgt</a></li>
-                                <li aria-current="page" class="breadcrumb-item active">Merchant View</li>
-                            </ol>
-                        </nav>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Merchant Management</h3>
                     </div>
-                    <div class="btn-toolbar mb-2 mb-md-0"><a class="btn btn-sm btn-primary"
-                                                             th:href="@{/merchants}"><span
-                            class="fas fa-list"></span> <span>Merchants</span></a>
-                        <div class="btn-group ml-3">
-                            <button class="btn btn-sm btn-outline-secondary" type="button">Share</button>
-                            <button class="btn btn-sm btn-outline-secondary" type="button">Export</button>
-                        </div>
+
+                    <div class="col-auto ms-auto text-end mt-n1">
+
+                        <a class="btn btn-primary shadow-sm" th:href="@{/merchants}">
+                            <i class="align-middle" data-lucide="list">&nbsp;</i> List Merchants
+                        </a>
+                        <a class="btn btn-primary shadow-sm" th:href="@{/merchants/new}">
+                            <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Add Merchant
+                        </a>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-xl-12">
-                        <div class="card card-body bg-white border-light shadow-sm mb-4">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <h2 class="h5 mb-4">Merchant information</h2>
-                                    <div class="row">
-                                        <div class="col-md-12 mb-1">
-                                            <div class="card card-body bg-white border-light shadow-sm mb-1">
-                                                <div class="d-xl-flex align-items-center">
-                                                    <div>
-                                                        <div class="merchant-avatar xl-avatar mb-3"><img
-                                                                alt="change avatar"
-                                                                class="rounded"
-                                                                id="thumbnail"
-                                                                style="height: 100px; width: 140px"
-                                                                th:src="@{${merchant.photosImagePath}}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="file-field">
-                                                        <div class="d-flex justify-content-xl-center ml-xl-3">
-                                                            <div class="d-flex">
-                                                                <div class="d-md-block text-left">
-                                                                    <div class="font-weight-normal text-dark mb-1">
-                                                                        [[${merchant.name}]]
-                                                                        ([[${merchant.merchantType}]])
-                                                                    </div>
-                                                                    <div class="font-weight-normal text-dark mb-1">
-                                                                        [[${merchant.phoneNumber}]],
-                                                                        [[${merchant.email}]]
-                                                                    </div>
-                                                                    <div class="font-weight-normal text-dark mb-1">
-                                                                        [[${merchant.district}]],
-                                                                        [[${merchant.province}]]
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr>
-                                        <div class="col-md-12 mb-3">
-                                            <div class="card card-body bg-white border-light shadow-sm mb-1">
-                                                <div class="d-xl-flex align-items-center">
-                                                    <div>
-                                                        <div class="merchant-avatar xl-avatar mb-3"><img
-                                                                alt="change avatar"
-                                                                style="max-width: 8.5rem;"
-                                                                th:src="@{${qrCodeContent}}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="file-field">
-                                                        <div class="d-flex justify-content-xl-center ml-xl-3">
-                                                            <div class="d-flex">
-                                                                <div class="d-md-block text-left">
-                                                                    <div class="font-weight-normal text-dark mb-1">
-                                                                        [[${merchant.name}]]
-                                                                    </div>
-                                                                    <div class="font-weight-normal text-dark mb-1">
-                                                                        [[${merchant.servicesOffered}]]
-                                                                    </div>
-                                                                    <div class="font-weight-normal text-dark mb-1">
-                                                                        [[${merchant.details}]]
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                    <input id="longitude" th:value="${merchant.longitude}" type="hidden"/>
+                    <input id="latitude" th:value="${merchant.latitude}" type="hidden"/>
+                    <div class="col-md-4 col-xl-3">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Merchant Details</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img th:src="@{${merchant.photosImagePath}}" alt="Logo"
+                                     class="img-fluid rounded-circle mb-2" width="128" height="128"/>
+                                <h5 class="card-title mb-0">[[${merchant.name}]]</h5>
+                                <div class="text-muted mb-2">[[${merchant.merchantType}]]</div>
+
+                                <div>
+                                    <a class="btn btn-primary btn-sm" href="#">Follow</a>
+                                    <a class="btn btn-primary btn-sm" href="#"><span
+                                            data-lucide="message-square"></span> Message</a>
+                                </div>
+                            </div>
+                            <hr class="my-0"/>
+                            <div class="card-body text-center">
+                                <h5 class="h6 card-title">Code</h5>
+                                <a href="#" class="badge badge-subtle-primary me-1 my-1">[[${merchant.code}]]</a>
+                                <hr>
+                                <div class="img-fluid mb-2"><img
+                                        alt="change avatar"
+                                        style="max-width: 8.5rem;"
+                                        th:src="@{${qrCodeContent}}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-3">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="h6 card-title">About</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><span data-lucide="home" class="lucide-sm me-1"></span> Services:
+                                        <a
+                                                href="#">[[${merchant.servicesOffered}]]</a></li>
+                                    <li class="mb-1"><span data-lucide="map-pin" class="lucide-sm me-1"></span> From <a
+                                            href="#"> [[${merchant.details}]]</a></li>
+                                </ul>
+                                <hr>
+                                <h5 class="h6 card-title">Services</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><span data-lucide="home" class="lucide-sm me-1"></span> Address: <a
+                                            href="#">[[${merchant.physicalAddress}]]</a></li>
+                                    <li class="mb-1"><span data-lucide="map-pin" class="lucide-sm me-1"></span> From <a
+                                            href="#"> [[${merchant.district}]],
+                                        [[${merchant.province}]]</a></li>
+                                </ul>
+                            </div>
+                            <hr class="my-0"/>
+                            <div class="card-body">
+                                <h5 class="h6 card-title">Elsewhere</h5>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1"><span class="fas fa-globe fa-fw me-1"></span> <a href="#">[[${merchant.email}]]</a>
+                                    </li>
+                                    <li class="mb-1"><span class="fab fa-twitter fa-fw me-1"></span> <a
+                                            href="#">Twitter</a></li>
+                                    <li class="mb-1"><span class="fab fa-facebook fa-fw me-1"></span> <a href="#">Facebook</a>
+                                    </li>
+                                    <li class="mb-1"><span class="fab fa-instagram fa-fw me-1"></span> <a href="#">Instagram</a>
+                                    </li>
+                                    <li class="mb-1"><span class="fab fa-linkedin fa-fw me-1"></span> <a href="#">LinkedIn</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <h2 class="h5 my-4"></h2>
-                                    <div class="row">
-                                        <div class="col-12 col-sm-6 col-xl-12">
-                                            <div class="card card-body bg-white border-light shadow-sm mb-4">
-                                                <div id="map" style='width: 100%; height: 400px'></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 mb-4 mb-xl-0">
+                                <h5 class="card-title mb-0">Activities</h5>
+                            </div>
+                            <div class="card-body h-100">
 
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="card card-body bg-white border-light shadow-sm mb-4">
+                                            <div id="map" style='width: 100%; height: 400px'></div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <hr/>
+                                <div class="d-grid">
+                                    <a href="#" class="btn btn-primary">Refresh</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+
+            </div>
+        </main>
     </div>
 </div>
 <footer th:replace="fragments/modal_fragment :: confirm_modal"></footer>

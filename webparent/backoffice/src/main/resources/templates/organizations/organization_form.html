@@ -1,195 +1,136 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark" data-layout="fluid" data-sidebar-theme="dark"
+      data-sidebar-position="left" data-sidebar-behavior="sticky">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Organization Mgt','none')"></head>
 <body>
-<div th:replace="fragments/fragments :: loader"></div>
-<!--<nav th:replace="fragments/fragments :: nav"></nav>-->
-<div class="container-fluid bg-soft">
-    <div class="row">
-        <div class="col-12">
-            <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
-            <main class="content">
-                <div th:replace="fragments/fragments :: topbar"></div>
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                    <div class="d-block mb-4 mb-md-0">
-                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
-                            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
-                                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
-                                <li class="breadcrumb-item"><a href="#">Organization Mgt</a></li>
-                                <li aria-current="page" class="breadcrumb-item active">Organizations Form</li>
-                            </ol>
-                        </nav>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Organization Management</h3>
                     </div>
-                    <div class="btn-toolbar mb-2 mb-md-0"><a class="btn btn-sm btn-primary"
-                                                             th:href="@{/organizations}"><span
-                            class="fas fa-backward"></span> <span>Back to Organizations</span></a>
-                        <div class="btn-group ml-3">
-                            <button class="btn btn-sm btn-outline-secondary" type="button">Share</button>
-                            <button class="btn btn-sm btn-outline-secondary" type="button">Export</button>
-                        </div>
+
+                    <div class="col-auto ms-auto text-end mt-n1">
+
+                        <a class="btn btn-primary shadow-sm" th:href="@{/organizations}">
+                            <i class="align-middle" data-lucide="list">&nbsp;</i> List Organizations
+                        </a>
+                        <a class="btn btn-primary shadow-sm" th:href="@{/organizations/new}">
+                            <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Add Organization
+                        </a>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-xl-12">
-                        <div class="card card-body bg-white border-light shadow-sm mb-4">
-                            <form enctype="multipart/form-data"
-                                  method="post"
-                                  onsubmit="return checkOrganizationUnique(this)"
-                                  th:action="@{/organizations/save}"
-                                  th:object="${organization}">
-                                <input id="id" th:field="*{id}" type="hidden"/>
-                                <input id="longitude" th:field="*{longitude}" type="hidden"/>
-                                <input id="latitude" th:field="*{latitude}" type="hidden"/>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <h2 class="h5 mb-4">General information</h2>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-group"><label for="name">Name</label>
-                                                    <input
-                                                            class="form-control" id="name" maxlength="45"
-                                                            minlength="2" placeholder="Name" required
-                                                            th:field="*{name}"
-                                                            type="text"></div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">[[${pageTitle}]]</h5>
+                                <h6 class="card-subtitle text-muted">Record organizations onto the system.</h6>
+                            </div>
+                            <div class="card-body">
+                                <form enctype="multipart/form-data"
+                                      method="post"
+                                      onsubmit="return checkOrganizationUnique(this)"
+                                      th:action="@{/organizations/save}"
+                                      th:object="${organization}">
+                                    <input id="id" th:field="*{id}" type="hidden"/>
+                                    <input id="longitude" th:field="*{longitude}" type="hidden"/>
+                                    <input id="latitude" th:field="*{latitude}" type="hidden"/>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Name</label>
+                                                <input
+                                                        class="form-control" id="name" maxlength="45"
+                                                        minlength="2" placeholder="Name" required
+                                                        th:field="*{name}"
+                                                        type="text">
                                             </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-group"><label>Type</label>
-                                                    <select class="custom-select" th:field="*{organizationType}">
-                                                        <option value="">Select...</option>
-                                                        <th:block
-                                                                th:each="ps : ${T(org.commons.enums.OrganizationType).values()}">
-                                                            <option th:defaultDescription="${ps.name()}"
-                                                                    th:text="${ps}"
-                                                                    th:value="${ps}">
-                                                            </option>
-                                                        </th:block>
-                                                    </select>
-                                                </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Type</label>
+                                                <select class="form-control" th:field="*{organizationType}">
+                                                    <option value="">Select...</option>
+                                                    <th:block
+                                                            th:each="ps : ${T(org.commons.enums.OrganizationType).values()}">
+                                                        <option th:defaultDescription="${ps.name()}"
+                                                                th:text="${ps}"
+                                                                th:value="${ps}">
+                                                        </option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Phone Number</label>
+                                                <input
+                                                        class="form-control" id="phoneNumber" maxlength="45"
+                                                        minlength="2" placeholder="Phone Number" required
+                                                        th:field="*{phoneNumber}"
+                                                        type="text">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Email</label>
+                                                <input
+                                                        class="form-control" id="email" maxlength="100"
+                                                        minlength="2" placeholder="Email" required
+                                                        th:field="*{email}"
+                                                        type="email">
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-group"><label for="name">Phone Number</label>
-                                                    <input
-                                                            class="form-control" id="phoneNumber" maxlength="45"
-                                                            minlength="2" placeholder="Phone Number" required
-                                                            th:field="*{phoneNumber}"
-                                                            type="text"></div>
+                                        <div class="col-md-6">
+
+                                            <div class="mb-3">
+                                                <img
+                                                        alt="change avatar"
+                                                        class="rounded"
+                                                        id="thumbnail"
+                                                        style="height: 100px; width: 100px"
+                                                        th:src="@{${organization.photosImagePath}}">
+                                                <hr>
+                                                <label class="form-label">File input</label>
+                                                <input accept="image/png, image/jpeg"
+                                                       capture="user"
+                                                       id="fileImage"
+                                                       name="image"
+                                                       class="form-control"
+                                                       type="file">
                                             </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-group"><label for="email">Email</label>
-                                                    <input
-                                                            class="form-control" id="email" maxlength="100"
-                                                            minlength="2" placeholder="Email" required
-                                                            th:field="*{email}"
-                                                            type="email"></div>
+                                            <div class="mb-3">
+                                                <label class="form-check m-0">
+                                                    <input type="checkbox" class="form-check-input" id="enabledInput"
+                                                           th:field="*{enabled}">
+                                                    <span class="form-check-label">Enabled</span>
+                                                </label>
                                             </div>
-                                        </div>
-                                        <hr>
-                                        <div class="row">
-                                            <div class="card card-body bg-white border-light shadow-sm mb-4">
-                                                <h2 class="h5 mb-4">Location</h2>
+                                            <hr>
+                                            <div class="mb-3">
+                                                <label class="form-label">Location</label>
                                                 <div class="text-center">
-                                                    <div id="map" style='width: 100%; height: 400px'></div>
+                                                    <div id="map" style='width: 100%; height: 250px'></div>
                                                     <pre id="info"></pre>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <h2 class="h5 my-4"></h2>
-                                        <div class="row">
-                                            <div class="col-12 col-sm-6 col-xl-12">
-                                                <div class="card card-body bg-white border-light shadow-sm mb-4">
-                                                    <h2 class="h5 mb-4">Select profile photo</h2>
-                                                    <div class="d-xl-flex align-items-center">
-                                                        <div>
-                                                            <div class="organization-avatar xl-avatar mb-3"><img
-                                                                    alt="change avatar"
-                                                                    class="rounded"
-                                                                    id="thumbnail"
-                                                                    style="height: 100px; width: 100px"
-                                                                    th:src="@{${organization.photosImagePath}}">
-                                                            </div>
-                                                        </div>
-                                                        <div class="file-field">
-                                                            <div class="d-flex justify-content-xl-center ml-xl-3">
-                                                                <div class="d-flex"><span class="icon icon-md"><span
-                                                                        class="fas fa-paperclip mr-3"></span></span>
-                                                                    <input accept="image/png, image/jpeg"
-                                                                           capture="user"
-                                                                           id="fileImage"
-                                                                           name="image"
-                                                                           type="file">
-                                                                    <div class="d-md-block text-left">
-                                                                        <div class="font-weight-normal text-dark mb-1">
-                                                                            Choose
-                                                                            Image
-                                                                        </div>
-                                                                        <div class="text-gray small">JPG, GIF or PNG.
-                                                                            Max size
-                                                                            of 800K
-                                                                        </div>
-                                                                        <div class="text-gray small">
-                                                                            <small class="text-muted">
-                                                                                <p class="font-size-xs text-muted"
-                                                                                   id="fileImageName"
-                                                                                   th:if="${organization.photos == null}">
-                                                                                <p class="font-size-xs text-muted"
-                                                                                   id="fileImageName"
-                                                                                   th:if="${organization.photos != null}"
-                                                                                   th:text="${organization.photos}">
-                                                                                </p>
-                                                                            </small>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                            <div class="col-12 mb-4 mb-xl-0">
-                                                <div class="card card-body bg-white border-light">
-                                                    <h2 class="h5 mb-4">Activation</h2>
-                                                    <ul class="list-group list-group-flush">
-                                                        <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
-                                                            <div>
-                                                                <h3 class="h6 mb-1">Enabled</h3>
-                                                            </div>
-                                                            <div>
-                                                                <div class="custom-control custom-switch"><input
-                                                                        checked="checked"
-                                                                        class="custom-control-input"
-                                                                        id="enabledInput"
-                                                                        th:field="*{enabled}"
-                                                                        type="checkbox">
-                                                                    <label class="custom-control-label"
-                                                                           for="enabledInput"></label></div>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
+                                        <div class="col-md-6">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="mt-3">
-                                    <button class="btn btn-primary" type="submit">Save All</button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 </div>
+
 <div th:replace="fragments/modal_fragment :: modal_dialog"></div>
 <footer th:replace="fragments/fragments :: js_code"></footer>
 <script type="text/javascript">
@@ -268,5 +209,5 @@
     map.on('click', add_marker);
 </script>
 </body>
-
 </html>
+

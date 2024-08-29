@@ -7,8 +7,6 @@ import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.organizations.enums.Constants;
 import org.paykesho.backoffice.organizations.service.OrganizationService;
-import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.paging.PagingAndSortingParam;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,14 +33,9 @@ public class OrganizationController {
     private SettingService settingService;
 
     @GetMapping("")
-    public String listFirstPage() {
-        return Constants.REDIRECT_ORGANIZATIONS_PAGE_1_SORT_FIELD_NAME_SORT_DIR_ASC;
-    }
-
-    @GetMapping("/page/{pageNum}")
-    public String listAllOrganizationsByPage(@PagingAndSortingParam(listName = "organizationList", moduleURL = "/organizations") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum) throws PaykeshoError {
-        organizationService.listByPage(pageNum, helper);
-
+    public String listAllOrganizationsByPage(Model model) throws PaykeshoError {
+        model.addAttribute("pageTitle", "List Organizations");
+        model.addAttribute("organizationList", organizationService.listAll());
         return "organizations/organizations";
     }
 

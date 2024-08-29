@@ -1,401 +1,737 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark" data-layout="fluid" data-sidebar-theme="dark"
+      data-sidebar-position="left" data-sidebar-behavior="sticky">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Dashboard','none')"></head>
 <body>
-<div th:replace="fragments/fragments :: loader"></div>
-<!--
-<nav th:replace="fragments/fragments :: nav"></nav>
--->
-<div class="container-fluid bg-soft">
-    <div class="row">
-        <div class="col-12">
-            <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
-            <main class="content">
-                <div th:replace="fragments/fragments :: topbar">
-                </div>
-                <div class="row justify-content-md-center">
-                    <div class="col-12 col-sm-6 col-xl-4 mb-4">
-                        <div class="card border-light shadow-sm">
-                            <div class="card-body">
-                                <div class="row d-block d-xl-flex align-items-center">
-                                    <div
-                                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                                        <div class="icon icon-shape icon-md icon-shape-primary rounded mr-4 mr-sm-0"><span
-                                                class="fas fa-chart-line"></span></div>
-                                        <div class="d-sm-none">
-                                            <h2 class="h5">Total Transactions</h2>
-                                            <h3 class="mb-1">345,678</h3>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-xl-7 px-xl-0">
-                                        <div class="d-none d-sm-block">
-                                            <h2 class="h5">Total Transactions</h2>
-                                            <h3 class="mb-1">345,678</h3>
-                                        </div>
-                                        <small>Feb 1 - Apr 1, <span class="icon icon-small"><span
-                                                class="fas fa-globe-africa"></span></span> Lusaka</small>
-                                        <div class="small mt-2"><span class="fas fa-angle-up text-success"></span> <span
-                                                class="text-success font-weight-bold">18.2%</span> Since last month
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Analytics</h3>
                     </div>
-                    <div class="col-12 col-sm-6 col-xl-4 mb-4">
-                        <div class="card border-light shadow-sm">
-                            <div class="card-body">
-                                <div class="row d-block d-xl-flex align-items-center">
-                                    <div
-                                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                                        <div class="icon icon-shape icon-md icon-shape-tertiary rounded mr-4"><span
-                                                class="fas fa-users"></span></div>
-                                        <div class="d-sm-none">
-                                            <h2 class="h5">New Clients</h2>
-                                            <h3 class="mb-1">5,342</h3>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-xl-7 px-xl-0">
-                                        <div class="d-none d-sm-block">
-                                            <h2 class="h5">New Clients</h2>
-                                            <h3 class="mb-1">5,342</h3>
-                                        </div>
-                                        <small>Feb 1 - Apr 1, <span class="icon icon-small"><span
-                                                class="fas fa-globe-africa"></span></span> Zambia</small>
-                                        <div class="small mt-2"><span class="fas fa-angle-up text-success"></span> <span
-                                                class="text-success font-weight-bold">28.2%</span> Since last month
-                                        </div>
-                                    </div>
-                                </div>
+
+                    <div class="col-auto ms-auto text-end mt-n1">
+
+                        <div class="dropdown me-2 d-inline-block position-relative">
+                            <a class="btn btn-light bg-white shadow-sm dropdown-toggle" href="#"
+                               data-bs-toggle="dropdown" data-bs-display="static">
+                                <i class="align-middle mt-n1" data-lucide="calendar"></i> Today
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <h6 class="dropdown-header">Settings</h6>
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Separated link</a>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-4 mb-4">
-                        <div class="card border-light shadow-sm">
-                            <div class="card-body">
-                                <div class="row d-block d-xl-flex align-items-center">
-                                    <div
-                                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                                        <div class="ct-chart-traffic-share ct-golden-section ct-series-a"></div>
-                                    </div>
-                                    <div class="col-12 col-xl-7 px-xl-0">
-                                        <h2 class="h5">Revenue Share</h2>
-                                        <div class="mb-3 small">Feb 1 - Apr 1, <span class="icon icon-small"><span
-                                                class="fas fa-globe-africa"></span></span> Zambia
-                                        </div>
-                                        <h6 class="font-weight-normal text-gray"><span
-                                                class="icon w-20 icon-xs icon-secondary mr-1"><span
-                                                class="fas fa-shopping-cart"></span></span> FMCG <a class="h6"
-                                                                                                    href="#">70%</a>
-                                        </h6>
-                                        <h6 class="font-weight-normal text-gray"><span
-                                                class="icon w-20 icon-xs icon-primary mr-1"><span
-                                                class="fas fa-bolt"></span></span> Utilities <a class="h6"
-                                                                                                href="#">30%</a>
-                                        </h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-4 mb-4">
-                        <div class="card border-light shadow-sm">
-                            <div class="card-body d-flex flex-row align-items-center flex-0 border-bottom">
-                                <div class="d-block">
-                                    <div class="h6 font-weight-normal text-gray mb-2">Merchant Ranking</div>
-                                    <h2 class="h3">452</h2>
-                                    <div class="small mt-2"><span class="fas fa-angle-up text-success"></span> <span
-                                            class="text-success font-weight-bold">18.2%</span></div>
-                                </div>
-                                <div class="d-block ml-auto">
-                                    <div class="d-flex align-items-center text-right mb-2"><span
-                                            class="shape-xs rounded-circle bg-primary mr-2"></span> <span
-                                            class="font-weight-normal small">All</span></div>
-                                    <div class="d-flex align-items-center text-right"><span
-                                            class="shape-xs rounded-circle bg-secondary mr-2"></span> <span
-                                            class="font-weight-normal small">Puma</span></div>
-                                </div>
-                            </div>
-                            <div class="card-body p-2">
-                                <div class="ct-chart-ranking ct-golden-section ct-series-a"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6 col-xl-4 mb-4">
-                        <div class="card border-light shadow-sm">
-                            <div class="card-body d-flex flex-row align-items-center flex-0 border-bottom">
-                                <div class="d-block">
-                                    <div class="h6 font-weight-normal text-gray mb-2">Stats by Organization</div>
-                                    <h2 class="h4">Paykesho</h2>
-                                    <div class="small mt-2"><span class="fas fa-angle-up text-success"></span> <span
-                                            class="text-success font-weight-bold">10.57%</span></div>
-                                </div>
-                                <div class="d-block ml-auto">
-                                    <div class="d-flex align-items-center text-right mb-2"><span
-                                            class="shape-xs rounded-circle bg-primary mr-2"></span> <span
-                                            class="font-weight-normal small">CHAZ</span></div>
-                                    <div class="d-flex align-items-center text-right mb-2"><span
-                                            class="shape-xs rounded-circle bg-secondary mr-2"></span> <span
-                                            class="font-weight-normal small">ZRA</span></div>
-                                    <div class="d-flex align-items-center text-right mb-2"><span
-                                            class="shape-xs rounded-circle bg-tertiary mr-2"></span> <span
-                                            class="font-weight-normal small">Lake Petroleum</span></div>
-                                </div>
-                            </div>
-                            <div class="card-body p-2">
-                                <div class="ct-chart-traffic-source ct-golden-section ct-series-a"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6 col-xl-4 mb-4">
-                        <div class="card border-light shadow-sm">
-                            <div class="card-body d-flex flex-row align-items-center flex-0 border-bottom">
-                                <div class="d-block">
-                                    <div class="h6 font-weight-normal text-gray mb-2">Sales Types</div>
-                                    <h2 class="h4">Distibution</h2>
-                                    <div class="small mt-2"><span class="fas fa-angle-up text-success"></span> <span
-                                            class="text-success font-weight-bold">K10.57%</span></div>
-                                </div>
-                                <div class="d-block ml-auto">
-                                    <div class="d-flex align-items-center text-right mb-2"><span
-                                            class="shape-xs rounded-circle bg-secondary mr-2"></span> <span
-                                            class="font-weight-normal small">GAS_STATION</span></div>
-                                    <div class="d-flex align-items-center text-right mb-2"><span
-                                            class="shape-xs rounded-circle bg-tertiary mr-2"></span> <span
-                                            class="font-weight-normal small">BARBERSHOP</span></div>
-                                    <div class="d-flex align-items-center text-right mb-2"><span
-                                            class="shape-xs rounded-circle bg-primary mr-2"></span> <span
-                                            class="font-weight-normal small">PHARMACY</span></div>
-                                </div>
-                            </div>
-                            <div class="card-body p-2">
-                                <div class="ct-chart-distribution ct-golden-section ct-series-a"></div>
-                            </div>
-                        </div>
+
+                        <button class="btn btn-primary shadow-sm">
+                            <i class="align-middle" data-lucide="filter">&nbsp;</i>
+                        </button>
+                        <button class="btn btn-primary shadow-sm">
+                            <i class="align-middle" data-lucide="refresh-cw">&nbsp;</i>
+                        </button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-xl-8 mb-4">
-                        <div class="row">
-                            <div class="col-12 mb-4">
-                                <div class="card border-light shadow-sm">
-                                    <div class="card-body d-flex flex-row align-items-center flex-0 border-bottom">
-                                        <div class="d-block">
-                                            <div class="h6 font-weight-normal text-gray mb-2">Sales Value</div>
-                                            <h2 class="h3">10,567</h2>
-                                            <div class="small mt-2"><span class="fas fa-angle-up text-success"></span>
-                                                <span
-                                                        class="text-success font-weight-bold">K10.57%</span></div>
+                    <div class="col-lg-6 col-xl-5 d-flex">
+                        <div class="w-100">
+
+                            <div class="row">
+                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
+                                    <div class="card illustration flex-fill">
+                                        <div class="card-body p-0 d-flex flex-fill">
+                                            <div class="row g-0 w-100">
+                                                <div class="col-6">
+                                                    <div class="illustration-text p-3 m-1">
+                                                        <h4 class="illustration-text">Welcome Back, Chris!</h4>
+                                                        <p class="mb-0">AppStack Dashboard</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 align-self-end text-end">
+                                                    <img th:src="@{/assets/img/illustrations/searching.png}" alt="Searching"
+                                                         class="img-fluid illustration-img">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="d-flex ml-auto"><a class="btn btn-tertiary btn-sm mr-3" href="#">Month</a>
-                                            <a class="btn btn-white border-light btn-sm mr-3"
-                                               href="#">Week</a></div>
                                     </div>
-                                    <div class="card-body p-2">
-                                        <div class="ct-chart-sales-value ct-major-tenth ct-series-b"></div>
+                                </div>
+                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
+                                    <div class="card flex-fill">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col mt-0">
+                                                    <h5 class="card-title">Bounce</h5>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <div class="stat stat-sm">
+                                                        <i class="align-middle" data-lucide="arrow-up-right"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="h1 d-inline-block mt-1 mb-4">2.364</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-success me-2"> +3.65% </span>
+                                                <span class="text-muted">Since last week</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row d-lg-none d-xxl-flex">
+                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
+                                    <div class="card flex-fill">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col mt-0">
+                                                    <h5 class="card-title">Real-Time</h5>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <div class="stat stat-sm">
+                                                        <i class="align-middle" data-lucide="clock"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="h1 d-inline-block mt-1 mb-4">1.856</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-success me-2"> +2.25% </span>
+                                                <span class="text-muted">Since last week</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
+                                    <div class="card flex-fill">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col mt-0">
+                                                    <h5 class="card-title">Visitors</h5>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <div class="stat stat-sm">
+                                                        <i class="align-middle" data-lucide="users"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="h1 d-inline-block mt-1 mb-4">17.212</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-danger me-2"> -1.25% </span>
+                                                <span class="text-muted">Since last week</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
                     </div>
-                    <div class="col-12 col-xl-4 mb-4">
-                        <div class="col-12 px-0 mb-4">
-                            <div class="card border-light shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center justify-content-between border-bottom border-light pb-3">
-                                        <div>
-                                            <h6 class="mb-0"><span class="icon icon-xs mr-3"><span
-                                                    class="fas fa-globe-africa"></span></span>Global Rank</h6>
+
+                    <div class="col-lg-6 col-xl-7">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
                                         </div>
-                                        <div><a class="text-primary font-weight-bold" href="#">#755<span
-                                                class="fas fa-chart-line ml-2"></span></a></div>
                                     </div>
-                                    <div class="d-flex align-items-center justify-content-between border-bottom border-light py-3">
-                                        <div>
-                                            <h6 class="mb-0"><span class="icon icon-xs mr-3"><span
-                                                    class="fas fa-flag-usa"></span></span>Merchant Rank</h6>
-                                            <div class="small card-stats">Nyampande Cutz<span
-                                                    class="icon icon-xs text-success ml-2"><span
-                                                    class="fas fa-angle-up"></span></span></div>
+                                </div>
+                                <h5 class="card-title mb-0">Real-Time</h5>
+                            </div>
+                            <div class="card-body p-2">
+                                <div id="world_map" style="height:279px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-lg-4 d-flex">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
                                         </div>
-                                        <div><a class="text-primary font-weight-bold" href="#">#32<span
-                                                class="fas fa-chart-line ml-2"></span></a></div>
                                     </div>
-                                    <div class="d-flex align-items-center justify-content-between pt-3">
-                                        <div>
-                                            <h6 class="mb-0"><span class="icon icon-xs mr-3"><span
-                                                    class="fas fa-folder-open"></span></span>Category Rank</h6><a
-                                                class="small card-stats"
-                                                href="#">Grocery > FMCG</a>
+                                </div>
+                                <h5 class="card-title mb-0">Languages</h5>
+                            </div>
+                            <table class="table table-striped my-0">
+                                <thead>
+                                <tr>
+                                    <th>Language</th>
+                                    <th class="text-end">Users</th>
+                                    <th class="d-none d-xl-table-cell w-75">% Users</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>en-us</td>
+                                    <td class="text-end">735</td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 43%;"
+                                                 aria-valuenow="43" aria-valuemin="0" aria-valuemax="100">43%
+                                            </div>
                                         </div>
-                                        <div><a class="text-primary font-weight-bold" href="#">#16<span
-                                                class="fas fa-chart-line ml-2"></span></a></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>en-gb</td>
+                                    <td class="text-end">223</td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 27%;"
+                                                 aria-valuenow="27" aria-valuemin="0" aria-valuemax="100">27%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>fr-fr</td>
+                                    <td class="text-end">181</td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 22%;"
+                                                 aria-valuenow="22" aria-valuemin="0" aria-valuemax="100">22%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>es-es</td>
+                                    <td class="text-end">132</td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 16%;"
+                                                 aria-valuenow="16" aria-valuemin="0" aria-valuemax="100">16%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>de-de</td>
+                                    <td class="text-end">118</td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 15%;"
+                                                 aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">15%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ru-ru</td>
+                                    <td class="text-end">98</td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 13%;"
+                                                 aria-valuenow="13" aria-valuemin="0" aria-valuemax="100">13%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-4 d-flex">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
                                     </div>
+                                </div>
+                                <h5 class="card-title mb-0">Mobile / Desktop</h5>
+                            </div>
+                            <div class="card-body d-flex w-100">
+                                <div class="align-self-center chart">
+                                    <canvas id="chartjs-dashboard-bar-devices"></canvas>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 px-0 mb-4">
-                            <div class="card border-light shadow-sm">
-                                <div class="card-body">
-                                    <h2 class="h5">Activity</h2>
-                                    <p>live stats about clients.</p>
-                                    <div class="d-block">
-                                        <div class="d-flex align-items-center pt-3 mr-5">
-                                            <div class="icon icon-shape icon-sm icon-shape-primary rounded mr-3"><span
-                                                    class="fas fa-chart-bar"></span></div>
-                                            <div class="d-block"><label class="mb-0">Purchase Rate</label>
-                                                <h4 class="mb-0">33.50%</h4>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center pt-3">
-                                            <div class="icon icon-shape icon-sm icon-shape-secondary rounded mr-3"><span
-                                                    class="fas fa-chart-area"></span></div>
-                                            <div class="d-block"><label class="mb-0">Sessions</label>
-                                                <h4 class="mb-0">9,567</h4>
-                                            </div>
+                    </div>
+
+                    <div class="col-12 col-lg-4 d-flex">
+                        <div class="card flex-fill">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
                                         </div>
                                     </div>
+                                </div>
+                                <h5 class="card-title mb-0">Interests</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="chartjs-dashboard-radar"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <footer th:replace="fragments/fragments ::footer"></footer>
-            </main>
-        </div>
+
+                <div class="row">
+                    <div class="col-12 col-lg-5 col-xl-4 d-flex">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h5 class="card-title mb-0">Source / Medium</h5>
+                            </div>
+                            <div class="card-body d-flex">
+                                <div class="align-self-center w-100">
+                                    <div class="py-3">
+                                        <div class="chart chart-xs">
+                                            <canvas id="chartjs-dashboard-pie"></canvas>
+                                        </div>
+                                    </div>
+
+                                    <table class="table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>Source</th>
+                                            <th class="text-end">Revenue</th>
+                                            <th class="text-end">Value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td><i class="fas fa-square-full text-primary"></i> Direct</td>
+                                            <td class="text-end">$ 2602</td>
+                                            <td class="text-end text-success">+43%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-square-full text-warning"></i> Affiliate</td>
+                                            <td class="text-end">$ 1253</td>
+                                            <td class="text-end text-success">+13%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-square-full text-danger"></i> E-mail</td>
+                                            <td class="text-end">$ 541</td>
+                                            <td class="text-end text-success">+24%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-square-full text-dark"></i> Other</td>
+                                            <td class="text-end">$ 1465</td>
+                                            <td class="text-end text-success">+11%</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-7 col-xl-8 d-flex">
+                        <div class="card flex-fill">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h5 class="card-title mb-0">Traffic</h5>
+                            </div>
+                            <table id="datatables-dashboard-traffic" class="table table-striped my-0">
+                                <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th class="text-end">Users</th>
+                                    <th class="d-none d-xl-table-cell text-end">Sessions</th>
+                                    <th class="d-none d-xl-table-cell text-end">Bounce Rate</th>
+                                    <th class="d-none d-xl-table-cell text-end">Avg. Session Duration</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Google</td>
+                                    <td class="text-end">1023</td>
+                                    <td class="d-none d-xl-table-cell text-end">1265</td>
+                                    <td class="d-none d-xl-table-cell text-end text-success">27.23%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:06:25</td>
+                                </tr>
+                                <tr>
+                                    <td>Bing</td>
+                                    <td class="text-end">504</td>
+                                    <td class="d-none d-xl-table-cell text-end">623</td>
+                                    <td class="d-none d-xl-table-cell text-end text-danger">66.76%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:04:42</td>
+                                </tr>
+                                <tr>
+                                    <td>Twitter</td>
+                                    <td class="text-end">462</td>
+                                    <td class="d-none d-xl-table-cell text-end">571</td>
+                                    <td class="d-none d-xl-table-cell text-end text-success">31.53%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:08:05</td>
+                                </tr>
+                                <tr>
+                                    <td>Pinterest</td>
+                                    <td class="text-end">623</td>
+                                    <td class="d-none d-xl-table-cell text-end">770</td>
+                                    <td class="d-none d-xl-table-cell text-end text-danger">52.81%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:03:10</td>
+                                </tr>
+                                <tr>
+                                    <td>Facebook</td>
+                                    <td class="text-end">812</td>
+                                    <td class="d-none d-xl-table-cell text-end">1003</td>
+                                    <td class="d-none d-xl-table-cell text-end text-success">24.83%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:05:56</td>
+                                </tr>
+                                <tr>
+                                    <td>DuckDuckGo</td>
+                                    <td class="text-end">693</td>
+                                    <td class="d-none d-xl-table-cell text-end">856</td>
+                                    <td class="d-none d-xl-table-cell text-end text-success">37.36%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:09:12</td>
+                                </tr>
+                                <tr>
+                                    <td>GitHub</td>
+                                    <td class="text-end">713</td>
+                                    <td class="d-none d-xl-table-cell text-end">881</td>
+                                    <td class="d-none d-xl-table-cell text-end text-success">38.09%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:06:19</td>
+                                </tr>
+                                <tr>
+                                    <td>Direct</td>
+                                    <td class="text-end">872</td>
+                                    <td class="d-none d-xl-table-cell text-end">1077</td>
+                                    <td class="d-none d-xl-table-cell text-end text-success">32.70%</td>
+                                    <td class="d-none d-xl-table-cell text-end">00:09:18</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <footer th:replace="fragments/fragments :: footer()"></footer>
     </div>
 </div>
+
 <footer th:replace="fragments/fragments :: js_code"></footer>
-<!--<script type="text/javascript">
-    let currYearTripData = [];
-    let lastYearTripData = [];
-    let facilityTypes = [];
-    let monthLabels = [];
-    let facilityTypesData = [];
-    let facilityGPSData = [];
-    let facilityGPSMapFeatures = [];
-    contextPath = "[[@{/}]]";
-
-    $(document).ready(function () {
-
-        const facilityTypesDataRequestUrl = contextPath + "facilities/rest/get-organization-types-data/true";
-        const facilityGPSDataRequestUrl = contextPath + "facilities/rest/get-organization-gps-data/true";
-
-        $.get(facilityTypesDataRequestUrl, function (responseJSON) {
-            $.each(responseJSON, function (index, reportItem) {
-                facilityTypes.push(reportItem.identifier);
-                facilityTypesData.push(reportItem.itemCount);
-            });
-
-            generateOrganizationTypeChart();
-        });
-
-        $.get(facilityGPSDataRequestUrl, function (responseJSON) {
-            $.each(responseJSON, function (index, reportItem) {
-                facilityGPSData.push(reportItem);
-            });
-
-            $.each(facilityGPSData, function (index, item) {
-                var element = {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Point',
-                        'coordinates': [item.longitude, item.latitude]
-                    },
-                    'properties': {
-                        'title': item.title
-                    }
-                }
-
-                facilityGPSMapFeatures.push(element);
-            })
-
-            generateOrganizationGPSMap();
-        });
-
-    });
-
-    function generateOrganizationTypeChart() {
-        var barColors = [
-            "#b91d47",
-            "#00aba9",
-            "#2b5797",
-            "#e8c3b9"
-        ];
-
-        new Chart("facilityTypeChart", {
-            type: "doughnut",
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Bar chart
+        new Chart(document.getElementById("chartjs-dashboard-bar-devices"), {
+            type: "bar",
             data: {
-                labels: facilityTypes,
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                 datasets: [{
-                    backgroundColor: barColors,
-                    data: facilityTypesData
+                    label: "Mobile",
+                    backgroundColor: window.cssVariables.primary,
+                    borderColor: window.cssVariables.primary,
+                    hoverBackgroundColor: window.cssVariables.primary,
+                    hoverBorderColor: window.cssVariables.primary,
+                    data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
+                    barPercentage: .5,
+                    categoryPercentage: .5
+                }, {
+                    label: "Desktop",
+                    backgroundColor: window.cssVariables.primarySubtle,
+                    borderColor: window.cssVariables.primarySubtle,
+                    hoverBackgroundColor: window.cssVariables.primarySubtle,
+                    hoverBorderColor: window.cssVariables.primarySubtle,
+                    data: [69, 66, 24, 48, 52, 51, 44, 53, 62, 79, 51, 68],
+                    barPercentage: .5,
+                    categoryPercentage: .5
                 }]
             },
             options: {
-                title: {
-                    display: true,
-                    text: "Legend"
+                maintainAspectRatio: false,
+                cornerRadius: 15,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            stepSize: 20
+                        },
+                        stacked: true,
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            color: "transparent"
+                        },
+                        stacked: true,
+                    }]
                 }
             }
         });
-    }
-
-    function generateOrganizationGPSMap() {
-        mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-        var map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            zoom: 5.0,
-            center: [28.5589884, -13.1189121]
-        });
-
-        map.on('load', () => {
-            map.loadImage(
-                contextPath + 'assets/img/marker.png',
-                (error, image) => {
-                    if (error) throw error;
-                    map.addImage('custom-marker', image);
-                    map.addSource('points', {
-                        'type': 'geojson',
-                        'data': {
-                            'type': 'FeatureCollection',
-                            'features': facilityGPSMapFeatures
-                        }
-                    });
-
-                    map.addLayer({
-                        'id': 'points',
-                        'type': 'symbol',
-                        'source': 'points',
-                        'layout': {
-                            'icon-image': 'custom-marker',
-                            'text-field': [
-                                'format',
-                                ['downcase', ['get', 'title']],
-                                {'font-scale': 0.6},
-                            ],
-                            'text-font': [
-                                'Open Sans Semibold',
-                                'Arial Unicode MS Bold'
-                            ],
-                            'text-offset': [0, 0.60],
-                            'text-anchor': 'top'
-                        },
-                        'paint': {
-                            "text-color": "#000"
-                        }
-                    });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var markers = [{
+            coords: [31.230391, 121.473701],
+            name: "Shanghai"
+        },
+            {
+                coords: [39.904202, 116.407394],
+                name: "Beijing"
+            },
+            {
+                coords: [28.704060, 77.102493],
+                name: "Delhi"
+            },
+            {
+                coords: [6.524379, 3.379206],
+                name: "Lagos"
+            },
+            {
+                coords: [39.343357, 117.361649],
+                name: "Tianjin"
+            },
+            {
+                coords: [24.860735, 67.001137],
+                name: "Karachi"
+            },
+            {
+                coords: [41.008240, 28.978359],
+                name: "Istanbul"
+            },
+            {
+                coords: [35.689487, 139.691711],
+                name: "Tokyo"
+            },
+            {
+                coords: [23.129110, 113.264381],
+                name: "Guangzhou"
+            },
+            {
+                coords: [19.075983, 72.877655],
+                name: "Mumbai"
+            },
+            {
+                coords: [40.7127837, -74.0059413],
+                name: "New York"
+            },
+            {
+                coords: [34.052235, -118.243683],
+                name: "Los Angeles"
+            },
+            {
+                coords: [41.878113, -87.629799],
+                name: "Chicago"
+            },
+            {
+                coords: [29.760427, -95.369804],
+                name: "Houston"
+            },
+            {
+                coords: [33.448376, -112.074036],
+                name: "Phoenix"
+            },
+            {
+                coords: [51.507351, -0.127758],
+                name: "London"
+            },
+            {
+                coords: [48.856613, 2.352222],
+                name: "Paris"
+            },
+            {
+                coords: [55.755825, 37.617298],
+                name: "Moscow"
+            },
+            {
+                coords: [40.416775, -3.703790],
+                name: "Madrid"
+            }
+        ];
+        var map = new jsVectorMap({
+            map: "world",
+            selector: "#world_map",
+            zoomButtons: true,
+            markers: markers,
+            markerStyle: {
+                initial: {
+                    r: 9,
+                    stroke: window.cssVariables.secondaryBg,
+                    strokeWidth: 7,
+                    stokeOpacity: .4,
+                    fill: window.cssVariables.primary
+                },
+                hover: {
+                    fill: window.cssVariables.primary,
+                    stroke: window.cssVariables.primary
                 }
-            );
+            },
+            regionStyle: {
+                initial: {
+                    fill: window.cssVariables.quaternaryBg
+                }
+            },
+            zoomOnScroll: false
         });
-        map.addControl(new mapboxgl.FullscreenControl());
-    }
-
-</script>-->
+        window.addEventListener("resize", () => {
+            map.updateSize();
+        });
+        setTimeout(function () {
+            map.updateSize();
+        }, 250);
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Pie chart
+        new Chart(document.getElementById("chartjs-dashboard-pie"), {
+            type: "pie",
+            data: {
+                labels: ["Direct", "Affiliate", "E-mail", "Other"],
+                datasets: [{
+                    data: [2602, 1253, 541, 1465],
+                    backgroundColor: [
+                        window.cssVariables.primary,
+                        window.cssVariables.warning,
+                        window.cssVariables.danger,
+                        "#E8EAED"
+                    ],
+                }]
+            },
+            options: {
+                responsive: !window.MSInputMethodContext,
+                maintainAspectRatio: false,
+                cutoutPercentage: 70,
+                legend: {
+                    display: false
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 5,
+                        borderColor: window.cssVariables.secondaryBg
+                    }
+                },
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Radar chart
+        new Chart(document.getElementById("chartjs-dashboard-radar"), {
+            type: "radar",
+            data: {
+                labels: ["Technology", "Sports", "Media", "Gaming", "Arts"],
+                datasets: [{
+                    label: "Interests",
+                    backgroundColor: "rgba(0, 123, 255, 0.2)",
+                    borderColor: window.cssVariables.primary,
+                    pointBackgroundColor: window.cssVariables.primary,
+                    pointBorderColor: "#fff",
+                    pointHoverBackgroundColor: "#fff",
+                    pointHoverBorderColor: window.cssVariables.primary,
+                    data: [70, 53, 82, 60, 33]
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                legend: {
+                    display: false,
+                },
+                scale: {
+                    gridLines: {
+                        color: window.cssVariables.quaternaryColor
+                    },
+                    ticks: {
+                        backdropColor: window.cssVariables.secondaryBg,
+                        fontColor: window.cssVariables.bodyColor
+                    },
+                    angleLines: {
+                        color: window.cssVariables.quaternaryColor
+                    },
+                    pointLabels: {
+                        fontColor: window.cssVariables.bodyColor
+                    }
+                }
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $("#datatables-dashboard-traffic").DataTable({
+            destroy: true,
+            pageLength: 8,
+            lengthChange: false,
+            bFilter: false,
+            autoWidth: false,
+            order: [
+                [1, "desc"]
+            ]
+        });
+    });
+</script>
 </body>
-
 </html>

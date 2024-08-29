@@ -7,8 +7,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchants.enums.Constants;
 import org.paykesho.backoffice.merchants.service.MerchantCodeService;
 import org.paykesho.backoffice.merchants.service.MerchantService;
-import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.paging.PagingAndSortingParam;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +39,9 @@ public class MerchantController {
     private MerchantCodeService merchantCodeService;
 
     @GetMapping("")
-    public String listFirstPage() {
-        return Constants.REDIRECT_TO_MERCHANTS_WITHOUT_KEYWORD;
-    }
-
-    @GetMapping("/page/{pageNum}")
-    public String listAllMerchantsByPage(@PagingAndSortingParam(listName = "merchantList", moduleURL = "/merchants") PagingAndSortingHelper helper, @PathVariable("pageNum") int pageNum, Model model) throws PaykeshoError {
-        merchantService.listByPage(pageNum, helper);
+    public String listAllMerchantsByPage(Model model) throws PaykeshoError {
         model.addAttribute("pageTitle", "List Merchants");
-
+        model.addAttribute("merchantList", merchantService.listAll());
         return "merchants/merchants";
     }
 

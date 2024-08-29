@@ -92,6 +92,7 @@
                                                 <select class="custom-select"
                                                         placeholder="Gender" required
                                                         th:field="*{genderType}">
+                                                    <option selected value="">Select Gender</option>
                                                     <option th:each="os : ${T(org.commons.enums.GenderType).values()}"
                                                             th:text="${os}"
                                                             th:value="${os}"/>
