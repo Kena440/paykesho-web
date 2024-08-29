@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark" data-layout="fluid" data-sidebar-theme="dark"
-      data-sidebar-position="left" data-sidebar-behavior="sticky">
+<html data-bs-theme="dark"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Organization Mgt','none')"></head>
 <body>
@@ -95,15 +95,15 @@
                                                 <label class="form-label">File input</label>
                                                 <input accept="image/png, image/jpeg"
                                                        capture="user"
+                                                       class="form-control"
                                                        id="fileImage"
                                                        name="image"
-                                                       class="form-control"
                                                        type="file">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-check m-0">
-                                                    <input type="checkbox" class="form-check-input" id="enabledInput"
-                                                           th:field="*{enabled}">
+                                                    <input class="form-check-input" id="enabledInput" th:field="*{enabled}"
+                                                           type="checkbox">
                                                     <span class="form-check-label">Enabled</span>
                                                 </label>
                                             </div>
@@ -117,7 +117,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                            <button class="btn btn-primary" type="submit">Submit</button>
                                         </div>
                                     </div>
                                 </form>

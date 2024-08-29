@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark" data-layout="fluid" data-sidebar-theme="dark"
-      data-sidebar-position="left" data-sidebar-behavior="sticky">
+<html data-bs-theme="dark"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Organization Mgt','none')"></head>
 <body>
@@ -35,8 +35,8 @@
                                 <h5 class="card-title mb-0">Organization Details</h5>
                             </div>
                             <div class="card-body text-center">
-                                <img th:src="@{${organization.photosImagePath}}" alt="Logo"
-                                     class="img-fluid rounded-circle mb-2" width="128" height="128"/>
+                                <img alt="Logo" class="img-fluid rounded-circle mb-2"
+                                     height="128" th:src="@{${organization.photosImagePath}}" width="128"/>
                                 <h5 class="card-title mb-0">[[${organization.name}]]</h5>
                                 <div class="text-muted mb-2">[[${organization.organizationType}]]</div>
 
@@ -50,9 +50,9 @@
                             <div class="card-body">
                                 <h5 class="h6 card-title">About</h5>
                                 <ul class="list-unstyled mb-0">
-                                    <li class="mb-1"><span data-lucide="home" class="lucide-sm me-1"></span> Phone: <a
+                                    <li class="mb-1"><span class="lucide-sm me-1" data-lucide="home"></span> Phone: <a
                                             href="#">[[${organization.phoneNumber}]]</a></li>
-                                    <li class="mb-1"><span data-lucide="map-pin" class="lucide-sm me-1"></span> From <a
+                                    <li class="mb-1"><span class="lucide-sm me-1" data-lucide="map-pin"></span> From <a
                                             href="#"> [[${organization.district}]],
                                         [[${organization.province}]]</a></li>
                                 </ul>
@@ -80,7 +80,7 @@
                             <div class="card-header">
                                 <div class="card-actions float-end">
                                     <div class="dropdown position-relative">
-                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
                                         </a>
 
@@ -144,7 +144,7 @@
                                 </div>
                                 <hr/>
                                 <div class="d-grid">
-                                    <a href="#" class="btn btn-primary">Refresh</a>
+                                    <a class="btn btn-primary" href="#">Refresh</a>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +161,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h6 class="modal-title">Add Record</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <form method="post"
                   th:action="@{/organizations/employee-record/save}">
@@ -206,7 +206,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h6 class="modal-title">List Database</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
                 <p>With less than a month to go before the European Union enacts new consumer privacy laws for its

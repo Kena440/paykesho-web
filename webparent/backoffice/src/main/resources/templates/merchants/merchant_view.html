@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark" data-layout="fluid" data-sidebar-theme="dark"
-      data-sidebar-position="left" data-sidebar-behavior="sticky">
+<html data-bs-theme="dark"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Merchant Mgt','none')"></head>
 <body>
@@ -35,8 +35,8 @@
                                 <h5 class="card-title mb-0">Merchant Details</h5>
                             </div>
                             <div class="card-body text-center">
-                                <img th:src="@{${merchant.photosImagePath}}" alt="Logo"
-                                     class="img-fluid rounded-circle mb-2" width="128" height="128"/>
+                                <img alt="Logo" class="img-fluid rounded-circle mb-2"
+                                     height="128" th:src="@{${merchant.photosImagePath}}" width="128"/>
                                 <h5 class="card-title mb-0">[[${merchant.name}]]</h5>
                                 <div class="text-muted mb-2">[[${merchant.merchantType}]]</div>
 
@@ -49,7 +49,7 @@
                             <hr class="my-0"/>
                             <div class="card-body text-center">
                                 <h5 class="h6 card-title">Code</h5>
-                                <a href="#" class="badge badge-subtle-primary me-1 my-1">[[${merchant.code}]]</a>
+                                <a class="badge badge-subtle-primary me-1 my-1" href="#">[[${merchant.code}]]</a>
                                 <hr>
                                 <div class="img-fluid mb-2"><img
                                         alt="change avatar"
@@ -67,18 +67,18 @@
                             <div class="card-body">
                                 <h5 class="h6 card-title">About</h5>
                                 <ul class="list-unstyled mb-0">
-                                    <li class="mb-1"><span data-lucide="home" class="lucide-sm me-1"></span> Services:
+                                    <li class="mb-1"><span class="lucide-sm me-1" data-lucide="home"></span> Services:
                                         <a
                                                 href="#">[[${merchant.servicesOffered}]]</a></li>
-                                    <li class="mb-1"><span data-lucide="map-pin" class="lucide-sm me-1"></span> From <a
+                                    <li class="mb-1"><span class="lucide-sm me-1" data-lucide="map-pin"></span> From <a
                                             href="#"> [[${merchant.details}]]</a></li>
                                 </ul>
                                 <hr>
                                 <h5 class="h6 card-title">Services</h5>
                                 <ul class="list-unstyled mb-0">
-                                    <li class="mb-1"><span data-lucide="home" class="lucide-sm me-1"></span> Address: <a
+                                    <li class="mb-1"><span class="lucide-sm me-1" data-lucide="home"></span> Address: <a
                                             href="#">[[${merchant.physicalAddress}]]</a></li>
-                                    <li class="mb-1"><span data-lucide="map-pin" class="lucide-sm me-1"></span> From <a
+                                    <li class="mb-1"><span class="lucide-sm me-1" data-lucide="map-pin"></span> From <a
                                             href="#"> [[${merchant.district}]],
                                         [[${merchant.province}]]</a></li>
                                 </ul>
@@ -106,7 +106,7 @@
                             <div class="card-header">
                                 <div class="card-actions float-end">
                                     <div class="dropdown position-relative">
-                                        <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
                                         </a>
 
@@ -131,7 +131,7 @@
 
                                 <hr/>
                                 <div class="d-grid">
-                                    <a href="#" class="btn btn-primary">Refresh</a>
+                                    <a class="btn btn-primary" href="#">Refresh</a>
                                 </div>
                             </div>
                         </div>

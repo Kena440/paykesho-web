@@ -25,8 +25,8 @@
                     <form method="post" th:action="@{/login}">
                         <div class="mb-4">
                             <div class="alert alert-warning alert-dismissible" role="alert" th:if="${param.error}">
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
+                                        type="button"></button>
                                 <div class="alert-icon">
                                     <i class="far fa-fw fa-lock"></i>
                                 </div>
@@ -35,8 +35,8 @@
                                 </div>
                             </div>
                             <div class="alert alert-success alert-dismissible" role="alert" th:if="${param.logout}">
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
+                                        type="button"></button>
                                 <div class="alert-icon">
                                     <i class="far fa-fw fa-unlock"></i>
                                 </div>
@@ -47,22 +47,22 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input class="form-control form-control-lg" type="email" name="email" id="email"
-                                   placeholder="Enter your email"/>
+                            <input class="form-control form-control-lg" id="email" name="email" placeholder="Enter your email"
+                                   type="email"/>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input class="form-control form-control-lg" type="password" name="password" id="password"
-                                   placeholder="Enter your password"/>
+                            <input class="form-control form-control-lg" id="password" name="password" placeholder="Enter your password"
+                                   type="password"/>
                             <small>
                                 <a href='auth-reset-password.html'>Forgot password?</a>
                             </small>
                         </div>
                         <div>
                             <div class="form-check align-items-center">
-                                <input id="customControlInline" type="checkbox" class="form-check-input"
-                                       value="remember-me"
-                                       name="remember-me" checked>
+                                <input checked class="form-check-input" id="customControlInline"
+                                       name="remember-me"
+                                       type="checkbox" value="remember-me">
                                 <label class="form-check-label text-small" for="customControlInline">Remember me</label>
                             </div>
                         </div>
