@@ -2,351 +2,456 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
       xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="page_head(title, remove)" th:remove="${remove}">
-    <!-- Favicon -->
-    <link rel="shortcut icon" th:href="@{/assets/favicon/favicon.ico}" type="image/x-icon"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Responsive Bootstrap 5 Admin &amp; Dashboard Template">
+    <meta name="author" content="Bootlab">
 
     <title>Paykesho | Get lelo, Pay mailo | [[${title}]]</title>
-    <meta charset="utf-8">
-    <meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport">
-    <meta content="Buy now, Pay Later - Paykesho" name="title">
-    <meta content="KAE Digital" name="author">
-    <meta content="Buy now, Pay Later - Paykesho" name="description">
-    <meta content="Buy now, Pay Later - Paykesho" name="keywords">
-    <link href="https://themesberg.com/product/bootstrap/rocket-saas-dashboard-bootstrap-template" rel="canonical">
-    <meta content="website" property="og:type">
-    <meta content="https://demo.themesberg.com/rocket" property="og:url">
-    <meta content="Paykesho - Buy now, Pay later" property="og:title">
-    <meta content="Buy now, Pay Later - Paykesho" property="og:description">
-    <meta content="summary_large_image" property="twitter:card">
-    <meta content="https://demo.themesberg.com/rocket" property="twitter:url">
-    <meta content="Buy now, Pay Later - Paykesho" property="twitter:title">
-    <meta content="Buy now, Pay Later - Paykesho" property="twitter:description">
-    <link rel="apple-touch-icon" sizes="120x120" th:href="@{/assets/img/favicon/apple-touch-icon.png}">
-    <link rel="icon" sizes="32x32" th:href="@{/assets/img/favicon/favicon-32x32.png}" type="image/png">
-    <link rel="icon" sizes="16x16" th:href="@{/assets/img/favicon/favicon-16x16.png}" type="image/png">
-    <link rel="manifest" th:href="@{/assets/img/favicon/site.webmanifest}">
-    <link color="#ffffff" rel="mask-icon" th:href="@{/assets/img/favicon/safari-pinned-tab.svg}">
-    <meta content="#ffffff" name="msapplication-TileColor">
-    <meta content="#ffffff" name="theme-color">
-    <link rel="stylesheet" th:href="@{/assets/vendor/fortawesome/fontawesome-free/css/all.min.css}" type="text/css">
-    <link rel="stylesheet" th:href="@{/assets/vendor/prismjs/themes/prism.css}" type="text/css">
-    <link rel="stylesheet" th:href="@{/assets/vendor/jqvmap/dist/jqvmap.min.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/rocket.css}" type="text/css">
 
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <link rel="shortcut icon" th:href="@{/assets/img/favicon/favicon.ico}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
-    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet'/>
-
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
-          rel="stylesheet"
-          type="text/css">
+    <link th:href="@{/assets/css/app.css}" rel="stylesheet">
+    <!-- Remove this after purchasing -->
+    <script th:src="@{/assets/js/settings.js}"></script>
+    <!-- END SETTINGS -->
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
 </head>
 
 <body>
 
-<div class="preloader bg-soft flex-column justify-content-center align-items-center" th:fragment="loader"><img
-        alt="Rocket logo"
-        class="loader-element"
-        height="50"
-        th:src="@{/assets/img/brand/paykeshologo.svg}"></div>
+<nav class="sidebar" id="sidebar" th:fragment="sidebarMenu">
+    <div class="sidebar-content js-simplebar">
+        <a class='sidebar-brand' th:href="@{/}">
+            <img alt="logo" class="logo-img mb-0" height="40" th:src="@{/images/paykeshologo.png}" width="60">
+            <span class="align-middle me-3">Paykesho</span>
+        </a>
 
-<header class="header-global" th:fragment="header">
-    <nav class="navbar navbar-main navbar-expand-lg navbar-light navbar-theme-primary headroom py-lg-2 px-lg-6"
-         id="navbar-main">
-        <div class="container">
-            <a class="navbar-brand @@logo_classes" th:href="@{/}">
-                <div class="d-flex align-items-center">
-                    <img alt="Paykesho Logo"
-                         class="navbar-brand-dark rotate-logo" th:src="@{/assets/img/brand/paykeshologo.svg}">
-                    <img alt="Paykesho Logo"
-                         class="navbar-brand-light rotate-logo" th:src="@{/assets/img/brand/paykeshologo.svg}">
+        <ul class="sidebar-nav">
+
+            <li class="sidebar-header">
+                Navigation
+            </li>
+            <li class="sidebar-item">
+                <a class='sidebar-link' th:href="@{/}">
+                    <i class="align-middle" data-lucide="home"></i> <span class="align-middle">Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#transactions" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="list"></i> <span class="align-middle">Transactions</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="transactions">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/transactions}">View All</a></li>
+                </ul>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#icons" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="landmark"></i> <span class="align-middle">Financials</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="icons">
+                    <li class="sidebar-item"><a class='sidebar-link' href='icons-lucide.html'>Reports</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Projections</a>
+                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Configurations</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#merchants" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="shopping-cart"></i> <span class="align-middle">Merchants</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="merchants">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Manage</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Reconciliation</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Configurations</a></li>
+
+                </ul>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#organizations" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="building"></i> <span
+                        class="align-middle">Organizations</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="organizations">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Manage</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Reconciliation</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Configurations</a></li>
+
+                </ul>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#clients" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="users"></i> <span class="align-middle">Clients</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="clients">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Manage</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Reconciliation</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Configurations</a></li>
+
+                </ul>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#siteadmin" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="settings"></i> <span
+                        class="align-middle">Site Administration</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="siteadmin">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/users}">User Mgt</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/settings}">Settings</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/integrations}">Integrations</a></li>
+
+                </ul>
+            </li>
+
+        </ul>
+
+        <div class="sidebar-cta">
+            <div class="sidebar-cta-content">
+                <strong class="d-inline-block mb-2">Quote of the day</strong>
+                <div class="mb-3 text-sm">
+                    Sebenza boi!
                 </div>
+
+                <div class="d-grid">
+                    <a class="btn btn-primary"
+                       href="/" target="_blank">Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<nav class="navbar navbar-expand navbar-bg" th:fragment="topbar">
+    <a class="sidebar-toggle">
+        <i class="hamburger align-self-center"></i>
+    </a>
+    <h3 class="nav-link ">Back Office | [[${pageTitle}]]</h3>
+    <ul class="navbar-nav">
+        <li class="nav-item px-2 dropdown d-none d-sm-inline-block">
+            <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+               href="#" id="servicesDropdown" role="button">
+                Quick Links
             </a>
-            <div class="navbar-collapse collapse" id="navbar_global">
-                <div class="navbar-collapse-header">
-                    <div class="row">
-                        <div class="col-6 collapse-brand">
-                            <a class="d-flex align-items-center" th:href="@{/}">
-                                <img alt="Paykesho Logo" th:src="@{/assets/img/brand/paykeshologo.svg}">
-                            </a>
-                        </div>
-                        <div class="col-6 collapse-close">
-                            <a aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation"
-                               class="fas fa-times" data-target="#navbar_global" data-toggle="collapse"
-                               href="#navbar_global"></a>
-                        </div>
+            <div aria-labelledby="servicesDropdown" class="dropdown-menu dropdown-menu-start dropdown-mega">
+                <div class="d-md-flex align-items-start justify-content-start">
+                    <div class="dropdown-mega-list">
+                        <div class="dropdown-header">Merchants</div>
+                        <a class="dropdown-item" href="#">Reconciliation</a>
+                    </div>
+                    <div class="dropdown-mega-list">
+                        <div class="dropdown-header">Transactions</div>
+                        <a class="dropdown-item" href="#">Reports</a>
+                    </div>
+                    <div class="dropdown-mega-list">
+                        <div class="dropdown-header">Clients</div>
+                        <a class="dropdown-item" href="#">Configurations</a>
                     </div>
                 </div>
-                <ul class="navbar-nav navbar-nav-hover justify-content-center">
-                    <li class="nav-item"><a class="nav-link" th:href="@{/}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/business}">Business</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/how-it-works}">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/contact}">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/faqs}">FAQ</a></li>
-                </ul>
             </div>
-            <div class="d-none d-lg-block">
-                <th:block sec:authorize="!isAuthenticated()">
-                    <a class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3" th:href="@{/login}">
-                        <i class="fas fa-lock mr-2"></i> Login
-                    </a>
-                    &nbsp;
-                    <a class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3" th:href="@{/clients/register}">
-                        <i class="fas fa-lock mr-2"></i> Register
-                    </a>
+        </li>
+    </ul>
 
-                </th:block>
-
-                <th:block sec:authorize="isAuthenticated()">
-                    <form method="post" name="LogoutForm" th:action="@{/logout}" th:hidden="true">
-                        <input type="submit" value="Logout">
-                    </form>
-                </th:block>
-                <th:block sec:authorize="isAuthenticated()">
-                    <a class="btn btn-secondary btn-pricing-plan animate-up-2 mr-3" th:href="@{/clients/dashboard}">
-                        <i class="fas fa-home mr-2"></i> Dashboard
-                    </a>
-                    <a class="btn btn-outline-white btn-docs animate-up-2"
-                       href="javascript: document.LogoutForm.submit()"
-                       style="color: #000000"><i class="icon-user"></i>Logout</a>
-                </th:block>
-
-                <a class="btn btn-outline-black btn-docs animate-up-2" th:href="@{/support}">
-                    <i class="fas fa-hands-helping mr-2"></i> Support
+    <div class="navbar-collapse collapse">
+        <ul class="navbar-nav navbar-align">
+            <!--<li class="nav-item dropdown">
+                <a class="nav-icon dropdown-toggle" href="#" id="messagesDropdown" data-bs-toggle="dropdown">
+                    <div class="position-relative">
+                        <i class="align-middle text-body" data-lucide="message-circle"></i>
+                        <span class="indicator">4</span>
+                    </div>
                 </a>
-            </div>
-            <div class="d-flex d-lg-none align-items-center ml-auto">
-                <button aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation"
-                        class="navbar-toggler"
-                        data-target="#navbar_global" data-toggle="collapse" type="button">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-        </div>
-    </nav>
-</header>
-
-<nav class="sidebar d-md-block bg-primary text-white collapse px-4" id="sidebarMenu" sec:authorize="isAuthenticated()"
-     th:fragment="sidebarMenu">
-    <div class="sidebar-sticky pt-4 mx-auto">
-        <div class="user-card d-flex align-items-center justify-content-between justify-content-md-center pb-4">
-            <div class="d-flex align-items-center">
-                <div class="user-avatar lg-avatar mr-4" style="background-color: white">
-                    <img alt="User Profile"
-                         class="card-img-top rounded-circle border-white" th:src="@{/images/paykeshologo.png}">
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+                     aria-labelledby="messagesDropdown">
+                    <div class="dropdown-menu-header">
+                        <div class="position-relative">
+                            4 New Messages
+                        </div>
+                    </div>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <img src="img/avatars/avatar-5.jpg" class="img-fluid rounded-circle"
+                                         alt="Ashley Briggs" width="40" height="40">
+                                </div>
+                                <div class="col-10 ps-2">
+                                    <div>Ashley Briggs</div>
+                                    <div class="text-muted small mt-1">Nam pretium turpis et arcu. Duis arcu
+                                        tortor.
+                                    </div>
+                                    <div class="text-muted small mt-1">15m ago</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <img src="img/avatars/avatar-2.jpg" class="img-fluid rounded-circle"
+                                         alt="Carl Jenkins" width="40" height="40">
+                                </div>
+                                <div class="col-10 ps-2">
+                                    <div>Carl Jenkins</div>
+                                    <div class="text-muted small mt-1">Curabitur ligula sapien euismod vitae.
+                                    </div>
+                                    <div class="text-muted small mt-1">2h ago</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <img src="img/avatars/avatar-4.jpg" class="img-fluid rounded-circle"
+                                         alt="Stacie Hall" width="40" height="40">
+                                </div>
+                                <div class="col-10 ps-2">
+                                    <div>Stacie Hall</div>
+                                    <div class="text-muted small mt-1">Pellentesque auctor neque nec urna.</div>
+                                    <div class="text-muted small mt-1">4h ago</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <img src="img/avatars/avatar-3.jpg" class="img-fluid rounded-circle"
+                                         alt="Bertha Martin" width="40" height="40">
+                                </div>
+                                <div class="col-10 ps-2">
+                                    <div>Bertha Martin</div>
+                                    <div class="text-muted small mt-1">Aenean tellus metus, bibendum sed,
+                                        posuere ac, mattis non.
+                                    </div>
+                                    <div class="text-muted small mt-1">5h ago</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="dropdown-menu-footer">
+                        <a href="#" class="text-muted">Show all messages</a>
+                    </div>
                 </div>
-                <div class="d-block">
-                    <a class="h6" sec:authentication="principal.fullName" th:href="@{/my-account}"></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-bs-toggle="dropdown">
+                    <div class="position-relative">
+                        <i class="align-middle text-body" data-lucide="bell-off"></i>
+                    </div>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+                     aria-labelledby="alertsDropdown">
+                    <div class="dropdown-menu-header">
+                        4 New Notifications
+                    </div>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <i class="text-danger" data-lucide="alert-circle"></i>
+                                </div>
+                                <div class="col-10">
+                                    <div>Update completed</div>
+                                    <div class="text-muted small mt-1">Restart server 12 to complete the
+                                        update.
+                                    </div>
+                                    <div class="text-muted small mt-1">2h ago</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <i class="text-warning" data-lucide="bell"></i>
+                                </div>
+                                <div class="col-10">
+                                    <div>Lorem ipsum</div>
+                                    <div class="text-muted small mt-1">Aliquam ex eros, imperdiet vulputate
+                                        hendrerit et.
+                                    </div>
+                                    <div class="text-muted small mt-1">6h ago</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <i class="text-primary" data-lucide="home"></i>
+                                </div>
+                                <div class="col-10">
+                                    <div>Login from 192.186.1.1</div>
+                                    <div class="text-muted small mt-1">8h ago</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-2">
+                                    <i class="text-success" data-lucide="user-plus"></i>
+                                </div>
+                                <div class="col-10">
+                                    <div>New connection</div>
+                                    <div class="text-muted small mt-1">Anna accepted your request.</div>
+                                    <div class="text-muted small mt-1">12h ago</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="dropdown-menu-footer">
+                        <a href="#" class="text-muted">Show all notifications</a>
+                    </div>
                 </div>
-            </div>
-
-            <div class="collapse-close d-md-none"><a aria-controls="sidebarMenu" aria-expanded="true"
-                                                     aria-label="Toggle navigation"
-                                                     class="fas fa-times" data-target="#sidebarMenu"
-                                                     data-toggle="collapse"
-                                                     href="#sidebarMenu"></a></div>
-        </div>
-        <ul class="nav flex-column mt-4">
-            <li class="nav-item"><a class="nav-link d-flex align-items-center"
-                                    th:href="@{/}"><span
-                    class="sidebar-icon"><span
-                    class="fas fa-home"></span> </span><span>Dashboard</span></a>
+            </li>-->
+            <li class="nav-item nav-theme-toggle dropdown">
+                <a class="nav-icon js-theme-toggle" href="#">
+                    <div class="position-relative">
+                        <i class="align-middle text-body nav-theme-toggle-light" data-lucide="sun"></i>
+                        <i class="align-middle text-body nav-theme-toggle-dark" data-lucide="moon"></i>
+                    </div>
+                </a>
             </li>
-
-            <li class="nav-item"><a
-                    class="nav-link collapsed d-flex justify-content-between align-items-center"
-                    data-target="#financialsMenu" data-toggle="collapse" href="#financialsMenu"><span><span
-                    class="sidebar-icon"><span class="fas fa-chart-area"></span></span> Finance </span><span
-                    class="link-arrow"><span class="fas fa-chevron-right"></span></span></a>
-                <div aria-expanded="false" class="multi-level collapse" id="financialsMenu" role="list">
-                    <ul class="flex-column nav">
-                        <li class="nav-item"><a class="nav-link" href="#"><span>Repayment Schedule</span></a></li>
-                        <li class="nav-item"><a class="nav-link" href="#"><span>Configurations</span></a></li>
-                    </ul>
+            <li class="nav-item dropdown">
+                <a class="nav-flag dropdown-toggle" data-bs-toggle="dropdown" href="#" id="languageDropdown">
+                    <img alt="English" th:src="@{/assets/img/flags/us.png}"/>
+                </a>
+                <div aria-labelledby="languageDropdown" class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item" href="#">
+                        <img alt="English" class="align-middle me-1" th:src="@{/assets/img/flags/us.png}" width="20"/>
+                        <span class="align-middle">English</span>
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <img alt="Spanish" class="align-middle me-1" th:src="@{/assets/img/flags/es.png}" width="20"/>
+                        <span class="align-middle">Spanish</span>
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <img alt="German" class="align-middle me-1" th:src="@{/assets/img/flags/de.png}" width="20"/>
+                        <span class="align-middle">German</span>
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <img alt="Dutch" class="align-middle me-1" th:src="@{/assets/img/flags/nl.png}" width="20"/>
+                        <span class="align-middle">Dutch</span>
+                    </a>
                 </div>
             </li>
-            <li class="nav-item"><a
-                    class="nav-link collapsed d-flex justify-content-between align-items-center"
-                    data-target="#clientsMenu" data-toggle="collapse" href="#clientsMenu"><span><span
-                    class="sidebar-icon"><span class="fas fa-users"></span></span> Clients </span><span
-                    class="link-arrow"><span class="fas fa-chevron-right"></span></span></a>
-                <div aria-expanded="false" class="multi-level collapse" id="clientsMenu" role="list">
-                    <ul class="flex-column nav">
-                        <li class="nav-item"><a class="nav-link" th:href="@{/clients}"><span>View All</span></a></li>
-                    </ul>
+            <li class="nav-item dropdown">
+                <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" data-bs-toggle="dropdown" href="#">
+                    <i class="align-middle" data-lucide="settings"></i>
+                </a>
+
+                <a class="nav-link dropdown-toggle d-none d-sm-inline-block" data-bs-toggle="dropdown" href="#">
+                    <img alt="Chris Wood" class="img-fluid rounded-circle me-1 mt-n2 mb-n2"
+                         height="40" th:src="@{/assets/img/avatars/avatar.jpg}" width="40"/> <span
+                        sec:authentication="principal.fullname"></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a class='dropdown-item' th:href="@{/my-account}"><i class="align-middle me-1"
+                                                                         data-lucide="user"></i> Profile</a>
+                    <a class="dropdown-item" href="#"><i class="align-middle me-1" data-lucide="pie-chart"></i>
+                        Analytics</a>
+                    <div class="dropdown-divider"></div>
+                    <a class='dropdown-item' href='pages-settings.html'>Settings & Privacy</a>
+                    <a class="dropdown-item" href="#">Help</a>
+                    <a class="dropdown-item" href="#" id="logoutLink">Sign out</a>
+
+
+                    <form method="post" name="logoutForm" th:action="@{/logout}" th:hidden="true">
+                        <input type="submit">
+                    </form>
                 </div>
             </li>
-            <li class="dropdown-divider mt-4 mb-3 border-blue" role="separator"></li>
-            <li class="nav-item"><a class="nav-link d-flex align-items-center"
-                                    th:href="@{/help-support}"><span
-                    class="sidebar-icon"><span
-                    class="fas fa-hands-helping"></span> </span><span>Help & Support</span></a>
-            </li>
-
         </ul>
     </div>
 </nav>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4"
-     sec:authorize="isAuthenticated()"
-     th:fragment="topbar">
-    <div>
-        <h3>Client Portal | [[${pageTitle}]]</h3>
-    </div>
-    <div>
-        <button
-                aria-expanded="false" aria-haspopup="true" class="btn btn-primary mr-2 dropdown-toggle"
-                data-toggle="dropdown"><span class="fas fa-user-circle mr-2"></span><a class="h6 text-white"
-                                                                                       sec:authentication="principal.fullName"
-                                                                                       th:href="@{/my-account}"></a>
-            <span
-                    class="icon icon-small ml-1"><span class="fas fa-chevron-down"></span></span></button>
-        <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2">
-            <a class="dropdown-item font-weight-bold" th:href="@{/my-account}"><span
-                    class="fas fa-user-cog mr-2"></span>My Profile</a>
-            <div class="dropdown-divider" role="separator"></div>
-            <a class="dropdown-item font-weight-bold"
-               id="logoutLink"><span class="fas fa-lock text-success mr-2"></span>Sign out</a>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark landing-navbar" th:fragment="navBar">
+    <div class="container">
+        <a class="navbar-brand landing-brand text-white" th:href="@{/}">
+            <img alt="logo" class="logo-img mb-0" height="40" th:src="@{/images/paykeshologo.png}" width="60">
+            Paykesho
+        </a>
 
-            <form method="post" name="logoutForm" th:action="@{/logout}" th:hidden="true">
-                <input type="submit">
-            </form>
-        </div>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item d-none d-md-inline-block">
+                <a class="nav-link active text-lg px-lg-3" th:href="@{/}">Home</a>
+            </li>
+            <li class="nav-item d-none d-md-inline-block">
+                <a class="nav-link active text-lg px-lg-3" th:href="@{/business}">Business</a>
+            </li>
+            <li class="nav-item d-none d-md-inline-block">
+                <a class="nav-link active text-lg px-lg-3" th:href="@{/how-it-works}">How it works</a>
+            </li>
+            <li class="nav-item d-none d-md-inline-block">
+                <a class="nav-link active text-lg px-lg-3" th:href="@{/faq}">FAQ</a>
+            </li>
+            <li class="nav-item d-none d-md-inline-block">
+                <a class="nav-link active text-lg px-lg-3" th:href="@{/contact}">Contact</a>
+            </li>
+        </ul>
+        <a th:href="@{/clients/register}" target="_blank"
+           class="btn btn-lg btn-success btn-pill my-2 my-sm-0 ms-3">Get Started</a>
+        <a th:href="@{/login}" target="_blank"
+           class="btn btn-lg btn-success btn-pill my-2 my-sm-0 ms-3">Sign In</a>
     </div>
-</div>
-
-<div class="table-settings mb-4" th:fragment="search_form()">
-
-    <div class="row justify-content-between align-items-center">
-        <div class="col-12 col-md-6 col-lg-3 align-items-center d-none d-md-flex">
-            <form th:action="@{${moduleURL} + '/page/1'}">
-                <div class="input-group">
-                    <input name="sortField" th:value="${sortField}" type="hidden">
-                    <input name="sortDir" th:value="${sortDir}" type="hidden">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">
-                            <span class="fas fa-search"></span>
-                        </span>
-                    </div>
-                    <input aria-label="Search" class="form-control" name="keyword" placeholder="Search"
-                           th:value="${keyword}"
-                           type="search">
-                </div>
-            </form>
-        </div>
-        <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
-            <div class="btn-group mr-2">
-                <button
-                        aria-expanded="false"
-                        aria-haspopup="true"
-                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
-                        data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
-                        class="fas fa-sliders-h"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
-                <div class="dropdown-menu dropdown-menu-right"><span
-                        class="dropdown-item font-weight-bold text-dark">Show</span> <a
-                        class="dropdown-item d-flex font-weight-bold" href="#">10 <span
-                        class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a> <a
-                        class="dropdown-item font-weight-bold" href="#">20</a> <a class="dropdown-item font-weight-bold"
-                                                                                  href="#">30</a></div>
-            </div>
-            <div class="btn-group">
-                <button
-                        aria-expanded="false"
-                        aria-haspopup="true"
-                        class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
-                        data-toggle="dropdown"><span class="icon icon-sm icon-gray"><span
-                        class="fas fa-cog"></span> </span><span class="sr-only">Toggle Dropdown</span></button>
-                <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right"><span
-                        class="dropdown-item font-weight-bold text-dark">Show</span> <a
-                        class="dropdown-item d-flex font-weight-bold" href="#">10 <span
-                        class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a> <a
-                        class="dropdown-item font-weight-bold" href="#">20</a> <a class="dropdown-item font-weight-bold"
-                                                                                  href="#">30</a></div>
-            </div>
-        </div>
-    </div>
-</div>
+</nav>
 
 <!-- Footer -->
-<footer class="footer section pt-2 pt-md-3 pt-lg-5 pb-3 bg-soft text-primary overflow-hidden" th:fragment="footer">
+<footer class="py-5 bg-dark" th:fragment="footer">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-4 mb-4 mb-lg-0">
-                <a class="footer-brand mr-lg-5 d-flex" th:href="@{/}">
-                    <img alt="Paykesho Logo" class="mr-3" th:src="@{/assets/img/brand/paykeshologo.svg}">
-                    <h4>Paykesho</h4>
-                </a>
-                <p class="my-4">Manage your payments effortlessly with Paykesho. Our platform ensures seamless, secure,
-                    and automated payment solutions for a smoother financial experience.</p>
-                <div class="dropdown mb-4 mb-lg-0">
-                    <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle footer-language-link pb-2"
-                       data-toggle="dropdown" href="#"
-                       id="langsDropdown">
-                        <img alt="USA Flag" class="language-flag"
-                             th:src="@{/assets/img/flags/united-states-of-america.svg}"> United States <i
-                            class="fas fa-chevron-down ml-1"></i>
-                    </a>
-                    <div aria-labelledby="langsDropdown" class="dropdown-menu dropdown-menu-center mt-0">
-                        <a class="dropdown-item text-gray text-sm" href="#"><img
-                                alt="Germany Flag" class="language-flag" th:src="@{/assets/img/flags/germany.svg}">
-                            German</a>
-                        <a class="dropdown-item text-gray text-sm" href="#"><img alt="Spain Flag"
-                                                                                 class="language-flag"
-                                                                                 th:src="@{/assets/img/flags/spain.svg}">
-                            Spanish</a>
-                        <a class="dropdown-item text-gray text-sm" href="#"><img
-                                alt="France Flag" class="language-flag" th:src="@{/assets/img/flags/france.svg}"> French</a>
-                    </div>
+        <div class="row mb-4">
+            <div class="col-12 col-lg-4">
+                <div class="mb-3">
+                    <svg style="fill:white;" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                         width="24px" height="24px" viewBox="0 0 20 20"
+                         enable-background="new 0 0 20 20" xml:space="preserve">
+            <path d="M19.4,4.1l-9-4C10.1,0,9.9,0,9.6,0.1l-9,4C0.2,4.2,0,4.6,0,5s0.2,0.8,0.6,0.9l9,4C9.7,10,9.9,10,10,10s0.3,0,0.4-0.1l9-4
+              C19.8,5.8,20,5.4,20,5S19.8,4.2,19.4,4.1z"/>
+                        <path d="M10,15c-0.1,0-0.3,0-0.4-0.1l-9-4c-0.5-0.2-0.7-0.8-0.5-1.3c0.2-0.5,0.8-0.7,1.3-0.5l8.6,3.8l8.6-3.8c0.5-0.2,1.1,0,1.3,0.5
+              c0.2,0.5,0,1.1-0.5,1.3l-9,4C10.3,15,10.1,15,10,15z"/>
+                        <path d="M10,20c-0.1,0-0.3,0-0.4-0.1l-9-4c-0.5-0.2-0.7-0.8-0.5-1.3c0.2-0.5,0.8-0.7,1.3-0.5l8.6,3.8l8.6-3.8c0.5-0.2,1.1,0,1.3,0.5
+              c0.2,0.5,0,1.1-0.5,1.3l-9,4C10.3,20,10.1,20,10,20z"/>
+          </svg>
                 </div>
+                <p class="text-white-50">
+                    A professional package that comes with hundreds of UI components, forms, tables, charts, dashboards,
+                    pages and svg icons.
+                </p>
             </div>
-            <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0">
-                <h5>Paykesho</h5>
-                <ul class="links-vertical">
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="features.html">Features</a></li>
-                    <li><a href="pricing.html">Pricing</a></li>
-                    <li><a href="contact.html">Contact</a></li>
+            <div class="col-12 col-md-4 col-lg-2 offset-lg-2 mb-3 mb-md-0">
+                <h4 class="text-light fs-5">Company</h4>
+                <ul class="list-unstyled ps-0 mb-0 mt-3">
+                    <li class="mt-2"><a href="#" class="text-white-50">About Us</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Diversity & inclusion</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Blog</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Careers</a></li>
                 </ul>
             </div>
-            <div class="col-6 col-sm-3 col-lg-2 mb-4 mb-lg-0">
-                <h5>Quick Links</h5>
-                <ul class="links-vertical">
-                    <li><a href="terms.html">Terms & Conditions</a></li>
-                    <li><a href="privacy.html">Privacy Policy</a></li>
-                    <li><a href="faq.html">FAQ</a></li>
+            <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
+                <h4 class="text-light fs-5">Resources</h4>
+                <ul class="list-unstyled ps-0 mb-0 mt-3">
+                    <li class="mt-2"><a href="#" class="text-white-50">Community</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Terms of service</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Report a vulnerability</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Brand kit</a></li>
                 </ul>
             </div>
-            <div class="col-12 col-sm-6 col-lg-4">
-                <h5>Subscribe</h5>
-                <p class="font-small">Stay updated with the latest from Paykesho. Get new features, updates, and more
-                    delivered straight to your inbox.</p>
-                <form action="#">
-                    <div class="form-row">
-                        <div class="col-8">
-                            <input class="form-control mb-2" name="email" placeholder="Email Address" required
-                                   type="email">
-                        </div>
-                        <div class="col-4">
-                            <button class="btn btn-secondary" type="submit"><span>Subscribe</span></button>
-                        </div>
-                    </div>
-                </form>
-                <small class="mt-2 form-text">We’ll never share your details. See our <a
-                        class="font-weight-bold text-underline"
-                        href="privacy.html">Privacy
-                    Policy</a></small>
+            <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
+                <h4 class="text-light fs-5">Legals</h4>
+                <ul class="list-unstyled ps-0 mb-0 mt-3">
+                    <li class="mt-2"><a href="#" class="text-white-50">Refund policy</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Terms & conditions</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Privacy policy</a></li>
+                </ul>
             </div>
         </div>
-        <hr class="my-4 my-lg-5">
         <div class="row">
-            <div class="col pb-4 mb-md-0">
-                <div class="d-flex text-center justify-content-center align-items-center">
-                    <p class="font-weight-normal font-small mb-0">Copyright © <a th:href="@{/}">Paykesho</a> <span
-                            class="current-year"></span>. All rights reserved.</p>
-                </div>
+            <div class="col-lg-12">
+                <p class="text-white-50 mt-4 text-center mb-0">
+                    © 2024 AppStack
+                </p>
             </div>
         </div>
     </div>
@@ -400,43 +505,6 @@
     </th:block>
 </div>
 
-<div th:fragment="pagnation(entityName)" th:remove="tag">
-    <div th:if="${totalItems > 0}">
-        <span class="mb-3 mb-md-0 font-size-xxs text-muted text-center ">Listing [[${entityName}]] # [[${startCount}]] to [[${endCount}]] of [[${totalItems}]] </span>
-    </div>
-    <div>
-        <div class="row alert alert-danger text-center" th:unless="${totalItems > 0}">
-            No [[${entityName}]] Found. Contact Admin 😢
-        </div>
-    </div>
-    <div th:if="${totalItems > 0}">
-        <!-- Pagination -->
-        <nav class="d-flex justify-content-center justify-content-md-end">
-            <ul class="pagination pagination-sm text-gray-400 flex-wrap">
-                <li class="page-item" th:classappend="${currentPage} == 1 ? 'disabled' : ''">
-                    <a class="page-link ps-0 pe-4 border-end"
-                       th:replace="fragments/fragments :: page_link_caret(${previousPage}, 'Previous')">
-                        <i class="fe fe-arrow-left me-1"></i>
-                    </a>
-                </li>
-                <li class="page-item"
-                    th:classappend="${currentPage} == ${i} ? 'active' : ''"
-                    th:each="i : ${#numbers.sequence(1, 3)}">
-                    <a class="page-link"
-                       th:replace="fragments/fragments :: page_link(${i}, ${i})"></a>
-                </li>
-                <li class="page-item"
-                    th:classappend="${currentPage} == ${totalPages} ? 'disabled' : ''">
-                    <a class="page-link ps-4 pe-0 border-start"
-                       th:replace="fragments/fragments :: page_link_caret(${nextPage}, 'Next')">
-                        <i class="fe fe-arrow-right ms-1"></i>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
 <div th:fragment="format_time(dateTime)" th:remove="tag">
     <span th:text="${#dates.format(dateTime, 'dd-MM-yyyy HH:mm:ss')}"></span>
 </div>
@@ -481,24 +549,68 @@
 
 </div>
 
+<footer class="py-5 bg-dark" th:fragment="footer()">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 col-lg-4">
+                <div class="mb-3">
+                    <svg style="fill:white;" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                         width="24px" height="24px" viewBox="0 0 20 20"
+                         enable-background="new 0 0 20 20" xml:space="preserve">
+            <path d="M19.4,4.1l-9-4C10.1,0,9.9,0,9.6,0.1l-9,4C0.2,4.2,0,4.6,0,5s0.2,0.8,0.6,0.9l9,4C9.7,10,9.9,10,10,10s0.3,0,0.4-0.1l9-4
+              C19.8,5.8,20,5.4,20,5S19.8,4.2,19.4,4.1z"/>
+                        <path d="M10,15c-0.1,0-0.3,0-0.4-0.1l-9-4c-0.5-0.2-0.7-0.8-0.5-1.3c0.2-0.5,0.8-0.7,1.3-0.5l8.6,3.8l8.6-3.8c0.5-0.2,1.1,0,1.3,0.5
+              c0.2,0.5,0,1.1-0.5,1.3l-9,4C10.3,15,10.1,15,10,15z"/>
+                        <path d="M10,20c-0.1,0-0.3,0-0.4-0.1l-9-4c-0.5-0.2-0.7-0.8-0.5-1.3c0.2-0.5,0.8-0.7,1.3-0.5l8.6,3.8l8.6-3.8c0.5-0.2,1.1,0,1.3,0.5
+              c0.2,0.5,0,1.1-0.5,1.3l-9,4C10.3,20,10.1,20,10,20z"/>
+          </svg>
+                </div>
+                <p class="text-white-50">
+                    A professional package that comes with hundreds of UI components, forms, tables, charts, dashboards,
+                    pages and svg icons.
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-lg-2 offset-lg-2 mb-3 mb-md-0">
+                <h4 class="text-light fs-5">Company</h4>
+                <ul class="list-unstyled ps-0 mb-0 mt-3">
+                    <li class="mt-2"><a href="#" class="text-white-50">About Us</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Diversity & inclusion</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Blog</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Careers</a></li>
+                </ul>
+            </div>
+            <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
+                <h4 class="text-light fs-5">Resources</h4>
+                <ul class="list-unstyled ps-0 mb-0 mt-3">
+                    <li class="mt-2"><a href="#" class="text-white-50">Community</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Terms of service</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Report a vulnerability</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Brand kit</a></li>
+                </ul>
+            </div>
+            <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
+                <h4 class="text-light fs-5">Legals</h4>
+                <ul class="list-unstyled ps-0 mb-0 mt-3">
+                    <li class="mt-2"><a href="#" class="text-white-50">Refund policy</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Terms & conditions</a></li>
+                    <li class="mt-2"><a href="#" class="text-white-50">Privacy policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="text-white-50 mt-4 text-center mb-0">
+                    © 2024 AppStack
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
 <th:block th:fragment="js_code">
     <!-- JAVASCRIPT -->
-    <script th:src="@{/assets/vendor/jquery/dist/jquery.min.js}"></script>
-    <script th:src="@{/assets/vendor/popper.js/dist/umd/popper.min.js}"></script>
-    <script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
-    <script th:src="@{/assets/vendor/headroom.js/dist/headroom.min.js}"></script>
-    <script th:src="@{/assets/vendor/countup.js/dist/countUp.min.js}"></script>
-    <script th:src="@{/assets/vendor/jquery-countdown/dist/jquery.countdown.min.js}"></script>
-    <script th:src="@{/assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js}"></script>
-    <script th:src="@{/assets/vendor/prismjs/prism.js}"></script>
-    <script th:src="@{/assets/vendor/chartist/dist/chartist.min.js}"></script>
-    <script th:src="@{/assets/vendor/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js}"></script>
-    <script th:src="@{/assets/vendor/jqvmap/dist/jquery.vmap.min.js}"></script>
-    <script th:src="@{/assets/vendor/jqvmap/dist/maps/jquery.vmap.world.js}"></script>
-    <script th:src="@{/assets/js/rocket.js}"></script>
-
+    <script th:src="@{/assets/js/app.js}"></script>
     <script th:src="@{/assets/richTextEditor/jquery.richtext.min.js}"></script>
-
     <script th:src="@{/assets/js/common.js}" type="text/javascript"></script>
     <script th:src="@{/assets/js/jquery.number.min.js}" type="text/javascript"></script>
 

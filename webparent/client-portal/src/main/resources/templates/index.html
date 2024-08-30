@@ -1,48 +1,260 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/fragments :: page_head('Home', 'none')"></head>
+<html lang="en">
+
+<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+<head th:replace="fragments/fragments :: page_head('Home','none')"></head>
+
 <body>
-<header th:replace="fragments/fragments :: header"></header>
-<main>
-    <div th:replace="fragments/fragments :: loader"></div>
-    <section class="section-header pb-2 pb-lg-4 bg-soft">
-        <div class="container">
-            <div class="row justify-content-between align-items-center">
-                <div class="col-12 col-lg-6 order-2 order-lg-1">
-                    <img alt="Paykesho Illustration" class=" w-100" th:src="@{/images/payment1.jpg}">
+
+<nav th:replace="fragments/fragments :: navBar"></nav>
+
+<section class="landing-intro text-bg-dark pt-5 pt-lg-6 pb-5 pb-lg-7">
+    <div class="landing-intro-content container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mx-auto">
+                <span class="badge badge-subtle-primary p-1">Welcome</span>
+
+                <h1 class="my-4 text-white">AppStack is the perfect Admin Template <span class="text-primary">for your next project</span>
+                </h1>
+
+                <p class="text-lg text-white-50">A professional package that comes with hundreds of UI components,
+                    forms, tables, charts, dashboards, pages and svg icons.</p>
+
+                <div class="my-4">
+                    <div class="d-inline-block me-3">
+                        <h2 class="text-white">500+</h2>
+                        <span class="text-white-50">UI Components</span>
+                    </div>
+                    <div class="d-inline-block me-3">
+                        <h2 class="text-white">1500+</h2>
+                        <span class="text-white-50">SVG Icons</span>
+                    </div>
+                    <div class="d-inline-block">
+                        <h2 class="text-white">75+</h2>
+                        <span class="text-white-50">HTML Pages</span>
+                    </div>
                 </div>
-                <div class="col-12 col-lg-5 order-1 order-lg-2">
-                    <h1 class="display-2 mb-3">Effortless Payments, Empowered Tomorrow</h1>
-                    <p class="lead">With Paykesho, "Get lelo, Pay mailo" becomes a reality.</p>
-                    <div class="mt-4">
-                        <a class="btn btn-primary" th:href="@{/clients/register}">
-                            <i class="fas fa-lock mr-2"></i> Register
-                        </a>
+                <div class="my-4">
+                    <a href="https://themes.getbootstrap.com/product/appstack-responsive-admin-template/"
+                       target="_blank" class="btn btn-primary btn-lg btn-pill">Get Started</a>
+                </div>
+            </div>
+            <div class="col-lg-7 d-none d-lg-flex mx-auto text-center">
+                <div class="landing-intro-screenshot pb-3">
+                    <img th:src="@{/assets/img/payment1.jpg}" alt="Dark/Light Bootstrap Admin Template"
+                         class="img-fluid"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-6 bg-white">
+    <div class="container">
+        <div class="mb-5 text-center">
+            <span class="text-uppercase text-primary text-sm fw-medium mb-1 d-block">Features</span>
+            <h2 class="h1">Features you'll love</h2>
+            <p class="text-muted fs-lg">A responsive dashboard built for everyone who wants to create webapps on top of
+                Bootstrap.</p>
+        </div>
+        <div class="row text-start">
+            <div class="col-12 col-md-4">
+                <div class="d-flex align-items-start py-3">
+                    <div class="landing-feature">
+                        <i data-lucide="sliders"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mt-0">Customizable</h4>
+                        <p class="fs-lg">You don't need to be an expert to customize our themes. Our code is very
+                            readable and well documented.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="d-flex align-items-start py-3">
+                    <div class="landing-feature">
+                        <i data-lucide="smartphone"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mt-0">Fully Responsive</h4>
+                        <p class="fs-lg">With mobile, tablet & desktop support it doesn't matter what device you're
+                            using. AppStack is responsive in all browsers.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="d-flex align-items-start py-3">
+                    <div class="landing-feature">
+                        <i data-lucide="mail"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mt-0">Dev-to-dev Support</h4>
+                        <p class="fs-lg">Our themes are supported by specialists who provide quick and effective
+                            support. Usually an email reply takes &lt;24h.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="d-flex align-items-start py-3">
+                    <div class="landing-feature">
+                        <i data-lucide="chrome"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mt-0">Cross Browser</h4>
+                        <p class="fs-lg">Our themes are working perfectly with: Chrome, Firefox, Safari, Opera and IE
+                            11+. We're working hard to support them.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="d-flex align-items-start py-3">
+                    <div class="landing-feature">
+                        <i data-lucide="code"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mt-0">Clean Code</h4>
+                        <p class="fs-lg">We strictly follow Bootstrap's guidelines to make your integration as easy as
+                            possible. All code is handwritten.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="d-flex align-items-start py-3">
+                    <div class="landing-feature">
+                        <i data-lucide="download-cloud"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mt-0">Regular Updates</h4>
+                        <p class="fs-lg">From time to time you'll receive an update containing new components,
+                            improvements and bugfixes.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Contact Us Section -->
-    <section class="section section-lg bg-gradient-primary text-white">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-6 text-center">
-                    <h2 class="h1 font-weight-bolder mb-1">Get in Touch</h2>
-                    <p class="lead">Have questions or need support? Reach out to us anytime.</p>
-                    <a class="btn btn-secondary" href="contact.html">Contact Us</a>
-                </div>
-                <div class="col-12 col-md-6 text-center">
-                    <h2 class="h1 font-weight-bolder mb-1">Frequently Asked Questions</h2>
-                    <p class="lead">Find answers to the most common questions about Paykesho.</p>
-                    <a class="btn btn-secondary" href="faq.html">Read FAQs</a>
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="mb-5 text-center">
+            <span class="text-uppercase text-primary text-sm fw-medium mb-1 d-block">FAQ</span>
+            <h2 class="h1">Frequently asked questions</h2>
+            <p class="text-muted fs-lg">Here are some of the answers you might be looking for.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-9 col-lg-8 mx-auto">
+                <div class="accordion" id="accordionFaq">
+                    <div class="card border mb-3">
+                        <div class="card-header cursor-pointer" id="faqOne" data-bs-toggle="collapse"
+                             data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h6 class="mb-0">
+                                Does it work with Rails? Laravel? ASP.NET? Django?
+                            </h6>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="faqOne"
+                             data-bs-parent="#accordionFaq">
+                            <div class="card-body py-3">
+                                Yes! We have a Django sample project, featuring allauth, debug-toolbar and crispy-forms,
+                                as well as documentation on how to use it with Pip, Pipenv and Docker To
+                                get the sample project, please reach out to us at <a
+                                    href="mailto:support@bootlab.io?subject=I+would+love+to+receive+the+Django+version+of+AppStack&body=Order+ID">support@bootlab.io</a>
+                                with your order ID.<br/><br/> For all other frameworks (Rails, Laravel, ASP.NET, etc) we
+                                recommend including the compiled CSS/JS files directly in your
+                                application. If you want to enable deeper customization, you can integrate it into your
+                                assets pipeline or build processes. <a
+                                    href="https://themes.getbootstrap.com/guide/#integrating-with-frameworks"
+                                    target="_blank" rel="noopener noreferrer nofollow">Read more here</a>.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border mb-3">
+                        <div class="card-header cursor-pointer" id="faqTwo" data-bs-toggle="collapse"
+                             data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                            <h6 class="mb-0">
+                                Can I use the static HTML, CSS and JS files?
+                            </h6>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="faqTwo" data-bs-parent="#accordionFaq">
+                            <div class="card-body py-3">
+                                Absolutely. You can bypass the Webpack build step completely and simply edit the static
+                                HTML, CSS and JS files included in the package.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border mb-3">
+                        <div class="card-header cursor-pointer" id="faqThree" data-bs-toggle="collapse"
+                             data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h6 class="mb-0">
+                                Is there any support included?
+                            </h6>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="faqThree"
+                             data-bs-parent="#accordionFaq">
+                            <div class="card-body py-3">
+                                You have access to the Software's online support services via email for six (6) months
+                                from the purchase date. Please contact us at <a href="mailto:info@bootlab.io">info@bootlab.io</a>
+                                for any questions.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border mb-3">
+                        <div class="card-header cursor-pointer" id="faqFour" data-bs-toggle="collapse"
+                             data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            <h6 class="mb-0">
+                                How do I get a receipt for my purchase?
+                            </h6>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="faqFour"
+                             data-bs-parent="#accordionFaq">
+                            <div class="card-body py-3">
+                                You'll receive an email from Bootstrap themes once your purchase is complete. More info
+                                can be found <a
+                                    href="https://themes.zendesk.com/hc/en-us/articles/360000011052-How-do-I-get-a-receipt-for-my-purchase-"
+                                    rel="noopener noreferrer" target="_blank">here</a>.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border mb-3">
+                        <div class="card-header cursor-pointer" id="faqFive" data-bs-toggle="collapse"
+                             data-bs-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                            <h6 class="mb-0">
+                                What methods of payments are supported?
+                            </h6>
+                        </div>
+                        <div id="collapseFive" class="collapse" aria-labelledby="faqFive"
+                             data-bs-parent="#accordionFaq">
+                            <div class="card-body py-3">
+                                You can purchase the themes on Bootstrap Themes via any major credit/debit card (via
+                                Stripe) or with your Paypal account. We don't support cryptocurrencies or invoicing
+                                at this time.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer th:replace="fragments/fragments :: footer"></footer>
-</main>
+<section class="py-6">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-12 col-md-9 col-lg-8 col-xl-6 mx-auto">
+                <h2 class="h1 mb-3">
+                    Join over 5,000 developers who are already working with our products
+                </h2>
+                <a href="https://themes.getbootstrap.com/product/appstack-responsive-admin-template/" target="_blank"
+                   class="align-middle btn btn-success btn-pill btn-lg mt-n1">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="fragments/fragments :: footer()"></footer>
+
 <footer th:replace="fragments/fragments :: js_code"></footer>
+
 </body>
+
 </html>

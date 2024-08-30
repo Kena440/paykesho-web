@@ -42,6 +42,16 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping("/faq")
+    public String viewFAQPage(Model model) {
+        Country country = settingService.getCountryByName("Zambia");
+        model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
+
+        if (country != null) model.addAttribute("country", country);
+
+        return "faq";
+    }
+
     @GetMapping("/login")
     public String viewLoginPage(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
