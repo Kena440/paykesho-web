@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
-<div class="modal fade text-center" id="modalDialog" th:fragment="modal_dialog">
+<div aria-hidden="true" aria-labelledby="modalDialog" class="modal fade" role="dialog"
+     tabindex="-1" id="modalDialog" th:fragment="modal_dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -20,7 +21,8 @@
     </div>
 </div>
 
-<div class="modal fade text-center" id="confirmModal" th:fragment="confirm_modal">
+<div aria-hidden="true" aria-labelledby="confirm_modal" class="modal fade" role="dialog"
+     tabindex="-1" id="confirmModal" th:fragment="confirm_modal">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">

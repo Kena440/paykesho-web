@@ -45,44 +45,44 @@
                                                th:field="*{salutation}" type="text">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Password</label>
+                                        <label class="form-label">Name</label>
                                         <input class="form-control" placeholder="Name" required
                                                th:field="*{name}" type="text">
                                     </div>
                                     <div class="mb-3">
 
-                                        <label class="form-label">Password</label>
+                                        <label class="form-label">NRC</label>
                                         <input class="form-control" placeholder="NRC" required
                                                th:field="*{nrc}" type="text">
                                     </div>
                                     <div class="mb-3">
 
-                                        <label class="form-label">Password</label>
+                                        <label class="form-label">Phone Number</label>
                                         <input class="form-control" placeholder="Phone Number" required
                                                th:field="*{phoneNumber}" type="text">
                                     </div>
                                     <div class="mb-3">
 
-                                        <label class="form-label">Password</label>
+                                        <label class="form-label">TPIN</label>
                                         <input class="form-control" placeholder="TPIN" required
                                                th:field="*{tpin}" type="text">
                                     </div>
                                     <div class="mb-3">
 
-                                        <label class="form-label">Password</label>
+                                        <label class="form-label">Man Number</label>
                                         <input class="form-control" placeholder="Man Number" required
                                                th:field="*{manNumber}" type="text">
                                     </div>
                                     <div class="mb-3">
 
-                                        <label class="form-label">Password</label>
+                                        <label class="form-label">Gender</label>
                                         <select class="form-control"
                                                 placeholder="Gender" required
                                                 th:field="*{genderType}">
                                             <option selected value="">Select Gender</option>
                                             <option th:each="os : ${T(org.commons.enums.GenderType).values()}"
                                                     th:text="${os}"
-                                                    th:value="${os}"/>
+                                                    th:value="${os}"></option>
                                         </select>
                                     </div>
                                 </div>
@@ -100,7 +100,7 @@
                                                 th:field="*{clientType}">
                                             <option th:each="os : ${T(org.commons.enums.ClientType).values()}"
                                                     th:text="${os}"
-                                                    th:value="${os}"/>
+                                                    th:value="${os}"></option>
                                         </select>
                                     </div>
 
@@ -112,7 +112,7 @@
                                             <option selected value="">Select Organization</option>
                                             <option th:each="os : ${organizationList}"
                                                     th:text="${os}"
-                                                    th:value="${os.id}"/>
+                                                    th:value="${os.id}"></option>
                                         </select>
 
                                     </div>
