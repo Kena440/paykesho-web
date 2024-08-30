@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -36,32 +37,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/**").permitAll();
-        http.authorizeRequests()
-                .antMatchers("/client").authenticated()
-                .and()
-                .formLogin()
-                .loginPage("/login")
-                .usernameParameter("email")
-                .permitAll()
-                .and()
-                .oauth2Login()
-                .loginPage("/login")
-                .userInfoEndpoint()
-                .userService(oAuth2UserService)
-                .and()
-                .and()
-                .logout()
-                .permitAll()
-                .and()
-                .rememberMe()
-                .key("1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ")
-                .tokenValiditySeconds(14 * 24 * 60 * 60);
+        http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.GET, "/api/**", "/clients/register", "/clients/save-client", "/clients/verify").permitAll();
+        http.authorizeRequests().antMatchers("/clients/dashboard").authenticated().and().formLogin().loginPage("/login").usernameParameter("email").successHandler(authenticationSuccessHandler()).permitAll().and().oauth2Login().loginPage("/login").userInfoEndpoint().userService(oAuth2UserService).and().and().logout().permitAll().and().rememberMe().key("1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ").tokenValiditySeconds(14 * 24 * 60 * 60);
 
-        http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
     }
 
     @Override
@@ -82,5 +61,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authProvider;
     }
 
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
 
 }

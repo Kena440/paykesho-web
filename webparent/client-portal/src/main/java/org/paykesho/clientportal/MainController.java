@@ -1,7 +1,5 @@
 package org.paykesho.clientportal;
 
-import org.commons.entity.client.Client;
-import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.events.service.EventsService;
@@ -15,8 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.List;
 
 @Controller
 public class MainController {
@@ -56,13 +52,7 @@ public class MainController {
     public String viewLoginPage(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            List<Country> countryList = clientService.countryList();
-            List<Organization> corporateList = organizationService.organizationListEnabled();
-
-            model.addAttribute("countryList", countryList);
-            model.addAttribute("corporateList", corporateList);
             model.addAttribute("pageTitle", "Sign Up");
-            model.addAttribute("customer", new Client());
             return "security/login";
         }
         return "redirect:/clients/dashboard";

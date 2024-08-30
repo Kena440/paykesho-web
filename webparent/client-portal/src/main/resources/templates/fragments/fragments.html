@@ -28,7 +28,7 @@
 
 <nav class="sidebar" id="sidebar" th:fragment="sidebarMenu">
     <div class="sidebar-content js-simplebar">
-        <a class='sidebar-brand' th:href="@{/}">
+        <a class='sidebar-brand' th:href="@{/clients/dashboard}">
             <img alt="logo" class="logo-img mb-0" height="40" th:src="@{/images/paykeshologo.png}" width="60">
             <span class="align-middle me-3">Paykesho</span>
         </a>
@@ -39,75 +39,42 @@
                 Navigation
             </li>
             <li class="sidebar-item">
-                <a class='sidebar-link' th:href="@{/}">
+                <a class='sidebar-link' th:href="@{/clients/dashboard}">
                     <i class="align-middle" data-lucide="home"></i> <span class="align-middle">Dashboard</span>
                 </a>
+            </li>
+            <li class="sidebar-item">
+                <a class='sidebar-link' th:href="@{/transactions/new}">
+                    <i class="align-middle" data-lucide="hand-coins"></i> <span class="align-middle">Pay</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#vouchers" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="ticket"></i> <span class="align-middle">Vouchers</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="vouchers">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers/request}">Request</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">History</a></li>
+                </ul>
             </li>
             <li class="sidebar-item">
                 <a class="sidebar-link collapsed" data-bs-target="#transactions" data-bs-toggle="collapse">
                     <i class="align-middle" data-lucide="list"></i> <span class="align-middle">Transactions</span>
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="transactions">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/transactions}">View All</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/transactions}">History</a></li>
                 </ul>
             </li>
             <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#icons" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="landmark"></i> <span class="align-middle">Financials</span>
+                <a class="sidebar-link collapsed" data-bs-target="#repayments" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="text-quote"></i> <span class="align-middle">Repayments</span>
                 </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="icons">
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-lucide.html'>Reports</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Projections</a>
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Configurations</a>
-                    </li>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="repayments">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/repayments/schedule}">Schedule</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/repayments}">History</a></li>
                 </ul>
             </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#merchants" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="shopping-cart"></i> <span class="align-middle">Merchants</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="merchants">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Reconciliation</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Configurations</a></li>
 
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#organizations" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="building"></i> <span
-                        class="align-middle">Organizations</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="organizations">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Reconciliation</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Configurations</a></li>
-
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#clients" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="users"></i> <span class="align-middle">Clients</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="clients">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Reconciliation</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Configurations</a></li>
-
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#siteadmin" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="settings"></i> <span
-                        class="align-middle">Site Administration</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="siteadmin">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/users}">User Mgt</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/settings}">Settings</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/integrations}">Integrations</a></li>
-
-                </ul>
-            </li>
 
         </ul>
 
@@ -131,7 +98,7 @@
     <a class="sidebar-toggle">
         <i class="hamburger align-self-center"></i>
     </a>
-    <h3 class="nav-link ">Back Office | [[${pageTitle}]]</h3>
+    <h3 class="nav-link ">Client Portal | [[${pageTitle}]]</h3>
     <ul class="navbar-nav">
         <li class="nav-item px-2 dropdown d-none d-sm-inline-block">
             <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
@@ -140,10 +107,6 @@
             </a>
             <div aria-labelledby="servicesDropdown" class="dropdown-menu dropdown-menu-start dropdown-mega">
                 <div class="d-md-flex align-items-start justify-content-start">
-                    <div class="dropdown-mega-list">
-                        <div class="dropdown-header">Merchants</div>
-                        <a class="dropdown-item" href="#">Reconciliation</a>
-                    </div>
                     <div class="dropdown-mega-list">
                         <div class="dropdown-header">Transactions</div>
                         <a class="dropdown-item" href="#">Reports</a>
@@ -345,7 +308,7 @@
                 <a class="nav-link dropdown-toggle d-none d-sm-inline-block" data-bs-toggle="dropdown" href="#">
                     <img alt="Chris Wood" class="img-fluid rounded-circle me-1 mt-n2 mb-n2"
                          height="40" th:src="@{/assets/img/avatars/avatar.jpg}" width="40"/> <span
-                        sec:authentication="principal.fullname"></span>
+                        sec:authentication="principal.username"></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class='dropdown-item' th:href="@{/my-account}"><i class="align-middle me-1"
@@ -392,9 +355,9 @@
             </li>
         </ul>
         <a th:href="@{/clients/register}" target="_blank"
-           class="btn btn-lg btn-success btn-pill my-2 my-sm-0 ms-3">Get Started</a>
+           class="btn btn-lg btn-success btn-pill text-black my-2 my-sm-0 ms-3">Get Started</a>
         <a th:href="@{/login}" target="_blank"
-           class="btn btn-lg btn-success btn-pill my-2 my-sm-0 ms-3">Sign In</a>
+           class="btn btn-lg btn-success btn-pill text-black my-2 my-sm-0 ms-3">Sign In</a>
     </div>
 </nav>
 
@@ -450,7 +413,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <p class="text-white-50 mt-4 text-center mb-0">
-                    © 2024 AppStack
+                    © 2024 Paykesho
                 </p>
             </div>
         </div>
@@ -549,6 +512,34 @@
 
 </div>
 
+<footer class="footer" th:fragment="footer1()">
+    <div class="container-fluid">
+        <div class="row text-muted">
+            <div class="col-6 text-start">
+                <ul class="list-inline">
+                    <li class="list-inline-item">
+                        <a class="text-muted" href="#">Support</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="text-muted" href="#">Help Center</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="text-muted" href="#">Privacy</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="text-muted" href="#">Terms of Service</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-6 text-end">
+                <p class="mb-0">
+                    &copy; 2024 - <a class='text-muted' th:href="@{/}">Paykesho</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
 <footer class="py-5 bg-dark" th:fragment="footer()">
     <div class="container">
         <div class="row mb-4">
@@ -600,7 +591,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <p class="text-white-50 mt-4 text-center mb-0">
-                    © 2024 AppStack
+                    © 2024 Paykesho
                 </p>
             </div>
         </div>
