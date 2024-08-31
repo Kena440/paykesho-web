@@ -50,7 +50,6 @@ public class VoucherController {
     @GetMapping("")
     public String showClientVouchers(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
         Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
-
         List<Voucher> voucherList = voucherService.getClientVouchers(client);
         model.addAttribute("client", client);
         model.addAttribute("voucherList", voucherList);

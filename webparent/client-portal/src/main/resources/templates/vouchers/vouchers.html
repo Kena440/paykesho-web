@@ -3,7 +3,7 @@
       data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
       lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
-<head th:replace="fragments/fragments :: page_head('Merchant Mgt','none')"></head>
+<head th:replace="fragments/fragments :: page_head('Voucher Mgt','none')"></head>
 <body>
 <div class="wrapper">
     <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
@@ -55,7 +55,9 @@
                                                 </a>
                                             </span>
                                         </td>
-                                        <td><span class="font-weight-normal" th:replace="fragments/fragments :: format_currency(${voucher.amount})"></span></td>
+                                        <td><span class="font-weight-normal"
+                                                  th:replace="fragments/fragments :: format_currency(${voucher.amount})"></span>
+                                        </td>
                                         <td>
                                             <th:block th:if="${voucher.approved == true}">
                                                 <div class="badge bg-success">

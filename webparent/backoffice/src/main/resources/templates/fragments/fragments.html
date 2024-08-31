@@ -109,6 +109,17 @@
                 </ul>
             </li>
             <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#vouchers" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="ticket"></i> <span class="align-middle">Vouchers</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="vouchers">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">Manage</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">Repayments</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">Configurations</a></li>
+
+                </ul>
+            </li>
+            <li class="sidebar-item">
                 <a class="sidebar-link collapsed" data-bs-target="#siteadmin" data-bs-toggle="collapse">
                     <i class="align-middle" data-lucide="settings"></i> <span
                         class="align-middle">Site Administration</span>
@@ -415,6 +426,22 @@
     <a class="fas fa-edit"
        th:href="@{${editURL}}"
        th:title="'Edit ' + ${entityName}">
+    </a>
+</div>
+
+<div th:fragment="approve(entityName, editURL)" th:remove="tag">
+    <a class="fas fa-check-circle"
+       th:href="@{${editURL}}"
+       th:title="'Approve ' + ${entityName}">
+        Approve
+    </a>
+</div>
+
+<div th:fragment="reject(entityName, editURL)" th:remove="tag">
+    <a class="fas fa-cancel"
+       th:href="@{${editURL}}"
+       th:title="'Reject ' + ${entityName}">
+        Reject
     </a>
 </div>
 

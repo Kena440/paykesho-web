@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('Vouchers','none')"></head>
+<body>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Voucher Management</h3>
+                    </div>
+
+                    <div class="col-auto ms-auto text-end mt-n1">
+
+                        <a class="btn btn-primary shadow-sm" th:href="@{/vouchers}">
+                            <i class="align-middle" data-lucide="list">&nbsp;</i> My Vouchers
+                        </a>
+                        <a class="btn btn-primary shadow-sm" th:href="@{/vouchers/request}">
+                            <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Request
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">[[${pageTitle}]]</h5>
+                                <h6 class="card-subtitle text-muted">Request for a quick voucher.</h6>
+                            </div>
+                            <div class="card-body">
+                                <form method="post"
+                                      th:action="@{/vouchers/save}"
+                                      th:object="${voucherRequest}">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Amount</label>
+                                                <input
+                                                        class="form-control" id="amount"
+                                                        max="999999" min="20"
+                                                        placeholder="amount"
+                                                        required
+                                                        step="0.1"
+                                                        th:field="*{amount}"
+                                                        type="number">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Reason</label>
+                                                <textarea class="form-control" id="reason" placeholder="Reason"
+                                                          required
+                                                          rows="3" th:field="*{reason}"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button class="btn btn-primary" type="submit">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </main>
+
+        <footer th:replace="fragments/fragments :: footer1()"></footer>
+    </div>
+</div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+</html>

@@ -31,7 +31,7 @@ public class VoucherService {
      * @return
      */
     public List<Voucher> listAll() {
-        return (List<Voucher>) voucherRepository.findAll(Sort.by("voucherRequestDate").descending());
+        return (List<Voucher>) voucherRepository.findAll(Sort.by("requestDate").descending());
     }
 
     /**

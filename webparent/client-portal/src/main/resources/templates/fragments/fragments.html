@@ -3,21 +3,21 @@
       xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="page_head(title, remove)" th:remove="${remove}">
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Responsive Bootstrap 5 Admin &amp; Dashboard Template">
-    <meta name="author" content="Bootlab">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <meta content="Responsive Bootstrap 5 Admin &amp; Dashboard Template" name="description">
+    <meta content="Bootlab" name="author">
 
     <title>Paykesho | Get lelo, Pay mailo | [[${title}]]</title>
 
     <link rel="shortcut icon" th:href="@{/assets/img/favicon/favicon.ico}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com/">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com/" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
-    <link th:href="@{/assets/css/app.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
     <!-- Remove this after purchasing -->
     <script th:src="@{/assets/js/settings.js}"></script>
     <!-- END SETTINGS -->
@@ -354,10 +354,10 @@
                 <a class="nav-link active text-lg px-lg-3" th:href="@{/contact}">Contact</a>
             </li>
         </ul>
-        <a th:href="@{/clients/register}" target="_blank"
-           class="btn btn-lg btn-success btn-pill text-black my-2 my-sm-0 ms-3">Get Started</a>
-        <a th:href="@{/login}" target="_blank"
-           class="btn btn-lg btn-success btn-pill text-black my-2 my-sm-0 ms-3">Sign In</a>
+        <a class="btn btn-lg btn-success btn-pill text-black my-2 my-sm-0 ms-3" target="_blank"
+           th:href="@{/clients/register}">Get Started</a>
+        <a class="btn btn-lg btn-success btn-pill text-black my-2 my-sm-0 ms-3" target="_blank"
+           th:href="@{/login}">Sign In</a>
     </div>
 </nav>
 
@@ -367,9 +367,9 @@
         <div class="row mb-4">
             <div class="col-12 col-lg-4">
                 <div class="mb-3">
-                    <svg style="fill:white;" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                         width="24px" height="24px" viewBox="0 0 20 20"
-                         enable-background="new 0 0 20 20" xml:space="preserve">
+                    <svg enable-background="new 0 0 20 20" height="24px" style="fill:white;" version="1.1" viewBox="0 0 20 20"
+                         width="24px" x="0px" xml:space="preserve"
+                         xmlns="http://www.w3.org/2000/svg" y="0px">
             <path d="M19.4,4.1l-9-4C10.1,0,9.9,0,9.6,0.1l-9,4C0.2,4.2,0,4.6,0,5s0.2,0.8,0.6,0.9l9,4C9.7,10,9.9,10,10,10s0.3,0,0.4-0.1l9-4
               C19.8,5.8,20,5.4,20,5S19.8,4.2,19.4,4.1z"/>
                         <path d="M10,15c-0.1,0-0.3,0-0.4-0.1l-9-4c-0.5-0.2-0.7-0.8-0.5-1.3c0.2-0.5,0.8-0.7,1.3-0.5l8.6,3.8l8.6-3.8c0.5-0.2,1.1,0,1.3,0.5
@@ -386,27 +386,27 @@
             <div class="col-12 col-md-4 col-lg-2 offset-lg-2 mb-3 mb-md-0">
                 <h4 class="text-light fs-5">Company</h4>
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
-                    <li class="mt-2"><a href="#" class="text-white-50">About Us</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Diversity & inclusion</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Blog</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Careers</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">About Us</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Diversity & inclusion</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Blog</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Careers</a></li>
                 </ul>
             </div>
             <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
                 <h4 class="text-light fs-5">Resources</h4>
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
-                    <li class="mt-2"><a href="#" class="text-white-50">Community</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Terms of service</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Report a vulnerability</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Brand kit</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Community</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Terms of service</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Report a vulnerability</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Brand kit</a></li>
                 </ul>
             </div>
             <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
                 <h4 class="text-light fs-5">Legals</h4>
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
-                    <li class="mt-2"><a href="#" class="text-white-50">Refund policy</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Terms & conditions</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Privacy policy</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Refund policy</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Terms & conditions</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Privacy policy</a></li>
                 </ul>
             </div>
         </div>
@@ -545,9 +545,9 @@
         <div class="row mb-4">
             <div class="col-12 col-lg-4">
                 <div class="mb-3">
-                    <svg style="fill:white;" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                         width="24px" height="24px" viewBox="0 0 20 20"
-                         enable-background="new 0 0 20 20" xml:space="preserve">
+                    <svg enable-background="new 0 0 20 20" height="24px" style="fill:white;" version="1.1" viewBox="0 0 20 20"
+                         width="24px" x="0px" xml:space="preserve"
+                         xmlns="http://www.w3.org/2000/svg" y="0px">
             <path d="M19.4,4.1l-9-4C10.1,0,9.9,0,9.6,0.1l-9,4C0.2,4.2,0,4.6,0,5s0.2,0.8,0.6,0.9l9,4C9.7,10,9.9,10,10,10s0.3,0,0.4-0.1l9-4
               C19.8,5.8,20,5.4,20,5S19.8,4.2,19.4,4.1z"/>
                         <path d="M10,15c-0.1,0-0.3,0-0.4-0.1l-9-4c-0.5-0.2-0.7-0.8-0.5-1.3c0.2-0.5,0.8-0.7,1.3-0.5l8.6,3.8l8.6-3.8c0.5-0.2,1.1,0,1.3,0.5
@@ -564,27 +564,27 @@
             <div class="col-12 col-md-4 col-lg-2 offset-lg-2 mb-3 mb-md-0">
                 <h4 class="text-light fs-5">Company</h4>
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
-                    <li class="mt-2"><a href="#" class="text-white-50">About Us</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Diversity & inclusion</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Blog</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Careers</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">About Us</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Diversity & inclusion</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Blog</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Careers</a></li>
                 </ul>
             </div>
             <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
                 <h4 class="text-light fs-5">Resources</h4>
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
-                    <li class="mt-2"><a href="#" class="text-white-50">Community</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Terms of service</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Report a vulnerability</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Brand kit</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Community</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Terms of service</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Report a vulnerability</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Brand kit</a></li>
                 </ul>
             </div>
             <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
                 <h4 class="text-light fs-5">Legals</h4>
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
-                    <li class="mt-2"><a href="#" class="text-white-50">Refund policy</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Terms & conditions</a></li>
-                    <li class="mt-2"><a href="#" class="text-white-50">Privacy policy</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Refund policy</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Terms & conditions</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Privacy policy</a></li>
                 </ul>
             </div>
         </div>

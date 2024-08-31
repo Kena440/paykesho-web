@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+<meta content="text/html;charset=UTF-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Home','none')"></head>
 
 <body>
@@ -21,14 +21,14 @@
             <div class="col-md-9 col-lg-8 mx-auto">
                 <div class="accordion" id="accordionFaq">
                     <div class="card border mb-3">
-                        <div class="card-header cursor-pointer" id="faqOne" data-bs-toggle="collapse"
-                             data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <div aria-controls="collapseOne" aria-expanded="true" class="card-header cursor-pointer"
+                             data-bs-target="#collapseOne" data-bs-toggle="collapse" id="faqOne">
                             <h6 class="mb-0">
                                 Does it work with Rails? Laravel? ASP.NET? Django?
                             </h6>
                         </div>
-                        <div id="collapseOne" class="collapse show" aria-labelledby="faqOne"
-                             data-bs-parent="#accordionFaq">
+                        <div aria-labelledby="faqOne" class="collapse show" data-bs-parent="#accordionFaq"
+                             id="collapseOne">
                             <div class="card-body py-3">
                                 Yes! We have a Django sample project, featuring allauth, debug-toolbar and crispy-forms,
                                 as well as documentation on how to use it with Pip, Pipenv and Docker To
@@ -39,18 +39,18 @@
                                 application. If you want to enable deeper customization, you can integrate it into your
                                 assets pipeline or build processes. <a
                                     href="https://themes.getbootstrap.com/guide/#integrating-with-frameworks"
-                                    target="_blank" rel="noopener noreferrer nofollow">Read more here</a>.
+                                    rel="noopener noreferrer nofollow" target="_blank">Read more here</a>.
                             </div>
                         </div>
                     </div>
                     <div class="card border mb-3">
-                        <div class="card-header cursor-pointer" id="faqTwo" data-bs-toggle="collapse"
-                             data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <div aria-controls="collapseTwo" aria-expanded="true" class="card-header cursor-pointer"
+                             data-bs-target="#collapseTwo" data-bs-toggle="collapse" id="faqTwo">
                             <h6 class="mb-0">
                                 Can I use the static HTML, CSS and JS files?
                             </h6>
                         </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="faqTwo" data-bs-parent="#accordionFaq">
+                        <div aria-labelledby="faqTwo" class="collapse" data-bs-parent="#accordionFaq" id="collapseTwo">
                             <div class="card-body py-3">
                                 Absolutely. You can bypass the Webpack build step completely and simply edit the static
                                 HTML, CSS and JS files included in the package.
@@ -58,14 +58,14 @@
                         </div>
                     </div>
                     <div class="card border mb-3">
-                        <div class="card-header cursor-pointer" id="faqThree" data-bs-toggle="collapse"
-                             data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                        <div aria-controls="collapseThree" aria-expanded="true" class="card-header cursor-pointer"
+                             data-bs-target="#collapseThree" data-bs-toggle="collapse" id="faqThree">
                             <h6 class="mb-0">
                                 Is there any support included?
                             </h6>
                         </div>
-                        <div id="collapseThree" class="collapse" aria-labelledby="faqThree"
-                             data-bs-parent="#accordionFaq">
+                        <div aria-labelledby="faqThree" class="collapse" data-bs-parent="#accordionFaq"
+                             id="collapseThree">
                             <div class="card-body py-3">
                                 You have access to the Software's online support services via email for six (6) months
                                 from the purchase date. Please contact us at <a href="mailto:info@bootlab.io">info@bootlab.io</a>
@@ -74,14 +74,14 @@
                         </div>
                     </div>
                     <div class="card border mb-3">
-                        <div class="card-header cursor-pointer" id="faqFour" data-bs-toggle="collapse"
-                             data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                        <div aria-controls="collapseFour" aria-expanded="true" class="card-header cursor-pointer"
+                             data-bs-target="#collapseFour" data-bs-toggle="collapse" id="faqFour">
                             <h6 class="mb-0">
                                 How do I get a receipt for my purchase?
                             </h6>
                         </div>
-                        <div id="collapseFour" class="collapse" aria-labelledby="faqFour"
-                             data-bs-parent="#accordionFaq">
+                        <div aria-labelledby="faqFour" class="collapse" data-bs-parent="#accordionFaq"
+                             id="collapseFour">
                             <div class="card-body py-3">
                                 You'll receive an email from Bootstrap themes once your purchase is complete. More info
                                 can be found <a
@@ -91,14 +91,14 @@
                         </div>
                     </div>
                     <div class="card border mb-3">
-                        <div class="card-header cursor-pointer" id="faqFive" data-bs-toggle="collapse"
-                             data-bs-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                        <div aria-controls="collapseFive" aria-expanded="true" class="card-header cursor-pointer"
+                             data-bs-target="#collapseFive" data-bs-toggle="collapse" id="faqFive">
                             <h6 class="mb-0">
                                 What methods of payments are supported?
                             </h6>
                         </div>
-                        <div id="collapseFive" class="collapse" aria-labelledby="faqFive"
-                             data-bs-parent="#accordionFaq">
+                        <div aria-labelledby="faqFive" class="collapse" data-bs-parent="#accordionFaq"
+                             id="collapseFive">
                             <div class="card-body py-3">
                                 You can purchase the themes on Bootstrap Themes via any major credit/debit card (via
                                 Stripe) or with your Paypal account. We don't support cryptocurrencies or invoicing
@@ -119,8 +119,8 @@
                 <h2 class="h1 mb-3">
                     Join over 5,000 developers who are already working with our products
                 </h2>
-                <a href="https://themes.getbootstrap.com/product/appstack-responsive-admin-template/" target="_blank"
-                   class="align-middle btn btn-success btn-pill btn-lg mt-n1">Get Started</a>
+                <a class="align-middle btn btn-success btn-pill btn-lg mt-n1" href="https://themes.getbootstrap.com/product/appstack-responsive-admin-template/"
+                   target="_blank">Get Started</a>
             </div>
         </div>
     </div>
