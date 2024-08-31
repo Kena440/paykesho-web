@@ -6,10 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 public class VoucherRequestDto {
-    private String merchant;
-    private BigDecimal voucherAmount;
+    private BigDecimal amount;
+    private String reason;
     //private String payslipFileName;
-    private String clientPaykeshoID;
-
-
 }

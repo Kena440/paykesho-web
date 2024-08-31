@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/clients/rest")
 public class ClientRestController {
     @Autowired
-    private ClientService customerService;
+    private ClientService clientService;
 
     @PostMapping("/check-email")
     public String checkCustomerEmail(Integer id, String email) {
-        return customerService.isEmailUnique(id, email) ? "OK" : "Duplicated";
+        return clientService.isEmailUnique(id, email) ? "OK" : "Duplicated";
     }
 }

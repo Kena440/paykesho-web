@@ -43,6 +43,9 @@ public class Voucher {
     @Column(name = "request_date", length = 128, nullable = false, unique = false)
     private Date requestDate;
 
+    @Column(name = "reason", length = 128, nullable = false)
+    private String reason;
+
     private boolean approved;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

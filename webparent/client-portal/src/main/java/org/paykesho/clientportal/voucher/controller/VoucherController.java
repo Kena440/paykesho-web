@@ -2,7 +2,6 @@ package org.paykesho.clientportal.voucher.controller;
 
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
-import org.commons.entity.merchant.Merchant;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.VoucherRequestDto;
 import org.paykesho.clientportal.clients.service.ClientService;
@@ -22,8 +21,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
@@ -38,7 +35,7 @@ import java.util.List;
 @RequestMapping("/vouchers")
 public class VoucherController {
     @Autowired
-    private ClientService customerService;
+    private ClientService clientService;
     @Autowired
     private VoucherService voucherService;
     @Autowired
@@ -50,43 +47,40 @@ public class VoucherController {
 /*    @Autowired
     private SMSNotificationService smsNotificationService;*/
 
-    @GetMapping("/client-vouchers")
+    @GetMapping("")
     public String showClientVouchers(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
-        Client client = customerService.getClientByCode(loggedInUser.getClient().getCode());
+        Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
         List<Voucher> voucherList = voucherService.getClientVouchers(client);
-        model.addAttribute("customer", client);
+        model.addAttribute("client", client);
         model.addAttribute("voucherList", voucherList);
         return "vouchers/vouchers";
     }
 
     @GetMapping("/request")
     public String showClientVoucherRequestForm(Model model) {
-
-        List<Merchant> merchantList = merchantService.listAllEnabledMerchants();
-        model.addAttribute("merchantList", merchantList);
         model.addAttribute("voucherRequest", new VoucherRequestDto());
-        return "vouchers/voucher_request";
+        return "vouchers/request";
     }
 
-    @PostMapping("/submit-request")
-    public String saveSubmittedRequest(VoucherRequestDto voucherRequestDto, @AuthenticationPrincipal ClientUserDetails loggedInUser, RedirectAttributes redirectAttributes, HttpServletRequest request, @RequestParam("image") MultipartFile multipartFile) throws IOException, PaykeshoError, MessagingException {
+    @PostMapping("/save")
+    public String saveSubmittedRequest(VoucherRequestDto voucherRequestDto, @AuthenticationPrincipal ClientUserDetails loggedInUser, RedirectAttributes redirectAttributes, HttpServletRequest request) throws IOException, PaykeshoError, MessagingException {
 
         Voucher voucher = new Voucher();
         Voucher savedVoucher = null;
-        Client client = customerService.getClientByCode(loggedInUser.getClient().getCode());
+        Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_VCR");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
         voucher.setReference(paykeshoRef);
         voucher.setApproved(false);
-        // voucher.setMerchant(voucherRequestDto.getMerchant());
+        voucher.setReason(voucherRequestDto.getReason());
         voucher.setClient(client);
-        voucher.setAmount(voucherRequestDto.getVoucherAmount());
-        voucher.setAvailableAmount(voucherRequestDto.getVoucherAmount());
+        voucher.setAmount(voucherRequestDto.getAmount());
+        voucher.setAvailableAmount(voucherRequestDto.getAmount());
         voucher.setRequestDate(new Date());
-
+        savedVoucher = voucherService.save(voucher);
         /*if (!multipartFile.isEmpty()) {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
             voucher.setPayslipFile(fileName);
@@ -105,11 +99,11 @@ public class VoucherController {
             savedVoucher = voucherService.save(voucher);
         }*/
 
-        sendNotifications(request, savedVoucher, paykeshoRef);
+        //sendNotifications(request, savedVoucher, paykeshoRef);
 
         redirectAttributes.addFlashAttribute("message", "Voucher request submitted. Kindly wait for processing. #" + paykeshoRef);
 
-        return "redirect:/vouchers/client-vouchers";
+        return "redirect:/vouchers";
     }
 
     private void sendNotifications(HttpServletRequest request, Voucher voucher, String paykeshoRef) throws MessagingException, UnsupportedEncodingException {

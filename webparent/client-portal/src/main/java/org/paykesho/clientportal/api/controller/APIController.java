@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class APIController {
 
   /*  @Autowired
-    private CustomerService customerService;
+    private CustomerService clientService;
     @Autowired
     private CorporateService corporateService;
     @Autowired
@@ -38,7 +38,7 @@ public class APIController {
             if (authentication.isAuthenticated()) {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 CustomerUserDetails userDetails = (CustomerUserDetails) authentication.getPrincipal();
-                Client client = customerService.getClientByPaykeshoId(userDetails.getPaykeshoId());
+                Client client = clientService.getClientByPaykeshoId(userDetails.getPaykeshoId());
 
                 response.put("error", false);
                 response.put("user", client);
@@ -63,7 +63,7 @@ public class APIController {
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
         try {
-            if (customerService.getCustomerByEmail(signUpDto.getEmail()) == null) {
+            if (clientService.getCustomerByEmail(signUpDto.getEmail()) == null) {
 
                 Corporate corporate = corporateService.getCorporateByName(signUpDto.getCorporate());
                 Country country = settingService.getCountryByName(signUpDto.getCountry());
@@ -84,7 +84,7 @@ public class APIController {
                 client.setEmail(signUpDto.getEmail());
                 client.setPassword(signUpDto.getPassword());
 
-                customerService.registerCustomer(client);
+                clientService.registerCustomer(client);
 
                 response.put("error", false);
                 response.put("client", client);
@@ -110,7 +110,7 @@ public class APIController {
 
         try {
             if (clientId != null) {
-                Client client = customerService.getClientById(clientId).get();
+                Client client = clientService.getClientById(clientId).get();
 
                 List<VoucherDto> clientVoucherList = voucherService.getClientVouchersFlat(client);
                 response.put("error", false);
@@ -134,7 +134,7 @@ public class APIController {
 
         try {
             if (userId != null && !merchantCode.isEmpty()) {
-                Client client = customerService.getClientById(userId).get();
+                Client client = clientService.getClientById(userId).get();
                 MerchantDto merchant = merchantService.getMerchantByCode(merchantCode);
 
                 List<VoucherDto> clientVoucherList = voucherService.getClientVouchersByMerchantFlat(client, merchant);
@@ -182,7 +182,7 @@ public class APIController {
 
         try {
             if (clientId != null) {
-                Client client = customerService.getClientById(clientId).get();
+                Client client = clientService.getClientById(clientId).get();
 
                 List<TransactionDto> clientTransactionList = transactionsService.getClientTransactionsFlat(client);
                 response.put("error", false);
@@ -233,7 +233,7 @@ public class APIController {
             if (voucherRequestDto.getClientPaykeshoID() != null) {
                 Voucher voucher = new Voucher();
                 Voucher savedVoucher;
-                Client client = customerService.getClientByPaykeshoId(voucherRequestDto.getClientPaykeshoID());
+                Client client = clientService.getClientByPaykeshoId(voucherRequestDto.getClientPaykeshoID());
                 Merchant merchantFromDB = merchantService.getMerchantByName(voucherRequestDto.getMerchant());
 
                 String paykeshoRef = paykeshoReferenceService.generatePaykeshoId("ITEM_REQ_VCR");
@@ -293,7 +293,7 @@ public class APIController {
         try {
             if (paymentDto != null) {
 
-                Client client = customerService.getClientById(paymentDto.getClientId()).get();
+                Client client = clientService.getClientById(paymentDto.getClientId()).get();
 
                 Transaction trx = runPaymentSubmission(client, paymentDto);
 

@@ -56,7 +56,7 @@ public class TransactionController {
     @GetMapping("/client-transactions")
     public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser,
                                          Model model) throws PaykeshoError {
-        Client client = clientService.getClientByCode(loggedInUser.getClient().getCode());
+        Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
         List<Transaction> transactionList = transactionsService.getClientTransactions(client);
         model.addAttribute("customer", client);
@@ -68,7 +68,7 @@ public class TransactionController {
     public String showClientTransactionPaymentForm(
             @AuthenticationPrincipal ClientUserDetails loggedInUser,
             Model model) throws PaykeshoError {
-        Client client = clientService.getClientByCode(loggedInUser.getClient().getCode());
+        Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
         List<Voucher> voucherList = voucherService.getApprovedAndValidClientVouchers(client);
         model.addAttribute("voucherList", voucherList);
         // model.addAttribute("payment", new PaymentDto());
@@ -82,7 +82,7 @@ public class TransactionController {
             Model model,
             HttpServletRequest request) throws IOException, PaykeshoError, MessagingException {
 
-        Client client = clientService.getClientByCode(loggedInUser.getClient().getCode());
+        Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
         Transaction trx = runPaymentSubmission(client, request);
 

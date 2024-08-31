@@ -20,6 +20,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -50,16 +51,15 @@ public class ClientController {
     private SettingService settingService;
 
     @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
+    public String showDashboard(Model model, @AuthenticationPrincipal ClientUserDetails loggedInUser) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Client client;
 
         if (principal instanceof UserDetails) {
-            // String paykeshoId = ((ClientUserDetails) principal).getCode();
-            String paykeshoId = ((ClientUserDetails) principal).getClient().getEmail();
-            client = clientService.getClientByEmail(paykeshoId);
+            client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
+
             String greeting = null;
             LocalTime currentTime = LocalTime.now();
 
