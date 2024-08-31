@@ -108,4 +108,9 @@ public class Client extends IdBasedEntity {
         }
         return Constants.S3_BASE_URI + "/client_logos/" + this.id + "/" + this.photos;
     }
+
+    @Override
+    public String toString() {
+        return salutation + ". " + name;
+    }
 }

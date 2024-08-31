@@ -34,6 +34,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalTime;
 import java.util.List;
 
 @Controller
@@ -56,8 +57,21 @@ public class ClientController {
         Client client;
 
         if (principal instanceof UserDetails) {
-            String paykeshoId = ((ClientUserDetails) principal).getCode();
-            client = clientService.getClientByCode(paykeshoId);
+            // String paykeshoId = ((ClientUserDetails) principal).getCode();
+            String paykeshoId = ((ClientUserDetails) principal).getClient().getEmail();
+            client = clientService.getClientByEmail(paykeshoId);
+            String greeting = null;
+            LocalTime currentTime = LocalTime.now();
+
+            if (currentTime.isBefore(LocalTime.NOON)) {
+                greeting = "Good Morning";
+            } else if (currentTime.isBefore(LocalTime.of(17, 0))) {
+                greeting = "Good Afternoon";
+            } else {
+                greeting = "Good Evening";
+            }
+
+            model.addAttribute("greeting", greeting);
             model.addAttribute("client", client);
         }
 
