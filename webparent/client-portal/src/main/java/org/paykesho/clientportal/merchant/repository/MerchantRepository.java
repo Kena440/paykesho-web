@@ -18,10 +18,10 @@ public interface MerchantRepository extends JpaRepository<Merchant, Integer> {
     @Query("select count(m.id) as total from Merchant m")
     public Long countAllMerchants();
 
-    @Query("select new org.paykesho.clientportal.api.dto.MerchantDto(m.id, m.code, m.name, m.details, m.photos) from Merchant m where m.enabled = true order by m.name desc")
+    @Query("select new org.paykesho.clientportal.api.dto.MerchantDto(m.id, m.code, m.name, m.merchantType, m.photos) from Merchant m where m.enabled = true order by m.name desc")
     List<MerchantDto> findAllEnabledMerchantsFlat();
 
-    @Query("select new org.paykesho.clientportal.api.dto.MerchantDto(m.id, m.code, m.name, m.details, m.photos) from Merchant m where m.code = :code")
+    @Query("select new org.paykesho.clientportal.api.dto.MerchantDto(m.id, m.code, m.name, m.merchantType, m.photos) from Merchant m where m.code = :code")
     MerchantDto getMerchantByPaykeshoId(@Param("code") String code);
 
     @Query("select m from Merchant m where m.code = :code")
