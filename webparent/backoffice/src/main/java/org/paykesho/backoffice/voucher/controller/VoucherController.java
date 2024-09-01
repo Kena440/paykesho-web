@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -62,14 +61,14 @@ public class VoucherController {
         return "vouchers/voucher_view_modal";
     }
 
-    @PostMapping("/approve/{id}")
+    @GetMapping("/approve/{id}")
     public String approveVoucherRequest(@PathVariable("id") Integer voucherId, HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
         Voucher approvedVoucher = runVoucherApprovalProcess(voucherId, request);
         redirectAttributes.addFlashAttribute("message", "Voucher has been approved #" + approvedVoucher.getReference());
         return "redirect:/vouchers";
     }
 
-    @PostMapping("/adjust")
+    @GetMapping("/adjust")
     public String adjustVoucherRequest(HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
         Voucher adjustedVoucher = runVoucherAdjustmentProcess(request);
         redirectAttributes.addFlashAttribute("message", "Voucher has been adjusted #" + adjustedVoucher.getReference());
@@ -87,7 +86,7 @@ public class VoucherController {
         Voucher voucher = getVoucherOrThrow(voucherId);
         updateVoucherForApproval(voucher, request);
         Voucher approvedVoucher = voucherService.save(voucher);
-        sendNotification(approvedVoucher, "APPROVAL", null);
+        //sendNotification(approvedVoucher, "APPROVAL", null);
         return approvedVoucher;
     }
 
@@ -116,7 +115,8 @@ public class VoucherController {
     }
 
     private void updateVoucherForApproval(Voucher voucher, HttpServletRequest request) {
-        voucher.setInterestPercent(Float.parseFloat(request.getParameter("voucherInterestPercent")));
+        //voucher.setInterestPercent(Float.parseFloat(request.getParameter("voucherInterestPercent")));
+        voucher.setInterestPercent(30);
         BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.CEILING);
         voucher.setRepaymentAmount(totalRepaymentAmount);
         voucher.setApproved(true);

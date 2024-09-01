@@ -4,6 +4,8 @@ import org.commons.entity.Transaction;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.clientportal.api.dto.MerchantDto;
+import org.paykesho.clientportal.api.dto.PaymentDto;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.merchant.service.MerchantService;
@@ -14,6 +16,8 @@ import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,21 +25,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/transactions")
 public class TransactionController {
+
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -48,97 +53,85 @@ public class TransactionController {
     private PaykeshoReferenceService paykeshoReferenceService;
     @Autowired
     private TransactionsService transactionsService;
-/*
-    @Autowired
-    private SMSNotificationService smsNotificationService;
-*/
 
-    @GetMapping("/client-transactions")
-    public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser,
-                                         Model model) throws PaykeshoError {
+    @GetMapping("")
+    public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
         Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
-
         List<Transaction> transactionList = transactionsService.getClientTransactions(client);
         model.addAttribute("customer", client);
         model.addAttribute("transactionList", transactionList);
+        model.addAttribute("pageTitle", "My Transactions");
+
         return "transactions/transactions";
     }
 
-    @GetMapping("/pay-merchant")
-    public String showClientTransactionPaymentForm(
-            @AuthenticationPrincipal ClientUserDetails loggedInUser,
-            Model model) throws PaykeshoError {
+    @GetMapping("/initiate")
+    public String showClientTransactionPaymentForm(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
         Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
         List<Voucher> voucherList = voucherService.getApprovedAndValidClientVouchers(client);
         model.addAttribute("voucherList", voucherList);
-        // model.addAttribute("payment", new PaymentDto());
-        return "merchants/pay_merchant";
+        model.addAttribute("paymentDto", new PaymentDto());
+        model.addAttribute("pageTitle", "Initiate Transaction");
+
+        return "transactions/initiate";
     }
 
-    @PostMapping("/submit-payment")
-    public String saveSubmittedPayment(
-            @AuthenticationPrincipal ClientUserDetails loggedInUser,
-            RedirectAttributes redirectAttributes,
-            Model model,
-            HttpServletRequest request) throws IOException, PaykeshoError, MessagingException {
+    @PostMapping("/confirm")
+    public ResponseEntity<?> saveSubmittedPayment(@AuthenticationPrincipal ClientUserDetails loggedInUser, @RequestBody Map<String, String> requestBody) throws PaykeshoError {
 
-        Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
+        String merchantCode = requestBody.get("merchantCode");
+        String amountStr = requestBody.get("amount");
 
-        Transaction trx = runPaymentSubmission(client, request);
+        try {
+            BigDecimal amount = new BigDecimal(amountStr);
+            Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
-        return "transactions/" + (!trx.getReference().isEmpty() ? "payment_success" : "payment_fail");
+            // Verify Merchant
+            MerchantDto merchant = merchantService.getMerchantByCode(merchantCode);
+            if (merchant == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
+            }
+
+            // Run Payment Submission
+            Transaction trx = runPaymentSubmission(client, merchant, amount);
+
+            if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
+                return ResponseEntity.ok(Collections.singletonMap("success", true));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment failed. Please try again."));
+            }
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "An error occurred while processing your payment."));
+        }
     }
 
-    private Transaction runPaymentSubmission(Client client, HttpServletRequest request) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
-
+    private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, BigDecimal amount) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_TRX");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
-        int voucherId = Integer.parseInt(request.getParameter("voucherAmount").split("-")[0]);
-        String transactionNarration = request.getParameter("transactionNarration");
+        BigDecimal availableBalance = voucherService.getApprovedAndValidClientVouchersBalance(client);
+        if (availableBalance == null || availableBalance.compareTo(amount) < 0) {
+            throw new PaykeshoError("error processing payment. payment amount is larger or insufficient balance.");
+        }
 
-        Voucher voucher = voucherService.getVoucherById(voucherId);
-
-        if (voucher == null) throw new PaykeshoError("voucher doesnt exist");
-
-        BigDecimal voucherAvailableAmount = voucher.getAvailableAmount();
-        BigDecimal paymentAmount = BigDecimal.valueOf(Long.parseLong(request.getParameter("transactionAmount")));
-        String meterAccountNumber = request.getParameter("meterAccountNumber");
-
-        if (voucherAvailableAmount.compareTo(paymentAmount) == -1)
-            throw new PaykeshoError("error processing payment. payment amount is larger");
-        BigDecimal newVoucherAvailableAmount = voucherAvailableAmount.subtract(paymentAmount);
-
-        voucher.setAvailableAmount(newVoucherAvailableAmount);
-        Voucher updateVoucher = voucherService.save(voucher);
+        BigDecimal newVoucherAvailableAmount = availableBalance.subtract(amount);
 
         Transaction transaction = new Transaction();
         transaction.setClient(client);
-        // transaction.setMerchant(voucher.getMerchant());
-        transaction.setAmount(paymentAmount);
+        transaction.setMerchant(merchantService.getMerchantByPaykeshoRef(merchantDto.getCode()));
+        transaction.setAmount(amount);
         transaction.setReference(paykeshoRef);
-        transaction.setVoucher(updateVoucher);
+        transaction.setNaration(paykeshoRef);
         transaction.setTxnDate(new Date());
-        transaction.setNaration(transactionNarration);
-        // if (!meterAccountNumber.isEmpty()) transaction.setMeterAccountNumber(meterAccountNumber);
 
-     /*   try {
-            //sendNotifications(transaction, paykeshoRef);
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }*/
+        // Uncomment if voucher update is necessary
+        // Voucher updateVoucher = voucherService.updateVoucherAvailableAmount(client, newVoucherAvailableAmount);
+        // transaction.setVoucher(updateVoucher);
 
-        return (transactionsService.save(transaction));
-
+        return transactionsService.save(transaction);
     }
-
-/*
-    private void sendNotifications(Transaction transaction, String paykeshoRef) throws MessagingException, UnsupportedEncodingException {
-        sendPaymentEmail(transaction);
-        smsNotificationService.send(new SMSDto(transaction.getClient().getPhoneNumber(), (!transaction.getReference()().isEmpty()) ? "Payment successful. Kindly wait for processing. #" + paykeshoRef : "Payment failed. Please try again later"));
-        smsNotificationService.send(new SMSDto(transaction.getMerchant().getPhoneNumber(), (!transaction.getReference()().isEmpty()) ? "Payment of goods received. Kindly note transaction id. #" + paykeshoRef : "Payment failed."));
-    }
-*/
 
     private void sendPaymentEmail(Transaction transaction) throws MessagingException, UnsupportedEncodingException {
         EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
@@ -146,10 +139,7 @@ public class TransactionController {
 
         String toAddress = transaction.getClient().getEmail();
         String subject = "Paykesho Payment #" + transaction.getReference();
-        String content = "<p>Hello, </p>" +
-                "<p>You made a payment successfully of \"" + transaction.getAmount() + "\" to \"" + transaction.getMerchant().getName() + "\". Transaction Reference: \"" + transaction.getReference() + "\"</p>" +
-                "<br>" +
-                "<p>Get lelo, Pay Mailo. </p>";
+        String content = "<p>Hello, </p>" + "<p>You made a payment successfully of \"" + transaction.getAmount() + "\" to \"" + transaction.getMerchant().getName() + "\". Transaction Reference: \"" + transaction.getReference() + "\"</p>" + "<br>" + "<p>Get lelo, Pay Mailo. </p>";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
@@ -157,7 +147,6 @@ public class TransactionController {
         helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
         helper.setTo(toAddress);
         helper.setSubject(subject);
-
         helper.setText(content, true);
 
         mailSender.send(mimeMessage);

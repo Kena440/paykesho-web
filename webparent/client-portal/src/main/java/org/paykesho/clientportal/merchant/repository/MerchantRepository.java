@@ -23,4 +23,7 @@ public interface MerchantRepository extends JpaRepository<Merchant, Integer> {
 
     @Query("select new org.paykesho.clientportal.api.dto.MerchantDto(m.id, m.code, m.name, m.details, m.photos) from Merchant m where m.code = :code")
     MerchantDto getMerchantByPaykeshoId(@Param("code") String code);
+
+    @Query("select m from Merchant m where m.code = :code")
+    Merchant getMerchantByPaykeshoRef(@Param("code") String code);
 }

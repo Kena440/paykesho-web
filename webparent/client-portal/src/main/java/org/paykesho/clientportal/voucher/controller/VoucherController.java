@@ -53,12 +53,16 @@ public class VoucherController {
         List<Voucher> voucherList = voucherService.getClientVouchers(client);
         model.addAttribute("client", client);
         model.addAttribute("voucherList", voucherList);
+        model.addAttribute("pageTitle", "My Vouchers");
+
         return "vouchers/vouchers";
     }
 
     @GetMapping("/request")
     public String showClientVoucherRequestForm(Model model) {
         model.addAttribute("voucherRequest", new VoucherRequestDto());
+        model.addAttribute("pageTitle", "Voucher Request");
+
         return "vouchers/request";
     }
 

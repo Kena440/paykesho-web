@@ -8,6 +8,7 @@ import org.paykesho.clientportal.voucher.repository.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -38,6 +39,17 @@ public class VoucherService {
         } else {
             return voucherRepository.getApprovedAndValidVouchers(client);
         }
+    }
+
+    public BigDecimal getApprovedAndValidClientVouchersBalance(Client client) throws PaykeshoError {
+        List<Voucher> vouchers = getApprovedAndValidClientVouchers(client);
+        BigDecimal totalBalance = BigDecimal.ZERO;
+
+        for (Voucher voucher : vouchers) {
+            totalBalance = totalBalance.add(voucher.getAmount());
+        }
+
+        return totalBalance;
     }
 
     public Voucher getVoucherById(Integer id) {

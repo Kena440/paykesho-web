@@ -25,6 +25,10 @@ public class MerchantService {
         return merchantRepository.getMerchantByMerchantName(merchant);
     }
 
+    public Merchant getMerchantByPaykeshoRef(String code) {
+        return merchantRepository.getMerchantByPaykeshoRef(code);
+    }
+
     public MerchantDto getMerchantByCode(String code) {
         return merchantRepository.getMerchantByPaykeshoId(code);
     }

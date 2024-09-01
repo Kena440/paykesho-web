@@ -1,7 +1,6 @@
 package org.paykesho.clientportal.clients.controller;
 
 import org.commons.entity.client.Client;
-import org.commons.entity.merchant.Merchant;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.ClientType;
@@ -14,6 +13,7 @@ import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2User;
 import org.paykesho.clientportal.settings.email.EmailSettingBag;
 import org.paykesho.clientportal.settings.service.SettingService;
+import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -35,6 +35,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -49,9 +50,25 @@ public class ClientController {
     private OrganizationService organizationService;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private VoucherService voucherService;
+
+    private static String getGreeting() {
+        String greeting = null;
+        LocalTime currentTime = LocalTime.now();
+
+        if (currentTime.isBefore(LocalTime.NOON)) {
+            greeting = "Good Morning";
+        } else if (currentTime.isBefore(LocalTime.of(17, 0))) {
+            greeting = "Good Afternoon";
+        } else {
+            greeting = "Good Evening";
+        }
+        return greeting;
+    }
 
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, @AuthenticationPrincipal ClientUserDetails loggedInUser) {
+    public String showDashboard(Model model, @AuthenticationPrincipal ClientUserDetails loggedInUser) throws PaykeshoError {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -60,23 +77,15 @@ public class ClientController {
         if (principal instanceof UserDetails) {
             client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
-            String greeting = null;
-            LocalTime currentTime = LocalTime.now();
-
-            if (currentTime.isBefore(LocalTime.NOON)) {
-                greeting = "Good Morning";
-            } else if (currentTime.isBefore(LocalTime.of(17, 0))) {
-                greeting = "Good Afternoon";
-            } else {
-                greeting = "Good Evening";
-            }
+            String greeting = getGreeting();
+            BigDecimal availableBalance = voucherService.getApprovedAndValidClientVouchersBalance(client);
 
             model.addAttribute("greeting", greeting);
             model.addAttribute("client", client);
+            model.addAttribute("availableBalance", availableBalance);
         }
 
-        List<Merchant> merchantList = merchantService.listAllEnabledMerchants();
-        model.addAttribute("merchantList", merchantList);
+        model.addAttribute("merchantList", merchantService.listAllEnabledMerchants());
         model.addAttribute("pageTitle", "Dashboard");
         return "clients/dashboard";
     }
