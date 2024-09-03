@@ -43,12 +43,20 @@ public class EmailSettingBag extends SettingBag {
         return super.getValue("MAIL_SENDER_NAME");
     }
 
-    public String getAssessorCreationSubject() {
-        return super.getValue("MEMBER_ADMIN_CREATION_SUBJECT");
+    public String getOrganizationAdminCreationSubject() {
+        return super.getValue("ORGANIZATION_ADMIN_CREATION_SUBJECT");
     }
 
-    public String getAssessorCreationContent() {
-        return super.getValue("MEMBER_ADMIN_CREATION_CONTENT");
+    public String getOrganizationAdminCreationContent() {
+        return super.getValue("ORGANIZATION_ADMIN_CREATION_CONTENT");
+    }
+
+    public String getMerchantAdminCreationSubject() {
+        return super.getValue("MERCHANT_ADMIN_CREATION_SUBJECT");
+    }
+
+    public String getMerchantAdminCreationContent() {
+        return super.getValue("MERCHANT_ADMIN_CREATION_CONTENT");
     }
 
     public String getFleetManager() {

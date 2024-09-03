@@ -1,8 +1,9 @@
 package org.paykesho.backoffice.organizations.controller;
 
 import org.commons.entity.State;
-import org.commons.entity.organization.EmployeeRecord;
+import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.organization.Organization;
+import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.organizations.enums.Constants;
@@ -73,6 +74,8 @@ public class OrganizationController {
 
             Organization organization = organizationService.getOrganizationById(id);
             List<EmployeeRecord> employeeRecords = null;
+            OrganizationAdmin organizationAdmin = organization.getContactPerson();
+            if (organizationAdmin == null) organizationAdmin = new OrganizationAdmin();
 
             if (organization != null) {
                 employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
@@ -81,6 +84,8 @@ public class OrganizationController {
             loadCurrencySetting(request);
             model.addAttribute("organization", organization);
             model.addAttribute("pageTitle", pageTitle);
+            model.addAttribute("organizationAdmin", organizationAdmin);
+
             if (employeeRecords != null) model.addAttribute("employeeRecords", employeeRecords);
             if (employeeRecords != null) model.addAttribute("employeeRecordsSize", employeeRecords.size());
 

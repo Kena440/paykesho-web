@@ -1,7 +1,8 @@
-package org.commons.entity.organization;
+package org.commons.entity.client;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.commons.entity.organization.Organization;
 
 import javax.persistence.*;
 import java.util.Date;

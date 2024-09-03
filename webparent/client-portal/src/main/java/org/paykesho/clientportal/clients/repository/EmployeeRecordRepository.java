@@ -1,6 +1,6 @@
 package org.paykesho.clientportal.clients.repository;
 
-import org.commons.entity.organization.EmployeeRecord;
+import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.organization.Organization;
 import org.paykesho.clientportal.paging.SearchRepository;
 import org.springframework.data.domain.Page;

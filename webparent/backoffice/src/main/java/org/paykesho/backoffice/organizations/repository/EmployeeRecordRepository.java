@@ -1,6 +1,6 @@
 package org.paykesho.backoffice.organizations.repository;
 
-import org.commons.entity.organization.EmployeeRecord;
+import org.commons.entity.client.EmployeeRecord;
 import org.paykesho.backoffice.paging.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

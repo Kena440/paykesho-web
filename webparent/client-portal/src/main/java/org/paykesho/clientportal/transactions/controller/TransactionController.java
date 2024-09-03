@@ -77,7 +77,7 @@ public class TransactionController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<?> saveSubmittedPayment(@AuthenticationPrincipal ClientUserDetails loggedInUser, @RequestBody Map<String, String> requestBody) throws PaykeshoError {
+    public ResponseEntity<?> saveSubmittedPayment(@AuthenticationPrincipal ClientUserDetails loggedInUser, @RequestBody Map<String, String> requestBody) {
 
         String merchantCode = requestBody.get("merchantCode");
         String amountStr = requestBody.get("amount");
@@ -107,7 +107,7 @@ public class TransactionController {
         }
     }
 
-    private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, BigDecimal amount) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
+    private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, BigDecimal amount) throws PaykeshoError {
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_TRX");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
