@@ -2,6 +2,8 @@ package org.paykesho.backoffice.merchants.controller;
 
 import org.commons.entity.State;
 import org.commons.entity.merchant.Merchant;
+import org.commons.entity.merchant.MerchantAdmin;
+import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchants.enums.Constants;
@@ -82,11 +84,14 @@ public class MerchantController {
         try {
 
             Merchant merchant = merchantService.getMerchantById(id);
+            MerchantAdmin merchantAdmin = merchant.getContactPerson();
+            if (merchantAdmin == null) merchantAdmin = new MerchantAdmin();
 
             loadCurrencySetting(request);
             model.addAttribute("qrCodeContent", "/merchants/generateQRCode?qrContent=" + merchant.getCode());
             model.addAttribute("merchant", merchant);
             model.addAttribute("pageTitle", pageTitle);
+            model.addAttribute("merchantAdmin", merchantAdmin);
 
             return "merchants/merchant_view";
         } catch (PaykeshoError paykeshoError) {

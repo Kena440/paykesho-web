@@ -1,6 +1,7 @@
 package org.paykesho.backoffice.organizations.controller;
 
 import org.commons.entity.State;
+import org.commons.entity.client.Client;
 import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.organization.OrganizationAdmin;
@@ -74,11 +75,13 @@ public class OrganizationController {
 
             Organization organization = organizationService.getOrganizationById(id);
             List<EmployeeRecord> employeeRecords = null;
+            List<Client> clientRecordsSize = null;
             OrganizationAdmin organizationAdmin = organization.getContactPerson();
             if (organizationAdmin == null) organizationAdmin = new OrganizationAdmin();
 
             if (organization != null) {
                 employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
+                clientRecordsSize = organizationService.listClientRecordsAll(organization.getId());
             }
 
             loadCurrencySetting(request);
@@ -88,6 +91,7 @@ public class OrganizationController {
 
             if (employeeRecords != null) model.addAttribute("employeeRecords", employeeRecords);
             if (employeeRecords != null) model.addAttribute("employeeRecordsSize", employeeRecords.size());
+            if (employeeRecords != null) model.addAttribute("clientRecordsSize", clientRecordsSize.size());
 
             return "organizations/organization_view";
         } catch (PaykeshoError paykeshoError) {

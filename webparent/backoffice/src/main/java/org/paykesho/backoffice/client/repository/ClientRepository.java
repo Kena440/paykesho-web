@@ -29,5 +29,8 @@ public interface ClientRepository extends SearchRepository<Client, Integer> {
 
     @Query("select c from Client c where c.organization = ?1")
     List<Client> getOrganizationClients(Organization organization);
+
+    @Query("select c from Client c where c.organization.id = ?1")
+    List<Client> listClientRecordsAll(Integer id);
 }
 

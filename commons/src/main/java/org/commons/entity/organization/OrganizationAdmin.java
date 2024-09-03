@@ -80,5 +80,8 @@ public class OrganizationAdmin extends IdBasedEntity {
         return title + ". " + name;
     }
 
-
+    @Override
+    public String toString() {
+        return title + ". " + name;
+    }
 }

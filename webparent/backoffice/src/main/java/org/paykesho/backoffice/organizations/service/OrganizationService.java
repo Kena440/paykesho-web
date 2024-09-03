@@ -1,10 +1,12 @@
 package org.paykesho.backoffice.organizations.service;
 
 import org.commons.dto.GeneralStatsDto;
+import org.commons.entity.client.Client;
 import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.organization.Organization;
 import org.commons.enums.OrganizationType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.organizations.dto.GPSDataItem;
 import org.paykesho.backoffice.organizations.repository.EmployeeRecordRepository;
 import org.paykesho.backoffice.organizations.repository.OrganizationRepository;
@@ -34,6 +36,8 @@ public class OrganizationService {
     private OrganizationRepository organizationRepository;
     @Autowired
     private EmployeeRecordRepository employeeRecordRepository;
+    @Autowired
+    private ClientRepository clientRepository;
     @Autowired
     private SettingService settingService;
 
@@ -240,6 +244,14 @@ public class OrganizationService {
         }
 
         return employeeRecordRepository.getEmployeeRecordsByOrganizationId(id);
+    }
+
+    public List<Client> listClientRecordsAll(Integer id) {
+        if (id == null) {
+            return null;
+        }
+
+        return clientRepository.listClientRecordsAll(id);
     }
 
 /*    public List<GeneralStatsDto> getOrganizationsCountByLevelOfCare(Integer countryId, boolean enabled) {
