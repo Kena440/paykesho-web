@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 
 @Controller
-@RequestMapping("/organization-admins")
+@RequestMapping("/organization-admin")
 public class OrganizationAdminController {
     @Autowired
     private OrganizationAdminService organizationAdminService;

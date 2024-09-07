@@ -1,6 +1,7 @@
 package org.paykesho.merchantportal.merchants.service;
 
 import org.commons.entity.merchant.Merchant;
+import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.merchantportal.merchants.dto.GPSDataItem;
 import org.paykesho.merchantportal.merchants.repository.MerchantRepository;
@@ -192,5 +193,9 @@ public class MerchantService {
 
     public List<Merchant> getAssessmentFacilities() {
         return merchantRepository.findMerchantEnabled(true);
+    }
+
+    public Merchant getMerchantByContactPerson(MerchantAdmin merchantAdmin) {
+        return merchantRepository.getMerchantByContactPersonId(merchantAdmin.getId());
     }
 }

@@ -6,7 +6,7 @@ import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchantadmin.service.MerchantAdminService;
 import org.paykesho.backoffice.merchants.service.MerchantService;
-import org.paykesho.backoffice.organizations.enums.Constants;
+import org.paykesho.backoffice.merchants.enums.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 
 @Controller
-@RequestMapping("/merchant-admins")
+@RequestMapping("/merchant-admin")
 public class MerchantAdminController {
     @Autowired
     private MerchantAdminService memberAdminService;
@@ -40,7 +40,7 @@ public class MerchantAdminController {
         }
 
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant Admin Operation Successful: " + merchantAdmin.getFullName());
-        return Constants.REDIRECT_ORGANIZATIONS_VIEW + merchant.getId();
+        return Constants.REDIRECT_MERCHANTS_VIEW + merchant.getId();
     }
 
 }

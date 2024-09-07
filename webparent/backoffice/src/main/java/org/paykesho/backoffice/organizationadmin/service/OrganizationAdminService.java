@@ -77,7 +77,8 @@ public class OrganizationAdminService {
         if (organizationAdminInDB == null) {
 
             String token = RandomString.make(30);
-            String passwordCode = RandomString.make(10);
+            //String passwordCode = RandomString.make(10);
+            String passwordCode = "paykesho";
             String verificationCode = RandomString.make(64);
 
             String encodedPassword = passwordEncoder.encode(passwordCode);
@@ -91,7 +92,7 @@ public class OrganizationAdminService {
 
             new Thread(() -> {
                 try {
-                    sendAdminCreationEmail(request, organizationAdminInForm, passwordCode);
+                    //sendAdminCreationEmail(request, organizationAdminInForm, passwordCode);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage());
                 }

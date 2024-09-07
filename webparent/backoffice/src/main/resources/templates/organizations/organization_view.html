@@ -107,11 +107,18 @@
                                                 <div class="d-block">
                                                     <div class="d-flex align-items-center pt-3 mr-5">
                                                         <div class="d-block"
-                                                             th:if="${organizationAdmin != null}"><label
+                                                             th:if="${organizationAdmin.id != null}"><label
                                                                 class="mb-0">Organization Admin</label>
                                                             <h4 class="mb-0">[[${organizationAdmin}]]</h4>
+                                                            &nbsp;
+                                                            <button class="btn btn-success"
+                                                                    data-bs-target="#modal-add-admin-record"
+                                                                    data-bs-toggle="modal"
+                                                                    type="button">
+                                                                Update
+                                                            </button>
                                                         </div>
-                                                        <div class="d-block" th:unless="${organizationAdmin != null}">
+                                                        <div class="d-block" th:if="${organizationAdmin.id == null}">
                                                             <div class="alert alert-primary alert-outline alert-dismissible"
                                                                  role="alert">
                                                                 <button type="button" class="btn-close"
@@ -266,11 +273,11 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="modal-title">Add Record</h6>
+                <h6 class="modal-title">Update Admin</h6>
                 <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <form method="post"
-                  th:action="@{/organizations-admins/save}"
+                  th:action="@{/organization-admin/save}"
                   th:object="${organizationAdmin}">
                 <input id="organizationId" name="organizationId" th:value="${organization.id}"
                        type="hidden"/>

@@ -80,5 +80,10 @@ public class MerchantAdmin extends IdBasedEntity {
         return title + ". " + name;
     }
 
+    @Override
+    public String toString() {
+        return title + ". " + name + " (" + email + ")";
+    }
+
 
 }
