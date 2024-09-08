@@ -70,6 +70,8 @@ public class Client extends IdBasedEntity {
     private Organization organization;
     @Column(length = 64)
     private String photos;
+    @Transient
+    private ClientBalance clientBalance;
 
     public Client() {
     }

@@ -1,8 +1,10 @@
 package org.paykesho.backoffice.client.service;
 
 import org.commons.entity.client.Client;
+import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Country;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.client.repository.ClientBalanceRepository;
 import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
@@ -23,6 +25,8 @@ public class ClientService {
     private ClientRepository clientRepository;
     @Autowired
     private CountryRepository countryRepository;
+    @Autowired
+    private ClientBalanceRepository clientBalanceRepository;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);
@@ -80,5 +84,9 @@ public class ClientService {
 
     public Long countAllClients() {
         return clientRepository.countAllClients();
+    }
+
+    public ClientBalance saveClientBalance(ClientBalance clientBalance) {
+        return clientBalanceRepository.save(clientBalance);
     }
 }

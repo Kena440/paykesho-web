@@ -3,6 +3,7 @@ package org.paykesho.clientportal.transactions.controller;
 import org.commons.entity.Transaction;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
+import org.commons.entity.client.ClientBalance;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.MerchantDto;
 import org.paykesho.clientportal.api.dto.PaymentDto;
@@ -86,17 +87,20 @@ public class TransactionController {
             BigDecimal amount = new BigDecimal(amountStr);
             Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
-            // Verify Merchant
             MerchantDto merchant = merchantService.getMerchantByCode(merchantCode);
             if (merchant == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
             }
 
-            // Run Payment Submission
+            BigDecimal currentBalance = client.getClientBalance().getAvailableBalance();
+            if (currentBalance.compareTo(amount) < 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Insufficient balance."));
+            }
+
             Transaction trx = runPaymentSubmission(client, merchant, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
-                return ResponseEntity.ok(Collections.singletonMap("success", true));
+                return updateClientBalance(amount, client, currentBalance);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment failed. Please try again."));
             }
@@ -105,6 +109,14 @@ public class TransactionController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "An error occurred while processing your payment."));
         }
+    }
+
+    private ResponseEntity<Map<String, Boolean>> updateClientBalance(BigDecimal amount, Client client, BigDecimal currentBalance) {
+        ClientBalance clientBalance = client.getClientBalance();
+        clientBalance.setCurrentBalance(currentBalance.subtract(amount));
+        clientBalance.setAvailableBalance(currentBalance.subtract(amount));
+        clientService.saveClientBalance(clientBalance);
+        return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
     private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, BigDecimal amount) throws PaykeshoError {

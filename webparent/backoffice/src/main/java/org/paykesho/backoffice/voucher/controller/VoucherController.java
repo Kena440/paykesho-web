@@ -1,8 +1,10 @@
 package org.paykesho.backoffice.voucher.controller;
 
 import org.commons.entity.Voucher;
+import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.client.service.ClientService;
 import org.paykesho.backoffice.config.Utility;
 import org.paykesho.backoffice.settings.email.EmailSettingBag;
 import org.paykesho.backoffice.settings.service.SettingService;
@@ -37,6 +39,8 @@ public class VoucherController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private ClientService clientService;
 
     @Autowired
     private SettingService settingService;
@@ -86,8 +90,27 @@ public class VoucherController {
         Voucher voucher = getVoucherOrThrow(voucherId);
         updateVoucherForApproval(voucher, request);
         Voucher approvedVoucher = voucherService.save(voucher);
+
+        updateClientBalance(approvedVoucher);
+
         //sendNotification(approvedVoucher, "APPROVAL", null);
         return approvedVoucher;
+    }
+
+    private void updateClientBalance(Voucher approvedVoucher) {
+        ClientBalance balance = approvedVoucher.getClient().getClientBalance();
+        if (balance == null) {
+            balance = new ClientBalance();
+            balance.setClient(balance.getClient());
+            balance.setCurrentBalance(BigDecimal.ZERO);
+            balance.setAvailableBalance(BigDecimal.ZERO);
+        }
+
+        balance.setCurrentBalance(balance.getCurrentBalance().add(approvedVoucher.getAmount()));
+        balance.setAvailableBalance(balance.getAvailableBalance().add(approvedVoucher.getAmount()));
+        balance.setLastUpdate(new Date());
+
+        clientService.saveClientBalance(balance);
     }
 
     private Voucher runVoucherAdjustmentProcess(HttpServletRequest request) throws PaykeshoError {

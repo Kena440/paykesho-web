@@ -3,10 +3,12 @@ package org.paykesho.clientportal.clients.service;
 
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.client.Client;
+import org.commons.entity.client.ClientBalance;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.clientportal.clients.repository.ClientBalanceRepository;
 import org.paykesho.clientportal.clients.repository.ClientRepository;
 import org.paykesho.clientportal.clients.repository.EmployeeRecordRepository;
 import org.paykesho.clientportal.config.Utility;
@@ -37,6 +39,8 @@ public class ClientService {
     private EmployeeRecordRepository employeeRecordRepository;
     @Autowired
     private PaykeshoReferenceService paykeshoReferenceService;
+    @Autowired
+    private ClientBalanceRepository clientBalanceRepository;
 
     public List<Country> countryList() {
         return countryRepository.findAllByOrderByNameDesc();
@@ -221,5 +225,9 @@ public class ClientService {
         }
 
         return "Not Found";
+    }
+
+    public ClientBalance saveClientBalance(ClientBalance clientBalance) {
+        return clientBalanceRepository.save(clientBalance);
     }
 }
