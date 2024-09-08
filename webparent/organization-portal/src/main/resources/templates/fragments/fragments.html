@@ -66,12 +66,22 @@
                 </ul>
             </li>
             <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#clients" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="list"></i> <span class="align-middle">Clients</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="clients">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Update Staff Database</a>
+                    </li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">View All</a></li>
+                </ul>
+            </li>
+            <li class="sidebar-item">
                 <a class="sidebar-link collapsed" data-bs-target="#icons" data-bs-toggle="collapse">
                     <i class="align-middle" data-lucide="landmark"></i> <span class="align-middle">Financials</span>
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="icons">
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-lucide.html'>Reports</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Repayment
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/finance/repayment-schedules}">Repayment
                         Schedules</a>
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Projections</a>
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Configurations</a>

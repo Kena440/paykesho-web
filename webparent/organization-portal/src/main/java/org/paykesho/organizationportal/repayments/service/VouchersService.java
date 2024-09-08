@@ -1,0 +1,25 @@
+package org.paykesho.organizationportal.repayments.service;
+
+import org.commons.entity.Voucher;
+import org.commons.entity.organization.Organization;
+import org.commons.utils.PaykeshoError;
+import org.paykesho.organizationportal.repayments.repository.VouchersRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class VouchersService {
+
+    @Autowired
+    private VouchersRepository vouchersRepository;
+
+    public List<Voucher> getOrganizationVouchers(Organization organization) throws PaykeshoError {
+        if (organization == null) {
+            throw new PaykeshoError("no organization id");
+        } else {
+            return vouchersRepository.getVouchersByOrganization(organization);
+        }
+    }
+}
