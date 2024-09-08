@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="dark"
+<html data-bs-theme="light"
       data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
       lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
@@ -85,12 +85,12 @@
                                             <span class="h1 d-inline-block mt-1 mb-4"
                                                   th:if="${availableBalance != null}">
                                                 <span class="font-weight-normal"
-                                                      th:replace="fragments/fragments :: format_currency(${availableBalance})">
+                                                      th:replace="fragments/fragments :: format_currency(${availableBalance})"></span>
                                             </span>
-                                                <!--   <div class="mb-0">
-                                                       <span class="badge badge-subtle-success me-2"> +3.65% </span>
-                                                       <span class="text-muted">Since last week</span>
-                                                   </div>-->
+                                            <!--   <div class="mb-0">
+                                                   <span class="badge badge-subtle-success me-2"> +3.65% </span>
+                                                   <span class="text-muted">Since last week</span>
+                                               </div>-->
                                         </div>
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col mt-0">
-                                                    <h5 class="card-title">Real-Time</h5>
+                                                    <h5 class="card-title">Credit Score</h5>
                                                 </div>
 
                                                 <div class="col-auto">
@@ -110,11 +110,12 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">1.856</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"> +2.25% </span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:if="${creditScore != null}">
+                                                <span class="font-weight-normal"
+                                                      th:replace="fragments/fragments :: format_number(${creditScore})"></span>
+                                            </span>
+
                                         </div>
                                     </div>
                                 </div>
@@ -123,7 +124,7 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col mt-0">
-                                                    <h5 class="card-title">Visitors</h5>
+                                                    <h5 class="card-title">Transactions</h5>
                                                 </div>
 
                                                 <div class="col-auto">

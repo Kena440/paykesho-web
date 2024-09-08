@@ -81,6 +81,8 @@ public class ClientController {
             if (client != null) {
                 BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
                 model.addAttribute("availableBalance", availableBalance);
+                int creditScore = 300;
+                model.addAttribute("creditScore", creditScore);
             }
 
             model.addAttribute("greeting", greeting);

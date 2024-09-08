@@ -33,8 +33,8 @@ public class VouchersController {
 
     @GetMapping("")
     public String showOrganizationTransactions(@AuthenticationPrincipal OrganizationAdminUserDetails loggedInUser, Model model) throws PaykeshoError {
-        OrganizationAdmin merchantAdmin = organizationAdminService.getOrganizationAdminByEmail(loggedInUser.getOrganizationAdmin().getEmail());
-        Organization organization = organizationService.getOrganizationByOrganizationAdmin(merchantAdmin);
+        OrganizationAdmin organizationAdmin = organizationAdminService.getOrganizationAdminByEmail(loggedInUser.getOrganizationAdmin().getEmail());
+        Organization organization = organizationService.getOrganizationByOrganizationAdmin(organizationAdmin);
         List<Voucher> voucherList = vouchersService.getOrganizationVouchers(organization);
         model.addAttribute("voucherList", voucherList);
         model.addAttribute("pageTitle", organization.getName() + " Vouchers");

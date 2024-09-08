@@ -11,8 +11,6 @@ import org.paykesho.organizationportal.client.enums.Constants;
 import org.paykesho.organizationportal.client.service.ClientService;
 import org.paykesho.organizationportal.organizationadmins.service.OrganizationAdminService;
 import org.paykesho.organizationportal.organizations.service.OrganizationService;
-import org.paykesho.organizationportal.paging.PagingAndSortingHelper;
-import org.paykesho.organizationportal.paging.PagingAndSortingParam;
 import org.paykesho.organizationportal.settings.service.SettingService;
 import org.paykesho.organizationportal.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;

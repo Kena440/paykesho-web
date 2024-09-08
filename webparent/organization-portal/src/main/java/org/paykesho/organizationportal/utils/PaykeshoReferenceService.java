@@ -2,6 +2,8 @@ package org.paykesho.organizationportal.utils;
 
 import net.bytebuddy.utility.RandomString;
 import org.paykesho.organizationportal.client.repository.ClientRepository;
+import org.paykesho.organizationportal.repayments.repository.PayrollDeductionRepository;
+import org.paykesho.organizationportal.repayments.repository.RepaymentScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,10 @@ public class PaykeshoReferenceService {
 
     @Autowired
     private ClientRepository clientRepository;
-
+    @Autowired
+    private PayrollDeductionRepository payrollDeductionRepository;
+    @Autowired
+    private RepaymentScheduleRepository repaymentScheduleRepository;
 
     public String generateCode(String itemRequest) {
         String reference = "";
@@ -26,6 +31,16 @@ public class PaykeshoReferenceService {
             case "ITEM_REQ_CLT":
                 itemPrefix = "C";
                 count = clientRepository.countAllClients() + 1;
+                reference = getReference(itemPrefix, count);
+                break;
+            case "ITEM_REQ_RPS":
+                itemPrefix = "R";
+                count = repaymentScheduleRepository.countAllRepaymentSchedules() + 1;
+                reference = getReference(itemPrefix, count);
+                break;
+            case "ITEM_REQ_PRD":
+                itemPrefix = "P";
+                count = payrollDeductionRepository.countAllPayrollDeductions() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
 

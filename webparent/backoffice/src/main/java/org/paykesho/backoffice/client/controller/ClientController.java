@@ -1,14 +1,11 @@
 package org.paykesho.backoffice.client.controller;
 
-import org.commons.entity.Transaction;
 import org.commons.entity.client.Client;
 import org.commons.entity.settings.Country;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.enums.Constants;
 import org.paykesho.backoffice.client.service.ClientService;
-import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.paging.PagingAndSortingParam;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

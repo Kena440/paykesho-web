@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="dark" data-layout="fluid"
+<html data-bs-theme="light" data-layout="fluid"
       data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark" lang="en"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:th="http://www.thymeleaf.org">
 
@@ -72,6 +72,8 @@
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="clients">
                     <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Update Staff Database</a>
                     </li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Update Payroll Data</a>
+                    </li>
                     <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">View All</a></li>
                 </ul>
             </li>
@@ -81,9 +83,12 @@
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="icons">
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-lucide.html'>Reports</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/finance/repayment-schedules}">Repayment
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/repayments/schedules}">Repayment
                         Schedules</a>
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Projections</a>
+                    </li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/repayments/payroll-deductions}">Payroll
+                        Deductions</a>
+                    </li>
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Configurations</a>
                     </li>
                 </ul>

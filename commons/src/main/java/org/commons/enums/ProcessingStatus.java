@@ -7,6 +7,12 @@ public enum ProcessingStatus {
             return "PROCESSED";
         }
 
+    }, COMPLETED {
+        @Override
+        public String defaultDescription() {
+            return "COMPLETED";
+        }
+
     }, FAILED {
         @Override
         public String defaultDescription() {

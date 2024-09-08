@@ -100,4 +100,8 @@ public class ClientService {
     public ClientBalance saveClientBalance(ClientBalance clientBalance) {
         return clientBalanceRepository.save(clientBalance);
     }
+
+    public ClientBalance getClientBalance(Client client) {
+        return clientBalanceRepository.getClientBalanceByClientId(client.getId());
+    }
 }

@@ -1,7 +1,6 @@
 package org.paykesho.backoffice.voucher.repository;
 
 import org.commons.entity.Voucher;
-import org.commons.entity.client.Client;
 import org.paykesho.backoffice.paging.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,10 +8,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface VoucherRepository extends SearchRepository<Voucher, Integer> {
 
     @Query("select v from Voucher v where v.client.id = :client order by v.requestDate desc")
-    public Client getVoucherByClient(@Param("client") Integer client);
+    public List<Voucher> getVouchersByClient(@Param("client") Integer client);
 
     public Long countById(Integer id);
 

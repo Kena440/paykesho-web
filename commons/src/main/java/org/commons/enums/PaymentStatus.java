@@ -15,6 +15,13 @@ public enum PaymentStatus {
         }
 
     },
+    COMPLETED {
+        @Override
+        public String defaultDescription() {
+            return "COMPLETED";
+        }
+
+    },
     PAID {
         @Override
         public String defaultDescription() {
