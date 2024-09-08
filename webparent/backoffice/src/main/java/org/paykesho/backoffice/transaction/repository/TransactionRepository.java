@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface TransactionRepository extends SearchRepository<Transaction, Integer> {
 
-    @Query("select t from Transaction t where t.client.id = :client")
+    @Query("select t from Transaction t where t.client.id = :client order by t.txnDate desc")
     public Client getTransactionByClient(@Param("client") Integer client);
 
     public Long countById(Integer id);
@@ -20,9 +20,9 @@ public interface TransactionRepository extends SearchRepository<Transaction, Int
     @Query("select t from Transaction t where concat(t.client, ' ', t.merchant.name, ' ', t.reference ) like %?1%")
     public Page<Transaction> findAll(String keyword, Pageable pageable);
 
-    @Query("select count(t.id) as total from Transaction t")
+    @Query("select count(t.id) as total from Transaction t order by t.txnDate desc")
     Long countAllTransactions();
 
-    @Query("select t from Transaction t where t.merchant.id = ?1")
+    @Query("select t from Transaction t where t.merchant.id = ?1 order by t.txnDate desc")
     List<Transaction> getTransactionsByMerchantId(int id);
 }

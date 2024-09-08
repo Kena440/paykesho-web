@@ -81,10 +81,9 @@ public class TransactionController {
     public ResponseEntity<?> saveSubmittedPayment(@AuthenticationPrincipal ClientUserDetails loggedInUser, @RequestBody Map<String, String> requestBody) {
 
         String merchantCode = requestBody.get("merchantCode");
-        String amountStr = requestBody.get("amount");
+        BigDecimal amount = BigDecimal.valueOf(Long.parseLong(requestBody.get("amount")));
 
         try {
-            BigDecimal amount = new BigDecimal(amountStr);
             Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
             MerchantDto merchant = merchantService.getMerchantByCode(merchantCode);
@@ -92,15 +91,16 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
             }
 
-            BigDecimal currentBalance = client.getClientBalance().getAvailableBalance();
-            if (currentBalance.compareTo(amount) < 0) {
+            BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
+
+            if (availableBalance.compareTo(amount) < 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Insufficient balance."));
             }
 
             Transaction trx = runPaymentSubmission(client, merchant, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
-                return updateClientBalance(amount, client, currentBalance);
+                return updateClientBalance(amount, client, availableBalance);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment failed. Please try again."));
             }
@@ -112,7 +112,7 @@ public class TransactionController {
     }
 
     private ResponseEntity<Map<String, Boolean>> updateClientBalance(BigDecimal amount, Client client, BigDecimal currentBalance) {
-        ClientBalance clientBalance = client.getClientBalance();
+        ClientBalance clientBalance = clientService.getClientBalance(client);
         clientBalance.setCurrentBalance(currentBalance.subtract(amount));
         clientBalance.setAvailableBalance(currentBalance.subtract(amount));
         clientService.saveClientBalance(clientBalance);

@@ -82,11 +82,15 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">[[${availableBalance}]]</span>
-                                            <!--   <div class="mb-0">
-                                                   <span class="badge badge-subtle-success me-2"> +3.65% </span>
-                                                   <span class="text-muted">Since last week</span>
-                                               </div>-->
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:if="${availableBalance != null}">
+                                                <span class="font-weight-normal"
+                                                      th:replace="fragments/fragments :: format_currency(${availableBalance})">
+                                            </span>
+                                                <!--   <div class="mb-0">
+                                                       <span class="badge badge-subtle-success me-2"> +3.65% </span>
+                                                       <span class="text-muted">Since last week</span>
+                                                   </div>-->
                                         </div>
                                     </div>
                                 </div>

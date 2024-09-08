@@ -78,11 +78,13 @@ public class ClientController {
             client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
             String greeting = getGreeting();
-            BigDecimal availableBalance = voucherService.getApprovedAndValidClientVouchersBalance(client);
+            if (client != null) {
+                BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
+                model.addAttribute("availableBalance", availableBalance);
+            }
 
             model.addAttribute("greeting", greeting);
             model.addAttribute("client", client);
-            model.addAttribute("availableBalance", availableBalance);
         }
 
         model.addAttribute("merchantList", merchantService.listAllEnabledMerchants());

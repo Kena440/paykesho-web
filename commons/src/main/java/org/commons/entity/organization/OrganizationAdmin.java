@@ -53,11 +53,6 @@ public class OrganizationAdmin extends IdBasedEntity {
     public OrganizationAdmin() {
     }
 
-    @Override
-    public String toString() {
-        return title + ". " + name + " (" + email + ")";
-    }
-
     public OrganizationAdmin(Integer id) {
         this.id = id;
     }
@@ -65,6 +60,11 @@ public class OrganizationAdmin extends IdBasedEntity {
     public OrganizationAdmin(String title, String name) {
         this.title = title;
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return title + ". " + name + " (" + email + ")";
     }
 
     @Override

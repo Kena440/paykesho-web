@@ -147,9 +147,9 @@
                                     <div class="d-block" th:if="${merchantAdmin.id == null}">
                                         <div class="alert alert-primary alert-outline alert-dismissible"
                                              role="alert">
-                                            <button type="button" class="btn-close"
+                                            <button aria-label="Close" class="btn-close"
                                                     data-bs-dismiss="alert"
-                                                    aria-label="Close"></button>
+                                                    type="button"></button>
                                             <div class="alert-message">
                                                 <h4 class="alert-heading">Warning</h4>
                                                 <p>Kindly update merchant admin information!</p>
@@ -201,30 +201,30 @@
                         <input class="form-control"
                                id="title"
                                name="title"
-                               th:field="*{title}" placeholder="Enter salutation"
-                               required type="text">
+                               placeholder="Enter salutation" required
+                               th:field="*{title}" type="text">
                     </div>
                     <div class="form-group">
                         <label>Name</label>
                         <input class="form-control"
                                id="name"
                                name="name"
-                               th:field="*{name}" placeholder="Enter Name"
-                               required type="text">
+                               placeholder="Enter Name" required
+                               th:field="*{name}" type="text">
                     </div>
                     <div class="form-group">
                         <label>Email</label>
                         <input class="form-control" id="email"
                                name="email"
-                               th:field="*{email}" placeholder="Enter Email"
-                               required type="email">
+                               placeholder="Enter Email" required
+                               th:field="*{email}" type="email">
                     </div>
                     <div class="form-group">
                         <label>Phone Number</label>
                         <input class="form-control" id="phoneNumber"
                                name="phoneNumber"
-                               th:field="*{phoneNumber}" placeholder="Enter Phone Number"
-                               required type="text">
+                               placeholder="Enter Phone Number" required
+                               th:field="*{phoneNumber}" type="text">
                     </div>
                 </div>
                 <div class="modal-footer">

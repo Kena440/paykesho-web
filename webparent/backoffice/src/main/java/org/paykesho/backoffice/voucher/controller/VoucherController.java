@@ -101,7 +101,7 @@ public class VoucherController {
         ClientBalance balance = approvedVoucher.getClient().getClientBalance();
         if (balance == null) {
             balance = new ClientBalance();
-            balance.setClient(balance.getClient());
+            balance.setClient(approvedVoucher.getClient());
             balance.setCurrentBalance(BigDecimal.ZERO);
             balance.setAvailableBalance(BigDecimal.ZERO);
         }

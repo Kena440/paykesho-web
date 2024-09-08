@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
 
-    @Query("select v from Voucher v where v.client = :client")
+    @Query("select v from Voucher v where v.client = :client order by v.requestDate desc")
     public List<Voucher> getVouchersByClient(@Param("client") Client client);
 
     @Query("select new org.paykesho.clientportal.api.dto.VoucherDto(v.reference, v.amount, v.availableAmount, v.repaymentAmount, v.interestPercent, v.repaymentCycle, v.repaymentDate, v.requestDate, v.approved) from Voucher v where v.client = :client")

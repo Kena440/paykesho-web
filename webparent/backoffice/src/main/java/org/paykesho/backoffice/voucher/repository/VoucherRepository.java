@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface VoucherRepository extends SearchRepository<Voucher, Integer> {
 
-    @Query("select v from Voucher v where v.client.id = :client")
+    @Query("select v from Voucher v where v.client.id = :client order by v.requestDate desc")
     public Client getVoucherByClient(@Param("client") Integer client);
 
     public Long countById(Integer id);
@@ -19,7 +19,7 @@ public interface VoucherRepository extends SearchRepository<Voucher, Integer> {
     @Query("select v from Voucher v where concat(v.client, ' ', v.amount, ' ', v.reference ) like %?1%")
     public Page<Voucher> findAll(String keyword, Pageable pageable);
 
-    @Query("select count(v.id) as total from Voucher v")
+    @Query("select count(v.id) as total from Voucher v order by v.requestDate desc")
     Long countAllVouchers();
 
     @Query("select v from Voucher v where v.id = ?1")

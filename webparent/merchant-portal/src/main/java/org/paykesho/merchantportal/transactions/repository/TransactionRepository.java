@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
-    @Query("select t from Transaction t where t.merchant = :merchant")
+    @Query("select t from Transaction t where t.merchant = :merchant order by t.txnDate desc")
     public List<Transaction> getTransactionsByMerchant(@Param("merchant") Merchant merchant);
 
     @Query("select count(t.id) as total from Transaction t where t.merchant = :merchant")

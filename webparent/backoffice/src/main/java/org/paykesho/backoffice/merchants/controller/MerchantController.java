@@ -3,7 +3,6 @@ package org.paykesho.backoffice.merchants.controller;
 import org.commons.entity.State;
 import org.commons.entity.merchant.Merchant;
 import org.commons.entity.merchant.MerchantAdmin;
-import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchants.enums.Constants;

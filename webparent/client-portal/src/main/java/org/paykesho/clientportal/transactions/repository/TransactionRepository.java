@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
-    @Query("select t from Transaction t where t.client = :client")
+    @Query("select t from Transaction t where t.client = :client order by t.txnDate desc")
     public List<Transaction> getTransactionsByClient(@Param("client") Client client);
 
     @Query("select count(t.id) as total from Transaction t")
