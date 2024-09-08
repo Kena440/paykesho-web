@@ -1,12 +1,15 @@
 package org.paykesho.backoffice.client.controller;
 
+import org.commons.entity.Transaction;
 import org.commons.entity.client.Client;
 import org.commons.entity.settings.Country;
+import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.enums.Constants;
 import org.paykesho.backoffice.client.service.ClientService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.paging.PagingAndSortingParam;
+import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -24,18 +28,15 @@ import java.util.List;
 public class ClientController {
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private SettingService settingService;
 
     @GetMapping("")
-    public String listFirstPage(Model model) {
-        return Constants.REDIRECT_CUSTOMERS_PAGE_WITHOUT_KEYWORD;
-    }
-
-    @GetMapping("/page/{pageNum}")
-    public String listByPage(Model model,
-                             @PathVariable(name = "pageNum") int pageNum,
-                             @PagingAndSortingParam(listName = "clientList", moduleURL = "/clients") PagingAndSortingHelper helper) throws PaykeshoError {
-
-        clientService.listByPage(pageNum, helper);
+    public String showClients(Model model, HttpServletRequest request) {
+        List<Client> clientList = clientService.listAll();
+        loadCurrencySetting(request);
+        model.addAttribute("clientList", clientList);
+        model.addAttribute("pageTitle", "Clients");
 
         return "clients/clients";
     }
@@ -122,4 +123,10 @@ public class ClientController {
         return Constants.REDIRECT_CUSTOMERS;
     }
 
+    private void loadCurrencySetting(HttpServletRequest request) {
+        List<Setting> currencySettings = settingService.getCurrencySettings();
+        for (Setting setting : currencySettings) {
+            request.setAttribute(setting.getKey(), setting.getValue());
+        }
+    }
 }

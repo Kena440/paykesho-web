@@ -9,6 +9,7 @@ import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,16 @@ public class ClientService {
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);
+    }
+
+    public List<Client> listAll() {
+        List<Client> clientList = (List<Client>) clientRepository.findAll(Sort.by("code").ascending());
+        for (Client c : clientList) {
+            ClientBalance clientBalance = clientBalanceRepository.getClientBalanceByClientId(c.getId());
+            c.setClientBalance(clientBalance);
+        }
+
+        return clientList;
     }
 
     public void updateCustomerEnabledStatus(Integer id, boolean enabled) {

@@ -4,6 +4,7 @@ import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Country;
+import org.commons.entity.settings.Setting;
 import org.commons.enums.ClientType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.client.enums.Constants;
@@ -12,6 +13,7 @@ import org.paykesho.organizationportal.organizationadmins.service.OrganizationAd
 import org.paykesho.organizationportal.organizations.service.OrganizationService;
 import org.paykesho.organizationportal.paging.PagingAndSortingHelper;
 import org.paykesho.organizationportal.paging.PagingAndSortingParam;
+import org.paykesho.organizationportal.settings.service.SettingService;
 import org.paykesho.organizationportal.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,16 +40,16 @@ public class ClientController {
     private OrganizationService organizationService;
     @Autowired
     private PaykeshoReferenceService paykeshoReferenceService;
+    @Autowired
+    private SettingService settingService;
+
 
     @GetMapping("")
-    public String listFirstPage(Model model) {
-        return Constants.REDIRECT_CUSTOMERS_PAGE_WITHOUT_KEYWORD;
-    }
-
-    @GetMapping("/page/{pageNum}")
-    public String listByPage(Model model, @PathVariable(name = "pageNum") int pageNum, @PagingAndSortingParam(listName = "clientList", moduleURL = "/clients") PagingAndSortingHelper helper) throws PaykeshoError {
-
-        clientService.listByPage(pageNum, helper);
+    public String showClients(Model model, HttpServletRequest request) {
+        List<Client> clientList = clientService.listAll();
+        loadCurrencySetting(request);
+        model.addAttribute("clientList", clientList);
+        model.addAttribute("pageTitle", "Clients");
 
         return "clients/clients";
     }
@@ -146,4 +148,10 @@ public class ClientController {
         return Constants.REDIRECT_CUSTOMERS;
     }
 
+    private void loadCurrencySetting(HttpServletRequest request) {
+        List<Setting> currencySettings = settingService.getCurrencySettings();
+        for (Setting setting : currencySettings) {
+            request.setAttribute(setting.getKey(), setting.getValue());
+        }
+    }
 }

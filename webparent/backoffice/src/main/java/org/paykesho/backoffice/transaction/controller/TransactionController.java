@@ -29,7 +29,7 @@ public class TransactionController {
         List<Transaction> transactionList = transactionsService.listAll();
         loadCurrencySetting(request);
         model.addAttribute("transactionList", transactionList);
-        model.addAttribute("pageTitle", "My Transactions");
+        model.addAttribute("pageTitle", "All Transactions");
 
         return "transactions/transactions";
     }

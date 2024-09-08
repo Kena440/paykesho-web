@@ -1,12 +1,15 @@
 package org.paykesho.organizationportal.client.service;
 
 import org.commons.entity.client.Client;
+import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Country;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.organizationportal.client.repository.ClientBalanceRepository;
 import org.paykesho.organizationportal.client.repository.ClientRepository;
 import org.paykesho.organizationportal.paging.PagingAndSortingHelper;
 import org.paykesho.organizationportal.settings.repository.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +26,17 @@ public class ClientService {
     private ClientRepository clientRepository;
     @Autowired
     private CountryRepository countryRepository;
+    @Autowired
+    private ClientBalanceRepository clientBalanceRepository;
 
-    public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
-        helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);
+    public List<Client> listAll() {
+        List<Client> clientList = (List<Client>) clientRepository.findAll(Sort.by("code").ascending());
+        for (Client c : clientList) {
+            ClientBalance clientBalance = clientBalanceRepository.getClientBalanceByClientId(c.getId());
+            c.setClientBalance(clientBalance);
+        }
+
+        return clientList;
     }
 
     public void updateClientEnabledStatus(Integer id, boolean enabled) {
