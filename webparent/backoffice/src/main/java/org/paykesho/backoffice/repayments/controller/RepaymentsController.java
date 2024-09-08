@@ -1,3 +1,4 @@
+/*
 package org.paykesho.backoffice.repayments.controller;
 
 import org.commons.entity.client.PayrollDeduction;
@@ -82,3 +83,4 @@ public class RepaymentsController {
         }
     }
 }
+*/

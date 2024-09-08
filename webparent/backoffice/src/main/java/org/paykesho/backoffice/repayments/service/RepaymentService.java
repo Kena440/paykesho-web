@@ -1,3 +1,4 @@
+/*
 package org.paykesho.backoffice.repayments.service;
 
 import org.commons.entity.client.PayrollDeduction;
@@ -93,3 +94,4 @@ public class RepaymentService {
         return payrollDeductionRepository.findByClientOrganizationId(organizationId);
     }
 }
+*/
