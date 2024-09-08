@@ -44,18 +44,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6 col-xl-5 d-flex">
+                    <div class="col-lg-6 col-xl-6 d-flex">
                         <div class="w-100">
 
                             <div class="row">
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
+                                <div class="col-sm-12 col-lg-12 col-xxl-12 d-flex">
                                     <div class="card illustration flex-fill">
                                         <div class="card-body p-0 d-flex flex-fill">
                                             <div class="row g-0 w-100">
                                                 <div class="col-6">
                                                     <div class="illustration-text p-3 m-1">
-                                                        <h4 class="illustration-text">Welcome Back, Chris!</h4>
-                                                        <p class="mb-0">Paykesho Dashboard</p>
+                                                        <h4 class="illustration-text">Welcome Back,
+                                                            [[${organizationAdmin}]]!</h4>
+                                                        <p class="mb-0">[[${organization}]] Dashboard</p>
                                                     </div>
                                                 </div>
                                                 <div class="col-6 align-self-end text-end">
@@ -63,6 +64,36 @@
                                                          class="img-fluid illustration-img"
                                                          th:src="@{/assets/img/illustrations/searching.png}">
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-xl-6 d-flex">
+                        <div class="w-100">
+                            <div class="row d-lg-none d-xxl-flex">
+                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
+                                    <div class="card flex-fill">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col mt-0">
+                                                    <h5 class="card-title">Visitors</h5>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <div class="stat stat-sm">
+                                                        <i class="align-middle" data-lucide="users"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="h1 d-inline-block mt-1 mb-4">17.212</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-danger me-2"> -1.25% </span>
+                                                <span class="text-muted">Since last week</span>
                                             </div>
                                         </div>
                                     </div>
@@ -89,77 +120,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row d-lg-none d-xxl-flex">
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Real-Time</h5>
-                                                </div>
-
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="clock"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">1.856</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"> +2.25% </span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Visitors</h5>
-                                                </div>
-
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="users"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">17.212</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-danger me-2"> -1.25% </span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6 col-xl-7">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
-                                            <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
-
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h5 class="card-title mb-0">Real-Time</h5>
-                            </div>
-                            <div class="card-body p-2">
-                                <div id="world_map" style="height:279px;"></div>
                             </div>
                         </div>
                     </div>

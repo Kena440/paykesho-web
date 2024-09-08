@@ -37,6 +37,7 @@ public class MainController {
         Country country = settingService.getCountryByName("Zambia");
 
         model.addAttribute("organization", organization);
+        model.addAttribute("organizationAdmin", organizationAdmin);
         model.addAttribute("pageTitle", "Dashboard");
         if (country != null) model.addAttribute("country", country);
 

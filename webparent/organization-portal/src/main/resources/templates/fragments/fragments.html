@@ -21,7 +21,9 @@
 
     <!-- BEGIN SETTINGS -->
     <!-- Remove this after purchasing -->
+<!--
     <script th:src="@{/assets/js/settings.js}"></script>
+-->
     <!-- END SETTINGS -->
 
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
@@ -57,10 +59,10 @@
             </li>
             <li class="sidebar-item">
                 <a class="sidebar-link collapsed" data-bs-target="#transactions" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="list"></i> <span class="align-middle">Transactions</span>
+                    <i class="align-middle" data-lucide="list"></i> <span class="align-middle">Vouchers</span>
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="transactions">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/transactions}">View All</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">View All</a></li>
                 </ul>
             </li>
             <li class="sidebar-item">
@@ -69,57 +71,15 @@
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="icons">
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-lucide.html'>Reports</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Repayment Schedules</a>
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Projections</a>
                     <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Configurations</a>
                     </li>
                 </ul>
             </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#merchants" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="shopping-cart"></i> <span class="align-middle">Merchants</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="merchants">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Reconciliation</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Configurations</a></li>
 
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#organizations" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="building"></i> <span
-                        class="align-middle">Organizations</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="organizations">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Reconciliation</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Configurations</a></li>
 
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#clients" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="users"></i> <span class="align-middle">Clients</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="clients">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Reconciliation</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Configurations</a></li>
 
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link collapsed" data-bs-target="#siteadmin" data-bs-toggle="collapse">
-                    <i class="align-middle" data-lucide="settings"></i> <span
-                        class="align-middle">Site Administration</span>
-                </a>
-                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="siteadmin">
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/users}">User Mgt</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/settings}">Settings</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/integrations}">Integrations</a></li>
-
-                </ul>
-            </li>
 
         </ul>
 
