@@ -9,6 +9,7 @@ import org.commons.entity.organization.Organization;
 import org.commons.enums.AuthenticationType;
 import org.commons.enums.ClientType;
 import org.commons.enums.GenderType;
+import org.commons.enums.SalutationType;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -31,8 +32,9 @@ public class Client extends IdBasedEntity {
     private String tpin;
     @Column(name = "man_number", length = 128, nullable = false, unique = true)
     private String manNumber;
-    @Column(length = 64, nullable = false)
-    private String salutation;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "salutation", length = 10)
+    private SalutationType salutation;
     @Column(name = "name", length = 245, nullable = false)
     private String name;
     @Column(length = 45, nullable = false, unique = true)
@@ -80,7 +82,7 @@ public class Client extends IdBasedEntity {
         this.id = id;
     }
 
-    public Client(String salutation, String name) {
+    public Client(SalutationType salutation, String name) {
         this.salutation = salutation;
         this.name = name;
     }

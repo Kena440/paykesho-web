@@ -28,7 +28,7 @@
                                     </div>
                                     <div class="alert-message">
                                         <strong>Hello there!</strong>
-                                        <span class="alert-inner--text"><strong>Warning!</strong> Registration only applies to formal clients in the meantime</span>
+                                        <span class="alert-inner--text"><strong>Warning!</strong> Registration only applies to clients in employment in the meantime</span>
                                     </div>
                                 </div>
                             </div>
@@ -41,8 +41,14 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Salutation</label>
-                                        <input class="form-control" placeholder="Salutation" required
-                                               th:field="*{salutation}" type="text">
+                                        <select class="form-control"
+                                                placeholder="Salutation" required
+                                                th:field="*{salutation}">
+                                            <option selected value="">Select</option>
+                                            <option th:each="os : ${T(org.commons.enums.SalutationType).values()}"
+                                                    th:text="${os}"
+                                                    th:value="${os}"></option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Name</label>
@@ -140,7 +146,7 @@
 
                                         <label class="form-label">Confirm Password</label>
 
-                                        <input class="form-control" id="passwordConfirm"
+                                        <input class="form-control" id="confirmPassword"
                                                maxlength="15" minlength="6"
                                                oninput="checkPasswordMatch(this)"
                                                placeholder="Confrm Password *"
@@ -193,7 +199,6 @@
 
         $.post(url, params, function (resp) {
             console.log(resp)
-
             if (resp === "OK") {
                 form.submit();
             } else if (resp === "Duplicated") {

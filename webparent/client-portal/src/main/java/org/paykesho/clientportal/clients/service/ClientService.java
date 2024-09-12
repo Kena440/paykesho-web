@@ -214,17 +214,22 @@ public class ClientService {
     }
 
     public String checkClientStatus(String name, String nrc, String tpin, String manNumber, Organization organization) {
+        String resp = "";
+
         boolean clientExists = clientRepository.existsByNrcAndTpinAndManNumberAndOrganization(nrc, tpin, manNumber, organization);
         if (clientExists) {
-            return "Duplicated";
+            resp = "Duplicated";
+            return resp;
         }
 
         boolean employeeExists = employeeRecordRepository.existsByNameAndNrcAndTpinAndManNumberAndOrganization(name, nrc, tpin, manNumber, organization);
-        if (employeeExists) {
-            return "OK";
+        if (!employeeExists) {
+            resp = "Not Found";
+        } else {
+            resp = "OK";
         }
 
-        return "Not Found";
+        return resp;
     }
 
     public ClientBalance saveClientBalance(ClientBalance clientBalance) {
