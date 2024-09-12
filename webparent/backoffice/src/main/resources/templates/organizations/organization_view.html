@@ -100,7 +100,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="card card-body bg-white border-light shadow-sm mb-4">
-                                                    <div id="map" style='width: 100%; height: 400px'></div>
+                                                    <div id="map" style='width: 100%; height: 200px'></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -142,42 +142,62 @@
                                                     </div>
                                                     <hr>
                                                     <div class="d-flex align-items-center pt-3 mr-5">
-                                                        <div class="d-block"
-                                                             th:if="${clientRecordsSize != null}"><label
-                                                                class="mb-0">Total (Client Records)</label>
-                                                            <h4 class="mb-0">[[${clientRecordsSize}]]</h4>
-                                                        </div>
+                                                        <table class="table">
+                                                            <tbody>
+                                                            <tr th:if="${clientRecordsSize != null}">
+                                                                <td>Total (Client Records)</td>
+                                                                <td>[[${clientRecordsSize}]]</td>
+                                                                <td>
+                                                                    <a href="#">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             width="24" height="24" viewBox="0 0 24 24"
+                                                                             fill="none" stroke="currentColor"
+                                                                             stroke-width="2" stroke-linecap="round"
+                                                                             stroke-linejoin="round" data-lucide="eye"
+                                                                             class="lucide lucide-trash align-middle">
+                                                                            <path d="M3 6h18"></path>
+                                                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                                        </svg>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr th:if="${employeeRecordsSize != null}">
+                                                                <td>Total (Employee Records)</td>
+                                                                <td>[[${employeeRecordsSize}]]</td>
+                                                                <td>
+                                                                    <a href="#">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             width="24" height="24" viewBox="0 0 24 24"
+                                                                             fill="none" stroke="currentColor"
+                                                                             stroke-width="2" stroke-linecap="round"
+                                                                             stroke-linejoin="round" data-lucide="eye"
+                                                                             class="lucide lucide-trash align-middle">
+                                                                            <path d="M3 6h18"></path>
+                                                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                                        </svg>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                     <hr>
                                                     <div class="d-flex align-items-center pt-3 mr-5">
-                                                        <div class="d-block"
-                                                             th:if="${employeeRecordsSize != null}"><label
-                                                                class="mb-0">Total (Employee Records)</label>
-                                                            <h4 class="mb-0">[[${employeeRecordsSize}]]</h4>
-                                                        </div>
-                                                    </div>
-                                                    <hr>
-                                                    <div class="d-flex align-items-center pt-3 mr-5">
-                                                        <button class="btn btn-primary shadow-sm mr-2"
+                                                        <button class="btn btn-sm btn-primary shadow-sm mr-2"
                                                                 data-bs-target="#modal-add-record"
                                                                 data-bs-toggle="modal"
                                                                 type="button">
                                                             <i class="align-middle" data-lucide="user-plus">&nbsp;</i>
                                                             Add Employee Record
                                                         </button>
-                                                        <button class="btn btn-primary shadow-sm mr-2"
-                                                                data-bs-target="#modal-add-record"
+                                                        <button class="btn btn-sm btn-primary shadow-sm mr-2"
+                                                                data-bs-target="#modal-add-bulk-record"
                                                                 data-bs-toggle="modal"
                                                                 type="button">
                                                             <i class="align-middle" data-lucide="folder-plus">&nbsp;</i>
                                                             Add Employee Record (Bulk)
-                                                        </button>
-                                                        <button class="btn btn-primary shadow-sm"
-                                                                data-bs-target="#modal-list-database"
-                                                                data-bs-toggle="modal"
-                                                                type="button">
-                                                            <i class="align-middle" data-lucide="database">&nbsp;</i>
-                                                            List Employee Record Database
                                                         </button>
                                                     </div>
                                                 </div>
@@ -234,6 +254,36 @@
                         <input class="form-control" name="manNumber" placeholder="Enter Man Number"
                                required type="text">
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link text-danger ml-auto" data-bs-dismiss="modal" type="button">Close
+                    </button>
+                    <button class="btn btn-sm btn-secondary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div aria-hidden="true" aria-labelledby="modal-add-bulk-record" class="modal fade" id="modal-add-bulk-record"
+     role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Add Bulk Records</h6>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <form method="post"
+                  th:action="@{/organizations/employee-record/bulk/save}">
+
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>CSV File</label>
+                        <input class="form-control" name="name" placeholder="Enter full name"
+                               required type="file">
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-link text-danger ml-auto" data-bs-dismiss="modal" type="button">Close

@@ -11,9 +11,11 @@ import org.paykesho.organizationportal.client.enums.Constants;
 import org.paykesho.organizationportal.client.service.ClientService;
 import org.paykesho.organizationportal.organizationadmins.service.OrganizationAdminService;
 import org.paykesho.organizationportal.organizations.service.OrganizationService;
+import org.paykesho.organizationportal.security.OrganizationAdminUserDetails;
 import org.paykesho.organizationportal.settings.service.SettingService;
 import org.paykesho.organizationportal.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +45,10 @@ public class ClientController {
 
 
     @GetMapping("")
-    public String showClients(Model model, HttpServletRequest request) {
-        List<Client> clientList = clientService.listAll();
+    public String showClients(@AuthenticationPrincipal OrganizationAdminUserDetails loggedInUser, Model model, HttpServletRequest request) {
+        OrganizationAdmin organizationAdmin = organizationAdminService.getOrganizationAdminByEmail(loggedInUser.getOrganizationAdmin().getEmail());
+        Organization organization = organizationService.getOrganizationByOrganizationAdmin(organizationAdmin);
+        List<Client> clientList = clientService.listAll(organization);
         loadCurrencySetting(request);
         model.addAttribute("clientList", clientList);
         model.addAttribute("pageTitle", "Clients");

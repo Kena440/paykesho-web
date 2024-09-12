@@ -2,6 +2,7 @@ package org.paykesho.organizationportal.client.service;
 
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
+import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.client.repository.ClientBalanceRepository;
@@ -28,8 +29,8 @@ public class ClientService {
     @Autowired
     private ClientBalanceRepository clientBalanceRepository;
 
-    public List<Client> listAll() {
-        List<Client> clientList = (List<Client>) clientRepository.findAll(Sort.by("code").ascending());
+    public List<Client> listAll(Organization organization) {
+        List<Client> clientList = clientRepository.getOrganizationClients(organization);
         for (Client c : clientList) {
             ClientBalance clientBalance = clientBalanceRepository.getClientBalanceByClientId(c.getId());
             c.setClientBalance(clientBalance);

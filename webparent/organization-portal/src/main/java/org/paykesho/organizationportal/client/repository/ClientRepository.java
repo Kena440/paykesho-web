@@ -7,13 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface ClientRepository extends SearchRepository<Client, Integer> {
-
-    @Query("select c from Client c where concat(c.code, ' ', c.email, ' ', c.name, ' ', c.address, ' ', c.phoneNumber, ' ', c.clientType, ' ', c.salutation) like %?1%")
-    public Page<Client> findAll(String keyword, Pageable pageable);
+public interface ClientRepository extends CrudRepository<Client, Integer> {
 
     @Query("update Client c set c.enabled = ?2 where c.id = ?1")
     @Modifying

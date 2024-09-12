@@ -242,10 +242,10 @@
             .then(response => response.json())
             .then(data => {
                 // Hide loader
+                loader.style.display = 'none';
 
                 if (data.success) {
-                    loader.style.display = 'none';
-                    showWarningModal('Payment successful!');
+                    showModalDialog('Payment', 'Payment successful!');
                     paymentForm.reset();
                     merchantDetailsDiv.style.display = 'none';
                     amountSection.style.display = 'none';
