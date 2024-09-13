@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface VoucherRepository extends SearchRepository<Voucher, Integer> {
+public interface VouchersRepository extends SearchRepository<Voucher, Integer> {
 
     @Query("select v from Voucher v where v.client.id = :client order by v.requestDate desc")
     public List<Voucher> getVouchersByClient(@Param("client") Integer client);

@@ -20,9 +20,12 @@
                         <a class="btn btn-primary shadow-sm" th:href="@{/repayments/schedules}">
                             <i class="align-middle" data-lucide="list">&nbsp;</i> All Repayments
                         </a>
-                        <a class="btn btn-primary shadow-sm" th:href="@{/repayments/create-schedule}">
+                        <button class="btn btn-primary shadow-sm"
+                                data-bs-target="#modal-add-repayment-schedule-record"
+                                data-bs-toggle="modal"
+                                type="button">
                             <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Create
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <div class="row">
@@ -53,13 +56,13 @@
                                         <td><span class="font-weight-normal">[[${repaymentSchedule.client}]] - <small>[[${repaymentSchedule.client.organization}]]</small></span>
                                         </td>
                                         <td><span class="font-weight-normal"
-                                                  th:replace="fragments/fragments :: format_currency(${schedule.amountDue})"></span>
+                                                  th:replace="fragments/fragments :: format_currency(${repaymentSchedule.amountDue})"></span>
                                         </td>
                                         <td><span class="font-weight-normal"
-                                                  th:replace="fragments/fragments :: format_currency(${schedule.amountPaid})"></span>
+                                                  th:replace="fragments/fragments :: format_currency(${repaymentSchedule.amountPaid})"></span>
                                         </td>
-                                        <td><span class="font-weight-normal">[[${schedule.dueDate}]]</span></td>
-                                        <td><span class="font-weight-normal">[[${schedule.status}]]</span></td>
+                                        <td><span class="font-weight-normal">[[${repaymentSchedule.dueDate}]]</span></td>
+                                        <td><span class="font-weight-normal">[[${repaymentSchedule.status}]]</span></td>
                                     </tr>
 
                                     </tbody>
@@ -70,6 +73,53 @@
                 </div>
             </div>
         </main>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="modal-add-repayment-schedule-record" class="modal fade"
+     id="modal-add-repayment-schedule-record" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Add Repayment Schedule</h6>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <form method="post"
+                  th:action="@{/repayments/save-schedule}"
+                  th:object="${request}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Client</label>
+                        <select class="form-control" placeholder="Client" required th:field="*{client}"
+                                id="client-selector">
+                            <option selected value="">Select</option>
+                            <option th:each="os : ${clientList}" th:text="${os}" th:value="${os.id}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Due</label>
+                        <input class="form-control" th:field="*{amountDue}" id="amount-due" readonly
+                               placeholder="Enter Amount"
+                               step="0.1"
+                               min="20"
+                               required type="number">
+                    </div>
+
+                 <!--   <div class="form-group">
+                        <label>Due Date</label>
+                        <input class="form-control" th:field="*{dueDateOnForm}" placeholder="Due Date"
+                               required type="date">
+                    </div>-->
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link text-danger ml-auto" data-bs-dismiss="modal" type="button">Close
+                    </button>
+                    <button class="btn btn-sm btn-secondary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -96,11 +146,26 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Datatables Responsive
         $("#datatables-reponsive").DataTable({
             destroy: true,
             responsive: true
         });
+    });
+</script>
+<script>
+    document.getElementById('client-selector').addEventListener('change', function () {
+        var clientId = this.value;
+
+        if (clientId) {
+            fetch('/clients/rest/voucher-totals?clientId=' + clientId, {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('amount-due').value = data;
+                })
+                .catch(error => console.error('Error fetching balance:', error));
+        }
     });
 </script>
 

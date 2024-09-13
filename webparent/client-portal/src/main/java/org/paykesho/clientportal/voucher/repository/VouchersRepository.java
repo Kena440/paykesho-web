@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
+public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
 
     @Query("select v from Voucher v where v.client = :client order by v.requestDate desc")
     public List<Voucher> getVouchersByClient(@Param("client") Client client);

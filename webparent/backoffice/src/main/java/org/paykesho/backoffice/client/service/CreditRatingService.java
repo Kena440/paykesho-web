@@ -10,7 +10,7 @@ import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.repayments.repository.PayrollDeductionRepository;
 import org.paykesho.backoffice.repayments.repository.RepaymentScheduleRepository;
 import org.paykesho.backoffice.transaction.repository.TransactionRepository;
-import org.paykesho.backoffice.voucher.repository.VoucherRepository;
+import org.paykesho.backoffice.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +39,7 @@ public class CreditRatingService {
     private RepaymentScheduleRepository repaymentScheduleRepository;
 
     @Autowired
-    private VoucherRepository voucherRepository;
+    private VouchersRepository vouchersRepository;
 
     public int calculateCreditScore(Integer clientId) {
         Client client = clientRepository.findById(clientId)
@@ -103,7 +103,7 @@ public class CreditRatingService {
 
     private int calculateCreditMixScore(Client client) {
         // Retrieve vouchers for the client
-        List<Voucher> vouchers = voucherRepository.getVouchersByClient(client.getId());
+        List<Voucher> vouchers = vouchersRepository.getVouchersByClient(client.getId());
 
         int voucherCount = vouchers.size();
         if (voucherCount == 0) {

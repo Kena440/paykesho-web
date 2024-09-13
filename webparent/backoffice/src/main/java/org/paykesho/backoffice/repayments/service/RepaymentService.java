@@ -29,7 +29,7 @@ public class RepaymentService {
     @Autowired
     private PayrollDeductionRepository payrollDeductionRepository;
     @Autowired
-    private VouchersRepository voucherRepository;
+    private VouchersRepository vouchersRepository;
 
     public void createRepaymentSchedule(RepaymentScheduleRequest request) throws PaykeshoError {
         BigDecimal amountDue = request.getAmountDue();

@@ -1,6 +1,7 @@
 package org.paykesho.organizationportal.vouchers.service;
 
 import org.commons.entity.Voucher;
+import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.vouchers.repository.VouchersRepository;
@@ -20,6 +21,14 @@ public class VouchersService {
             throw new PaykeshoError("no organization id");
         } else {
             return vouchersRepository.getVouchersByOrganization(organization);
+        }
+    }
+
+    public List<Voucher> getApprovedAndValidClientVouchers(Client client) throws PaykeshoError {
+        if (client == null) {
+            throw new PaykeshoError("no client id");
+        } else {
+            return vouchersRepository.getApprovedAndValidVouchers(client);
         }
     }
 }

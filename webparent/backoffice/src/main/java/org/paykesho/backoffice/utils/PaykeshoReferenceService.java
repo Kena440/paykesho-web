@@ -4,7 +4,7 @@ import net.bytebuddy.utility.RandomString;
 import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.merchants.repository.MerchantRepository;
 import org.paykesho.backoffice.transaction.repository.TransactionRepository;
-import org.paykesho.backoffice.voucher.repository.VoucherRepository;
+import org.paykesho.backoffice.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ public class PaykeshoReferenceService {
     @Autowired
     private ClientRepository clientRepository;
     @Autowired
-    private VoucherRepository voucherRepository;
+    private VouchersRepository vouchersRepository;
     @Autowired
     private TransactionRepository transactionRepository;
 
@@ -43,7 +43,7 @@ public class PaykeshoReferenceService {
 
             case "ITEM_REQ_VCR":
                 itemPrefix = "V";
-                count = voucherRepository.countAllVouchers() + 1;
+                count = vouchersRepository.countAllVouchers() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
 

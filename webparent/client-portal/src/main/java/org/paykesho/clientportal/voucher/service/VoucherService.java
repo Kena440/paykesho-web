@@ -4,7 +4,7 @@ import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.VoucherDto;
-import org.paykesho.clientportal.voucher.repository.VoucherRepository;
+import org.paykesho.clientportal.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +15,13 @@ import java.util.List;
 public class VoucherService {
 
     @Autowired
-    private VoucherRepository voucherRepository;
+    private VouchersRepository vouchersRepository;
 
     public List<Voucher> getClientVouchers(Client client) throws PaykeshoError {
         if (client == null) {
             throw new PaykeshoError("no client id");
         } else {
-            return voucherRepository.getVouchersByClient(client);
+            return vouchersRepository.getVouchersByClient(client);
         }
     }
 
@@ -29,7 +29,7 @@ public class VoucherService {
         if (voucher == null) {
             throw new PaykeshoError("no voucher");
         } else {
-            return voucherRepository.save(voucher);
+            return vouchersRepository.save(voucher);
         }
     }
 
@@ -37,7 +37,7 @@ public class VoucherService {
         if (client == null) {
             throw new PaykeshoError("no client id");
         } else {
-            return voucherRepository.getApprovedAndValidVouchers(client);
+            return vouchersRepository.getApprovedAndValidVouchers(client);
         }
     }
 
@@ -53,14 +53,14 @@ public class VoucherService {
     }
 
     public Voucher getVoucherById(Integer id) {
-        return voucherRepository.getVoucherById(id);
+        return vouchersRepository.getVoucherById(id);
     }
 
     public List<VoucherDto> getClientVouchersFlat(Client client) throws PaykeshoError {
         if (client == null) {
             throw new PaykeshoError("no client id");
         } else {
-            return voucherRepository.getVouchersByClientFlat(client);
+            return vouchersRepository.getVouchersByClientFlat(client);
         }
     }
 
@@ -68,11 +68,11 @@ public class VoucherService {
         if (client == null ) {
             throw new PaykeshoError("no client id");
         } else {
-            return voucherRepository.getVouchersByClientAndMerchantFlat(client, merchant.getCode());
+            return vouchersRepository.getVouchersByClientAndMerchantFlat(client, merchant.getCode());
         }
     }*/
 
     public Voucher getVoucherByCode(String voucherCode) {
-        return voucherRepository.getVoucherByReference(voucherCode);
+        return vouchersRepository.getVoucherByReference(voucherCode);
     }
 }

@@ -20,9 +20,12 @@
                         <a class="btn btn-primary shadow-sm" th:href="@{/repayments/payroll-deductions}">
                             <i class="align-middle" data-lucide="list">&nbsp;</i> All Payments
                         </a>
-                        <a class="btn btn-primary shadow-sm" th:href="@{/repayments/create-payroll-deduction}">
+                        <button class="btn btn-primary shadow-sm"
+                                data-bs-target="#modal-add-payroll-deduction-record"
+                                data-bs-toggle="modal"
+                                type="button">
                             <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Process
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <div class="row">
@@ -66,6 +69,47 @@
                 </div>
             </div>
         </main>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="modal-add-payroll-deduction-record" class="modal fade"
+     id="modal-add-payroll-deduction-record" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Add Payroll Deduction</h6>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <form method="post"
+                  th:action="@{/repayments/save-payroll-deduction}"
+                  th:object="${repaymentRequest}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Client</label>
+                        <select class="form-control" placeholder="Client" required th:field="*{client}"
+                                id="client-selector">
+                            <option selected value="">Select</option>
+                            <option th:each="os : ${clientList}" th:text="${os}" th:value="${os.id}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Due</label>
+                        <input class="form-control" th:field="*{amount}"
+                               placeholder="Enter Amount"
+                               step="0.1"
+                               min="20"
+                               required type="number">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link text-danger ml-auto" data-bs-dismiss="modal" type="button">Close
+                    </button>
+                    <button class="btn btn-sm btn-secondary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
