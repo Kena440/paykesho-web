@@ -34,4 +34,7 @@ public class Transaction {
     private String naration;
     @Column(name = "txn_date", length = 128, nullable = false)
     private Date txnDate;
+
+    private boolean settled;
+
 }

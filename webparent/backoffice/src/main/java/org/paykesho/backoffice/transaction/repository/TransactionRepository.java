@@ -2,6 +2,7 @@ package org.paykesho.backoffice.transaction.repository;
 
 import org.commons.entity.Transaction;
 import org.commons.entity.client.Client;
+import org.commons.entity.merchant.Merchant;
 import org.paykesho.backoffice.paging.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +26,12 @@ public interface TransactionRepository extends SearchRepository<Transaction, Int
 
     @Query("select t from Transaction t where t.merchant.id = ?1 order by t.txnDate desc")
     List<Transaction> getTransactionsByMerchantId(int id);
+
+    @Query("SELECT t FROM Transaction t WHERE t.settled = false")
+    List<Transaction> findUnsettledTransactions();
+
+    @Query("SELECT t FROM Transaction t WHERE t.merchant = :merchant AND t.settled = false")
+    List<Transaction> findUnsettledTransactionsByMerchant(@Param("merchant") Merchant merchant);
+
+
 }

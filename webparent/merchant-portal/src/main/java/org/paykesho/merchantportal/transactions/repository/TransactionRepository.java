@@ -16,4 +16,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Query("select count(t.id) as total from Transaction t where t.merchant = :merchant")
     Long countAllTransactions(@Param("merchant") Merchant merchant);
 
+    @Query("SELECT t FROM Transaction t WHERE t.merchant = :merchant AND t.settled = false")
+    List<Transaction> findUnsettledTransactionsByMerchant(@Param("merchant") Merchant merchant);
+
 }

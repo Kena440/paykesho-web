@@ -350,6 +350,7 @@ public class APIController {
         transaction.setVoucher(updateVoucher);
         transaction.setTransactionDate(new Date());
         transaction.setTransactionNaration("test from app");
+            transaction.setSettled(false);
 //        if (!meterAccountNumber.isEmpty()) transaction.setMeterAccountNumber(meterAccountNumber);
 
         try {

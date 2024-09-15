@@ -3,6 +3,7 @@ package org.paykesho.backoffice.utils;
 import net.bytebuddy.utility.RandomString;
 import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.merchants.repository.MerchantRepository;
+import org.paykesho.backoffice.settlement.repository.SettlementRepository;
 import org.paykesho.backoffice.transaction.repository.TransactionRepository;
 import org.paykesho.backoffice.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class PaykeshoReferenceService {
     private VouchersRepository vouchersRepository;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private SettlementRepository settlementRepository;
 
     public String generateCode(String itemRequest) {
         String reference = "";
@@ -50,6 +53,12 @@ public class PaykeshoReferenceService {
             case "ITEM_REQ_TRX":
                 itemPrefix = "T";
                 count = transactionRepository.countAllTransactions() + 1;
+                reference = getReference(itemPrefix, count);
+                break;
+
+            case "ITEM_REQ_STL":
+                itemPrefix = "S";
+                count = settlementRepository.countAllSettlements() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
 

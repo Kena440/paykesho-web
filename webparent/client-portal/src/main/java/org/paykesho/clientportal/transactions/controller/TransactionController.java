@@ -137,6 +137,7 @@ public class TransactionController {
         transaction.setReference(paykeshoRef);
         transaction.setNaration(paykeshoRef);
         transaction.setTxnDate(new Date());
+        transaction.setSettled(false);
 
         // Uncomment if voucher update is necessary
         // Voucher updateVoucher = voucherService.updateVoucherAvailableAmount(client, newVoucherAvailableAmount);
