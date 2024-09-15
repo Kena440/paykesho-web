@@ -77,7 +77,7 @@ public class Client extends IdBasedEntity {
     @Transient
     private ClientBalance clientBalance;
     @Transient
-    private CreditScore creditScore;
+    private Integer creditScore;
 
     public Client() {
     }

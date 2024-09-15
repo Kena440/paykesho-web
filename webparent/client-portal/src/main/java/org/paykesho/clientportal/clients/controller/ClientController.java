@@ -71,7 +71,7 @@ public class ClientController {
     }
 
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, @AuthenticationPrincipal ClientUserDetails loggedInUser) throws PaykeshoError {
+    public String showDashboard(Model model, @AuthenticationPrincipal ClientUserDetails loggedInUser) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -111,10 +111,9 @@ public class ClientController {
     }
 
     @PostMapping(value = "/save-client")
-    public String signUpClient(Client client, Model model, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
-
+    public String signUpClient(Client client, Model model, HttpServletRequest request) {
         clientService.registerClient(client);
-        sendVerificationEmail(request, client);
+        //sendVerificationEmail(request, client);
 
         model.addAttribute("pageTitle", "Registration Successful");
         return "register/register_success";

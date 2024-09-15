@@ -81,6 +81,15 @@
                                     </div>
                                     <div class="mb-3">
 
+                                        <label class="form-label">Net Income</label>
+                                        <input class="form-control" max="999999999999" min="20"
+                                               placeholder="Net Income" required
+                                               step="0.1"
+                                               th:field="*{clientIncome}"
+                                               type="number">
+                                    </div>
+                                    <div class="mb-3">
+
                                         <label class="form-label">Gender</label>
                                         <select class="form-control"
                                                 placeholder="Gender" required
