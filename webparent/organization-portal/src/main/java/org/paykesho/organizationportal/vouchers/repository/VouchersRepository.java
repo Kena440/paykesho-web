@@ -16,6 +16,7 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
 
     @Query("select count(t.id) as total from Voucher t where t.client.organization = :organization")
     Long countAllVouchers(@Param("organization") Organization organization);
+
     @Query("select v from Voucher v where v.client = :client and v.approved = true and v.availableAmount > 0")
     public List<Voucher> getApprovedAndValidVouchers(@Param("client") Client client);
 

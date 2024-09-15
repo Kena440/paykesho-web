@@ -10,7 +10,6 @@ import org.paykesho.organizationportal.client.repository.ClientBalanceRepository
 import org.paykesho.organizationportal.client.repository.ClientRepository;
 import org.paykesho.organizationportal.settings.repository.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

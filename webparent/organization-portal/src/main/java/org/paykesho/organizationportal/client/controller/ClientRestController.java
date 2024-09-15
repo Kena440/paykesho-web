@@ -41,7 +41,8 @@ public class ClientRestController {
         Client client = clientService.get(clientId);
         BigDecimal totals = vouchersService.getApprovedAndValidClientVouchers(client).stream()
                 .map(Voucher::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add); ;
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        ;
         return new ResponseEntity<>(totals, HttpStatus.OK);
     }
 }

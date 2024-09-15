@@ -4404,7 +4404,7 @@
         nn.prototype.insert = function (t, e, r, n, i) {
             this._forEachCell(e, r, n, i, this._insertCell, this.uid++), this.keys.push(t), this.bboxes.push(e), this.bboxes.push(r), this.bboxes.push(n), this.bboxes.push(i);
         }, nn.prototype._insertReadonly = function () {
-            throw"Cannot insert into a GridIndex created from an ArrayBuffer."
+            throw "Cannot insert into a GridIndex created from an ArrayBuffer."
         }, nn.prototype._insertCell = function (t, e, r, n, i, a) {
             this.cells[i].push(a);
         }, nn.prototype.query = function (t, e, r, n, i) {

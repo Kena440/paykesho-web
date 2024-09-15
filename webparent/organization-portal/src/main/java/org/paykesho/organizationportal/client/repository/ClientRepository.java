@@ -2,9 +2,6 @@ package org.paykesho.organizationportal.client.repository;
 
 import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
-import org.paykesho.organizationportal.paging.SearchRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -61,7 +61,8 @@
                                         <td><span class="font-weight-normal"
                                                   th:replace="fragments/fragments :: format_currency(${repaymentSchedule.amountPaid})"></span>
                                         </td>
-                                        <td><span class="font-weight-normal">[[${repaymentSchedule.dueDate}]]</span></td>
+                                        <td><span class="font-weight-normal">[[${repaymentSchedule.dueDate}]]</span>
+                                        </td>
                                         <td><span class="font-weight-normal">[[${repaymentSchedule.status}]]</span></td>
                                     </tr>
 
@@ -91,26 +92,26 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Client</label>
-                        <select class="form-control" placeholder="Client" required th:field="*{client}"
-                                id="client-selector">
+                        <select class="form-control" id="client-selector" placeholder="Client" required
+                                th:field="*{client}">
                             <option selected value="">Select</option>
                             <option th:each="os : ${clientList}" th:text="${os}" th:value="${os.id}"></option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Amount Due</label>
-                        <input class="form-control" th:field="*{amountDue}" id="amount-due" readonly
-                               placeholder="Enter Amount"
+                        <input class="form-control" id="amount-due" min="20" placeholder="Enter Amount"
+                               readonly
+                               required
                                step="0.1"
-                               min="20"
-                               required type="number">
+                               th:field="*{amountDue}" type="number">
                     </div>
 
-                 <!--   <div class="form-group">
-                        <label>Due Date</label>
-                        <input class="form-control" th:field="*{dueDateOnForm}" placeholder="Due Date"
-                               required type="date">
-                    </div>-->
+                    <!--   <div class="form-group">
+                           <label>Due Date</label>
+                           <input class="form-control" th:field="*{dueDateOnForm}" placeholder="Due Date"
+                                  required type="date">
+                       </div>-->
 
                 </div>
                 <div class="modal-footer">
