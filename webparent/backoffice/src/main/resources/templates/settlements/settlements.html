@@ -36,29 +36,24 @@
                                         <th>#</th>
                                         <th>Ref</th>
                                         <th>Amount</th>
-                                        <th>Client</th>
                                         <th>Merchant</th>
+                                        <th>Status</th>
                                         <th>Date</th>
+                                        <th>Update</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr th:each="settlement, settlementStat : ${settlementList}">
                                         <td class="hideable-column">[[${settlementStat.count}]]</td>
-                                        <td>
-                                            <span class="font-weight-normal">
-                                                <a th:href="@{'/settlements/view/'+${settlement.id}}"
-                                                   title="settlement View">
-                                                    <span class="font-weight-normal"> [[${settlement.reference}]]</span>
-                                                </a>
-                                            </span>
-                                        </td>
+                                        <td><span class="font-weight-normal">[[${settlement.reference}]]</span></td>
                                         <td><span class="font-weight-normal"
-                                                  th:replace="fragments/fragments :: format_currency(${settlement.amount})"></span>
+                                                  th:replace="fragments/fragments :: format_currency(${settlement.settlementAmount})"></span>
                                         </td>
-                                        <td><span class="font-weight-normal">[[${settlement.client}]] <small>([[${settlement.client.organization}]])</small></span>
+                                        <td><span class="font-weight-normal">[[${settlement.settlementStatus}]]</span>
                                         </td>
                                         <td><span class="font-weight-normal">[[${settlement.merchant}]]</span></td>
-                                        <td><span class="font-weight-normal">[[${settlement.txnDate}]]</span></td>
+                                        <td><span class="font-weight-normal">[[${settlement.settlementStatus}]]</span></td>
+                                        <td><span class="font-weight-normal">[[${settlement.lastUpdated}]]</span></td>
                                     </tr>
 
                                     </tbody>
