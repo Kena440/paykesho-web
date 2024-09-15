@@ -25,8 +25,8 @@ public class SettlementService {
     @Autowired
     private PaykeshoReferenceService paykeshoReferenceService;
 
-    public List<Settlement> listAll() {
-        return settlementRepository.listAll();
+    public List<Settlement> getAllSettlements() {
+        return settlementRepository.getAllSettlements();
     }
 
     public List<Settlement> listAllByMerchant(Merchant merchant) {

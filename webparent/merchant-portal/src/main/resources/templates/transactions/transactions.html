@@ -41,6 +41,7 @@
                                         <th>Amount</th>
                                         <th>Client</th>
                                         <th>Merchant</th>
+                                        <th>Settled</th>
                                         <th>Date</th>
                                     </tr>
                                     </thead>
@@ -61,6 +62,16 @@
                                         <td><span class="font-weight-normal">[[${transaction.client}]] <small>([[${transaction.client.organization}]])</small></span>
                                         </td>
                                         <td><span class="font-weight-normal">[[${transaction.merchant}]]</span></td>
+                                        <td>
+                                            <span class="font-weight-normal">
+                                               <th:block th:if="${transaction.settled}">
+                                                        <span class="badge rounded-pill bg-success">Settled</span>
+                                                    </th:block>
+                                                    <th:block th:unless="${transaction.settled}">
+                                                        <span class="badge rounded-pill bg-warning">Pending</span>
+                                                    </th:block>
+                                            </span>
+                                        </td>
                                         <td><span class="font-weight-normal">[[${transaction.txnDate}]]</span></td>
                                     </tr>
 

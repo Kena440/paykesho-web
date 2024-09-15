@@ -30,7 +30,7 @@ public class SettlementController {
 
     @GetMapping("")
     public String showSettlements(Model model, HttpServletRequest request) {
-        List<Settlement> settlementList = settlementService.listAll();
+        List<Settlement> settlementList = settlementService.getAllSettlements();
         loadCurrencySetting(request);
         model.addAttribute("settlementList", settlementList);
         model.addAttribute("pageTitle", "All Settlements");
