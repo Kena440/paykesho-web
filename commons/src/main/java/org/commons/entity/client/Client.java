@@ -13,6 +13,7 @@ import org.commons.enums.SalutationType;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -61,7 +62,8 @@ public class Client extends IdBasedEntity {
     private ClientType clientType;
     @Column(name = "account_non_locked")
     private boolean accountNonLocked;
-
+    @Column(name = "client_income", length = 128, nullable = false)
+    private BigDecimal clientIncome;
     @Column(name = "failed_attempt")
     private int failedAttempt;
 
@@ -74,6 +76,8 @@ public class Client extends IdBasedEntity {
     private String photos;
     @Transient
     private ClientBalance clientBalance;
+    @Transient
+    private CreditScore creditScore;
 
     public Client() {
     }

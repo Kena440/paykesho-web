@@ -2,10 +2,12 @@ package org.paykesho.backoffice.client.service;
 
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
+import org.commons.entity.client.CreditScore;
 import org.commons.entity.settings.Country;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.repository.ClientBalanceRepository;
 import org.paykesho.backoffice.client.repository.ClientRepository;
+import org.paykesho.backoffice.client.repository.CreditScoreRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ public class ClientService {
     private CountryRepository countryRepository;
     @Autowired
     private ClientBalanceRepository clientBalanceRepository;
+    @Autowired
+    private CreditScoreRepository creditScoreRepository;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);
@@ -37,7 +41,9 @@ public class ClientService {
         List<Client> clientList = (List<Client>) clientRepository.findAll(Sort.by("code").ascending());
         for (Client c : clientList) {
             ClientBalance clientBalance = clientBalanceRepository.getClientBalanceByClientId(c.getId());
+            CreditScore creditScore = creditScoreRepository.getCreditScoreByClientId(c.getId());
             c.setClientBalance(clientBalance);
+            c.setCreditScore(creditScore);
         }
 
         return clientList;

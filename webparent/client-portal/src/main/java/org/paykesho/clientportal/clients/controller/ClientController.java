@@ -6,6 +6,7 @@ import org.commons.entity.settings.Country;
 import org.commons.enums.ClientType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
+import org.paykesho.clientportal.clients.service.CreditScoreService;
 import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.merchant.service.MerchantService;
 import org.paykesho.clientportal.organizations.service.OrganizationService;
@@ -45,6 +46,8 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
     @Autowired
+    private CreditScoreService creditScoreService;
+    @Autowired
     private MerchantService merchantService;
     @Autowired
     private OrganizationService organizationService;
@@ -81,7 +84,7 @@ public class ClientController {
             if (client != null) {
                 BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
                 model.addAttribute("availableBalance", availableBalance);
-                int creditScore = 300;
+                int creditScore = creditScoreService.calculateCreditScore(client);
                 model.addAttribute("creditScore", creditScore);
             }
 

@@ -43,6 +43,7 @@
                                         <th>Contact Details</th>
                                         <th>Enabled</th>
                                         <th>Balance</th>
+                                        <th>Score</th>
                                         <th>Type</th>
                                     </tr>
                                     </thead>
@@ -70,6 +71,12 @@
                                         </td>
                                         <td><span class="font-weight-normal"
                                                   th:replace="fragments/fragments :: format_currency(${client.clientBalance.availableBalance})"></span>
+                                        </td>
+                                        <td><span class="font-weight-normal" th:if="${client.creditScore != null}"
+                                                  th:replace="fragments/fragments :: format_number(${client.creditScore.score})"></span>
+                                            <span class="font-weight-normal"
+                                                  th:unless="${client.creditScore != null}">Pending..</span>
+                                        </td>
                                         <td><span class="font-weight-normal">[[${client.clientType}]]</span></td>
                                     </tr>
 

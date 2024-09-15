@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
@@ -30,5 +31,12 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
       List<VoucherDto> getVouchersByClientAndMerchantFlat(Client client, String merchantCode);
   */
     Voucher getVoucherByReference(String voucherCode);
+
+    @Query("SELECT COUNT(v) FROM Voucher v WHERE v.client.id = :clientId AND v.repaymentDate IS NOT NULL AND v.repaymentDate > CURRENT_DATE")
+    long countDelayedPayments(@Param("clientId") Integer clientId);
+
+    // Custom query to get the outstanding balance for a client
+    @Query("SELECT SUM(v.availableAmount) FROM Voucher v WHERE v.client.id = :clientId AND v.approved = true AND v.availableAmount > 0")
+    BigDecimal getOutstandingBalance(@Param("clientId") Integer clientId);
 }
 
