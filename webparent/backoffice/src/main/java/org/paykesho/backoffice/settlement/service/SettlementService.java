@@ -9,7 +9,6 @@ import org.paykesho.backoffice.settlement.repository.SettlementRepository;
 import org.paykesho.backoffice.transaction.repository.TransactionRepository;
 import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,7 +29,7 @@ public class SettlementService {
         return settlementRepository.listAll();
     }
 
-    public List<Settlement> listAll(Merchant merchant) {
+    public List<Settlement> listAllByMerchant(Merchant merchant) {
         return settlementRepository.getSettlementsByMerchant(merchant);
     }
 

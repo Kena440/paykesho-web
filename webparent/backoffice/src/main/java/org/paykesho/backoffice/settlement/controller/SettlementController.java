@@ -43,7 +43,7 @@ public class SettlementController {
 
         Merchant merchant = merchantService.getMerchantById(id);
 
-        List<Settlement> settlementList = settlementService.listAll(merchant);
+        List<Settlement> settlementList = settlementService.listAllByMerchant(merchant);
         model.addAttribute("settlementList", settlementList);
         model.addAttribute("pageTitle", "Merchant Settlements");
 
