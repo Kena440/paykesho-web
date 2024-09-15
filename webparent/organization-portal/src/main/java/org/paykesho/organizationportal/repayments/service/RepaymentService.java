@@ -56,7 +56,7 @@ public class RepaymentService {
     }
 
     public void processRepayment(RepaymentRequest repaymentRequest) throws PaykeshoError {
-        RepaymentSchedule schedule = repaymentScheduleRepository.findByReference(repaymentRequest.getReference());
+        RepaymentSchedule schedule = repaymentScheduleRepository.findDistinctFirstByClientIdOrderByIdDesc(repaymentRequest.getClient().getId());
 
         if (schedule != null && schedule.getStatus() == PaymentStatus.PENDING) {
             BigDecimal repaymentAmount = repaymentRequest.getAmount();

@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 @Data
 public class RepaymentRequest {
     private Client client;
-
     private String reference;
     private BigDecimal amount;
 }

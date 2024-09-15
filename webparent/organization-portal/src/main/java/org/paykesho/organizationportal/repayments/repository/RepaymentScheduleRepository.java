@@ -13,6 +13,8 @@ public interface RepaymentScheduleRepository extends JpaRepository<RepaymentSche
 
     RepaymentSchedule findByReference(String reference);
 
+    RepaymentSchedule findDistinctFirstByClientIdOrderByIdDesc(Integer clientId);
+
     @Query("select count(c.id) from RepaymentSchedule c")
     public Long countAllRepaymentSchedules();
 }

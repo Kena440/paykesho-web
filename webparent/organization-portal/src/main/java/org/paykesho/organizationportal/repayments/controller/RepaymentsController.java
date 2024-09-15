@@ -90,7 +90,7 @@ public class RepaymentsController {
     }
 
     @PostMapping("/save-payroll-deduction")
-    public String processRepayment(@RequestBody RepaymentRequest repaymentRequest) throws PaykeshoError {
+    public String processRepayment(RepaymentRequest repaymentRequest) throws PaykeshoError {
         repaymentService.processRepayment(repaymentRequest);
         return "redirect:/repayments/payroll-deductions";
 

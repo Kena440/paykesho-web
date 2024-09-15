@@ -55,10 +55,10 @@
                                         <td><span class="font-weight-normal">[[${payrollDeduction.client}]] - <small>[[${payrollDeduction.client.organization}]]</small></span>
                                         </td>
                                         <td><span class="font-weight-normal"
-                                                  th:replace="fragments/fragments :: format_currency(${schedule.amountDeducted})"></span>
+                                                  th:replace="fragments/fragments :: format_currency(${payrollDeduction.amountDeducted})"></span>
                                         </td>
-                                        <td><span class="font-weight-normal">[[${schedule.payrollDate}]]</span></td>
-                                        <td><span class="font-weight-normal">[[${schedule.status}]]</span></td>
+                                        <td><span class="font-weight-normal">[[${payrollDeduction.payrollDate}]]</span></td>
+                                        <td><span class="font-weight-normal">[[${payrollDeduction.status}]]</span></td>
                                     </tr>
 
                                     </tbody>
@@ -94,7 +94,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Amount Due</label>
+                        <label>Amount Paid</label>
                         <input class="form-control" th:field="*{amount}"
                                placeholder="Enter Amount"
                                step="0.1"
