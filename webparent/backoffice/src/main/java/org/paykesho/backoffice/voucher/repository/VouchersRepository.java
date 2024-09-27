@@ -1,6 +1,7 @@
 package org.paykesho.backoffice.voucher.repository;
 
 import org.commons.entity.Voucher;
+import org.commons.entity.client.Client;
 import org.paykesho.backoffice.paging.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,5 +38,9 @@ public interface VouchersRepository extends SearchRepository<Voucher, Integer> {
     // Custom query to get the outstanding balance for a client
     @Query("SELECT SUM(v.availableAmount) FROM Voucher v WHERE v.client.id = :clientId AND v.approved = true AND v.availableAmount > 0")
     BigDecimal getOutstandingBalance(@Param("clientId") Integer clientId);
+
+    @Query("select v from Voucher v where v.client = :client and v.approved = true and v.availableAmount > 0")
+    public List<Voucher> getApprovedAndValidVouchers(@Param("client") Client client);
+
 }
 

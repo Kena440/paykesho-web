@@ -1,17 +1,18 @@
-/*
 package org.paykesho.backoffice.repayments.service;
 
+import org.commons.entity.Voucher;
 import org.commons.entity.client.PayrollDeduction;
 import org.commons.entity.client.RepaymentSchedule;
 import org.commons.enums.PaymentStatus;
 import org.commons.enums.ProcessingStatus;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.organizationportal.repayments.dto.RepaymentRequest;
-import org.paykesho.organizationportal.repayments.dto.RepaymentScheduleRequest;
-import org.paykesho.organizationportal.repayments.repository.PayrollDeductionRepository;
-import org.paykesho.organizationportal.repayments.repository.RepaymentScheduleRepository;
-import org.paykesho.organizationportal.utils.PaykeshoReferenceService;
-import org.paykesho.organizationportal.vouchers.repository.VouchersRepository;
+import org.paykesho.backoffice.client.service.ClientService;
+import org.paykesho.backoffice.repayments.dto.RepaymentRequest;
+import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
+import org.paykesho.backoffice.repayments.repository.PayrollDeductionRepository;
+import org.paykesho.backoffice.repayments.repository.RepaymentScheduleRepository;
+import org.paykesho.backoffice.utils.PaykeshoReferenceService;
+import org.paykesho.backoffice.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,29 +30,33 @@ public class RepaymentService {
     @Autowired
     private PayrollDeductionRepository payrollDeductionRepository;
     @Autowired
-    private VouchersRepository vouchersRepository;
+    private VoucherService vouchersService;
+    @Autowired
+    private ClientService clientService;
 
     public void createRepaymentSchedule(RepaymentScheduleRequest request) throws PaykeshoError {
         BigDecimal amountDue = request.getAmountDue();
-        Date dueDate = request.getDueDate();
+        // Date dueDate = request.getDueDate();
 
         RepaymentSchedule schedule = new RepaymentSchedule();
 
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_RPS");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
+        BigDecimal totals = vouchersService.getApprovedAndValidClientVouchers(request.getClient()).stream().map(Voucher::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
         schedule.setReference(paykeshoRef);
         schedule.setClient(request.getClient());
-        schedule.setAmountDue(amountDue);
+        schedule.setAmountDue(totals);
         schedule.setAmountPaid(BigDecimal.ZERO);
-        schedule.setDueDate(dueDate);
+        schedule.setDueDate(new Date());
         schedule.setStatus(PaymentStatus.PENDING);
 
         repaymentScheduleRepository.save(schedule);
     }
 
     public void processRepayment(RepaymentRequest repaymentRequest) throws PaykeshoError {
-        RepaymentSchedule schedule = repaymentScheduleRepository.findByReference(repaymentRequest.getReference());
+        RepaymentSchedule schedule = repaymentScheduleRepository.findDistinctFirstByClientIdOrderByIdDesc(repaymentRequest.getClient().getId());
 
         if (schedule != null && schedule.getStatus() == PaymentStatus.PENDING) {
             BigDecimal repaymentAmount = repaymentRequest.getAmount();
@@ -82,7 +87,7 @@ public class RepaymentService {
         }
     }
 
-    public List<RepaymentSchedule> getRepaymentSchedule(Long clientId) {
+    public List<RepaymentSchedule> getRepaymentSchedule(Integer clientId) {
         return repaymentScheduleRepository.findByClientId(clientId);
     }
 
@@ -94,4 +99,3 @@ public class RepaymentService {
         return payrollDeductionRepository.findByClientOrganizationId(organizationId);
     }
 }
-*/

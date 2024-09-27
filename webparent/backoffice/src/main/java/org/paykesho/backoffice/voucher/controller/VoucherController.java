@@ -6,6 +6,8 @@ import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.service.ClientService;
 import org.paykesho.backoffice.config.Utility;
+import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
+import org.paykesho.backoffice.repayments.service.RepaymentService;
 import org.paykesho.backoffice.settings.email.EmailSettingBag;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.user.service.UserService;
@@ -36,14 +38,14 @@ public class VoucherController {
 
     @Autowired
     private VoucherService voucherService;
-
     @Autowired
     private UserService userService;
     @Autowired
     private ClientService clientService;
-
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private RepaymentService repaymentService;
 
     @GetMapping("")
     public String listAllVouchersByPage(Model model, HttpServletRequest request) throws PaykeshoError {
@@ -92,9 +94,15 @@ public class VoucherController {
         Voucher approvedVoucher = voucherService.save(voucher);
 
         updateClientBalance(approvedVoucher);
-
+        runRepaymentScheduleProcess(approvedVoucher);
         //sendNotification(approvedVoucher, "APPROVAL", null);
         return approvedVoucher;
+    }
+
+    private void runRepaymentScheduleProcess(Voucher approvedVoucher) throws PaykeshoError {
+        RepaymentScheduleRequest scheduleRequest = new RepaymentScheduleRequest();
+        scheduleRequest.setClient(approvedVoucher.getClient());
+        repaymentService.createRepaymentSchedule(scheduleRequest);
     }
 
     private void updateClientBalance(Voucher approvedVoucher) {

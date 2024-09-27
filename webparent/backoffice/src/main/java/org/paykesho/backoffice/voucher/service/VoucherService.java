@@ -1,6 +1,7 @@
 package org.paykesho.backoffice.voucher.service;
 
 import org.commons.entity.Voucher;
+import org.commons.entity.client.Client;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.service.SettingService;
@@ -57,6 +58,14 @@ public class VoucherService {
             throw new PaykeshoError("Null parameter id");
         }
         return vouchersRepository.save(voucher);
+    }
+
+    public List<Voucher> getApprovedAndValidClientVouchers(Client client) throws PaykeshoError {
+        if (client == null) {
+            throw new PaykeshoError("no client id");
+        } else {
+            return vouchersRepository.getApprovedAndValidVouchers(client);
+        }
     }
 
 /*    public List<Voucher> getMerchantVouchers(int id) throws PaykeshoError {
