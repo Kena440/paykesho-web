@@ -3,9 +3,11 @@ package org.paykesho.backoffice.voucher.controller;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Setting;
+import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.service.ClientService;
 import org.paykesho.backoffice.config.Utility;
+import org.paykesho.backoffice.notifications.service.NotificationService;
 import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.backoffice.repayments.service.RepaymentService;
 import org.paykesho.backoffice.settings.email.EmailSettingBag;
@@ -46,6 +48,8 @@ public class VoucherController {
     private SettingService settingService;
     @Autowired
     private RepaymentService repaymentService;
+    @Autowired
+    NotificationService notificationService;
 
     @GetMapping("")
     public String listAllVouchersByPage(Model model, HttpServletRequest request) throws PaykeshoError {
@@ -168,17 +172,34 @@ public class VoucherController {
     }
 
     private void sendNotification(Voucher voucher, String actionType, BigDecimal voucherAmount) {
-        try {
-            String emailSubject = generateEmailSubject(voucher, actionType);
-            String emailMessage = generateEmailMessage(voucher, actionType, voucherAmount);
-            String smsMessage = generateSmsMessage(voucher, actionType);
+        String emailMessage = generateEmailMessage(voucher, actionType, voucherAmount);
+        String smsMessage = generateSmsMessage(voucher, actionType);
 
-            sendVoucherEmail(voucher.getClient().getEmail(), emailMessage, emailSubject);
-            //smsNotificationService.send(new SMSDto(voucher.getClient().getPhoneNumber(), smsMessage));
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+        boolean emailSent = notificationService.sendNotification(
+                voucher.getClient().getEmail(),
+                emailMessage,
+                NotificationType.email.defaultDescription()
+        );
+
+        if (emailSent) {
+            System.out.println("Email sent successfully to " + voucher.getClient().getEmail());
+        } else {
+            System.err.println("Failed to send email to " + voucher.getClient().getEmail());
+        }
+
+        boolean smsSent = notificationService.sendNotification(
+                voucher.getClient().getPhoneNumber(),
+                smsMessage,
+                NotificationType.sms.defaultDescription()
+        );
+
+        if (smsSent) {
+            System.out.println("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
+        } else {
+            System.err.println("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
         }
     }
+
 
     private BigDecimal calculateTotalRepayment(Voucher voucher) {
         BigDecimal interestAmount = BigDecimal.valueOf(voucher.getInterestPercent() / 100).multiply(voucher.getAmount());
@@ -199,30 +220,31 @@ public class VoucherController {
         return calendar.getTime();
     }
 
-    private String generateEmailSubject(Voucher voucher, String actionType) {
-        switch (actionType) {
-            case "APPROVAL":
-                return "Voucher Request Approval #" + voucher.getReference();
-            case "REJECTION":
-                return "Voucher Request Rejected #" + voucher.getReference();
-            case "ADJUSTMENT":
-                return "Voucher Request Adjusted #" + voucher.getReference();
-            default:
-                return "";
-        }
-    }
-
     private String generateEmailMessage(Voucher voucher, String actionType, BigDecimal voucherAmount) {
         StringBuilder message = new StringBuilder("<p>Congratulations!</p>");
+
+        String repaymentAmount = "K" + voucher.getRepaymentAmount();
+        String repaymentDate = voucher.getRepaymentDate().toString();
+        String voucherReference = voucher.getReference();
+
         switch (actionType) {
             case "APPROVAL":
-                message.append("<p>Your voucher request has been approved. ").append("Repayment amount: K").append(voucher.getRepaymentAmount()).append(", Repayment date: ").append(voucher.getRepaymentDate()).append(".</p>");
+                message.append("<p>Your voucher request has been approved. ")
+                        .append("Repayment amount: ").append(repaymentAmount)
+                        .append(", Repayment date: ").append(repaymentDate)
+                        .append(".</p>");
                 break;
             case "REJECTION":
                 message.append("<p>Your voucher request has been rejected.</p>");
                 break;
             case "ADJUSTMENT":
-                message.append("<p>Your voucher request has been adjusted to K").append(voucherAmount).append(".</p>").append("<p>Repayment amount: K").append(voucher.getRepaymentAmount()).append(", Repayment date: ").append(voucher.getRepaymentDate()).append(".</p>");
+                message.append("<p>Your voucher request has been adjusted to K").append(voucherAmount)
+                        .append(".</p>")
+                        .append("<p>Repayment amount: ").append(repaymentAmount)
+                        .append(", Repayment date: ").append(repaymentDate).append(".</p>");
+                break;
+            default:
+                message.append("<p>Unknown action type.</p>");
                 break;
         }
         message.append("<br><p>Get lelo, Pay Mailo.</p>");
@@ -230,32 +252,22 @@ public class VoucherController {
     }
 
     private String generateSmsMessage(Voucher voucher, String actionType) {
+        String repaymentAmount = "K" + voucher.getRepaymentAmount();
+        String repaymentDate = voucher.getRepaymentDate().toString();
+        String voucherReference = voucher.getReference();
+
         switch (actionType) {
             case "APPROVAL":
-                return String.format("Voucher request approved. Repayment amount: K%s, to be paid on %s. Reference: %s. Get lelo, Pay Mailo.", voucher.getRepaymentAmount(), voucher.getRepaymentDate(), voucher.getReference());
+                return String.format("Voucher request approved. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Mailo.",
+                        repaymentAmount, repaymentDate, voucherReference);
             case "REJECTION":
-                return String.format("Voucher request rejected. Reference: %s. Get lelo, Pay Mailo.", voucher.getReference());
+                return String.format("Voucher request rejected. Reference: %s. Get lelo, Pay Mailo.", voucherReference);
             case "ADJUSTMENT":
-                return String.format("Voucher request adjusted. Repayment amount: K%s, to be paid on %s. Reference: %s. Get lelo, Pay Mailo.", voucher.getRepaymentAmount(), voucher.getRepaymentDate(), voucher.getReference());
-
-
+                return String.format("Voucher request adjusted. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Mailo.",
+                        repaymentAmount, repaymentDate, voucherReference);
             default:
-                return "";
+                return "Unknown action type."; // Handling unknown action types
         }
-    }
-
-    private void sendVoucherEmail(String toEmail, String emailMessage, String emailSubject) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettings = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettings);
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-
-        helper.setFrom(emailSettings.getFromAddress(), emailSettings.getSenderName());
-        helper.setTo(toEmail);
-        helper.setSubject(emailSubject);
-        helper.setText(emailMessage, true);
-
-        mailSender.send(message);
     }
 
     private void loadCurrencySetting(HttpServletRequest request) {
