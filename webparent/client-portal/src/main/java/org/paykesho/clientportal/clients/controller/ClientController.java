@@ -4,11 +4,13 @@ import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.ClientType;
+import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.clients.service.CreditScoreService;
 import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.merchant.service.MerchantService;
+import org.paykesho.clientportal.notifications.service.NotificationService;
 import org.paykesho.clientportal.organizations.service.OrganizationService;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2User;
@@ -43,6 +45,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/clients")
 public class ClientController {
+    @Autowired
+    NotificationService notificationService;
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -111,9 +115,9 @@ public class ClientController {
     }
 
     @PostMapping(value = "/save-client")
-    public String signUpClient(Client client, Model model, HttpServletRequest request) {
+    public String signUpClient(Client client, Model model, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
         clientService.registerClient(client);
-        //sendVerificationEmail(request, client);
+        sendVerificationEmail(request, client);
 
         model.addAttribute("pageTitle", "Registration Successful");
         return "register/register_success";
@@ -177,26 +181,47 @@ public class ClientController {
     }
 
     private void sendVerificationEmail(HttpServletRequest request, Client client) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBags);
+        // Get email settings from the service
+        EmailSettingBag emailSettings = settingService.getEmailSettingsBag();
+        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettings);
 
-        String toAddress = client.getEmail();
-        String subject = emailSettingBags.getClientVerificationSubject();
-        String content = emailSettingBags.getClientVerificationContent();
+        // Prepare recipient, subject, and content
+        String recipientEmail = client.getEmail();
+        String subject = emailSettings.getClientVerificationSubject();
+        String emailContent = emailSettings.getClientVerificationContent();
 
+        // Create MIME message
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 
-        helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
-        helper.setTo(toAddress);
+        // Set the "from" address and sender name
+        helper.setFrom(emailSettings.getFromAddress(), emailSettings.getSenderName());
+        helper.setTo(recipientEmail);
         helper.setSubject(subject);
 
-        content = content.replace("[[name]]", client.getFullName());
+        // Customize email content with client-specific details
+        emailContent = emailContent.replace("[[name]]", client.getFullName());
         String verifyURL = Utility.getSiteUrl(request) + "/clients/verify?code=" + client.getVerificationCode();
-        content = content.replace("[[URL]]", verifyURL);
+        emailContent = emailContent.replace("[[URL]]", verifyURL);
 
-        helper.setText(content, true);
+        // Send email as HTML
+        helper.setText(emailContent, true);
 
+        // Send the email using mailSender
         mailSender.send(mimeMessage);
+        System.out.println("Verification email sent successfully to " + recipientEmail);
+
+        // Send a notification about the email being sent
+        boolean emailNotificationSent = notificationService.sendNotification(
+                recipientEmail,
+                emailContent,
+                NotificationType.email.defaultDescription()
+        );
+
+        if (emailNotificationSent) {
+            System.out.println("Notification sent successfully for " + recipientEmail);
+        } else {
+            System.err.println("Failed to send notification for " + recipientEmail);
+        }
     }
 }

@@ -1,18 +1,13 @@
 package org.paykesho.backoffice.notifications.service;
 
-import org.springframework.http.HttpEntity;
+import org.commons.entity.Notification;
+import org.commons.enums.NotificationType;
 import org.paykesho.backoffice.notifications.dto.NotificationRequest;
 import org.paykesho.backoffice.notifications.repository.NotificationsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import org.commons.entity.Notification;
-import org.commons.enums.NotificationType;
 
 import javax.transaction.Transactional;
 
@@ -50,7 +45,7 @@ public class NotificationService {
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    "http://paykesho.kaedigital.tech/notifications-api",
+                    "http://paykesho-notifications.kaedigital.tech/notifications-api",
                     HttpMethod.POST,
                     request,
                     String.class

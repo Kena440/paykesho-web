@@ -6,17 +6,13 @@ import org.commons.entity.settings.Setting;
 import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.service.ClientService;
-import org.paykesho.backoffice.config.Utility;
 import org.paykesho.backoffice.notifications.service.NotificationService;
 import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.backoffice.repayments.service.RepaymentService;
-import org.paykesho.backoffice.settings.email.EmailSettingBag;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.user.service.UserService;
 import org.paykesho.backoffice.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -39,6 +34,8 @@ import java.util.List;
 public class VoucherController {
 
     @Autowired
+    NotificationService notificationService;
+    @Autowired
     private VoucherService voucherService;
     @Autowired
     private UserService userService;
@@ -48,8 +45,6 @@ public class VoucherController {
     private SettingService settingService;
     @Autowired
     private RepaymentService repaymentService;
-    @Autowired
-    NotificationService notificationService;
 
     @GetMapping("")
     public String listAllVouchersByPage(Model model, HttpServletRequest request) throws PaykeshoError {
