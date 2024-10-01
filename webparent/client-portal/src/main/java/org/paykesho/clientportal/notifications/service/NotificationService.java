@@ -2,8 +2,8 @@ package org.paykesho.clientportal.notifications.service;
 
 import org.commons.entity.Notification;
 import org.commons.enums.NotificationType;
-import org.paykesho.backoffice.notifications.dto.NotificationRequest;
-import org.paykesho.backoffice.notifications.repository.NotificationsRepository;
+import org.paykesho.clientportal.notifications.dto.NotificationRequest;
+import org.paykesho.clientportal.notifications.repository.NotificationsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;

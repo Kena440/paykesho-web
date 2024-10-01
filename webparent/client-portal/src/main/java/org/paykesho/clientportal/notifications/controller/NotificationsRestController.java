@@ -1,7 +1,8 @@
 package org.paykesho.clientportal.notifications.controller;
 
-import org.paykesho.backoffice.notifications.dto.NotificationRequest;
-import org.paykesho.backoffice.notifications.service.NotificationService;
+
+import org.paykesho.clientportal.notifications.dto.NotificationRequest;
+import org.paykesho.clientportal.notifications.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
