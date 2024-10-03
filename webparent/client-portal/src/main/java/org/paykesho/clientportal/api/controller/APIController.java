@@ -384,7 +384,7 @@ public class APIController {
                 "<p>You requested for a voucher. Voucher Reference: \"" + voucher.getPaykeshoReference() + "\"</p>" +
                 "<p>Kindly wait for processing</>" +
                 "<br>" +
-                "<p>Get lelo, Pay Mailo. </p>";
+                "<p>Get lelo, Pay Kesho. </p>";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
@@ -437,7 +437,7 @@ public class APIController {
         String content = "<p>Hello, </p>" +
                 "<p>You made a payment successfully of \"" + transaction.getTransactionAmount() + "\" to \"" + transaction.getMerchant().getMerchantName() + "\". Transaction Reference: \"" + transaction.getPaykeshoReference() + "\"</p>" +
                 "<br>" +
-                "<p>Get lelo, Pay Mailo. </p>";
+                "<p>Get lelo, Pay Kesho. </p>";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);

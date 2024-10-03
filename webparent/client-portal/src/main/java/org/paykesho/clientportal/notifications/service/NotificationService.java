@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -28,6 +29,7 @@ public class NotificationService {
     public boolean sendNotification(String recipient, String message, String notificationType) {
         String apiKey = "F39E25A3B2A446F98E87A95723AE4";
         Notification notification = new Notification();
+        notification.setReference(UUID.randomUUID().toString());
         notification.setNotificationType(NotificationType.valueOf(notificationType));
         notification.setRecipient(recipient);
         notification.setMessage(message);
@@ -36,8 +38,9 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + apiKey);
+        //headers.set("Authorization", "Bearer " + apiKey);
         headers.set("Content-Type", "application/json");
+        headers.set("API-Key", apiKey);
 
         NotificationRequest requestBody = new NotificationRequest(recipient, message, notificationType);
 

@@ -145,7 +145,7 @@ public class ClientController {
         String pageTitle = "My Account";
         List<Country> countryList = clientService.countryList();
 
-        String email = Utility.getEmailOfAuthenticatedClient(httpServletRequest);
+        String email = Utility.getEKeshofAuthenticatedClient(httpServletRequest);
         Client client = clientService.getClientByEmail(email);
 
         model.addAttribute("pageTitle", pageTitle);
@@ -181,37 +181,29 @@ public class ClientController {
     }
 
     private void sendVerificationEmail(HttpServletRequest request, Client client) throws MessagingException, UnsupportedEncodingException {
-        // Get email settings from the service
         EmailSettingBag emailSettings = settingService.getEmailSettingsBag();
         JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettings);
 
-        // Prepare recipient, subject, and content
         String recipientEmail = client.getEmail();
         String subject = emailSettings.getClientVerificationSubject();
         String emailContent = emailSettings.getClientVerificationContent();
 
-        // Create MIME message
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 
-        // Set the "from" address and sender name
         helper.setFrom(emailSettings.getFromAddress(), emailSettings.getSenderName());
         helper.setTo(recipientEmail);
         helper.setSubject(subject);
 
-        // Customize email content with client-specific details
         emailContent = emailContent.replace("[[name]]", client.getFullName());
         String verifyURL = Utility.getSiteUrl(request) + "/clients/verify?code=" + client.getVerificationCode();
         emailContent = emailContent.replace("[[URL]]", verifyURL);
 
-        // Send email as HTML
         helper.setText(emailContent, true);
 
-        // Send the email using mailSender
         mailSender.send(mimeMessage);
         System.out.println("Verification email sent successfully to " + recipientEmail);
 
-        // Send a notification about the email being sent
         boolean emailNotificationSent = notificationService.sendNotification(
                 recipientEmail,
                 emailContent,

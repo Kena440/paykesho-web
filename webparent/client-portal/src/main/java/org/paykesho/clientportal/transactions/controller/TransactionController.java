@@ -152,7 +152,7 @@ public class TransactionController {
 
         String toAddress = transaction.getClient().getEmail();
         String subject = "Paykesho Payment #" + transaction.getReference();
-        String content = "<p>Hello, </p>" + "<p>You made a payment successfully of \"" + transaction.getAmount() + "\" to \"" + transaction.getMerchant().getName() + "\". Transaction Reference: \"" + transaction.getReference() + "\"</p>" + "<br>" + "<p>Get lelo, Pay Mailo. </p>";
+        String content = "<p>Hello, </p>" + "<p>You made a payment successfully of \"" + transaction.getAmount() + "\" to \"" + transaction.getMerchant().getName() + "\". Transaction Reference: \"" + transaction.getReference() + "\"</p>" + "<br>" + "<p>Get lelo, Pay Kesho. </p>";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);

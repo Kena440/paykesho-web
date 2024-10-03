@@ -35,7 +35,7 @@ public class Utility {
         return mailSender;
     }
 
-    public static String getEmailOfAuthenticatedOrganizationAdmin(HttpServletRequest request) {
+    public static String getEKeshofAuthenticatedOrganizationAdmin(HttpServletRequest request) {
         Object principal = request.getUserPrincipal();
         if (principal == null) return null;
 

@@ -2,19 +2,17 @@ package org.paykesho.clientportal.voucher.controller;
 
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
+import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.VoucherRequestDto;
 import org.paykesho.clientportal.clients.service.ClientService;
-import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.merchant.service.MerchantService;
+import org.paykesho.clientportal.notifications.service.NotificationService;
 import org.paykesho.clientportal.security.ClientUserDetails;
-import org.paykesho.clientportal.settings.email.EmailSettingBag;
 import org.paykesho.clientportal.settings.service.SettingService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,10 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -44,8 +41,10 @@ public class VoucherController {
     private SettingService settingService;
     @Autowired
     private PaykeshoReferenceService paykeshoReferenceService;
-/*    @Autowired
-    private SMSNotificationService smsNotificationService;*/
+    /*    @Autowired
+        private SMSNotificationService smsNotificationService;*/
+    @Autowired
+    NotificationService notificationService;
 
     @GetMapping("")
     public String showClientVouchers(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
@@ -102,16 +101,11 @@ public class VoucherController {
             savedVoucher = voucherService.save(voucher);
         }*/
 
-        //sendNotifications(request, savedVoucher, paykeshoRef);
+        sendNotification(savedVoucher, null);
 
         redirectAttributes.addFlashAttribute("message", "Voucher request submitted. Kindly wait for processing. #" + paykeshoRef);
 
         return "redirect:/vouchers";
-    }
-
-    private void sendNotifications(HttpServletRequest request, Voucher voucher, String paykeshoRef) throws MessagingException, UnsupportedEncodingException {
-        sendVoucherEmail(voucher);
-        //smsNotificationService.send(new SMSDto(voucher.getClient().getPhoneNumber(), "Voucher request submitted. Kindly wait for processing. #" + paykeshoRef));
     }
 
     @GetMapping("/cancel")
@@ -121,23 +115,72 @@ public class VoucherController {
         return "vouchers/voucher_cancellation";
     }
 
-    private void sendVoucherEmail(Voucher voucher) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBags);
+    private void sendNotification(Voucher voucher, BigDecimal voucherAmount) {
+        String emailMessage = generateEmailMessage(voucher, "REQUEST", voucherAmount);
+        String smsMessage = generateSmsMessage(voucher, "REQUEST");
 
-        String toAddress = voucher.getClient().getEmail();
-        String subject = "Voucher Request";
-        String content = "<p>Hello, </p>" + "<p>You requested for a voucher. Voucher Reference: \"" + voucher.getReference() + "\"</p>" + "<p>Kindly wait for processing</>" + "<br>" + "<p>Get lelo, Pay Mailo. </p>";
+        boolean emailSent = notificationService.sendNotification(
+                voucher.getClient().getEmail(),
+                emailMessage,
+                NotificationType.email.defaultDescription()
+        );
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        if (emailSent) {
+            System.out.println("Email sent successfully to " + voucher.getClient().getEmail());
+        } else {
+            System.err.println("Failed to send email to " + voucher.getClient().getEmail());
+        }
 
-        helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
+        boolean smsSent = notificationService.sendNotification(
+                voucher.getClient().getPhoneNumber(),
+                smsMessage,
+                NotificationType.sms.defaultDescription()
+        );
 
-        helper.setText(content, true);
-
-        mailSender.send(mimeMessage);
+        if (smsSent) {
+            System.out.println("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
+        } else {
+            System.err.println("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
+        }
     }
+
+    private String generateEmailMessage(Voucher voucher, String actionType, BigDecimal voucherAmount) {
+        StringBuilder message = new StringBuilder("<p>Congratulations!</p>");
+
+        String repaymentAmount = "K" + voucher.getRepaymentAmount();
+        //String repaymentDate = voucher.getRepaymentDate().toString();
+        String repaymentDate = new Date().toString();
+        String voucherReference = voucher.getReference();
+
+        switch (actionType) {
+            case "REQUEST":
+                message.append("<p>Your voucher request has been submitted. ")
+                        .append("Repayment amount: ").append(repaymentAmount)
+                        .append(", Repayment date: ").append(repaymentDate)
+                        .append(".</p>");
+                break;
+            default:
+                message.append("<p>Unknown action type.</p>");
+                break;
+        }
+        message.append("<br><p>Get lelo, Paykesho.</p>");
+        return message.toString();
+    }
+
+    private String generateSmsMessage(Voucher voucher, String actionType) {
+        String repaymentAmount = "K" + voucher.getRepaymentAmount();
+        //String repaymentDate = voucher.getRepaymentDate().toString();
+        String repaymentDate = new Date().toString();
+        String voucherReference = voucher.getReference();
+
+        switch (actionType) {
+            case "REQUEST":
+                return String.format("Voucher request has been submitted. Repayment amount: %s, to be paid on %s. Reference: %s. Please wait for approval processing. Get lelo, Pay Kesho.",
+                        repaymentAmount, repaymentDate, voucherReference);
+            default:
+                return "Unknown action type.";
+        }
+    }
+
+
 }

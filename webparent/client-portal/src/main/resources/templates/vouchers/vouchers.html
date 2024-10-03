@@ -27,6 +27,18 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert"
+                         th:if="${message != null}">
+
+                        <!-- Text -->
+                        <strong>[[${message}]] 😎👍</strong>
+
+                        <!-- Button -->
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+
+                    </div>
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">

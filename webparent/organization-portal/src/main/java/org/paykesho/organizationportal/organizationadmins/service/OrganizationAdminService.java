@@ -160,7 +160,7 @@ public class OrganizationAdminService {
     }
 
     public OrganizationAdmin getAuthenticatedOrganizationAdmin(HttpServletRequest request) {
-        String email = Utility.getEmailOfAuthenticatedOrganizationAdmin(request);
+        String email = Utility.getEKeshofAuthenticatedOrganizationAdmin(request);
         return getOrganizationAdminByEmail(email);
     }
 

@@ -35,7 +35,7 @@ public class Utility {
         return mailSender;
     }
 
-    public static String getEmailOfAuthenticatedMerchantAdmin(HttpServletRequest request) {
+    public static String getEKeshofAuthenticatedMerchantAdmin(HttpServletRequest request) {
         Object principal = request.getUserPrincipal();
         if (principal == null) return null;
 

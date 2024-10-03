@@ -18,7 +18,7 @@ public class RepaymentSchedule {
     private Integer id;
     @Column(name = "reference", length = 128, nullable = false, unique = true)
     private String reference;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
     @Column(name = "amount_due", length = 128, nullable = false)

@@ -160,7 +160,7 @@ public class MerchantAdminService {
     }
 
     public MerchantAdmin getAuthenticatedMerchantAdmin(HttpServletRequest request) {
-        String email = Utility.getEmailOfAuthenticatedMerchantAdmin(request);
+        String email = Utility.getEKeshofAuthenticatedMerchantAdmin(request);
         return getMerchantAdminByEmail(email);
     }
 

@@ -19,7 +19,7 @@ public class Notification {
     private String reference;
     @Column(name = "recipient", length = 128)
     private String recipient;
-    @Column(name = "message", length = 128)
+    @Column(name = "message")
     private String message;
     @Column(nullable = false)
     private String status;

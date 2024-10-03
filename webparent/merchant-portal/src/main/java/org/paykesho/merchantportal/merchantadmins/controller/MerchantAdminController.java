@@ -77,7 +77,7 @@ public class MerchantAdminController {
         String pageTitle = "My Account";
         List<Country> countryList = merchantAdminService.countryList();
 
-        String email = Utility.getEmailOfAuthenticatedMerchantAdmin(httpServletRequest);
+        String email = Utility.getEKeshofAuthenticatedMerchantAdmin(httpServletRequest);
         MerchantAdmin assessor = merchantAdminService.getMerchantAdminByEmail(email);
 
         model.addAttribute("pageTitle", pageTitle);

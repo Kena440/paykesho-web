@@ -3,13 +3,13 @@ package org.paykesho.backoffice.notifications.dto;
 public class NotificationRequest {
     private String recipient;
     private String message;
-    private String notificationType;
+    private String notification_type;
 
     // Constructor
-    public NotificationRequest(String recipient, String message, String notificationType) {
+    public NotificationRequest(String recipient, String message, String notification_type) {
         this.recipient = recipient;
         this.message = message;
-        this.notificationType = notificationType;
+        this.notification_type = notification_type;
     }
 
     // Getters and Setters
@@ -29,12 +29,12 @@ public class NotificationRequest {
         this.message = message;
     }
 
-    public String getNotificationType() {
-        return notificationType;
+    public String getNotification_type() {
+        return notification_type;
     }
 
-    public void setNotificationType(String notificationType) {
-        this.notificationType = notificationType;
+    public void setNotification_type(String notification_type) {
+        this.notification_type = notification_type;
     }
 }
 

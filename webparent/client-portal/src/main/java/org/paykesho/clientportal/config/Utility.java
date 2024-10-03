@@ -35,7 +35,7 @@ public class Utility {
         return mailSender;
     }
 
-    public static String getEmailOfAuthenticatedClient(HttpServletRequest request) {
+    public static String getEKeshofAuthenticatedClient(HttpServletRequest request) {
         Object principal = request.getUserPrincipal();
         if (principal == null) return null;
 

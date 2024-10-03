@@ -77,7 +77,7 @@ public class OrganizationAdminController {
         String pageTitle = "My Account";
         List<Country> countryList = organizationAdminService.countryList();
 
-        String email = Utility.getEmailOfAuthenticatedOrganizationAdmin(httpServletRequest);
+        String email = Utility.getEKeshofAuthenticatedOrganizationAdmin(httpServletRequest);
         OrganizationAdmin assessor = organizationAdminService.getOrganizationAdminByEmail(email);
 
         model.addAttribute("pageTitle", pageTitle);

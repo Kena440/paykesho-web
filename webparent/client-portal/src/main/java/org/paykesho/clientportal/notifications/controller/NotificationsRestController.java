@@ -17,7 +17,7 @@ public class NotificationsRestController {
 
     @PostMapping("/send")
     public String sendNotification(@RequestBody NotificationRequest notificationRequest, @RequestHeader("apiKey") String apiKey) {
-        boolean result = notificationService.sendNotification(notificationRequest.getRecipient(), notificationRequest.getMessage(), notificationRequest.getNotificationType());
+        boolean result = notificationService.sendNotification(notificationRequest.getRecipient(), notificationRequest.getMessage(), notificationRequest.getNotification_type());
         return result ? "Notification sent successfully" : "Failed to send notification";
     }
 }

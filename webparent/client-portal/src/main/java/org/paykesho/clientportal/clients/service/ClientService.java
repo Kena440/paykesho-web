@@ -176,7 +176,7 @@ public class ClientService {
     }
 
     public Client getAuthenticatedClient(HttpServletRequest request) {
-        String email = Utility.getEmailOfAuthenticatedClient(request);
+        String email = Utility.getEKeshofAuthenticatedClient(request);
         return getClientByEmail(email);
     }
 

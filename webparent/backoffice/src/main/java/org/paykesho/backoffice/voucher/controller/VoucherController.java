@@ -93,8 +93,8 @@ public class VoucherController {
         Voucher approvedVoucher = voucherService.save(voucher);
 
         updateClientBalance(approvedVoucher);
-        runRepaymentScheduleProcess(approvedVoucher);
-        //sendNotification(approvedVoucher, "APPROVAL", null);
+        //runRepaymentScheduleProcess(approvedVoucher);
+        sendNotification(approvedVoucher, "APPROVAL", null);
         return approvedVoucher;
     }
 
@@ -219,7 +219,8 @@ public class VoucherController {
         StringBuilder message = new StringBuilder("<p>Congratulations!</p>");
 
         String repaymentAmount = "K" + voucher.getRepaymentAmount();
-        String repaymentDate = voucher.getRepaymentDate().toString();
+        //String repaymentDate = voucher.getRepaymentDate().toString();
+        String repaymentDate = new Date().toString();
         String voucherReference = voucher.getReference();
 
         switch (actionType) {
@@ -242,23 +243,24 @@ public class VoucherController {
                 message.append("<p>Unknown action type.</p>");
                 break;
         }
-        message.append("<br><p>Get lelo, Pay Mailo.</p>");
+        message.append("<br><p>Get lelo, Pay Kesho.</p>");
         return message.toString();
     }
 
     private String generateSmsMessage(Voucher voucher, String actionType) {
         String repaymentAmount = "K" + voucher.getRepaymentAmount();
-        String repaymentDate = voucher.getRepaymentDate().toString();
+        //String repaymentDate = voucher.getRepaymentDate().toString();
+        String repaymentDate = new Date().toString();
         String voucherReference = voucher.getReference();
 
         switch (actionType) {
             case "APPROVAL":
-                return String.format("Voucher request approved. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Mailo.",
+                return String.format("Voucher request approved. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Kesho.",
                         repaymentAmount, repaymentDate, voucherReference);
             case "REJECTION":
-                return String.format("Voucher request rejected. Reference: %s. Get lelo, Pay Mailo.", voucherReference);
+                return String.format("Voucher request rejected. Reference: %s. Get lelo, Pay Kesho.", voucherReference);
             case "ADJUSTMENT":
-                return String.format("Voucher request adjusted. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Mailo.",
+                return String.format("Voucher request adjusted. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Kesho.",
                         repaymentAmount, repaymentDate, voucherReference);
             default:
                 return "Unknown action type."; // Handling unknown action types

@@ -1,13 +1,16 @@
 server:
   port: 8082
-  servlet:
-  context-path: /merchant-portal
+  #servlet:
+  #context-path: /merchant-portal
 
 spring:
   datasource:
     password: p@ssw0rd
     url: jdbc:mysql://localhost:3306/paykesho_db
     username: root
+    #password: fbxYJJJ1KwhQ7Bl$$$$$
+    #url: jdbc:mysql://127.0.0.1:3306/paykesho_db
+    #username: mek
     hikari:
       minimum-idle: 5
       maximum-pool-size: 40
