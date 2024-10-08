@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TransactionRepository extends SearchRepository<Transaction, Integer> {
@@ -33,5 +34,6 @@ public interface TransactionRepository extends SearchRepository<Transaction, Int
     @Query("SELECT t FROM Transaction t WHERE t.merchant = :merchant AND t.settled = false")
     List<Transaction> findUnsettledTransactionsByMerchant(@Param("merchant") Merchant merchant);
 
+    long countByTxnDateAfter(Date date);
 
 }

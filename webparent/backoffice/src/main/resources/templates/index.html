@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html data-bs-theme="light"
       data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
-      lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+      lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Dashboard','none')"></head>
 <body>
@@ -73,7 +74,7 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col mt-0">
-                                                    <h5 class="card-title">Bounce</h5>
+                                                    <h5 class="card-title">Vouchers</h5>
                                                 </div>
 
                                                 <div class="col-auto">
@@ -82,9 +83,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">2.364</span>
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${totalVouchers}">0</span>
                                             <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"> +3.65% </span>
+                                                <span class="badge badge-subtle-danger me-2"
+                                                      th:text="${voucherPercentageChange + '%'}">0.00%</span>
                                                 <span class="text-muted">Since last week</span>
                                             </div>
                                         </div>
@@ -121,21 +124,23 @@
                                                 <div class="col mt-0">
                                                     <h5 class="card-title">Transactions</h5>
                                                 </div>
-
                                                 <div class="col-auto">
                                                     <div class="stat stat-sm">
                                                         <i class="align-middle" data-lucide="users"></i>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">17.212</span>
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${totalTransactions}">0</span>
                                             <div class="mb-0">
-                                                <span class="badge badge-subtle-danger me-2"> -1.25% </span>
+                                                <span class="badge badge-subtle-danger me-2"
+                                                      th:text="${txnPercentageChange + '%'}">0.00%</span>
                                                 <span class="text-muted">Since last week</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
 
                         </div>
@@ -157,7 +162,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h5 class="card-title mb-0">Real-Time</h5>
+                                <h5 class="card-title mb-0">Map</h5>
                             </div>
                             <div class="card-body p-2">
                                 <div id="map" style='width: 100%; height: 279px'></div>
@@ -166,7 +171,8 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <!--Todo-->
+                <div class="row d-none">
                     <div class="col-12 col-lg-4 d-flex">
                         <div class="card flex-fill w-100">
                             <div class="card-header">
@@ -323,8 +329,8 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
+                <!--Todo-->
+                <div class="row d-none">
                     <div class="col-12 col-lg-5 col-xl-4 d-flex">
                         <div class="card flex-fill w-100">
                             <div class="card-header">

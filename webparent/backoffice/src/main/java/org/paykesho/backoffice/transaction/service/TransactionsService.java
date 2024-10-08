@@ -9,7 +9,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -50,5 +55,22 @@ public class TransactionsService {
         }
 
         return transactionRepository.getTransactionsByMerchantId(id);
+    }
+
+    public Map<String, Object> getTransactionStats() {
+
+        LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
+        Date oneWeekAgoDate = Date.from(oneWeekAgo.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        long totalTransactions = transactionRepository.count();
+        long transactionsLastWeek = transactionRepository.countByTxnDateAfter(oneWeekAgoDate);
+
+        double percentageChange = ((double) transactionsLastWeek / (totalTransactions - transactionsLastWeek)) * 100;
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalTransactions", totalTransactions);
+        stats.put("txnPercentageChange", String.format("%.2f", percentageChange));
+
+        return stats;
     }
 }

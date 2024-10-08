@@ -11,7 +11,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -75,4 +80,21 @@ public class VoucherService {
 
         return vouchersRepository.getVouchersByMerchantId(id);
     }*/
+
+    public Map<String, Object> getVoucherStats() {
+
+        LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
+        Date oneWeekAgoDate = Date.from(oneWeekAgo.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        long totalVouchers = vouchersRepository.count();
+        long vouchersLastWeek = vouchersRepository.countByRequestDateAfter(oneWeekAgoDate);
+
+        double percentageChange = ((double) vouchersLastWeek / (totalVouchers - vouchersLastWeek)) * 100;
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalVouchers", totalVouchers);
+        stats.put("voucherPercentageChange", String.format("%.2f", percentageChange));
+
+        return stats;
+    }
 }
