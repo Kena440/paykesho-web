@@ -144,6 +144,6 @@ public class MerchantAdminService {
         content = content.replace("[[password]]", passwordCode);
 
         helper.setText(content, true);
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 }

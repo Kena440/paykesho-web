@@ -395,7 +395,7 @@ public class APIController {
 
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 
     private void sendVerificationEmail(HttpServletRequest request, Client customer) throws MessagingException, UnsupportedEncodingException {
@@ -419,7 +419,7 @@ public class APIController {
 
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 
     private void sendNotifications(Transaction transaction, String paykeshoRef) throws MessagingException, UnsupportedEncodingException {
@@ -448,7 +448,7 @@ public class APIController {
 
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 
 */

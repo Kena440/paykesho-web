@@ -136,7 +136,7 @@ public class DeviceService {
 
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 
     private String getMessage(String code, Locale locale) {

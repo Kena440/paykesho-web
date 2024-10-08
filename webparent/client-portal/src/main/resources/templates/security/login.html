@@ -53,6 +53,17 @@
                                         <strong>Hi!</strong> You have been logged out
                                     </div>
                                 </div>
+                                <div class="alert alert-success alert-dismissible" role="alert"
+                                     th:if="${forgotPasswordMessage != null}">
+                                    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
+                                            type="button"></button>
+                                    <div class="alert-icon">
+                                        <i class="far fa-fw fa-unlock"></i>
+                                    </div>
+                                    <div class="alert-message">
+                                        <strong>Hi!</strong> [[${forgotPasswordMessage}]]
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
@@ -66,7 +77,10 @@
                                        placeholder="Enter your password"
                                        type="password"/>
                                 <small>
-                                    <a href='auth-reset-password.html'>Forgot password?</a>
+                                    <a type="button" class=" my-1" data-bs-toggle="modal"
+                                       data-bs-target="#passwordResetModal">
+                                        Forgot password?
+                                    </a>
                                 </small>
                             </div>
                             <div>
@@ -93,6 +107,43 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <strong class="mx-auto">Forgot Password?</strong>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/forgot-password}" method="post">
+
+                <div class="modal-body m-3">
+                    <p class=" font-size-sm text-warning">
+                        Please enter your Email Address. You will receive a link
+                        to create a new password via Email.
+                    </p>
+                    <hr>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="sr-only" for="modalPasswordResetEmail">
+                            Email Address *
+                        </label>
+                        <input class="form-control form-control-lg" id="modalPasswordResetEmail"
+                               name="modalPasswordResetEmail" type="email"
+                               placeholder="Email Address *" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <footer th:replace="fragments/fragments :: footer1()"></footer>
 

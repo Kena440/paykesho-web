@@ -126,7 +126,7 @@ public class ForgotPasswordController {
 
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 
 }

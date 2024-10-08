@@ -134,7 +134,7 @@ public class MerchantAdminController {
 
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 */
 }

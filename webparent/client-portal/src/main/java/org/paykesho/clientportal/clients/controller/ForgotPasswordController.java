@@ -1,9 +1,11 @@
 package org.paykesho.clientportal.clients.controller;
 
 import org.commons.entity.client.Client;
+import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.config.Utility;
+import org.paykesho.clientportal.notifications.service.NotificationService;
 import org.paykesho.clientportal.settings.email.EmailSettingBag;
 import org.paykesho.clientportal.settings.service.SettingService;
 import org.slf4j.Logger;
@@ -31,11 +33,11 @@ public class ForgotPasswordController {
     private ClientService clientService;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    NotificationService notificationService;
 
     @PostMapping(value = "/forgot-password")
-    public String forgotPasswordForm(
-            Model model,
-            HttpServletRequest request) throws PaykeshoError {
+    public String forgotPasswordForm(Model model, HttpServletRequest request) throws PaykeshoError {
         String email = request.getParameter("modalPasswordResetEmail");
         try {
             String token = clientService.updateClientResetToken(email);
@@ -78,10 +80,7 @@ public class ForgotPasswordController {
     }
 
     @PostMapping(value = "/reset-password-action")
-    public String resetPasswordAction(
-            RedirectAttributes redirectAttributes,
-            Model model,
-            HttpServletRequest request) throws PaykeshoError {
+    public String resetPasswordAction(RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) throws PaykeshoError {
 
         String token = request.getParameter("token");
         String password = request.getParameter("password");
@@ -110,12 +109,7 @@ public class ForgotPasswordController {
 
         String toAddress = email;
         String subject = "Password Reset";
-        String content = "<p>Hello, </p>" +
-                "<p>You requested for a password reset.</p>" +
-                "<p>Click the link below to change the password</>" +
-                "<p><a href=\"" + verifyURL + "\" >Change Password</a></p>" +
-                "<br>" +
-                "<p>Ignore this email if you do remember your password, or you have not made the request. </p>";
+        String content = "<p>Hello,</p><p>You requested a password reset. Click the link below to change your password:</p>" + "<p><a href=\"" + verifyURL + "\">Change Password</a></p>" + "<p>If you did not request this, please ignore the email.</p>";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
@@ -126,7 +120,15 @@ public class ForgotPasswordController {
 
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        ////mailSender.send(mimeMessage);
+
+        boolean emailNotificationSent = notificationService.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
+
+        if (emailNotificationSent) {
+            System.out.println("Notification sent successfully for " + toAddress);
+        } else {
+            System.err.println("Failed to send notification for " + toAddress);
+        }
     }
 
 }

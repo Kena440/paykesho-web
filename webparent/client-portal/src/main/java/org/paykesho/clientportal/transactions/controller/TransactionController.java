@@ -162,6 +162,6 @@ public class TransactionController {
         helper.setSubject(subject);
         helper.setText(content, true);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 }

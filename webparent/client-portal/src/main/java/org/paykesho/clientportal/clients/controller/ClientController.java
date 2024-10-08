@@ -201,7 +201,7 @@ public class ClientController {
 
         helper.setText(emailContent, true);
 
-        mailSender.send(mimeMessage);
+        ////mailSender.send(mimeMessage);
         System.out.println("Verification email sent successfully to " + recipientEmail);
 
         boolean emailNotificationSent = notificationService.sendNotification(

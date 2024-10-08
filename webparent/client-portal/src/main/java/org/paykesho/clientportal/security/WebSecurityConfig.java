@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.GET, "/api/**", "/clients/register", "/clients/save-client", "/clients/verify").permitAll();
+        http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.GET, "/api/**", "/clients/register", "/clients/save-client", "/clients/verify", "/business", "/how-it-works", "/faq", "/contact").permitAll();
         http.authorizeRequests().antMatchers("/clients/dashboard", "/vouchers/**", "/transactions/**").authenticated().and().formLogin().loginPage("/login").usernameParameter("email").successHandler(authenticationSuccessHandler()).permitAll().and().oauth2Login().loginPage("/login").userInfoEndpoint().userService(oAuth2UserService).and().and().logout().permitAll().and().rememberMe().key("1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ").tokenValiditySeconds(14 * 24 * 60 * 60);
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);

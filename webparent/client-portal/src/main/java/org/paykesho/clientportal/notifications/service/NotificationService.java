@@ -48,7 +48,7 @@ public class NotificationService {
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    "http://paykesho-notifications.kaedigital.tech/notifications-api",
+                    "http://notifications.paykesho.com/notifications-api",
                     HttpMethod.POST,
                     request,
                     String.class
