@@ -7,6 +7,7 @@ import org.paykesho.merchantportal.events.service.EventsService;
 import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
 import org.paykesho.merchantportal.merchants.service.MerchantService;
 import org.paykesho.merchantportal.settings.service.SettingService;
+import org.paykesho.merchantportal.transactions.service.TransactionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @Controller
 public class MainController {
@@ -25,7 +27,7 @@ public class MainController {
     @Autowired
     private MerchantService merchantService;
     @Autowired
-    private EventsService eventsService;
+    private TransactionsService transactionsService;
     @Autowired
     private SettingService settingService;
 
@@ -34,7 +36,9 @@ public class MainController {
         MerchantAdmin merchantAdmin = merchantAdminService.getAuthenticatedMerchantAdmin(request);
         Merchant merchant = merchantService.getMerchantByContactPerson(merchantAdmin);
         Country country = settingService.getCountryByName("Zambia");
-
+        Map<String, Object> txnStats = transactionsService.getTransactionStats();
+        model.addAttribute("totalTransactions", txnStats.get("totalTransactions"));
+        model.addAttribute("txnPercentageChange", txnStats.get("txnPercentageChange"));
         model.addAttribute("merchantAdmin", merchantAdmin);
         model.addAttribute("merchant", merchant);
 

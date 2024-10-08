@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
@@ -19,5 +20,5 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
 
     @Query("select v from Voucher v where v.client = :client and v.approved = true and v.availableAmount > 0")
     public List<Voucher> getApprovedAndValidVouchers(@Param("client") Client client);
-
+    long countByRequestDateAfter(Date date);
 }

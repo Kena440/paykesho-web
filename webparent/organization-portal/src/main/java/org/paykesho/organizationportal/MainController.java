@@ -3,10 +3,10 @@ package org.paykesho.organizationportal;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Country;
-import org.paykesho.organizationportal.events.service.EventsService;
 import org.paykesho.organizationportal.organizationadmins.service.OrganizationAdminService;
 import org.paykesho.organizationportal.organizations.service.OrganizationService;
 import org.paykesho.organizationportal.settings.service.SettingService;
+import org.paykesho.organizationportal.vouchers.service.VouchersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @Controller
 public class MainController {
@@ -25,7 +26,7 @@ public class MainController {
     @Autowired
     private OrganizationService organizationService;
     @Autowired
-    private EventsService eventsService;
+    private VouchersService voucherService;
     @Autowired
     private SettingService settingService;
 
@@ -35,7 +36,9 @@ public class MainController {
         Organization organization = organizationService.getOrganizationByOrganizationAdmin(organizationAdmin);
 
         Country country = settingService.getCountryByName("Zambia");
-
+        Map<String, Object> voucherStats = voucherService.getVoucherStats();
+        model.addAttribute("totalVouchers", voucherStats.get("totalVouchers"));
+        model.addAttribute("voucherPercentageChange", voucherStats.get("voucherPercentageChange"));
         model.addAttribute("organization", organization);
         model.addAttribute("organizationAdmin", organizationAdmin);
         model.addAttribute("pageTitle", "Dashboard");

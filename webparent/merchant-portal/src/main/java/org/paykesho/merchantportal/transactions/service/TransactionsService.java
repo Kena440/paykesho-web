@@ -7,7 +7,12 @@ import org.paykesho.merchantportal.transactions.repository.TransactionRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TransactionsService {
@@ -21,5 +26,22 @@ public class TransactionsService {
         } else {
             return transactionRepository.getTransactionsByMerchant(merchant);
         }
+    }
+
+    public Map<String, Object> getTransactionStats() {
+
+        LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
+        Date oneWeekAgoDate = Date.from(oneWeekAgo.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        long totalTransactions = transactionRepository.count();
+        long transactionsLastWeek = transactionRepository.countByTxnDateAfter(oneWeekAgoDate);
+
+        double percentageChange = ((double) transactionsLastWeek / (totalTransactions - transactionsLastWeek)) * 100;
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalTransactions", totalTransactions);
+        stats.put("txnPercentageChange", String.format("%.2f", percentageChange));
+
+        return stats;
     }
 }
