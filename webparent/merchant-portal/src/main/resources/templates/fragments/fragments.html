@@ -4,28 +4,44 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:th="http://www.thymeleaf.org">
 
 <head th:fragment="page_head(title, remove)" th:remove="${remove}">
-    <title>Paykesho | Merchant Portal | [[${title}]]</title>
     <meta charset="utf-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
-    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-    <meta content="Responsive Bootstrap 5 Admin &amp; Dashboard Template" name="description">
-    <meta content="Bootlab" name="author">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Paykesho Limited">
+    <meta name="description"
+          content="Paykesho's Merchant Portal enables merchants to offer goods on credit to clients, securely managing transactions and sales through an easy-to-use platform.">
+    <meta name="keywords"
+          content="Paykesho, merchant portal, credit services, client credit, buy now pay later, QR code payments, merchant payments, e-value transactions, Paykesho platform, Paykesho Zambia">
+    <meta name="robots" content="index, follow">
+
+    <title>Paykesho | Merchant Portal | [[${title}]]</title>
+
+    <!-- Open Graph (OG) Meta Tags for Social Media -->
+    <meta property="og:title" content="Paykesho Merchant Portal - Manage Credit Sales Seamlessly">
+    <meta property="og:description"
+          content="Access the Paykesho Merchant Portal to manage credit sales, transactions, and client accounts securely. Offer your products to clients on credit and handle payments with ease.">
+    <meta property="og:image" content="{{asset('website/assets/images/og-image.jpg')}}">
+    <meta property="og:url" content="{{url()->current()}}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Paykesho Merchant Portal - Streamline Your Credit Sales">
+    <meta name="twitter:description"
+          content="Through Paykesho's Merchant Portal, merchants can offer goods on credit to clients and securely manage sales, transactions, and payments.">
+    <meta name="twitter:image" content="{{asset('website/assets/images/og-image.jpg')}}">
 
     <link rel="shortcut icon" th:href="@{/assets/img/favicon.ico}">
 
     <link href="https://fonts.googleapis.com/" rel="preconnect">
     <link crossorigin href="https://fonts.gstatic.com/" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" th:href="@{/assets/css/app.css}">
 
-    <!-- BEGIN SETTINGS -->
-    <!-- Remove this after purchasing -->
-    <!-- <script th:src="@{/assets/js/settings.js}"></script>-->
     <!-- END SETTINGS -->
-
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet'/>

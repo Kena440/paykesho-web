@@ -4,11 +4,30 @@
 <head th:fragment="page_head(title, remove)" th:remove="${remove}">
     <meta charset="utf-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
-    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-    <meta content="Responsive Bootstrap 5 Admin &amp; Dashboard Template" name="description">
-    <meta content="Bootlab" name="author">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Paykesho Limited">
+    <meta name="description"
+          content="Paykesho enables clients to access goods on credit from merchants, using a seamless E-value and QR code system. Get your products today and pay tomorrow!">
+    <meta name="keywords"
+          content="Paykesho, credit services, merchant payments, QR code payments, client credit, buy now pay later, credit platform, Paykesho Zambia, e-value transactions">
+    <meta name="robots" content="index, follow">
 
     <title>Paykesho | Get lelo, Pay Kesho | [[${title}]]</title>
+
+    <!-- Open Graph (OG) Meta Tags for Social Media -->
+    <meta property="og:title" content="Paykesho - Get lelo, Pay Kesho! Access Goods on Credit">
+    <meta property="og:description"
+          content="Paykesho connects clients with merchants to access goods on credit through a convenient, cashless system. Learn more about how you can get your goods now and pay later.">
+    <meta property="og:image" content="{{asset('website/assets/images/og-image.jpg')}}">
+    <meta property="og:url" content="{{url()->current()}}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Paykesho - Get lelo, Pay Kesho!">
+    <meta name="twitter:description"
+          content="Paykesho allows you to access goods on credit from merchants with a secure, QR code-based E-value system. Purchase now and pay later.">
+    <meta name="twitter:image" content="{{asset('website/assets/images/og-image.jpg')}}">
 
     <link rel="shortcut icon" th:href="@{/assets/img/favicon/favicon.ico}">
 
@@ -512,9 +531,10 @@
                 </ul>
             </div>
             <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
-                <h4 class="text-light fs-5">Resources</h4>
+                <h4 class="text-light fs-5">Links</h4>
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
-                    <li class="mt-2"><a class="text-white-50" href="#">Terms of service</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="https://merchant.paykesho.com">Merchant</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="https://organization.paykesho.com">Organization</a></li>
                 </ul>
             </div>
             <div class="col-12 col-md-4 col-lg-2 mb-3 mb-md-0">
@@ -522,6 +542,8 @@
                 <ul class="list-unstyled ps-0 mb-0 mt-3">
                     <li class="mt-2"><a class="text-white-50" href="#">Terms & conditions</a></li>
                     <li class="mt-2"><a class="text-white-50" href="#">Privacy policy</a></li>
+                    <li class="mt-2"><a class="text-white-50" href="#">Terms of service</a></li>
+
                 </ul>
             </div>
         </div>

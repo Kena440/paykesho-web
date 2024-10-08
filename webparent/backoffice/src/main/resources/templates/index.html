@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html data-bs-theme="light"
       data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
-      lang="en" xmlns:th="http://www.thymeleaf.org">
+      lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Dashboard','none')"></head>
 <body>
@@ -54,7 +54,8 @@
                                             <div class="row g-0 w-100">
                                                 <div class="col-6">
                                                     <div class="illustration-text p-3 m-1">
-                                                        <h4 class="illustration-text">Welcome Back, Chris!</h4>
+                                                        <h4 class="illustration-text">Welcome Back,
+                                                            <span sec:authentication="principal.fullname"></span>!</h4>
                                                         <p class="mb-0">Paykesho Dashboard</p>
                                                     </div>
                                                 </div>
@@ -159,7 +160,7 @@
                                 <h5 class="card-title mb-0">Real-Time</h5>
                             </div>
                             <div class="card-body p-2">
-                                <div id="world_map" style="height:279px;"></div>
+                                <div id="map" style='width: 100%; height: 279px'></div>
                             </div>
                         </div>
                     </div>
@@ -539,117 +540,32 @@
     });
 </script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var markers = [{
-            coords: [31.230391, 121.473701],
-            name: "Shanghai"
-        },
-            {
-                coords: [39.904202, 116.407394],
-                name: "Beijing"
-            },
-            {
-                coords: [28.704060, 77.102493],
-                name: "Delhi"
-            },
-            {
-                coords: [6.524379, 3.379206],
-                name: "Lagos"
-            },
-            {
-                coords: [39.343357, 117.361649],
-                name: "Tianjin"
-            },
-            {
-                coords: [24.860735, 67.001137],
-                name: "Karachi"
-            },
-            {
-                coords: [41.008240, 28.978359],
-                name: "Istanbul"
-            },
-            {
-                coords: [35.689487, 139.691711],
-                name: "Tokyo"
-            },
-            {
-                coords: [23.129110, 113.264381],
-                name: "Guangzhou"
-            },
-            {
-                coords: [19.075983, 72.877655],
-                name: "Mumbai"
-            },
-            {
-                coords: [40.7127837, -74.0059413],
-                name: "New York"
-            },
-            {
-                coords: [34.052235, -118.243683],
-                name: "Los Angeles"
-            },
-            {
-                coords: [41.878113, -87.629799],
-                name: "Chicago"
-            },
-            {
-                coords: [29.760427, -95.369804],
-                name: "Houston"
-            },
-            {
-                coords: [33.448376, -112.074036],
-                name: "Phoenix"
-            },
-            {
-                coords: [51.507351, -0.127758],
-                name: "London"
-            },
-            {
-                coords: [48.856613, 2.352222],
-                name: "Paris"
-            },
-            {
-                coords: [55.755825, 37.617298],
-                name: "Moscow"
-            },
-            {
-                coords: [40.416775, -3.703790],
-                name: "Madrid"
-            }
-        ];
-        var map = new jsVectorMap({
-            map: "world",
-            selector: "#world_map",
-            zoomButtons: true,
-            markers: markers,
-            markerStyle: {
-                initial: {
-                    r: 9,
-                    stroke: window.cssVariables.secondaryBg,
-                    strokeWidth: 7,
-                    stokeOpacity: .4,
-                    fill: window.cssVariables.primary
-                },
-                hover: {
-                    fill: window.cssVariables.primary,
-                    stroke: window.cssVariables.primary
-                }
-            },
-            regionStyle: {
-                initial: {
-                    fill: window.cssVariables.quaternaryBg
-                }
-            },
-            zoomOnScroll: false
-        });
-        window.addEventListener("resize", () => {
-            map.updateSize();
-        });
-        setTimeout(function () {
-            map.updateSize();
-        }, 250);
-    });
+    var map = L.map('map').setView([-14.432750819377832, 28.446846724905615], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    fetch('/general/rest/map-data')
+        .then(response => response.json())
+        .then(mapData => {
+
+            mapData.forEach(function (location) {
+                var customIcon = L.icon({
+                    iconUrl: '/images/store.png',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10],
+                    popupAnchor: [0, -10]
+                });
+
+                L.marker([location.latitude, location.longitude], {icon: customIcon})
+                    .addTo(map)
+                    .bindPopup(`<b>${location.name}</b><br>Type: ${location.type}`);
+            });
+        })
+        .catch(error => console.error('Error fetching map data:', error));
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Pie chart
