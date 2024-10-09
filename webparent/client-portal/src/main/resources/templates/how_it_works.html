@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta content="text/html;charset=UTF-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('How it Works','none')"></head>
+
+<body>
+
+<nav th:replace="fragments/fragments :: navBar"></nav>
+
+
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="mb-5 text-center">
+            <span class="text-uppercase text-primary text-sm fw-medium mb-1 d-block">How it Works</span>
+            <h2 class="h1">Kindly get in touch with us</h2>
+            <p class="text-muted fs-lg">Feel free.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-9 col-lg-8 mx-auto">
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-6">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-12 col-md-9 col-lg-8 col-xl-6 mx-auto">
+                <h2 class="h1 mb-3">
+                    Join our ecosystem
+                </h2>
+                <a class="align-middle btn btn-success btn-pill btn-lg mt-n1"
+                   th:href="@{/clients/register}">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="fragments/fragments :: footer()"></footer>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+
+</html>

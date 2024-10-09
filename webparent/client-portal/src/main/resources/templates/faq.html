@@ -2,7 +2,7 @@
 <html lang="en">
 
 <meta content="text/html;charset=UTF-8" http-equiv="content-type"/>
-<head th:replace="fragments/fragments :: page_head('Home','none')"></head>
+<head th:replace="fragments/fragments :: page_head('FAQ','none')"></head>
 
 <body>
 
@@ -111,11 +111,10 @@
         <div class="row">
             <div class="col-12 col-md-9 col-lg-8 col-xl-6 mx-auto">
                 <h2 class="h1 mb-3">
-                    Join over 5,000 developers who are already working with our products
+                    Join our ecosystem
                 </h2>
                 <a class="align-middle btn btn-success btn-pill btn-lg mt-n1"
-                   href="https://themes.getbootstrap.com/product/appstack-responsive-admin-template/"
-                   target="_blank">Get Started</a>
+                   th:href="@{/clients/register}">Get Started</a>
             </div>
         </div>
     </div>

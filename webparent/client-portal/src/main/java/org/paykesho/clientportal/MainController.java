@@ -48,6 +48,36 @@ public class MainController {
         return "faq";
     }
 
+    @GetMapping("/contact")
+    public String viewContactPage(Model model) {
+        Country country = settingService.getCountryByName("Zambia");
+        model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
+
+        if (country != null) model.addAttribute("country", country);
+
+        return "contact";
+    }
+
+    @GetMapping("/business")
+    public String viewBusinessPage(Model model) {
+        Country country = settingService.getCountryByName("Zambia");
+        model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
+
+        if (country != null) model.addAttribute("country", country);
+
+        return "business";
+    }
+
+    @GetMapping("/how-it-works")
+    public String viewHowItWorksPage(Model model) {
+        Country country = settingService.getCountryByName("Zambia");
+        model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
+
+        if (country != null) model.addAttribute("country", country);
+
+        return "how_it_works";
+    }
+
     @GetMapping("/login")
     public String viewLoginPage(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

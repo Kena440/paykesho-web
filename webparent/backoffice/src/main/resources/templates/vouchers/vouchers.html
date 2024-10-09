@@ -81,8 +81,12 @@
                                                     <div th:replace="fragments/fragments :: approve('voucher', '/vouchers/approve/' + ${voucher.id})"></div>
                                                 </a>
                                                 &nbsp;
-                                                <a class="dropdown-item text-danger" href="#">
-                                                    <div th:replace="fragments/fragments :: reject('voucher', '/vouchers/reject/' + ${voucher.id})"></div>
+                                                <a class="dropdown-item text-danger fas fa-cancel"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#rejectVoucherModal"
+                                                   href="#"
+                                                   th:data-voucher-id="${voucher.id}">
+                                                    Reject
                                                 </a>
                                                 &nbsp;
                                                 <!--       <a class="dropdown-item text-danger" href="#">
@@ -101,6 +105,38 @@
                 </div>
             </div>
         </main>
+    </div>
+</div>
+<div class="modal fade" id="rejectVoucherModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <strong class="mx-auto">Reject Reason</strong>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/vouchers/reject}" method="post">
+                <input type="hidden" id="voucherId" name="voucherId" value="">
+
+                <div class="modal-body m-3">
+                    <p class="font-size-sm text-warning">
+                        Please enter reason for rejecting the voucher.
+                    </p>
+                    <hr>
+                    <div class="form-group">
+                        <label class="sr-only" for="modalRejectVoucherMessage">Reject Reason*</label>
+                        <input class="form-control form-control-lg" id="modalRejectVoucherMessage"
+                               name="modalRejectVoucherMessage" type="text" placeholder="Reason *" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Reject</button>
+                </div>
+            </form>
+
+        </div>
     </div>
 </div>
 
@@ -133,6 +169,18 @@
             responsive: true
         });
     });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $('#rejectVoucherModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var voucherId = button.data('voucher-id');
+            console.log(voucherId)
+            var modal = $(this);
+            modal.find('#voucherId').val(voucherId);
+        });
+    });
+
 </script>
 
 </body>

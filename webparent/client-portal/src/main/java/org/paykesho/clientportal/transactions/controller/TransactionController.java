@@ -4,23 +4,20 @@ import org.commons.entity.Transaction;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
+import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.MerchantDto;
 import org.paykesho.clientportal.api.dto.PaymentDto;
 import org.paykesho.clientportal.clients.service.ClientService;
-import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.merchant.service.MerchantService;
+import org.paykesho.clientportal.notifications.service.NotificationService;
 import org.paykesho.clientportal.security.ClientUserDetails;
-import org.paykesho.clientportal.settings.email.EmailSettingBag;
-import org.paykesho.clientportal.settings.service.SettingService;
 import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,9 +26,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
@@ -49,11 +43,11 @@ public class TransactionController {
     @Autowired
     private MerchantService merchantService;
     @Autowired
-    private SettingService settingService;
-    @Autowired
     private PaykeshoReferenceService paykeshoReferenceService;
     @Autowired
     private TransactionsService transactionsService;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("")
     public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
@@ -120,6 +114,8 @@ public class TransactionController {
     }
 
     private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, BigDecimal amount) throws PaykeshoError {
+
+        Transaction savedTxn = null;
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_TRX");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
@@ -127,8 +123,6 @@ public class TransactionController {
         if (availableBalance == null || availableBalance.compareTo(amount) < 0) {
             throw new PaykeshoError("error processing payment. payment amount is larger or insufficient balance.");
         }
-
-        BigDecimal newVoucherAvailableAmount = availableBalance.subtract(amount);
 
         Transaction transaction = new Transaction();
         transaction.setClient(client);
@@ -139,29 +133,53 @@ public class TransactionController {
         transaction.setTxnDate(new Date());
         transaction.setSettled(false);
 
-        // Uncomment if voucher update is necessary
-        // Voucher updateVoucher = voucherService.updateVoucherAvailableAmount(client, newVoucherAvailableAmount);
-        // transaction.setVoucher(updateVoucher);
+        savedTxn = transactionsService.save(transaction);
 
-        return transactionsService.save(transaction);
+        sendNotification(savedTxn);
+        return savedTxn;
     }
 
-    private void sendPaymentEmail(Transaction transaction) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBags);
+    private void sendNotification(Transaction transaction) {
+        // Generate messages
+        String emailMessage = generateEmailMessage(transaction, "PAYMENT");
+        String smsMessage = generateSmsMessage(transaction, "PAYMENT");
 
-        String toAddress = transaction.getClient().getEmail();
-        String subject = "Paykesho Payment #" + transaction.getReference();
-        String content = "<p>Hello, </p>" + "<p>You made a payment successfully of \"" + transaction.getAmount() + "\" to \"" + transaction.getMerchant().getName() + "\". Transaction Reference: \"" + transaction.getReference() + "\"</p>" + "<br>" + "<p>Get lelo, Pay Kesho. </p>";
+        // Send email notification
+        boolean emailSent = notificationService.sendNotification(transaction.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        if (emailSent) {
+            System.out.println("Email sent successfully to " + transaction.getClient().getEmail());
+        } else {
+            System.err.println("Failed to send email to " + transaction.getClient().getEmail());
+        }
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        // Send SMS notification
+        boolean smsSent = notificationService.sendNotification(transaction.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        if (smsSent) {
+            System.out.println("SMS sent successfully to " + transaction.getClient().getPhoneNumber());
+        } else {
+            System.err.println("Failed to send SMS to " + transaction.getClient().getPhoneNumber());
+        }
+    }
 
-        helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
-        helper.setText(content, true);
+    private String generateEmailMessage(Transaction transaction, String actionType) {
+        StringBuilder message = new StringBuilder("<p>Dear ").append(transaction.getClient().getFullName()).append(",</p>");
 
-        //mailSender.send(mimeMessage);
+        if ("PAYMENT".equals(actionType)) {
+            message.append("<p>Your payment request has been processed successfully. ").append("Transaction Amount: K").append(transaction.getAmount()).append("Merchant: ").append(transaction.getMerchant().getName()).append("Transaction Reference: ").append(transaction.getReference()).append(".</p>");
+        } else {
+            message.append("<p>Unknown action type.</p>");
+        }
+
+        message.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
+        return message.toString();
+    }
+
+    // Generate SMS content based on voucher action type
+    private String generateSmsMessage(Transaction transaction, String actionType) {
+        String txnAmount = "K" + transaction.getAmount();
+        if ("PAYMENT".equals(actionType)) {
+            return String.format("Dear %s, your payment request processed successfully. Amount: %s. Merchant: %s. Reference: %s. Thank you. Get lelo, Paykesho.", transaction.getClient(), txnAmount, transaction.getMerchant().getName(), transaction.getReference());
+        }
+        return "Unknown action type.";
     }
 }
