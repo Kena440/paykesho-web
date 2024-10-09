@@ -82,8 +82,8 @@
                                                 </a>
                                                 &nbsp;
                                                 <a class="dropdown-item text-danger fas fa-cancel"
-                                                   data-bs-toggle="modal"
                                                    data-bs-target="#rejectVoucherModal"
+                                                   data-bs-toggle="modal"
                                                    href="#"
                                                    th:data-voucher-id="${voucher.id}">
                                                     Reject
@@ -107,17 +107,17 @@
         </main>
     </div>
 </div>
-<div class="modal fade" id="rejectVoucherModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div aria-hidden="true" class="modal fade" id="rejectVoucherModal" role="dialog" tabindex="-1">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <strong class="mx-auto">Reject Reason</strong>
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
-            <form th:action="@{/vouchers/reject}" method="post">
-                <input type="hidden" id="voucherId" name="voucherId" value="">
+            <form method="post" th:action="@{/vouchers/reject}">
+                <input id="voucherId" name="voucherId" type="hidden" value="">
 
                 <div class="modal-body m-3">
                     <p class="font-size-sm text-warning">
@@ -127,12 +127,12 @@
                     <div class="form-group">
                         <label class="sr-only" for="modalRejectVoucherMessage">Reject Reason*</label>
                         <input class="form-control form-control-lg" id="modalRejectVoucherMessage"
-                               name="modalRejectVoucherMessage" type="text" placeholder="Reason *" required>
+                               name="modalRejectVoucherMessage" placeholder="Reason *" required type="text">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Reject</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" type="submit">Reject</button>
                 </div>
             </form>
 

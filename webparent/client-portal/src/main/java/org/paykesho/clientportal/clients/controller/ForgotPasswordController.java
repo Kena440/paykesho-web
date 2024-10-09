@@ -30,11 +30,11 @@ public class ForgotPasswordController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgotPasswordController.class);
     @Autowired
+    NotificationService notificationService;
+    @Autowired
     private ClientService clientService;
     @Autowired
     private SettingService settingService;
-    @Autowired
-    NotificationService notificationService;
 
     @PostMapping(value = "/forgot-password")
     public String forgotPasswordForm(Model model, HttpServletRequest request) throws PaykeshoError {

@@ -6,30 +6,30 @@
 <head th:fragment="page_head(title, remove)" th:remove="${remove}">
     <meta charset="utf-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="author" content="Paykesho Limited">
-    <meta name="description"
-          content="The Paykesho Organization Portal provides a comprehensive platform for organizations to manage client credit services, monitor transactions, and streamline operations efficiently.">
-    <meta name="keywords"
-          content="Paykesho, organization portal, client credit management, transaction monitoring, credit services, digital solutions, Paykesho Zambia">
-    <meta name="robots" content="index, follow">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <meta content="Paykesho Limited" name="author">
+    <meta content="The Paykesho Organization Portal provides a comprehensive platform for organizations to manage client credit services, monitor transactions, and streamline operations efficiently."
+          name="description">
+    <meta content="Paykesho, organization portal, client credit management, transaction monitoring, credit services, digital solutions, Paykesho Zambia"
+          name="keywords">
+    <meta content="index, follow" name="robots">
 
     <title>Paykesho | Organization Portal | [[${title}]]</title>
 
     <!-- Open Graph (OG) Meta Tags for Social Media -->
-    <meta property="og:title" content="Paykesho Organization Portal - Streamline Client Credit Management">
-    <meta property="og:description"
-          content="Access the Paykesho Organization Portal to effectively manage client credit services and transactions with ease. Transform how your organization handles sales on credit.">
-    <meta property="og:image" content="{{asset('website/assets/images/og-image.jpg')}}">
-    <meta property="og:url" content="{{url()->current()}}">
-    <meta property="og:type" content="website">
+    <meta content="Paykesho Organization Portal - Streamline Client Credit Management" property="og:title">
+    <meta content="Access the Paykesho Organization Portal to effectively manage client credit services and transactions with ease. Transform how your organization handles sales on credit."
+          property="og:description">
+    <meta content="{{asset('website/assets/images/og-image.jpg')}}" property="og:image">
+    <meta content="{{url()->current()}}" property="og:url">
+    <meta content="website" property="og:type">
 
     <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Paykesho Organization Portal - Enhance Your Credit Management">
-    <meta name="twitter:description"
-          content="The Paykesho Organization Portal empowers organizations to manage client credit services and transactions seamlessly.">
-    <meta name="twitter:image" content="{{asset('website/assets/images/og-image.jpg')}}">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Paykesho Organization Portal - Enhance Your Credit Management" name="twitter:title">
+    <meta content="The Paykesho Organization Portal empowers organizations to manage client credit services and transactions seamlessly."
+          name="twitter:description">
+    <meta content="{{asset('website/assets/images/og-image.jpg')}}" name="twitter:image">
 
     <link rel="shortcut icon" th:href="@{/assets/img/favicon.ico}">
 
@@ -52,7 +52,7 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
           rel="stylesheet" type="text/css">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+    <link href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" rel="stylesheet"/>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 </head>
 

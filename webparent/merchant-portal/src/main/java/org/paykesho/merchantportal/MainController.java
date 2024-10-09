@@ -3,7 +3,6 @@ package org.paykesho.merchantportal;
 import org.commons.entity.merchant.Merchant;
 import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.settings.Country;
-import org.paykesho.merchantportal.events.service.EventsService;
 import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
 import org.paykesho.merchantportal.merchants.service.MerchantService;
 import org.paykesho.merchantportal.settings.service.SettingService;

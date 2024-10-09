@@ -20,5 +20,6 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
 
     @Query("select v from Voucher v where v.client = :client and v.approved = true and v.availableAmount > 0")
     public List<Voucher> getApprovedAndValidVouchers(@Param("client") Client client);
+
     long countByRequestDateAfter(Date date);
 }

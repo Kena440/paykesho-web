@@ -77,8 +77,8 @@
                                        placeholder="Enter your password"
                                        type="password"/>
                                 <small>
-                                    <a type="button" class=" my-1" data-bs-toggle="modal"
-                                       data-bs-target="#passwordResetModal">
+                                    <a class=" my-1" data-bs-target="#passwordResetModal" data-bs-toggle="modal"
+                                       type="button">
                                         Forgot password?
                                     </a>
                                 </small>
@@ -108,16 +108,16 @@
     </div>
 </section>
 
-<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div aria-hidden="true" class="modal fade" id="passwordResetModal" role="dialog" tabindex="-1">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <strong class="mx-auto">Forgot Password?</strong>
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
-            <form th:action="@{/forgot-password}" method="post">
+            <form method="post" th:action="@{/forgot-password}">
 
                 <div class="modal-body m-3">
                     <p class=" font-size-sm text-warning">
@@ -132,13 +132,13 @@
                             Email Address *
                         </label>
                         <input class="form-control form-control-lg" id="modalPasswordResetEmail"
-                               name="modalPasswordResetEmail" type="email"
-                               placeholder="Email Address *" required>
+                               name="modalPasswordResetEmail" placeholder="Email Address *"
+                               required type="email">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Reset</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" type="submit">Reset</button>
                 </div>
             </form>
         </div>
