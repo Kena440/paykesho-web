@@ -61,7 +61,8 @@ public class OrganizationController {
         organization.setRegistrationDate(new Date());
         organizationService.save(organization);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization Operation Successful: " + organization.getEmail());
-        return getRedirectURLtoAffectedOrganization(organization);
+        return "redirect:/organizations";
+       // return getRedirectURLtoAffectedOrganization(organization);
     }
 
     @GetMapping("/view/{id}")

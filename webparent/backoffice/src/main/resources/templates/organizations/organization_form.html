@@ -169,46 +169,57 @@
 </script>
 <script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
 <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        zoom: 4.8,
-        center: [28.5589884, -13.1189121]
-    });
+    // Initialize the Leaflet map
+    var map = L.map('map').setView([-13.1189121, 28.5589884], 4.8); // Set map center and zoom level
 
-    const marker1 = new mapboxgl.Marker()
-        .setLngLat([$("#longitude").val(), $("#latitude").val()])
-        .addTo(map);
+    // Add OpenStreetMap tile layer (similar to the Mapbox streets-v11 style)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
+    // Add an initial marker at the coordinates from the input fields
+    var marker1 = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
 
-    map.on('mousemove', (e) => {
+    // Mousemove event to display container point (pixel coordinates) and lat-lng information
+    map.on('mousemove', function(e) {
         document.getElementById('info').innerHTML =
-            JSON.stringify(e.point) +
-            '<br />' +
-            // `e.lngLat` is the longitude, latitude geographical position of the event.
-            JSON.stringify(e.lngLat.wrap());
+            JSON.stringify({ x: e.containerPoint.x, y: e.containerPoint.y }) + '<br />' +
+            JSON.stringify({ lng: e.latlng.lng, lat: e.latlng.lat }); // Display longitude and latitude
     });
 
-    var marker = new mapboxgl.Marker();
+    // Define a new marker to be added/updated on map click
+    var marker = L.marker([0, 0]).addTo(map); // Initialize the marker at an arbitrary position
 
-    function add_marker(event) {
-        var coordinates = event.lngLat;
+    // Function to add/update marker on map click
+    function add_marker(e) {
+        var coordinates = e.latlng; // Get the clicked location's lat-lng
 
+        // Update input fields with new coordinates
         $("#longitude").val(coordinates.lng);
         $("#latitude").val(coordinates.lat);
 
-        marker.setLngLat(coordinates).addTo(map);
+        // Update the marker's position to the clicked location
+        marker.setLatLng(coordinates).addTo(map);
     }
 
+    // Add the click event listener to the map to place/update marker
     map.on('click', add_marker);
+
+    // For geocoding functionality, you can add Leaflet geocoder or a plugin (like leaflet-control-geocoder)
+    L.Control.geocoder({
+        defaultMarkGeocode: false
+    }).on('markgeocode', function(e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]).addTo(map);
+        map.fitBounds(poly.getBounds());
+    }).addTo(map);
 </script>
+
 </body>
 </html>
 

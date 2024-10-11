@@ -177,46 +177,36 @@
 </script>
 <script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
 <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        zoom: 4.8,
-        center: [28.5589884, -13.1189121]
-    });
+    var map = L.map('map').setView([-13.1189121, 28.5589884], 4.8); // Center map and set zoom level
 
-    const marker1 = new mapboxgl.Marker()
-        .setLngLat([$("#longitude").val(), $("#latitude").val()])
-        .addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
+    var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
 
-    map.on('mousemove', (e) => {
+    map.on('mousemove', function(e) {
         document.getElementById('info').innerHTML =
-            JSON.stringify(e.point) +
+            JSON.stringify({ x: e.containerPoint.x, y: e.containerPoint.y }) + // container point (x, y)
             '<br />' +
-            // `e.lngLat` is the longitude, latitude geographical position of the event.
-            JSON.stringify(e.lngLat.wrap());
+            JSON.stringify({ lng: e.latlng.lng, lat: e.latlng.lat }); // longitude, latitude of event
     });
 
-    var marker = new mapboxgl.Marker();
+    function add_marker(e) {
+        var coordinates = e.latlng; // Get the clicked location
 
-    function add_marker(event) {
-        var coordinates = event.lngLat;
-
+        // Update latitude and longitude input fields
         $("#longitude").val(coordinates.lng);
         $("#latitude").val(coordinates.lat);
 
-        marker.setLngLat(coordinates).addTo(map);
+        // Update marker position
+        marker.setLatLng(coordinates).addTo(map);
     }
 
+    // Add click event to place a marker on the map
     map.on('click', add_marker);
 </script>
+
 </body>
 </html>
 

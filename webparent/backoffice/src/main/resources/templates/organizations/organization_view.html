@@ -389,24 +389,26 @@
     });
 </script>
 <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        zoom: 15,
-        center: [$("#longitude").val(), $("#latitude").val()]
-    });
+    var map = L.map('map').setView([$("#latitude").val(), $("#longitude").val()], 15);
 
-    const marker1 = new mapboxgl.Marker()
-        .setLngLat([$("#longitude").val(), $("#latitude").val()])
-        .addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
+    var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
+
+    L.Control.geocoder({
+        defaultMarkGeocode: false
+    }).on('markgeocode', function(e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]).addTo(map);
+        map.fitBounds(poly.getBounds());
+    }).addTo(map);
 
 </script>
 
