@@ -58,11 +58,11 @@
                                                 <div class="col-6">
                                                     <div class="illustration-text p-3 m-1">
                                                         <h4 class="illustration-text">Welcome Back,
-                                                            [[${merchantAdmin}]]!</h4>
+                                                            [[${merchantAdmin.name}]]!</h4>
                                                         <p class="mb-0">Merchant Dashboard - [[${merchant}]]</p>
                                                     </div>
                                                 </div>
-                                                <div class="col-6 align-self-end text-end">
+                                                <div class="col-4 align-self-end text-end">
                                                     <img alt="Searching"
                                                          class="img-fluid illustration-img"
                                                          th:src="@{/assets/img/illustrations/searching.png}">
@@ -523,26 +523,33 @@
     });
 </script>
 <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhemRldmVsb3BlcjcwIiwiYSI6ImNsOG11dXptNTBjc2Mzb3A2aTg3aXkzMmQifQ.EpRXqn3-sQCu8qEu9l7nCA';
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        zoom: 15,
-        center: [$("#longitude").val(), $("#latitude").val()]
-    });
+    // Initialize the Leaflet map
+    var map = L.map('map').setView([$("#latitude").val(), $("#longitude").val()], 15);
 
-    const marker1 = new mapboxgl.Marker()
-        .setLngLat([$("#longitude").val(), $("#latitude").val()])
-        .addTo(map);
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
+    // Add a marker at the given coordinates
+    var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
 
+    // Optionally, if you need geocoding similar to MapboxGeocoder, you can integrate a Leaflet geocoder plugin.
+    // Here is an example of using leaflet-control-geocoder:
+    L.Control.geocoder({
+        defaultMarkGeocode: false
+    }).on('markgeocode', function(e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]).addTo(map);
+        map.fitBounds(poly.getBounds());
+    }).addTo(map);
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Pie chart
