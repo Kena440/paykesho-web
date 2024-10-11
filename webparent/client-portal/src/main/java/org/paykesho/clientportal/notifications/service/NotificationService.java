@@ -4,6 +4,8 @@ import org.commons.entity.Notification;
 import org.commons.enums.NotificationType;
 import org.paykesho.clientportal.notifications.dto.NotificationRequest;
 import org.paykesho.clientportal.notifications.repository.NotificationsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class NotificationService {
 
     private final RestTemplate restTemplate;
     private final NotificationsRepository notificationRepository;
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     @Autowired
     public NotificationService(RestTemplate restTemplate, NotificationsRepository notificationRepository) {
@@ -35,14 +38,21 @@ public class NotificationService {
         notification.setMessage(message);
         notification.setStatus("pending");
 
-        notificationRepository.save(notification);
+        try {
+            notificationRepository.save(notification);
+        } catch (Exception e) {
+            logger.error("Error saving notification to database: {}", e.getMessage());
+            return false;
+        }
 
         HttpHeaders headers = new HttpHeaders();
-        //headers.set("Authorization", "Bearer " + apiKey);
         headers.set("Content-Type", "application/json");
         headers.set("API-Key", apiKey);
 
         NotificationRequest requestBody = new NotificationRequest(recipient, message, notificationType);
+
+        // Log message length
+        logger.info("Message length for recipient {}: {}", recipient, message.length());
 
         HttpEntity<NotificationRequest> request = new HttpEntity<>(requestBody, headers);
 
@@ -60,14 +70,22 @@ public class NotificationService {
                 notification.setStatus("failed");
             }
 
-            notificationRepository.save(notification);
+            try {
+                notificationRepository.save(notification);
+            } catch (Exception e) {
+                logger.error("Error saving notification status to database: {}", e.getMessage());
+            }
 
             return response.getStatusCode() == HttpStatus.OK;
 
         } catch (Exception e) {
-            System.err.println("Error sending notification: " + e.getMessage());
+            logger.error("Error sending notification: {}", e.getMessage());
             notification.setStatus("failed");
-            notificationRepository.save(notification);
+            try {
+                notificationRepository.save(notification);
+            } catch (Exception saveException) {
+                logger.error("Error saving failed notification status to database: {}", saveException.getMessage());
+            }
             return false;
         }
     }
