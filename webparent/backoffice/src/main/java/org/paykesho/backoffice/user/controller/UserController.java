@@ -37,7 +37,7 @@ public class UserController {
     public String listAllUsersByPage(Model model) {
         model.addAttribute("pageTitle", "List Merchants");
         model.addAttribute("merchantList", userService.listAll());
-        return "merchants/merchants";
+        return "users/users";
     }
 
 
