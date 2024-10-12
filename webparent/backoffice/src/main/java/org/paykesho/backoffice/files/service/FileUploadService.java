@@ -50,8 +50,8 @@ public class FileUploadService {
         try {
             tempFile = convertMultipartToFile(file);
             body.add("file", new FileSystemResource(tempFile));
-            body.add("fileType", fileType.toString());
-            body.add("userId", userId);
+            body.add("file_type", fileType.toString());
+            body.add("user_id", userId);
             body.add("description", description);
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);

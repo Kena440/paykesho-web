@@ -2,9 +2,9 @@ package org.paykesho.backoffice.user.controller;
 
 import org.commons.entity.Role;
 import org.commons.entity.User;
+import org.commons.enums.FileType;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.paging.PagingAndSortingParam;
+import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.user.enums.Constants;
 import org.paykesho.backoffice.user.fileHandlers.UserCSVExporter;
 import org.paykesho.backoffice.user.fileHandlers.UserExcelExporter;
@@ -30,21 +30,14 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @GetMapping("")
-    public String listFirstPage() {
-        return Constants.REDIRECT_TO_USERS_WITHOUT_KEYWORD;
-    }
-
-    @GetMapping("/page/{pageNum}")
-    public String listAllUsersByPage(
-            @PagingAndSortingParam(listName = "userList", moduleURL = "/users") PagingAndSortingHelper helper,
-            @PathVariable("pageNum") int pageNum,
-            Model model) throws PaykeshoError {
-        userService.listByPage(pageNum, helper);
-        model.addAttribute("pageTitle", "User List");
-
-        return "users/users";
+    public String listAllUsersByPage(Model model) {
+        model.addAttribute("pageTitle", "List Merchants");
+        model.addAttribute("merchantList", userService.listAll());
+        return "merchants/merchants";
     }
 
 
@@ -65,30 +58,43 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public String saveUser(User user,
-                           RedirectAttributes redirectAttributes,
-                           @RequestParam("image") MultipartFile multipartFile) throws IOException, PaykeshoError {
-        if (!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-            user.setPhotos(fileName);
-            User savedUser = userService.save(user);
-            String uploadDir = "user_photos/" + savedUser.getId();
+    public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws IOException, PaykeshoError {
+        try {
+            if (!multipartFile.isEmpty()) {
+                String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
 
-            if (!fileName.isEmpty()) {
-                AmazonS3Util.removeFolder(uploadDir);
-                AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
+                if (!isValidImageType(multipartFile)) {
+                    throw new PaykeshoError("Invalid image type uploaded");
+                }
+
+                user.setPhotos(fileName);
+                User savedUser = userService.save(user);
+
+                boolean isUploaded = fileUploadService.uploadFile(multipartFile, FileType.photo, savedUser.getId(), "profile photo for " + savedUser.getEmail());
+                if (!isUploaded) {
+                    throw new PaykeshoError("File upload failed.");
+                }
+
+            } else {
+                if (user.getPhotos().isEmpty()) {
+                    user.setPhotos(null);
+                }
+                userService.save(user);
             }
-        } else {
-            if (user.getPhotos().isEmpty()) {
-                user.setPhotos(null);
-            }
-            userService.save(user);
+
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "User Operation Successful: " + user.getEmail());
+        } catch (PaykeshoError e) {
+            redirectAttributes.addFlashAttribute(Constants.ERROR, "Error saving user: " + e.getMessage());
+            return "redirect:/users";
         }
 
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "User Operation Successful: " + user.getEmail());
         return getRedirectURLtoAffectedUser(user);
     }
 
+    private boolean isValidImageType(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/png"));
+    }
 
     private String getRedirectURLtoAffectedUser(User user) throws PaykeshoError {
         if (user == null) {
@@ -99,9 +105,7 @@ public class UserController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editUser(@PathVariable(name = "id") Integer id,
-                           RedirectAttributes redirectAttributes,
-                           Model model) throws PaykeshoError {
+    public String editUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
         if (id == null) {
             return Constants.REDIRECT_TO_USERS;
         }
@@ -124,9 +128,7 @@ public class UserController {
     }
 
     @GetMapping("delete/{id}")
-    public String deleteUser(@PathVariable(name = "id") Integer id,
-                             RedirectAttributes redirectAttributes,
-                             Model model) throws PaykeshoError {
+    public String deleteUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("no parameter id");
         }
@@ -144,10 +146,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/enabled/{status}")
-    public String updateUserEnabledStatus(@PathVariable(name = "id") Integer id,
-                                          @PathVariable(name = "status") boolean enabled,
-                                          RedirectAttributes redirectAttributes,
-                                          Model model) throws PaykeshoError {
+    public String updateUserEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
 
         if (id == null) {
             throw new PaykeshoError("no parameter id");
@@ -167,9 +166,7 @@ public class UserController {
     }
 
     @GetMapping("/details/{id}")
-    public String viewUserDetails(@PathVariable("id") Integer id,
-                                  Model model,
-                                  RedirectAttributes redirectAttributes) throws PaykeshoError {
+    public String viewUserDetails(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
 
         User user = userService.getUserById(id);
         model.addAttribute("user", user);
