@@ -2,12 +2,10 @@ package org.paykesho.backoffice.voucher.service;
 
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
-import org.commons.entity.organization.Organization;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.files.dto.FileAccessResponse;
 import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

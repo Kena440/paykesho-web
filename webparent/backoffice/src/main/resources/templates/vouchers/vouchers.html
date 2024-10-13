@@ -77,12 +77,12 @@
                                         </td>
                                         <td><span class="font-weight-normal">[[${voucher.requestDate}]]</span></td>
                                         <td>
-                                            <a th:if="${voucher.payslipPath != null}"
-                                               class="dropdown-item text-primary fas fa-file-pdf"
+                                            <a class="dropdown-item text-primary fas fa-file-pdf"
                                                data-bs-target="#voucherPayslipModal"
                                                data-bs-toggle="modal"
                                                href="#"
-                                               th:data-voucher-payslip-url="${voucher.payslipPath}">
+                                               th:data-voucher-payslip-url="${voucher.payslipPath}"
+                                               th:if="${voucher.payslipPath != null}">
                                                 Payslip
                                             </a>
                                         </td>
