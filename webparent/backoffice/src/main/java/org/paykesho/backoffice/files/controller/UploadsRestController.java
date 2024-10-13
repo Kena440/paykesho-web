@@ -19,7 +19,7 @@ public class UploadsRestController {
         this.fileUploadService = fileUploadService;
     }
 
-    @PostMapping("/upload")
+/*    @PostMapping("/upload")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("fileType") FileType fileType, @RequestParam("userId") int userId, @RequestParam("description") String description) {
 
         boolean success = fileUploadService.uploadFile(file, fileType, userId, description);
@@ -29,9 +29,9 @@ public class UploadsRestController {
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed.");
         }
-    }
+    }*/
 
-    @GetMapping("/access/{fileId}")
+/*    @GetMapping("/access/{fileId}")
     public ResponseEntity<String> getAccessDetails(@PathVariable int fileId) {
         String accessDetails = fileUploadService.getFileAccessDetails(fileId);
         if (accessDetails != null) {
@@ -39,5 +39,5 @@ public class UploadsRestController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Access details not found for file ID: " + fileId);
         }
-    }
+    }*/
 }

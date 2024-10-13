@@ -4,7 +4,10 @@ import org.commons.entity.State;
 import org.commons.entity.merchant.Merchant;
 import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.settings.Setting;
+import org.commons.enums.FileType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileUploadResponse;
+import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.merchants.enums.Constants;
 import org.paykesho.backoffice.merchants.service.MerchantCodeService;
 import org.paykesho.backoffice.merchants.service.MerchantService;
@@ -13,10 +16,8 @@ import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,8 @@ public class MerchantController {
     private SettingService settingService;
     @Autowired
     private MerchantCodeService merchantCodeService;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @GetMapping("")
     public String listAllMerchantsByPage(Model model) throws PaykeshoError {
@@ -61,16 +64,25 @@ public class MerchantController {
     }
 
     @PostMapping("/save")
-    public String saveMerchant(Merchant merchant, RedirectAttributes redirectAttributes) throws PaykeshoError {
+    public String saveMerchant(Merchant merchant, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
 
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_MNT");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
         merchant.setCode(paykeshoRef);
         merchant.setRegistrationDate(new Date());
+        FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.logo, 1, "logo photo for " + merchant.getEmail());
+
+        if (!uploadResponse.isStatus()) {
+            throw new PaykeshoError("File upload failed.");
+        }
+
+        merchant.setRemoteFileId(uploadResponse.getFileId());
+        merchant.setPhotos(uploadResponse.getFilePath());
+        merchant.setPhotoPath(uploadResponse.getFilePath());
         merchantService.save(merchant);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant Operation Successful: " + merchant.getEmail());
-        return getRedirectURLtoAffectedMerchant(merchant);
+        return "redirect:/merchants";
     }
 
     @GetMapping("/view/{id}")

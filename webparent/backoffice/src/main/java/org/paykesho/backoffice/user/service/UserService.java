@@ -3,6 +3,8 @@ package org.paykesho.backoffice.user.service;
 import org.commons.entity.Role;
 import org.commons.entity.User;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
+import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.user.repository.RoleRepository;
 import org.paykesho.backoffice.user.repository.UserRepository;
@@ -29,6 +31,8 @@ public class UserService {
     private RoleRepository roleRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     /**
      * +
@@ -37,7 +41,18 @@ public class UserService {
      * @return
      */
     public List<User> listAll() {
-        return (List<User>) userRepository.findAll(Sort.by("firstName").ascending());
+        List<User> users = (List<User>) userRepository.findAll(Sort.by("firstName").ascending());
+
+        for (User user : users) {
+            if (user.getPhotoPath() != null) {
+
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(user.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    user.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
+            }
+        }
+        return users;
     }
 
     /**

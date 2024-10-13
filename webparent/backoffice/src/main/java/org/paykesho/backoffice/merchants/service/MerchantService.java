@@ -3,6 +3,8 @@ package org.paykesho.backoffice.merchants.service;
 import org.commons.entity.merchant.Merchant;
 import org.commons.enums.MerchantType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
+import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.merchants.repository.MerchantRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.service.SettingService;
@@ -29,9 +31,22 @@ public class MerchantService {
     private MerchantRepository merchantRepository;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     public List<Merchant> listAll() {
-        return (List<Merchant>) merchantRepository.findAll(Sort.by("name").ascending());
+        List<Merchant> merchants = (List<Merchant>) merchantRepository.findAll(Sort.by("name").ascending());
+
+        for (Merchant merchant : merchants) {
+            if (merchant.getPhotoPath() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
+            }
+        }
+
+        return merchants;
     }
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
@@ -111,8 +126,7 @@ public class MerchantService {
         }
 
         Merchant merchant = getMerchantById(id);
-        if (merchant.getId() == null)
-            throw new PaykeshoError("Could not find any civilSocietyOrganization");
+        if (merchant.getId() == null) throw new PaykeshoError("Could not find any civilSocietyOrganization");
         merchant.setDeleted(true);
         save(merchant);
         // userRepository.deleteById(id);

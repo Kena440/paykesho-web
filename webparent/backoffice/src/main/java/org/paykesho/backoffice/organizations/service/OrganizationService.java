@@ -3,10 +3,13 @@ package org.paykesho.backoffice.organizations.service;
 import org.commons.dto.GeneralStatsDto;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.EmployeeRecord;
+import org.commons.entity.merchant.Merchant;
 import org.commons.entity.organization.Organization;
 import org.commons.enums.OrganizationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.repository.ClientRepository;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
+import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.organizations.dto.GPSDataItem;
 import org.paykesho.backoffice.organizations.repository.EmployeeRecordRepository;
 import org.paykesho.backoffice.organizations.repository.OrganizationRepository;
@@ -40,9 +43,23 @@ public class OrganizationService {
     private ClientRepository clientRepository;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     public List<Organization> listAll() {
-        return (List<Organization>) organizationRepository.findAll(Sort.by("name").ascending());
+
+        List<Organization> organizations = (List<Organization>) organizationRepository.findAll(Sort.by("name").ascending());
+
+        for (Organization organization : organizations) {
+            if (organization.getPhotoPath() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    organization.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
+            }
+        }
+
+        return organizations;
     }
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {

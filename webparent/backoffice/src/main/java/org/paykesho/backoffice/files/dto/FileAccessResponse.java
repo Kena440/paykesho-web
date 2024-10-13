@@ -6,9 +6,8 @@ import org.commons.enums.FileType;
 @Data
 public class FileAccessResponse {
     private String fileName;
-    private String fileType;
-    private String filePath;
-    private String error;
+    private String fileUrl;
+    private boolean status;
 
  }
 

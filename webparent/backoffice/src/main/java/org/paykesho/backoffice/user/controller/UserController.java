@@ -4,6 +4,7 @@ import org.commons.entity.Role;
 import org.commons.entity.User;
 import org.commons.enums.FileType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileUploadResponse;
 import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.user.enums.Constants;
 import org.paykesho.backoffice.user.fileHandlers.UserCSVExporter;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +38,7 @@ public class UserController {
     @GetMapping("")
     public String listAllUsersByPage(Model model) {
         model.addAttribute("pageTitle", "List Merchants");
-        model.addAttribute("merchantList", userService.listAll());
+        model.addAttribute("userList", userService.listAll());
         return "users/users";
     }
 
@@ -58,31 +60,38 @@ public class UserController {
     }
 
     @PostMapping("/save")
+    @Transactional
     public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws IOException, PaykeshoError {
         try {
             if (!multipartFile.isEmpty()) {
-                String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+                String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
 
                 if (!isValidImageType(multipartFile)) {
                     throw new PaykeshoError("Invalid image type uploaded");
                 }
 
-                user.setPhotos(fileName);
-                User savedUser = userService.save(user);
+                user.setPhotos(originalFileName);
+                FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.photo, 1, "profile photo for " + user.getEmail());
 
-                boolean isUploaded = fileUploadService.uploadFile(multipartFile, FileType.photo, savedUser.getId(), "profile photo for " + savedUser.getEmail());
-                if (!isUploaded) {
+                if (!uploadResponse.isStatus()) {
                     throw new PaykeshoError("File upload failed.");
                 }
 
+                user.setRemoteFileId(uploadResponse.getFileId());
+                user.setPhotos(uploadResponse.getFilePath());
+                user.setPhotoPath(uploadResponse.getFilePath());
+                userService.save(user);
+
             } else {
-                if (user.getPhotos().isEmpty()) {
+                if (user.getPhotos() == null || user.getPhotos().isEmpty()) {
                     user.setPhotos(null);
+                    user.setPhotoPath(null);
                 }
                 userService.save(user);
             }
 
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "User Operation Successful: " + user.getEmail());
+
         } catch (PaykeshoError e) {
             redirectAttributes.addFlashAttribute(Constants.ERROR, "Error saving user: " + e.getMessage());
             return "redirect:/users";
@@ -101,7 +110,7 @@ public class UserController {
             throw new PaykeshoError("no user provided");
         }
         String firstPartOfEmail = user.getEmail().split("@")[0];
-        return Constants.REDIRECT_TO_USERS_KEYWORD + firstPartOfEmail;
+        return Constants.REDIRECT_TO_USERS;
     }
 
     @GetMapping("/edit/{id}")

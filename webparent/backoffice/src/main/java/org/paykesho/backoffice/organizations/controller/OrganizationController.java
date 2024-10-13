@@ -6,17 +6,18 @@ import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Setting;
+import org.commons.enums.FileType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileUploadResponse;
+import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.organizations.enums.Constants;
 import org.paykesho.backoffice.organizations.service.OrganizationService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,9 +31,10 @@ public class OrganizationController {
 
     @Autowired
     private OrganizationService organizationService;
-
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @GetMapping("")
     public String listAllOrganizationsByPage(Model model) throws PaykeshoError {
@@ -56,13 +58,21 @@ public class OrganizationController {
     }
 
     @PostMapping("/save")
-    public String saveOrganization(Organization organization, RedirectAttributes redirectAttributes) throws PaykeshoError {
+    public String saveOrganization(Organization organization, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
         organization.setDistrict("N/A");
         organization.setRegistrationDate(new Date());
+        FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.logo, 1, "logo photo for " + organization.getEmail());
+
+        if (!uploadResponse.isStatus()) {
+            throw new PaykeshoError("File upload failed.");
+        }
+
+        organization.setRemoteFileId(uploadResponse.getFileId());
+        organization.setPhotos(uploadResponse.getFilePath());
+        organization.setPhotoPath(uploadResponse.getFilePath());
         organizationService.save(organization);
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization Operation Successful: " + organization.getEmail());
         return "redirect:/organizations";
-       // return getRedirectURLtoAffectedOrganization(organization);
     }
 
     @GetMapping("/view/{id}")

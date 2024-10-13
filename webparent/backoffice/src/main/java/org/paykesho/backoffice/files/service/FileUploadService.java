@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.commons.entity.FileUpload;
 import org.commons.enums.FileType;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
+import org.paykesho.backoffice.files.dto.FileUploadResponse;
 import org.paykesho.backoffice.files.repository.FileUploadRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,8 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Service
@@ -37,7 +41,7 @@ public class FileUploadService {
     }
 
     @Transactional
-    public boolean uploadFile(MultipartFile file, FileType fileType, int userId, String description) {
+    public FileUploadResponse uploadFile(MultipartFile file, FileType fileType, int userId, String description) {
         String apiKey = "F39E25A3B2A446F98E87A95723AE4";
 
         HttpHeaders headers = new HttpHeaders();
@@ -46,6 +50,7 @@ public class FileUploadService {
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         File tempFile = null;
+        FileUploadResponse fileUploadResponse = new FileUploadResponse();
 
         try {
             tempFile = convertMultipartToFile(file);
@@ -62,6 +67,8 @@ public class FileUploadService {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonResponse = objectMapper.readTree(response.getBody());
                 int fileId = jsonResponse.get("file_id").asInt();
+                String message = jsonResponse.get("message").asText();
+                String filePath = jsonResponse.get("file_name").asText();
                 FileUpload uploadedFile = new FileUpload();
                 uploadedFile.setFileName(file.getOriginalFilename());
                 uploadedFile.setFileType(fileType);
@@ -69,15 +76,22 @@ public class FileUploadService {
                 uploadedFile.setCreatedAt(new Date());
                 uploadedFile.setRemoteFileId(fileId);
                 fileUploadRepository.save(uploadedFile);
-                return true;
+
+                fileUploadResponse.setMessage(message);
+                fileUploadResponse.setStatus(true);
+                fileUploadResponse.setFileId(fileId);
+                fileUploadResponse.setFilePath(filePath);
+                return fileUploadResponse;
             } else {
                 logger.error("File upload failed with status: {}", response.getStatusCode());
-                return false;
+                fileUploadResponse.setStatus(false);
+                return fileUploadResponse;
             }
 
         } catch (Exception e) {
             logger.error("Error uploading file: {}", e.getMessage());
-            return false;
+            fileUploadResponse.setStatus(false);
+            return fileUploadResponse;
         } finally {
             if (tempFile != null && tempFile.exists()) {
                 if (!tempFile.delete()) {
@@ -88,33 +102,47 @@ public class FileUploadService {
     }
 
     @Transactional
-    public String getFileAccessDetails(int fileId) {
+    public FileAccessResponse getFileAccessDetails(int fileId) {
         String apiKey = "F39E25A3B2A446F98E87A95723AE4";
+        String url = "http://files.paykesho.com/access-api";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("API-Key", apiKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        Map<String, Integer> requestBody = new HashMap<>();
+        requestBody.put("file_id", fileId);
+
+        HttpEntity<Map<String, Integer>> requestEntity = new HttpEntity<>(requestBody, headers);
+        FileAccessResponse fileAccessResponse = new FileAccessResponse();
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    "http://files.paykesho.com/access-api/" + fileId,
-                    HttpMethod.GET,
+                    url,
+                    HttpMethod.POST,
                     requestEntity,
                     String.class
             );
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                return response.getBody();
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+                String fileName = jsonResponse.get("file_name").asText();
+                String fileUrl = jsonResponse.get("file_url").asText();
+                fileAccessResponse.setFileName(fileName);
+                fileAccessResponse.setFileUrl(fileUrl);
+                fileAccessResponse.setStatus(true);
+                return fileAccessResponse;
             } else {
                 logger.error("Failed to retrieve access details for file ID {}: {}", fileId, response.getStatusCode());
-                return null;
+                fileAccessResponse.setStatus(false);
+                return fileAccessResponse;
             }
 
         } catch (Exception e) {
             logger.error("Error retrieving access details for file ID {}: {}", fileId, e.getMessage());
-            return null;
+            fileAccessResponse.setStatus(false);
+            return fileAccessResponse;
         }
     }
 

@@ -36,7 +36,7 @@ public class User extends IdBasedEntity {
     private int failedAttempt;
     @Column(name = "lock_time")
     private Date lockTime;
-
+    private String photoPath;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -44,7 +44,8 @@ public class User extends IdBasedEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-
+    @Column(name = "remote_file_id")
+    private Integer remoteFileId;
     public User(String email, String password, String firstName, String lastName) {
         this.email = email;
         this.password = password;

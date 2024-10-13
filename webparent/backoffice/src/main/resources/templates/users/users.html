@@ -53,8 +53,8 @@
                                         <td class="hideable-column">[[${userStat.count}]]</td>
                                         <td>
                                             <a class="d-flex align-items-center" href="#">
-                                                <img alt="Avatar" class="user-avatar rounded-circle mr-3"
-                                                     th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}">
+                                                <img alt="Avatar" class="user-avatar rounded-circle mr-3" style="max-height: 100px; max-width: 100px"
+                                                     th:if="${user.photos != null}" th:src="@{${user.photoPath}}">
                                             </a>
                                         </td>
                                         <td><span class="font-weight-normal">[[${user.email}]]</span></td>

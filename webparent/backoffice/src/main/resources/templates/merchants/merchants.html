@@ -51,9 +51,10 @@
                                         <td class="hideable-column">[[${merchantStat.count}]]</td>
                                         <td>
                                             <a class="d-flex align-items-center" href="#">
-                                                <img alt="Avatar" class="merchant-avatar rounded-circle mr-3"
+                                                <img alt="Avatar" class="user-avatar rounded-circle mr-3"
+                                                     style="max-height: 100px; max-width: 100px"
                                                      th:if="${merchant.photos != null}"
-                                                     th:src="@{${merchant.photosImagePath}}">
+                                                     th:src="@{${merchant.photoPath}}">
                                             </a>
                                         </td>
                                         <td>
