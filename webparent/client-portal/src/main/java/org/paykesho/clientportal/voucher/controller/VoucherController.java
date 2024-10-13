@@ -131,7 +131,7 @@ public class VoucherController {
 
     private boolean isValidFileType(MultipartFile file) {
         String contentType = file.getContentType();
-        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/png") || contentType.equals("application/pdf") || contentType.equals("application/msword") || contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || contentType.equals("application/vnd.ms-excel") || contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        return contentType != null && (contentType.equals("application/pdf"));
     }
 
 
