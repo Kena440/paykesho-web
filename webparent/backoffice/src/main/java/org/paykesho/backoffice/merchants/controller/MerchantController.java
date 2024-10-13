@@ -6,6 +6,7 @@ import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.settings.Setting;
 import org.commons.enums.FileType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
 import org.paykesho.backoffice.files.dto.FileUploadResponse;
 import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.merchants.enums.Constants;
@@ -97,6 +98,11 @@ public class MerchantController {
             Merchant merchant = merchantService.getMerchantById(id);
             MerchantAdmin merchantAdmin = merchant.getContactPerson();
             if (merchantAdmin == null) merchantAdmin = new MerchantAdmin();
+
+            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
+            if (fileAccessResponse != null) {
+                merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+            }
 
             loadCurrencySetting(request);
             model.addAttribute("qrCodeContent", "/merchants/generateQRCode?qrContent=" + merchant.getCode());

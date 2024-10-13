@@ -1,6 +1,7 @@
 package org.paykesho.clientportal.api.dto;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -8,5 +9,5 @@ import java.math.BigDecimal;
 public class VoucherRequestDto {
     private BigDecimal amount;
     private String reason;
-    //private String payslipFileName;
+    private MultipartFile payslip;
 }

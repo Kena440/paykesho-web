@@ -46,6 +46,7 @@ public class User extends IdBasedEntity {
     private Set<Role> roles = new HashSet<>();
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
+
     public User(String email, String password, String firstName, String lastName) {
         this.email = email;
         this.password = password;

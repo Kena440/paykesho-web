@@ -30,9 +30,9 @@ import java.util.Map;
 @Transactional
 public class FileUploadService {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadService.class);
     private final RestTemplate restTemplate;
     private final FileUploadRepository fileUploadRepository;
-    private static final Logger logger = LoggerFactory.getLogger(FileUploadService.class);
 
     @Autowired
     public FileUploadService(RestTemplate restTemplate, FileUploadRepository fileUploadRepository) {

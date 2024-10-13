@@ -61,7 +61,7 @@ public class UserController {
 
     @PostMapping("/save")
     @Transactional
-    public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws IOException, PaykeshoError {
+    public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
         try {
             if (!multipartFile.isEmpty()) {
                 String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));

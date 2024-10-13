@@ -1,12 +1,9 @@
 package org.paykesho.backoffice.files.controller;
 
-import org.commons.enums.FileType;
 import org.paykesho.backoffice.files.service.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/uploads/rest")

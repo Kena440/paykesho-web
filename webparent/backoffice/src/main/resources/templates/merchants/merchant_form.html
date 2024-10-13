@@ -185,11 +185,11 @@
 
     var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
 
-    map.on('mousemove', function(e) {
+    map.on('mousemove', function (e) {
         document.getElementById('info').innerHTML =
-            JSON.stringify({ x: e.containerPoint.x, y: e.containerPoint.y }) + // container point (x, y)
+            JSON.stringify({x: e.containerPoint.x, y: e.containerPoint.y}) + // container point (x, y)
             '<br />' +
-            JSON.stringify({ lng: e.latlng.lng, lat: e.latlng.lat }); // longitude, latitude of event
+            JSON.stringify({lng: e.latlng.lng, lat: e.latlng.lat}); // longitude, latitude of event
     });
 
     function add_marker(e) {

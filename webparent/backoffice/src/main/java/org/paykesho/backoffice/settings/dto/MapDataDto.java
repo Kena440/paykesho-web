@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class MapDataDto {
     private String name;
     private String type;
+    private String photoPath;
     private float latitude;
     private float longitude;
 }

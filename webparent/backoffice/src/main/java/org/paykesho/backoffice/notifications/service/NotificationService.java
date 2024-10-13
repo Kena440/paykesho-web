@@ -18,9 +18,9 @@ import java.util.UUID;
 @Transactional
 public class NotificationService {
 
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
     private final RestTemplate restTemplate;
     private final NotificationsRepository notificationRepository;
-    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     @Autowired
     public NotificationService(RestTemplate restTemplate, NotificationsRepository notificationRepository) {

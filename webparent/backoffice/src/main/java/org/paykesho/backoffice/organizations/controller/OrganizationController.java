@@ -8,6 +8,7 @@ import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Setting;
 import org.commons.enums.FileType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
 import org.paykesho.backoffice.files.dto.FileUploadResponse;
 import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.organizations.enums.Constants;
@@ -90,11 +91,13 @@ public class OrganizationController {
             OrganizationAdmin organizationAdmin = organization.getContactPerson();
             if (organizationAdmin == null) organizationAdmin = new OrganizationAdmin();
 
-            if (organization != null) {
-                employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
-                clientRecordsSize = organizationService.listClientRecordsAll(organization.getId());
-            }
+            employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
+            clientRecordsSize = organizationService.listClientRecordsAll(organization.getId());
 
+            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
+            if (fileAccessResponse != null) {
+                organization.setPhotoPath(fileAccessResponse.getFileUrl());
+            }
             loadCurrencySetting(request);
             model.addAttribute("organization", organization);
             model.addAttribute("pageTitle", pageTitle);

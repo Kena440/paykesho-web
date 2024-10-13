@@ -35,8 +35,8 @@
                                 <h5 class="card-title mb-0">Merchant Details</h5>
                             </div>
                             <div class="card-body text-center">
-                                <img alt="Logo" class="img-fluid rounded-circle mb-2"
-                                     height="128" th:src="@{${merchant.photosImagePath}}" width="128"/>
+                                <img alt="Logo" class="img-fluid mb-2"
+                                     height="128" th:src="@{${merchant.photoPath}}" width="128"/>
                                 <h5 class="card-title mb-0">[[${merchant.name}]]</h5>
                                 <div class="text-muted mb-2">[[${merchant.merchantType}]]</div>
 
@@ -260,7 +260,7 @@
 
     L.Control.geocoder({
         defaultMarkGeocode: false
-    }).on('markgeocode', function(e) {
+    }).on('markgeocode', function (e) {
         var bbox = e.geocode.bbox;
         var poly = L.polygon([
             bbox.getSouthEast(),

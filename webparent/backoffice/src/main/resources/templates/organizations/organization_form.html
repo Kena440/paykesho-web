@@ -181,10 +181,10 @@
     var marker1 = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
 
     // Mousemove event to display container point (pixel coordinates) and lat-lng information
-    map.on('mousemove', function(e) {
+    map.on('mousemove', function (e) {
         document.getElementById('info').innerHTML =
-            JSON.stringify({ x: e.containerPoint.x, y: e.containerPoint.y }) + '<br />' +
-            JSON.stringify({ lng: e.latlng.lng, lat: e.latlng.lat }); // Display longitude and latitude
+            JSON.stringify({x: e.containerPoint.x, y: e.containerPoint.y}) + '<br />' +
+            JSON.stringify({lng: e.latlng.lng, lat: e.latlng.lat}); // Display longitude and latitude
     });
 
     // Define a new marker to be added/updated on map click
@@ -208,7 +208,7 @@
     // For geocoding functionality, you can add Leaflet geocoder or a plugin (like leaflet-control-geocoder)
     L.Control.geocoder({
         defaultMarkGeocode: false
-    }).on('markgeocode', function(e) {
+    }).on('markgeocode', function (e) {
         var bbox = e.geocode.bbox;
         var poly = L.polygon([
             bbox.getSouthEast(),

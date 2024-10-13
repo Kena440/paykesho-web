@@ -52,6 +52,7 @@ public class Merchant extends IdBasedEntity {
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
     private String photoPath;
+
     @Override
     public String toString() {
         return name + " ~ " + merchantType;

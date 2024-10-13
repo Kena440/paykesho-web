@@ -43,6 +43,7 @@
                                         <th>Amount</th>
                                         <th>Approved</th>
                                         <th>Date</th>
+                                        <th>File</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
@@ -75,6 +76,9 @@
                                             </th:block>
                                         </td>
                                         <td><span class="font-weight-normal">[[${voucher.requestDate}]]</span></td>
+                                        <td>
+
+                                        </td>
                                         <td>
                                             <th:block th:if="${voucher.approved == false}">
                                                 <a class="dropdown-item" href="#">

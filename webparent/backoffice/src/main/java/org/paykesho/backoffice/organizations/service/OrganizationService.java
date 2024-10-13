@@ -3,7 +3,6 @@ package org.paykesho.backoffice.organizations.service;
 import org.commons.dto.GeneralStatsDto;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.EmployeeRecord;
-import org.commons.entity.merchant.Merchant;
 import org.commons.entity.organization.Organization;
 import org.commons.enums.OrganizationType;
 import org.commons.utils.PaykeshoError;

@@ -35,7 +35,8 @@
                                 <h6 class="card-subtitle text-muted">Request for a quick voucher.</h6>
                             </div>
                             <div class="card-body">
-                                <form method="post"
+                                <form enctype="multipart/form-data"
+                                      method="post"
                                       th:action="@{/vouchers/save}"
                                       th:object="${voucherRequest}">
                                     <div class="row">
@@ -60,6 +61,18 @@
                                                           rows="3" th:field="*{reason}"></textarea>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Latest Payslip</label>
+                                                <input accept=".pdf, .xls, .xlsx, .doc, .docx, image/png, image/jpeg"
+                                                       class="form-control"
+                                                       id="payslip"
+                                                       name="payslip"
+                                                       type="file">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-6">
                                             <button class="btn btn-primary" type="submit">Submit</button>
                                         </div>
