@@ -77,7 +77,13 @@
                                         </td>
                                         <td><span class="font-weight-normal">[[${voucher.requestDate}]]</span></td>
                                         <td>
-
+                                            <a class="dropdown-item text-danger fas fa-file-pdf"
+                                               data-bs-target="#voucherPayslipModal"
+                                               data-bs-toggle="modal"
+                                               href="#"
+                                               th:data-voucher-payslip-url="${voucher.payslipPath}">
+                                                Payslip
+                                            </a>
                                         </td>
                                         <td>
                                             <th:block th:if="${voucher.approved == false}">
@@ -143,6 +149,28 @@
         </div>
     </div>
 </div>
+<div aria-hidden="true" class="modal fade" id="voucherPayslipModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <strong class="mx-auto">Payslip</strong>
+                </h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body m-3">
+                <!-- PDF Viewer -->
+                <div id="payslipViewer" style="height: 500px; overflow: auto;">
+                    <!-- The PDF will be embedded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <footer th:replace="fragments/modal_fragment :: confirm_modal"></footer>
 <footer th:replace="fragments/fragments :: js_code"></footer>
@@ -186,7 +214,22 @@
     });
 
 </script>
+<script>
+    $(document).ready(function () {
+        // Event listener for opening the voucher payslip modal
+        $('#voucherPayslipModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var payslipUrl = button.data('voucher-payslip-url'); // Extract the payslip URL from the button
 
+            // Add the PDF to the viewer
+            var modal = $(this);
+            modal.find('#payslipViewer').html(
+                '<iframe src="' + payslipUrl + '" width="100%" height="100%" style="border: none;"></iframe>'
+            );
+        });
+    });
+
+</script>
 </body>
 </html>
 

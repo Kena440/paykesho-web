@@ -45,3 +45,8 @@ spring:
             scope:
               - email
               - public_profile
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari: ERROR

@@ -2,7 +2,10 @@ package org.paykesho.backoffice.voucher.service;
 
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
+import org.commons.entity.organization.Organization;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
+import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.voucher.repository.VouchersRepository;
@@ -26,9 +29,8 @@ public class VoucherService {
 
     @Autowired
     VouchersRepository vouchersRepository;
-
     @Autowired
-    SettingService settingService;
+    FileUploadService fileUploadService;
 
     /**
      * +
@@ -37,7 +39,18 @@ public class VoucherService {
      * @return
      */
     public List<Voucher> listAll() {
-        return (List<Voucher>) vouchersRepository.findAll(Sort.by("requestDate").descending());
+        List<Voucher> vouchers = (List<Voucher>) vouchersRepository.findAll(Sort.by("requestDate").descending());
+
+        for (Voucher voucher : vouchers) {
+            if (voucher.getPayslip() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(voucher.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    voucher.setPayslipPath(fileAccessResponse.getFileUrl());
+                }
+            }
+        }
+
+        return vouchers;
     }
 
     /**
