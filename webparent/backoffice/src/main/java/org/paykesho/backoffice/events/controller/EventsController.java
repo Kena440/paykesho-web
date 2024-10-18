@@ -75,25 +75,6 @@ public class EventsController {
             e.printStackTrace();
         }
 
-        if (!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-            announcement.setPhotos(fileName);
-            Announcement savedAnnouncement = eventsService.save(announcement);
-            String uploadDir = "event_photos/" + savedAnnouncement.getId();
-
-            if (!fileName.isEmpty()) {
-                AmazonS3Util.removeFolder(uploadDir);
-                AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
-            }
-        } else {
-            if (announcement.getPhotos().isEmpty()) {
-                announcement.setPhotos(null);
-            }
-            eventsService.save(announcement);
-        }
-
-        //todo add logic for survey if response is required
-
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "event Operation Successful: " + announcement.getName());
         return getRedirectURLtoAffectedEvent(announcement);
     }

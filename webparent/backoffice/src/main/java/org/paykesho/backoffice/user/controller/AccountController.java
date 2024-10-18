@@ -47,23 +47,6 @@ public class AccountController {
                               RedirectAttributes redirectAttributes,
                               @AuthenticationPrincipal MembershipMgtUserDetails loggedUser,
                               @RequestParam("image") MultipartFile multipartFile) throws IOException, PaykeshoError {
-        if (!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-            user.setPhotos(fileName);
-            User savedUser = userService.updateAccount(user);
-            String uploadDir = "user_photos/" + savedUser.getId();
-
-            if (!fileName.isEmpty()) {
-                AmazonS3Util.removeFolder(uploadDir);
-                AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
-            }
-        } else {
-            if (user.getPhotos().isEmpty()) {
-                user.setPhotos(null);
-            }
-            userService.updateAccount(user);
-        }
-
         loggedUser.setFirstName(user.getFirstName());
         loggedUser.setLastName(user.getLastName());
 

@@ -51,7 +51,6 @@ public class SettingsController {
     @PostMapping("/save-general")
     public String saveGeneralSettings(@RequestParam("fileImage") MultipartFile multipartFile, HttpServletRequest request, RedirectAttributes redirectAttributes) throws IOException {
         GeneralSettingBag settingBag = settingService.getGeneralSettings();
-        saveSiteLogo(multipartFile, settingBag);
         saveCurrencySymbol(request, settingBag);
         updateSettingValuesFromForm(request, settingBag.list());
         redirectAttributes.addFlashAttribute("message", "General settings have been saved");
@@ -101,17 +100,6 @@ public class SettingsController {
             Currency currency = findByIdResult.get();
             String symbol = currency.getSymbol();
             generalSettingBag.updateCurrencySymbol(symbol);
-        }
-    }
-
-    private void saveSiteLogo(MultipartFile multipartFile, GeneralSettingBag settingBag) throws IOException {
-        if (!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            String value = "/site_logo/" + fileName;
-            settingBag.updateSiteLogo(value);
-            String uploadDir = "site_logo";
-            AmazonS3Util.removeFolder(uploadDir);
-            AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
         }
     }
 }
