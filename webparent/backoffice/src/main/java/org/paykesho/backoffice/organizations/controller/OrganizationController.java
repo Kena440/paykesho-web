@@ -60,8 +60,12 @@ public class OrganizationController {
 
     @PostMapping("/save")
     public String saveOrganization(Organization organization, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
-        organization.setDistrict("N/A");
-        organization.setRegistrationDate(new Date());
+
+        if (organization.getId() == null || organization.getOrganizationType() == null) {
+            organization.setDistrict("N/A");
+            organization.setRegistrationDate(new Date());
+        }
+
         FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.logo, 1, "logo photo for " + organization.getEmail());
 
         if (!uploadResponse.isStatus()) {

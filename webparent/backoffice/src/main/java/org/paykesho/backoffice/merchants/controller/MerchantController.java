@@ -64,14 +64,41 @@ public class MerchantController {
         return "merchants/merchant_form";
     }
 
+    @GetMapping("/edit/{id}")
+    public String editMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) {
+        if (id == null) {
+            return Constants.REDIRECT_MERCHANTS;
+        }
+        String pageTitle = "Edit Merchant";
+
+        try {
+            Merchant merchant = merchantService.getMerchantById(id);
+
+            List<State> stateList = settingService.listStatesByCountry("Zambia");
+
+            model.addAttribute("merchant", merchant);
+            model.addAttribute("stateList", stateList);
+            model.addAttribute("pageTitle", pageTitle);
+
+            return "merchants/merchant_form";
+        } catch (PaykeshoError paykeshoError) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
+            return Constants.REDIRECT_MERCHANTS;
+        }
+
+    }
+
     @PostMapping("/save")
     public String saveMerchant(Merchant merchant, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
 
-        String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_MNT");
-        if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
+        if (merchant.getId() == null || merchant.getCode() == null) {
+            String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_MNT");
+            if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
-        merchant.setCode(paykeshoRef);
-        merchant.setRegistrationDate(new Date());
+            merchant.setCode(paykeshoRef);
+            merchant.setRegistrationDate(new Date());
+        }
+
         FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.logo, 1, "logo photo for " + merchant.getEmail());
 
         if (!uploadResponse.isStatus()) {
@@ -81,10 +108,14 @@ public class MerchantController {
         merchant.setRemoteFileId(uploadResponse.getFileId());
         merchant.setPhotos(uploadResponse.getFilePath());
         merchant.setPhotoPath(uploadResponse.getFilePath());
+
+        // Save the merchant
         merchantService.save(merchant);
+
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant Operation Successful: " + merchant.getEmail());
         return "redirect:/merchants";
     }
+
 
     @GetMapping("/view/{id}")
     public String viewMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
@@ -128,30 +159,6 @@ public class MerchantController {
         } else {
             return Constants.REDIRECT_TO_MERCHANTS_KEYWORD + code;
         }
-    }
-
-    @GetMapping("/edit/{id}")
-    public String editMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) {
-        if (id == null) {
-            return Constants.REDIRECT_MERCHANTS;
-        }
-        String pageTitle = "Edit Merchant";
-
-        try {
-            Merchant merchant = merchantService.getMerchantById(id);
-
-            List<State> stateList = settingService.listStatesByCountry("Zambia");
-
-            model.addAttribute("merchant", merchant);
-            model.addAttribute("stateList", stateList);
-            model.addAttribute("pageTitle", pageTitle);
-
-            return "merchants/merchant_form";
-        } catch (PaykeshoError paykeshoError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
-            return Constants.REDIRECT_MERCHANTS;
-        }
-
     }
 
     @GetMapping("delete/{id}")
