@@ -108,14 +108,6 @@ public class MerchantAdminService {
         return merchantAdminRepository.save(merchantAdmin);
     }
 
-    public void delete(Integer id) throws PaykeshoError {
-        Long count = merchantAdminRepository.countById(id);
-        if (count == null || count == 0) {
-            throw new PaykeshoError("could not find customer");
-        }
-        merchantAdminRepository.deleteById(id);
-    }
-
     public Long countAdmins() {
         return merchantAdminRepository.count();
     }

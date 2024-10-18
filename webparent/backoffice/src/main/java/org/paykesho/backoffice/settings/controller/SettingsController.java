@@ -6,7 +6,6 @@ import org.commons.entity.settings.GeneralSettingBag;
 import org.commons.entity.settings.Setting;
 import org.paykesho.backoffice.settings.repository.CurrencyRepository;
 import org.paykesho.backoffice.settings.service.SettingService;
-import org.paykesho.backoffice.utils.AmazonS3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

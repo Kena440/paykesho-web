@@ -103,7 +103,7 @@ public class VoucherController {
         Voucher approvedVoucher = voucherService.save(voucher);
 
         updateClientBalance(approvedVoucher);
-        //runRepaymentScheduleProcess(approvedVoucher);
+        runRepaymentScheduleProcess(approvedVoucher);
         sendNotification(approvedVoucher, "APPROVAL", null, null);
         return approvedVoucher;
     }
@@ -111,6 +111,9 @@ public class VoucherController {
     private void runRepaymentScheduleProcess(Voucher approvedVoucher) throws PaykeshoError {
         RepaymentScheduleRequest scheduleRequest = new RepaymentScheduleRequest();
         scheduleRequest.setClient(approvedVoucher.getClient());
+        scheduleRequest.setDueDate(new Date());
+        scheduleRequest.setAmountDue(approvedVoucher.getRepaymentAmount());
+
         repaymentService.createRepaymentSchedule(scheduleRequest);
     }
 

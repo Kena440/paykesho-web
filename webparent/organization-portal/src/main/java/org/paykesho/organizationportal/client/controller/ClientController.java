@@ -135,21 +135,6 @@ public class ClientController {
         return Constants.REDIRECT_CUSTOMERS;
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteClient(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
-        if (id == null) {
-            return Constants.REDIRECT_CUSTOMERS;
-        }
-
-        try {
-            clientService.delete(id);
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "CUSTOMER deleted successfully");
-        } catch (PaykeshoError paykeshoError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
-        }
-        return Constants.REDIRECT_CUSTOMERS;
-    }
-
     private void loadCurrencySetting(HttpServletRequest request) {
         List<Setting> currencySettings = settingService.getCurrencySettings();
         for (Setting setting : currencySettings) {

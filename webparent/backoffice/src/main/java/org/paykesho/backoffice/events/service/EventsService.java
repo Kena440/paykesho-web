@@ -77,19 +77,6 @@ public class EventsService {
         }
     }
 
-    public void delete(Integer id) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("Null parameter id");
-        }
-
-        Long countById = eventsRepository.countById(id);
-        if (countById == null || countById == 0) {
-            throw new PaykeshoError("Could not find any Event");
-        }
-
-        eventsRepository.deleteById(id);
-    }
-
     public void updateEventStatus(Integer id, boolean enabled) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("Null parameter id");

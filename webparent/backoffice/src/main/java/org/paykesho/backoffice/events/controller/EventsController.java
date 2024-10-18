@@ -8,7 +8,6 @@ import org.paykesho.backoffice.events.service.EventsService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.paging.PagingAndSortingParam;
 import org.paykesho.backoffice.settings.service.SettingService;
-import org.paykesho.backoffice.utils.AmazonS3Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,20 +110,6 @@ public class EventsController {
         model.addAttribute("pageTitle", pageTitle);
 
         return "events/event_form";
-    }
-
-    @GetMapping("delete/{id}")
-    public String deleteEvent(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("no parameter id");
-        }
-
-        eventsService.delete(id);
-
-        String eventPhotosDir = "event_photos/" + id;
-        AmazonS3Util.removeFolder(eventPhotosDir);
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "event deleted successfully");
-        return Constants.REDIRECT_TO_Events;
     }
 
     @GetMapping("/{id}/enabled/{status}")

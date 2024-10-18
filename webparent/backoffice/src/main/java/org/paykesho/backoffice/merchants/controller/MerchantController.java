@@ -161,21 +161,6 @@ public class MerchantController {
         }
     }
 
-    @GetMapping("delete/{id}")
-    public String deleteMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("no parameter id");
-        }
-
-        try {
-            merchantService.delete(id);
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant deleted successfully");
-        } catch (PaykeshoError paykeshoError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
-        }
-        return Constants.REDIRECT_MERCHANTS;
-    }
-
     @GetMapping("/{id}/enabled/{status}")
     public String updateMerchantEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
 

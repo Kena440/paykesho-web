@@ -115,24 +115,6 @@ public class MerchantService {
     }
 
     @Transactional(rollbackOn = {Exception.class})
-    public void delete(Integer id) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("Null parameter id");
-        }
-
-        Long countById = merchantRepository.countById(id);
-        if (countById == null || countById == 0) {
-            throw new PaykeshoError("Could not find any member");
-        }
-
-        Merchant merchant = getMerchantById(id);
-        if (merchant.getId() == null) throw new PaykeshoError("Could not find any civilSocietyOrganization");
-        merchant.setDeleted(true);
-        save(merchant);
-        // userRepository.deleteById(id);
-    }
-
-    @Transactional(rollbackOn = {Exception.class})
     public void updateMerchantStatus(Integer id, boolean enabled) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("Null parameter id");

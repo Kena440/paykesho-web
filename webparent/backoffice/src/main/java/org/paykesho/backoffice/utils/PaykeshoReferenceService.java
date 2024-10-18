@@ -3,6 +3,7 @@ package org.paykesho.backoffice.utils;
 import net.bytebuddy.utility.RandomString;
 import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.merchants.repository.MerchantRepository;
+import org.paykesho.backoffice.repayments.repository.RepaymentScheduleRepository;
 import org.paykesho.backoffice.settlement.repository.SettlementRepository;
 import org.paykesho.backoffice.transaction.repository.TransactionRepository;
 import org.paykesho.backoffice.voucher.repository.VouchersRepository;
@@ -25,6 +26,8 @@ public class PaykeshoReferenceService {
     private TransactionRepository transactionRepository;
     @Autowired
     private SettlementRepository settlementRepository;
+    @Autowired
+    private RepaymentScheduleRepository repaymentScheduleRepository;
 
     public String generateCode(String itemRequest) {
         String reference = "";
@@ -37,28 +40,29 @@ public class PaykeshoReferenceService {
                 count = merchantRepository.countAllMerchants() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
-
             case "ITEM_REQ_CLT":
                 itemPrefix = "C";
                 count = clientRepository.countAllClients() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
-
             case "ITEM_REQ_VCR":
                 itemPrefix = "V";
                 count = vouchersRepository.countAllVouchers() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
-
             case "ITEM_REQ_TRX":
                 itemPrefix = "T";
                 count = transactionRepository.countAllTransactions() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
-
             case "ITEM_REQ_STL":
                 itemPrefix = "S";
                 count = settlementRepository.countAllSettlements() + 1;
+                reference = getReference(itemPrefix, count);
+                break;
+            case "ITEM_REQ_RPS":
+                itemPrefix = "R";
+                count = repaymentScheduleRepository.countAllRepaymentSchedules() + 1;
                 reference = getReference(itemPrefix, count);
                 break;
 

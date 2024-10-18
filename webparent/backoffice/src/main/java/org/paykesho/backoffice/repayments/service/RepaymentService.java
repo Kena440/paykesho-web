@@ -1,6 +1,5 @@
 package org.paykesho.backoffice.repayments.service;
 
-import org.commons.entity.Voucher;
 import org.commons.entity.client.PayrollDeduction;
 import org.commons.entity.client.RepaymentSchedule;
 import org.commons.enums.PaymentStatus;
@@ -43,11 +42,11 @@ public class RepaymentService {
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_RPS");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
-        BigDecimal totals = vouchersService.getApprovedAndValidClientVouchers(request.getClient()).stream().map(Voucher::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        //BigDecimal totals = vouchersService.getApprovedAndValidClientVouchers(request.getClient()).stream().map(Voucher::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         schedule.setReference(paykeshoRef);
         schedule.setClient(request.getClient());
-        schedule.setAmountDue(totals);
+        schedule.setAmountDue(request.getAmountDue());
         schedule.setAmountPaid(BigDecimal.ZERO);
         schedule.setDueDate(new Date());
         schedule.setStatus(PaymentStatus.PENDING);

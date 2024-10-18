@@ -165,30 +165,6 @@ public class UserService {
         }
     }
 
-    /**
-     * +
-     * This method deletes a user based on ID produced
-     *
-     * @param id
-     * @throws PaykeshoError
-     */
-    @Transactional(rollbackOn = {Exception.class})
-    public void delete(Integer id) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("Null parameter id");
-        }
-
-        Long countById = userRepository.countById(id);
-        if (countById == null || countById == 0) {
-            throw new PaykeshoError("Could not find any user");
-        }
-
-        User user = getUserById(id);
-        if (user.getId() == null) throw new PaykeshoError("Could not find any driver");
-        user.setDeleted(true);
-        save(user);
-        // userRepository.deleteById(id);
-    }
 
     /**
      * +

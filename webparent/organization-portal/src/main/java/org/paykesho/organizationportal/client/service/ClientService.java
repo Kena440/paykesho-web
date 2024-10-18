@@ -81,14 +81,6 @@ public class ClientService {
         clientRepository.save(clientInForm);
     }
 
-    public void delete(Integer id) throws PaykeshoError {
-        Long count = clientRepository.countById(id);
-        if (count == null || count == 0) {
-            throw new PaykeshoError("could not find client");
-        }
-        clientRepository.deleteById(id);
-    }
-
     public Long countAllClients() {
         return clientRepository.countAllClients();
     }

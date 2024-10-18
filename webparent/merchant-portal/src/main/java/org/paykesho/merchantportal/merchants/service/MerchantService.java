@@ -86,7 +86,7 @@ public class MerchantService {
         }
     }
 
-    public void delete(Integer id) throws PaykeshoError {
+    /*public void delete(Integer id) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("Null parameter id");
         }
@@ -102,7 +102,7 @@ public class MerchantService {
         save(merchant);
         // userRepository.deleteById(id);
     }
-
+*/
     public void updateMerchantStatus(Integer id, boolean enabled) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("Null parameter id");

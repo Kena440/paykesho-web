@@ -11,7 +11,6 @@ import org.paykesho.backoffice.user.fileHandlers.UserCSVExporter;
 import org.paykesho.backoffice.user.fileHandlers.UserExcelExporter;
 import org.paykesho.backoffice.user.fileHandlers.UserPDFExporter;
 import org.paykesho.backoffice.user.service.UserService;
-import org.paykesho.backoffice.utils.AmazonS3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -134,24 +133,6 @@ public class UserController {
             return Constants.REDIRECT_TO_USERS;
         }
 
-    }
-
-    @GetMapping("delete/{id}")
-    public String deleteUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("no parameter id");
-        }
-
-        try {
-            userService.delete(id);
-
-            String userPhotosDir = "user_photos/" + id;
-            AmazonS3Util.removeFolder(userPhotosDir);
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "User deleted successfully");
-        } catch (PaykeshoError paykeshoError) {
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
-        }
-        return Constants.REDIRECT_TO_USERS;
     }
 
     @GetMapping("/{id}/enabled/{status}")

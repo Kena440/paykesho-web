@@ -5,7 +5,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.security.MembershipMgtUserDetails;
 import org.paykesho.backoffice.user.enums.Constants;
 import org.paykesho.backoffice.user.service.UserService;
-import org.paykesho.backoffice.utils.AmazonS3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;

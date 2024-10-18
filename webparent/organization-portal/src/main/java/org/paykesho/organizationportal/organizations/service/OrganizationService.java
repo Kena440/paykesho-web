@@ -86,23 +86,6 @@ public class OrganizationService {
         }
     }
 
-    public void delete(Integer id) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("Null parameter id");
-        }
-
-        Long countById = organizationRepository.countById(id);
-        if (countById == null || countById == 0) {
-            throw new PaykeshoError("Could not find any member");
-        }
-
-        Organization organization = getOrganizationById(id);
-        if (organization.getId() == null) throw new PaykeshoError("Could not find any driver");
-        organization.setDeleted(true);
-        save(organization);
-        // userRepository.deleteById(id);
-    }
-
     public void updateOrganizationStatus(Integer id, boolean enabled) throws PaykeshoError {
         if (id == null) {
             throw new PaykeshoError("Null parameter id");
