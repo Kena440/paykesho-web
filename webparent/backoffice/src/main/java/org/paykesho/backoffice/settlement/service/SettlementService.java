@@ -76,7 +76,7 @@ public class SettlementService {
         try {
             MerchantMoneyAccountDetail detail = merchantMoneyAccountDetailsRepository.getMerchantMoneyAccountDetailByMerchantId(merchant.getId());
 
-            URL url = new URL("http://payments.paykesho.com/payments-api");
+            URL url = new URL("https://payments.paykesho.com/payments-api");
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");

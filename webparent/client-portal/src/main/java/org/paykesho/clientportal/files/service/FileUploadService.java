@@ -104,7 +104,7 @@ public class FileUploadService {
     @Transactional
     public FileAccessResponse getFileAccessDetails(int fileId) {
         String apiKey = "F39E25A3B2A446F98E87A95723AE4";
-        String url = "http://files.paykesho.com/access-api";
+        String url = "https://files.paykesho.com/access-api";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("API-Key", apiKey);
