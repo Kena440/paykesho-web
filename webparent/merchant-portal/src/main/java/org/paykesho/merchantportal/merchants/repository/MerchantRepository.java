@@ -24,8 +24,8 @@ public interface MerchantRepository extends CrudRepository<Merchant, Integer> {
     @Modifying
     public void updateEnableStatus(Integer id, boolean enabled);
 
-    @Query("select m from Merchant m where m.id = :id and m.province.id = :provinceId and m.name = :memberName and m.email = :email")
-    public Merchant getMerchantByIdAndProvinceAndNameAndMemberTypeAndEmail(@Param("id") Integer id, @Param("provinceId") Integer provinceId, @Param("memberName") String memberName, @Param("email") String email);
+    @Query("select m from Merchant m where m.id = :id and m.name = :memberName and m.email = :email")
+    public Merchant getMerchantByIdAndNameAndMemberTypeAndEmail(@Param("id") Integer id, @Param("memberName") String memberName, @Param("email") String email);
 
     @Query("select m " + "from Merchant m " + "where m.enabled = ?1 ")
     List<Merchant> findMerchantEnabled(boolean enabled);

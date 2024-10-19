@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
-import org.commons.entity.State;
 import org.commons.enums.OrganizationType;
 
 import javax.persistence.*;
@@ -20,11 +19,6 @@ public class Organization extends IdBasedEntity {
     protected String phoneNumber;
     @Column(name = "name", length = 245, nullable = false, unique = true)
     private String name;
-    @ManyToOne
-    @JoinColumn(name = "province_id")
-    private State province;
-    @Column(name = "district", length = 45)
-    private String district;
     @Enumerated(EnumType.STRING)
     @Column(name = "organization_type", length = 50)
     private OrganizationType organizationType;

@@ -128,11 +128,11 @@ public class MerchantService {
         }
     }
 
-    public boolean isMemberUnique(Integer id, Integer provinceId, String memberName, String memberType, String email) {
-        if (provinceId == null || memberName == null || memberType == null) {
+    public boolean isMemberUnique(Integer id, String memberName, String memberType, String email) {
+        if (memberName == null || memberType == null) {
             return false;
         }
-        Merchant merchant = merchantRepository.getMerchantByIdAndProvinceAndNameAndMemberTypeAndEmail(id, provinceId, memberName, email);
+        Merchant merchant = merchantRepository.getMerchantByIdAndNameAndMemberTypeAndEmail(id, memberName, email);
 
         if (merchant == null) return true;
         boolean isCreatingNew = (id == null);

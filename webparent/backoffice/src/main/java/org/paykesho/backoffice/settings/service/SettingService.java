@@ -96,11 +96,4 @@ public class SettingService {
         return countryInDb;
     }
 
-    public State getProvinceByName(String attendeeProvince) {
-        State stateInDb = stateRepository.findById(Integer.valueOf(attendeeProvince)).get();
-        if (stateInDb == null) {
-            return null;
-        }
-        return stateInDb;
-    }
 }
