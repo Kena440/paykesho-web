@@ -1,6 +1,5 @@
 package org.paykesho.backoffice.merchants.repository;
 
-import org.commons.dto.GeneralStatsDto;
 import org.commons.entity.merchant.Merchant;
 import org.commons.enums.MerchantType;
 import org.paykesho.backoffice.paging.SearchRepository;
@@ -21,7 +20,7 @@ public interface MerchantRepository extends SearchRepository<Merchant, Integer> 
 
     public Long countById(Integer id);
 
-    @Query("select m from Merchant m where concat(m.name, ' ', m.latitude, ' ', m.servicesOffered, ' ', m.district, ' ', m.province.name, ' ', m.email) like %?1%")
+    @Query("select m from Merchant m where concat(m.name, ' ', m.latitude, ' ', m.servicesOffered, ' ', m.email) like %?1%")
     public Page<Merchant> findAll(String keyword, Pageable pageable);
 
     @Query("update Merchant m set m.enabled = ?2 where m.id = ?1")
@@ -36,8 +35,5 @@ public interface MerchantRepository extends SearchRepository<Merchant, Integer> 
 
     @Query("select m " + "from Merchant m " + "where m.enabled = ?1 ")
     List<Merchant> findMerchantTypesEnabled(boolean enabled);
-
-    @Query("select new org.commons.dto.GeneralStatsDto(s.name, count(m.province.id)) from State s, Merchant m where m.province.id = s.id and s.country.id = ?1 and m.enabled = ?2 group by s.name order by s.name")
-    List<GeneralStatsDto> getMerchantsCountByProvince(@Param("countryId") Integer countryId, boolean enabled);
 
 }

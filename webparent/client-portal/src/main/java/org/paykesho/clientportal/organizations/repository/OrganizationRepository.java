@@ -21,8 +21,8 @@ public interface OrganizationRepository extends CrudRepository<Organization, Int
     @Modifying
     public void updateEnableStatus(Integer id, boolean enabled);
 
-    @Query("select m from Organization m where m.id = :id and m.province.id = :provinceId and m.name = :memberName and m.email = :email")
-    public Organization getOrganizationByIdAndProvinceAndNameAndMemberTypeAndEmail(@Param("id") Integer id, @Param("provinceId") Integer provinceId, @Param("memberName") String memberName, @Param("email") String email);
+    @Query("select m from Organization m where m.id = :id and m.name = :memberName and m.email = :email")
+    public Organization getOrganizationByIdAndNameAndMemberTypeAndEmail(@Param("id") Integer id, @Param("memberName") String memberName, @Param("email") String email);
 
     @Query("select m " + "from Organization m " + "where m.enabled = ?1 ")
     List<Organization> findOrganizationEnabled(boolean enabled);

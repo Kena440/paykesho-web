@@ -1,6 +1,5 @@
 package org.paykesho.backoffice.merchants.service;
 
-import org.commons.entity.State;
 import org.commons.entity.merchant.Merchant;
 import org.commons.enums.MerchantType;
 import org.commons.utils.PaykeshoError;
@@ -59,10 +58,6 @@ public class MerchantService {
         if (merchant == null) {
             return null;
         }
-
-        State state = settingService.getProvinceByName("LUSAKA");
-        merchant.setProvince(state);
-        merchant.setDistrict("LUSAKA");
 
         return merchantRepository.save(merchant);
     }

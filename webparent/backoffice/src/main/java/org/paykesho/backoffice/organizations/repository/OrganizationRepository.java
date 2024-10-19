@@ -1,6 +1,5 @@
 package org.paykesho.backoffice.organizations.repository;
 
-import org.commons.dto.GeneralStatsDto;
 import org.commons.entity.organization.Organization;
 import org.commons.enums.OrganizationType;
 import org.paykesho.backoffice.paging.SearchRepository;
@@ -21,7 +20,7 @@ public interface OrganizationRepository extends SearchRepository<Organization, I
 
     public Long countById(Integer id);
 
-    @Query("select m from Organization m where concat(m.name, ' ', m.latitude, ' ', m.organizationType, ' ', m.district, ' ', m.province.name, ' ', m.email) like %?1%")
+    @Query("select m from Organization m where concat(m.name, ' ', m.latitude, ' ', m.organizationType, ' ', m.email) like %?1%")
     public Page<Organization> findAll(String keyword, Pageable pageable);
 
     @Query("update Organization m set m.enabled = ?2 where m.id = ?1")
@@ -33,9 +32,5 @@ public interface OrganizationRepository extends SearchRepository<Organization, I
 
     @Query("select m " + "from Organization m " + "where m.enabled = ?1 ")
     List<Organization> findOrganizationTypesEnabled(boolean enabled);
-
-    @Query("select new org.commons.dto.GeneralStatsDto(s.name, count(m.province.id)) from State s, Organization m where m.province.id = s.id and s.country.id = ?1 and m.enabled = ?2 group by s.name order by s.name")
-    List<GeneralStatsDto> getOrganizationsCountByProvince(@Param("countryId") Integer countryId, boolean enabled);
-
 
 }

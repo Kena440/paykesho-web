@@ -62,7 +62,6 @@ public class OrganizationController {
     public String saveOrganization(Organization organization, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
 
         if (organization.getId() == null || organization.getOrganizationType() == null) {
-            organization.setDistrict("N/A");
             organization.setRegistrationDate(new Date());
         }
 

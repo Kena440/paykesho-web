@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
-import org.commons.entity.State;
 import org.commons.enums.MerchantType;
 
 import javax.persistence.*;
@@ -29,11 +28,6 @@ public class Merchant extends IdBasedEntity {
     private String name;
     @Column(name = "details", length = 128, nullable = false)
     private String details;
-    @ManyToOne
-    @JoinColumn(name = "province_id")
-    private State province;
-    @Column(name = "district")
-    private String district;
     @Enumerated(EnumType.STRING)
     @Column(name = "merchant_type", length = 50)
     private MerchantType merchantType;
