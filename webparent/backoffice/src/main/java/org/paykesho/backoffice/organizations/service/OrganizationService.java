@@ -1,9 +1,11 @@
 package org.paykesho.backoffice.organizations.service;
 
 import org.commons.dto.GeneralStatsDto;
+import org.commons.entity.State;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.organization.Organization;
+import org.commons.entity.settings.Country;
 import org.commons.enums.OrganizationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.repository.ClientRepository;
@@ -70,6 +72,10 @@ public class OrganizationService {
         if (organization == null) {
             return null;
         }
+
+        State state = settingService.getProvinceByName("LUSAKA");
+        organization.setProvince(state);
+        organization.setDistrict("LUSAKA");
 
         return organizationRepository.save(organization);
     }
