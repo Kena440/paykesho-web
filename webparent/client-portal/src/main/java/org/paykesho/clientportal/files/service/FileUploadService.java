@@ -61,7 +61,7 @@ public class FileUploadService {
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange("http://files.paykesho.com/uploads-api", HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange("https://files.paykesho.com/uploads-api", HttpMethod.POST, requestEntity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 ObjectMapper objectMapper = new ObjectMapper();
