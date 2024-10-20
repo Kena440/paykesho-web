@@ -46,7 +46,6 @@ public class Voucher {
     @Column(name = "reason", length = 128, nullable = false)
     private String reason;
 
-    @Column(length = 64)
     private String payslip;
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
