@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -60,7 +61,22 @@ public class ClientService {
 
         String randomCode = RandomString.make(64);
         client.setVerificationCode(randomCode);
-        clientRepository.save(client);
+        Client savedClient = clientRepository.save(client);
+        createClientBalance(savedClient);
+    }
+
+    private void createClientBalance(Client client) {
+        ClientBalance balance = getClientBalance(client);
+
+        if (balance == null) {
+            balance = new ClientBalance();
+            balance.setClient(client);
+            balance.setCurrentBalance(BigDecimal.ZERO);
+            balance.setAvailableBalance(BigDecimal.ZERO);
+            balance.setLastUpdate(new Date());
+        }
+
+        saveClientBalance(balance);
     }
 
     private void encodePassword(Client client) {
