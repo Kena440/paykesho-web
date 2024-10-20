@@ -23,7 +23,7 @@ public class Announcement extends IdBasedEntity {
     private String name;
     @Column(length = 255, nullable = false)
     private String details;
-    @Column(length = 64)
+
     private String photos;
     private Date eventDate;
 

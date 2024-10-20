@@ -72,7 +72,7 @@ public class Client extends IdBasedEntity {
     @OneToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
-    @Column(length = 64)
+
     private String photos;
     @Transient
     private ClientBalance clientBalance;

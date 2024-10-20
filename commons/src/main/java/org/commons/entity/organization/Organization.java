@@ -31,7 +31,7 @@ public class Organization extends IdBasedEntity {
     private boolean deleted;
     private float longitude;
     private float latitude;
-    @Column(length = 64)
+
     private String photos;
     private Date registrationDate;
     @Column(name = "remote_file_id")

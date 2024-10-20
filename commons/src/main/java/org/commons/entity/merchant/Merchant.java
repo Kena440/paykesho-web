@@ -41,7 +41,7 @@ public class Merchant extends IdBasedEntity {
     private boolean deleted;
     private float longitude;
     private float latitude;
-    @Column(length = 64)
+
     private String photos;
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
