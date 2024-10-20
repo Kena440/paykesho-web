@@ -19,6 +19,10 @@ import java.util.UUID;
 public class NotificationService {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+    private static final String API_KEY = "F39E25A3B2A446F98E87A95723AE4";
+    private static final int MAX_MESSAGE_LENGTH = 200;
+    private static final String NOTIFICATION_API_URL = "https://notifications.paykesho.com/notifications-api";
+
     private final RestTemplate restTemplate;
     private final NotificationsRepository notificationRepository;
 
@@ -28,14 +32,31 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
+    public static String trimString(String input) {
+        if (input != null && input.length() > MAX_MESSAGE_LENGTH) {
+            return input.substring(0, MAX_MESSAGE_LENGTH) + "...";
+        }
+        return input;
+    }
+
     @Transactional
     public boolean sendNotification(String recipient, String message, String notificationType) {
-        String apiKey = "F39E25A3B2A446F98E87A95723AE4";
+        // Validate inputs
+        if (recipient == null || message == null || notificationType == null) {
+            logger.error("Invalid input: recipient, message, or notification type cannot be null.");
+            return false;
+        }
+
         Notification notification = new Notification();
         notification.setReference(UUID.randomUUID().toString());
-        notification.setNotificationType(NotificationType.valueOf(notificationType));
+        try {
+            notification.setNotificationType(NotificationType.valueOf(notificationType));
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid notification type: {}", notificationType);
+            return false;
+        }
         notification.setRecipient(recipient);
-        notification.setMessage(message);
+        notification.setMessage(trimString(message));
         notification.setStatus("pending");
 
         try {
@@ -47,9 +68,9 @@ public class NotificationService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        headers.set("API-Key", apiKey);
+        headers.set("API-Key", API_KEY);
 
-        NotificationRequest requestBody = new NotificationRequest(recipient, message, notificationType);
+        NotificationRequest requestBody = new NotificationRequest(recipient, notification.getMessage(), notificationType);
 
         // Log message length
         logger.info("Message length for recipient {}: {}", recipient, message.length());
@@ -57,24 +78,16 @@ public class NotificationService {
         HttpEntity<NotificationRequest> request = new HttpEntity<>(requestBody, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(
-                    "https://notifications.paykesho.com/notifications-api",
-                    HttpMethod.POST,
-                    request,
-                    String.class
-            );
+            ResponseEntity<String> response = restTemplate.exchange(NOTIFICATION_API_URL, HttpMethod.POST, request, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 notification.setStatus("sent");
             } else {
                 notification.setStatus("failed");
+                logger.error("Failed to send notification. Response: {}", response.getBody());
             }
 
-            try {
-                notificationRepository.save(notification);
-            } catch (Exception e) {
-                logger.error("Error saving notification status to database: {}", e.getMessage());
-            }
+            notificationRepository.save(notification); // Save notification status
 
             return response.getStatusCode() == HttpStatus.OK;
 
@@ -82,7 +95,7 @@ public class NotificationService {
             logger.error("Error sending notification: {}", e.getMessage());
             notification.setStatus("failed");
             try {
-                notificationRepository.save(notification);
+                notificationRepository.save(notification); // Save failed notification status
             } catch (Exception saveException) {
                 logger.error("Error saving failed notification status to database: {}", saveException.getMessage());
             }
