@@ -53,7 +53,8 @@ public class ClientService {
 
     public void registerClient(Client client) {
         encodePassword(client);
-        client.setEnabled(false);
+        client.setEnabled(true);
+        client.setAccountNonLocked(true);
         client.setCreatedTime(new Date());
         client.setAuthenticationType(AuthenticationType.DATABASE);
 
