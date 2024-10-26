@@ -14,13 +14,10 @@ import org.paykesho.clientportal.notifications.service.NotificationService;
 import org.paykesho.clientportal.organizations.service.OrganizationService;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2User;
-import org.paykesho.clientportal.settings.email.EmailSettingBag;
 import org.paykesho.clientportal.settings.service.SettingService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -180,40 +176,51 @@ public class ClientController {
         return clientUserDetails;
     }
 
-    private void sendVerificationEmail(HttpServletRequest request, Client client) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettings = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettings);
 
-        String recipientEmail = client.getEmail();
-        String subject = emailSettings.getClientVerificationSubject();
-        String emailContent = emailSettings.getClientVerificationContent();
-
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-
-        helper.setFrom(emailSettings.getFromAddress(), emailSettings.getSenderName());
-        helper.setTo(recipientEmail);
-        helper.setSubject(subject);
-
-        emailContent = emailContent.replace("[[name]]", client.getFullName());
+    private void sendNotification(Client client, HttpServletRequest request) {
+        // Generate messages
         String verifyURL = Utility.getSiteUrl(request) + "/clients/verify?code=" + client.getVerificationCode();
-        emailContent = emailContent.replace("[[URL]]", verifyURL);
 
-        helper.setText(emailContent, true);
+        String emailMessage = generateEmailMessage(client, "REGISTRATION", verifyURL);
+        String smsMessage = generateSmsMessage(client, "REGISTRATION", verifyURL);
 
-        ////mailSender.send(mimeMessage);
-        System.out.println("Verification email sent successfully to " + recipientEmail);
 
-        boolean emailNotificationSent = notificationService.sendNotification(
-                recipientEmail,
-                emailContent,
-                NotificationType.email.defaultDescription()
-        );
-
-        if (emailNotificationSent) {
-            System.out.println("Notification sent successfully for " + recipientEmail);
+        // Send email notification
+        boolean emailSent = notificationService.sendNotification(client.getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        if (emailSent) {
+            System.out.println("Email sent successfully to " + client.getEmail());
         } else {
-            System.err.println("Failed to send notification for " + recipientEmail);
+            System.err.println("Failed to send email to " + client.getEmail());
         }
+
+        // Send SMS notification
+        boolean smsSent = notificationService.sendNotification(client.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        if (smsSent) {
+            System.out.println("SMS sent successfully to " + client.getPhoneNumber());
+        } else {
+            System.err.println("Failed to send SMS to " + client.getPhoneNumber());
+        }
+    }
+
+
+    private String generateEmailMessage(Client client, String actionType, String verifyURL) {
+        StringBuilder message = new StringBuilder("<p>Greetings ").append(client.getFullName()).append(",</p>");
+
+        if ("REGISTRATION".equals(actionType)) {
+            message.append("<p>Your registration has been received. ").append("Verification URL: ").append(verifyURL).append(".</p>");
+        } else {
+            message.append("<p>Unknown action type.</p>");
+        }
+
+        message.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
+        return message.toString();
+    }
+
+    // Generate SMS content based on voucher action type
+    private String generateSmsMessage(Client client, String actionType, String verifyURL) {
+        if ("REGISTRATION".equals(actionType)) {
+            return String.format("Greetings %s, Your registration has been received. Verification URL: %s. Thank you. Get lelo, Paykesho.", client, verifyURL);
+        }
+        return "Unknown action type.";
     }
 }
