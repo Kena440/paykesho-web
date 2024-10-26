@@ -4,6 +4,7 @@ import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.enums.FileType;
 import org.commons.enums.NotificationType;
+import org.commons.enums.VoucherStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.VoucherRequestDto;
 import org.paykesho.clientportal.clients.service.ClientService;
@@ -86,6 +87,7 @@ public class VoucherController {
             Voucher voucher = new Voucher();
             voucher.setReference(paykeshoRef);
             voucher.setApproved(false);
+            voucher.setVoucherStatus(VoucherStatus.PENDING);
             voucher.setReason(voucherRequestDto.getReason());
             voucher.setClient(client);
             voucher.setAmount(voucherRequestDto.getAmount());

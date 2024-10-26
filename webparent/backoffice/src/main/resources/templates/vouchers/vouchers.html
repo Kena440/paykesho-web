@@ -41,7 +41,7 @@
                                         <th>Code</th>
                                         <th>Client</th>
                                         <th>Amount</th>
-                                        <th>Approved</th>
+                                        <th>Status</th>
                                         <th>Date</th>
                                         <th>File</th>
                                         <th>Actions</th>
@@ -52,10 +52,7 @@
                                         <td class="hideable-column">[[${voucherStat.count}]]</td>
                                         <td>
                                             <span class="font-weight-normal">
-                                                <a th:href="@{'/vouchers/view/'+${voucher.id}}"
-                                                   title="voucher View">
                                                     <span class="font-weight-normal"> [[${voucher.reference}]]</span>
-                                                </a>
                                             </span>
                                         </td>
                                         <td><span class="font-weight-normal">[[${voucher.client}]] - <small>[[${voucher.client.organization}]]</small></span>
@@ -64,16 +61,7 @@
                                                   th:replace="fragments/fragments :: format_currency(${voucher.amount})"></span>
                                         </td>
                                         <td>
-                                            <th:block th:if="${voucher.approved == true}">
-                                                <div class="badge bg-success">
-                                                    Approved
-                                                </div>
-                                            </th:block>
-                                            <th:block th:if="${voucher.approved == false}">
-                                                <div class="badge bg-danger">
-                                                    Pending Approval
-                                                </div>
-                                            </th:block>
+                                            <span class="font-weight-normal">[[${voucher.voucherStatus}]]</span>
                                         </td>
                                         <td><span class="font-weight-normal">[[${voucher.requestDate}]]</span></td>
                                         <td>

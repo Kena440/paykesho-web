@@ -4,6 +4,7 @@ import org.commons.entity.Voucher;
 import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Setting;
 import org.commons.enums.NotificationType;
+import org.commons.enums.VoucherStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.service.ClientService;
 import org.paykesho.backoffice.notifications.service.NotificationService;
@@ -145,6 +146,7 @@ public class VoucherController {
 
     private Voucher runVoucherRejectionProcess(Integer voucherId, HttpServletRequest request, String message) throws PaykeshoError {
         Voucher voucher = getVoucherOrThrow(voucherId);
+        voucher.setVoucherStatus(VoucherStatus.REJECTED);
         Voucher rejectedVoucher = voucherService.save(voucher);
         sendNotification(rejectedVoucher, "REJECTION", null, message);
         return rejectedVoucher;
@@ -164,6 +166,7 @@ public class VoucherController {
         BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.CEILING);
         voucher.setRepaymentAmount(totalRepaymentAmount);
         voucher.setApproved(true);
+        voucher.setVoucherStatus(VoucherStatus.APPROVED);
     }
 
     private void updateVoucherForAdjustment(Voucher voucher, HttpServletRequest request) {
@@ -177,6 +180,7 @@ public class VoucherController {
         voucher.setRepaymentAmount(totalRepaymentAmount);
         voucher.setRepaymentDate(repaymentDate);
         voucher.setApproved(true);
+        voucher.setVoucherStatus(VoucherStatus.APPROVED);
     }
 
     private void sendNotification(Voucher voucher, String actionType, BigDecimal voucherAmount, String message) {

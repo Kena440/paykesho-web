@@ -63,9 +63,14 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-4 align-self-end text-end">
-                                                    <img alt="Searching"
-                                                         class="img-fluid illustration-img"
-                                                         th:src="@{/assets/img/illustrations/searching.png}">
+
+
+                                                    <div class="img-fluid mb-2"><img
+                                                            alt="loading..."
+                                                            class="img-fluid illustration-img"
+                                                            style="max-width: 8.5rem;"
+                                                            th:src="@{${qrCodeContent}}">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -78,7 +83,7 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col mt-0">
-                                                    <h5 class="card-title">Real-Time</h5>
+                                                    <h5 class="card-title">Merchant Code</h5>
                                                 </div>
 
                                                 <div class="col-auto">
@@ -87,11 +92,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">1.856</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"> +2.25% </span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
+                                            <span class="h1 d-inline-block mt-1 mb-4">                                <a
+                                                    class="badge badge-subtle-primary me-1 my-1" href="#">[[${merchant.code}]]</a></span>
                                         </div>
                                     </div>
                                 </div>

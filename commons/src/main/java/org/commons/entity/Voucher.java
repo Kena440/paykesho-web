@@ -3,6 +3,7 @@ package org.commons.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.entity.client.Client;
+import org.commons.enums.VoucherStatus;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -50,7 +51,9 @@ public class Voucher {
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
     private String payslipPath;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "voucher_status", length = 50)
+    private VoucherStatus voucherStatus;
     private boolean approved;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
