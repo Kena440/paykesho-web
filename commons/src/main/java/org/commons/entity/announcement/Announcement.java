@@ -2,9 +2,7 @@ package org.commons.entity.announcement;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -51,11 +49,11 @@ public class Announcement extends IdBasedEntity {
     }
 
     @Transient
-    public String getPhotosImagePath() {
+    public String getPhotoPath() {
         if (id == null || photos == null) {
             return "/images/default_image.png";
         }
-        return Constants.S3_BASE_URI + "/event_photos/" + this.id + "/" + this.photos;
+        return this.photos;
     }
 
     @Override

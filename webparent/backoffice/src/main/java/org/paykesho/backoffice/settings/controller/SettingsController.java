@@ -1,6 +1,6 @@
 package org.paykesho.backoffice.settings.controller;
 
-import org.commons.constants.Constants;
+
 import org.commons.entity.settings.Currency;
 import org.commons.entity.settings.GeneralSettingBag;
 import org.commons.entity.settings.Setting;
@@ -42,7 +42,7 @@ public class SettingsController {
             model.addAttribute(setting.getKey(), setting.getValue());
         }
 
-        model.addAttribute("S3_BASE_URI", Constants.S3_BASE_URI);
+        //model.addAttribute("S3_BASE_URI", Constants.S3_BASE_URI);
 
         return "settings/settings";
     }

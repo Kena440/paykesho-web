@@ -55,15 +55,5 @@ public class Voucher {
     @Column(name = "voucher_status", length = 50)
     private VoucherStatus voucherStatus;
     private boolean approved;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "history",
-            joinColumns = @JoinColumn(name = "id"),
-            inverseJoinColumns = @JoinColumn(name = "history_id")
-    )
-    private Set<VoucherTrxHistory> voucherTrxHistory = new HashSet<>();
 
-    public void addHistoryData(VoucherTrxHistory history) {
-        this.voucherTrxHistory.add(history);
-    }
 }

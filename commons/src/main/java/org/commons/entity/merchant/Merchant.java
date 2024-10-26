@@ -2,7 +2,6 @@ package org.commons.entity.merchant;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
 import org.commons.enums.MerchantType;
 
@@ -53,11 +52,11 @@ public class Merchant extends IdBasedEntity {
     }
 
     @Transient
-    public String getPhotosImagePath() {
+    public String getPhotoPath() {
         if (id == null || photos == null) {
             return "/images/default_image.png";
         }
-        return Constants.S3_BASE_URI + "/merchant_logos/" + this.id + "/" + this.photos;
+        return this.photoPath;
     }
 
 }

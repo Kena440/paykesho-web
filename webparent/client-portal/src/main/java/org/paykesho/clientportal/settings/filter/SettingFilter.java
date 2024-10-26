@@ -1,6 +1,6 @@
 package org.paykesho.clientportal.settings.filter;
 
-import org.commons.constants.Constants;
+
 import org.commons.entity.settings.Setting;
 import org.paykesho.clientportal.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class SettingFilter implements Filter {
             request.setAttribute(setting.getKey(), setting.getValue());
         });
 
-        request.setAttribute("S3_BASE_URI", Constants.S3_BASE_URI);
+        //request.setAttribute("S3_BASE_URI", Constants.S3_BASE_URI);
 
         filterChain.doFilter(request, response);
     }

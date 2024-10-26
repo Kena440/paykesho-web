@@ -2,7 +2,6 @@ package org.commons.entity.organization;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.commons.constants.Constants;
 import org.commons.entity.IdBasedEntity;
 import org.commons.enums.OrganizationType;
 
@@ -44,10 +43,10 @@ public class Organization extends IdBasedEntity {
     }
 
     @Transient
-    public String getPhotosImagePath() {
+    public String getPhotoPath() {
         if (id == null || photos == null) {
             return "/images/default_image.png";
         }
-        return Constants.S3_BASE_URI + "/organization_logos/" + this.id + "/" + this.photos;
+        return this.photoPath;
     }
 }

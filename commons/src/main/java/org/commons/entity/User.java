@@ -2,7 +2,6 @@ package org.commons.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.commons.constants.Constants;
 import org.commons.enums.GenderType;
 
 import javax.persistence.*;
@@ -38,11 +37,7 @@ public class User extends IdBasedEntity {
     private Date lockTime;
     private String photoPath;
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
@@ -64,11 +59,11 @@ public class User extends IdBasedEntity {
     }
 
     @Transient
-    public String getPhotosImagePath() {
+    public String getPhotoPath() {
         if (id == null || photos == null) {
             return "/images/default_user_image.jpg";
         }
-        return Constants.S3_BASE_URI + "/user_photos/" + this.id + "/" + this.photos;
+        return this.photoPath;
     }
 
     @Transient
