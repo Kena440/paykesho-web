@@ -184,7 +184,7 @@ public class VoucherController {
     // Generate SMS content based on voucher action type
     private String generateSmsMessage(Voucher voucher, String actionType) {
         if ("REQUEST".equals(actionType)) {
-            return String.format("Dear %s, your voucher request submitted successfully. Reference: %s. Await processing. Get lelo, Paykesho.", voucher.getClient(), voucher.getReference());
+            return String.format("Dear %s, your voucher request submitted successfully. Reference: %s. Await processing. Get lelo, Pay Kesho.", voucher.getClient(), voucher.getReference());
         }
         return "Unknown action type.";
     }

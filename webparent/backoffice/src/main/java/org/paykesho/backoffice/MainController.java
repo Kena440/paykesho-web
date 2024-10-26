@@ -1,7 +1,6 @@
 package org.paykesho.backoffice;
 
 import org.commons.entity.settings.Country;
-import org.paykesho.backoffice.events.service.EventsService;
 import org.paykesho.backoffice.organizations.service.OrganizationService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.transaction.service.TransactionsService;
@@ -26,8 +25,6 @@ public class MainController {
     @Autowired
     private SettingService settingService;
     @Autowired
-    private EventsService eventsService;
-    @Autowired
     private OrganizationService facilityService;
     @Autowired
     private TransactionsService transactionsService;
@@ -45,7 +42,6 @@ public class MainController {
         model.addAttribute("voucherPercentageChange", voucherStats.get("voucherPercentageChange"));
         model.addAttribute("pageTitle", "Dashboard");
         model.addAttribute("facilityCount", facilityService.countInstitutions());
-        model.addAttribute("upcomingEvents", eventsService.getUpcomingEvents(30));
         if (country != null) model.addAttribute("country", country);
         return "index";
     }

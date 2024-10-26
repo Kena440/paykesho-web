@@ -4,23 +4,20 @@ import net.bytebuddy.utility.RandomString;
 import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
+import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.backoffice.config.Utility;
 import org.paykesho.backoffice.merchantadmin.repository.MerchantAdminRepository;
+import org.paykesho.backoffice.notifications.service.NotificationService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.settings.email.EmailSettingBag;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
@@ -40,6 +37,8 @@ public class MerchantAdminService {
     private CountryRepository countryRepository;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    NotificationService notificationService;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, merchantAdminRepository);
@@ -77,8 +76,7 @@ public class MerchantAdminService {
         if (merchantAdminInDB == null) {
 
             String token = RandomString.make(30);
-            //String passwordCode = RandomString.make(10);
-            String passwordCode = "paykesho";
+            String passwordCode = RandomString.make(10);
             String verificationCode = RandomString.make(64);
 
             String encodedPassword = passwordEncoder.encode(passwordCode);
@@ -92,7 +90,7 @@ public class MerchantAdminService {
 
             new Thread(() -> {
                 try {
-                    //sendAdminCreationEmail(request, merchantAdmin, passwordCode);
+                    sendNotification(merchantAdmin, passwordCode);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage());
                 }
@@ -112,30 +110,49 @@ public class MerchantAdminService {
         return merchantAdminRepository.count();
     }
 
-    private void sendAdminCreationEmail(HttpServletRequest request, MerchantAdmin merchantAdmin, String passwordCode) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettingBag = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBag);
+    private void sendNotification(MerchantAdmin merchantAdmin, String passwordCode) {
+        // Generate messages
 
-        mailSender.setDefaultEncoding("utf-8");
+        String emailMessage = generateEmailMessage(merchantAdmin, passwordCode);
+        String smsMessage = generateSmsMessage(merchantAdmin, passwordCode);
 
-        String toAddress = merchantAdmin.getEmail();
-        String subject = emailSettingBag.getMerchantAdminCreationSubject();
-        String content = emailSettingBag.getMerchantAdminCreationContent();
-        String systemURL = Utility.getSiteUrl(request);
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        // Send email notification
+        boolean emailSent = notificationService.sendNotification(merchantAdmin.getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        if (emailSent) {
+            System.out.println("Email sent successfully to " + merchantAdmin.getEmail());
+        } else {
+            System.err.println("Failed to send email to " + merchantAdmin.getEmail());
+        }
 
-        helper.setFrom(emailSettingBag.getFromAddress(), emailSettingBag.getSenderName());
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
+        // Send SMS notification
+        boolean smsSent = notificationService.sendNotification(merchantAdmin.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        if (smsSent) {
+            System.out.println("SMS sent successfully to " + merchantAdmin.getPhoneNumber());
+        } else {
+            System.err.println("Failed to send SMS to " + merchantAdmin.getPhoneNumber());
+        }
+    }
 
-        content = content.replace("[[name]]", merchantAdmin.getFullName());
-        content = content.replace("[[link]]", "https://merchant.paykesho.com/");
-        content = content.replace("[[email]]", merchantAdmin.getEmail());
-        content = content.replace("[[password]]", passwordCode);
 
-        helper.setText(content, true);
-        //mailSender.send(mimeMessage);
+    private String generateEmailMessage(MerchantAdmin merchantAdmin, String passwordCode) {
+        StringBuilder message = new StringBuilder("<p>Greetings ").append(merchantAdmin.getFullName()).append(",</p>");
+
+        if ("REGISTRATION".equals("REGISTRATION")) {
+            message.append("<p>You have been registered as an admin. ").append("URL: ").append("https://merchant.paykesho.com/").append("Email: ").append(merchantAdmin.getEmail()).append("Password: ").append(passwordCode).append(".</p>");
+        } else {
+            message.append("<p>Unknown action type.</p>");
+        }
+
+        message.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
+        return message.toString();
+    }
+
+
+    private String generateSmsMessage(MerchantAdmin merchantAdmin, String passwordCode) {
+        if ("REGISTRATION".equals("REGISTRATION")) {
+            return String.format("Greetings %s,You have been registered as an admin. URL: %s. Email: %s. Password: %s. Thank you. Get lelo, Pay Kesho.", "https://merchant.paykesho.com/", merchantAdmin.getEmail(), passwordCode);
+        }
+        return "Unknown action type.";
     }
 }

@@ -178,7 +178,7 @@ public class TransactionController {
     private String generateSmsMessage(Transaction transaction, String actionType) {
         String txnAmount = "K" + transaction.getAmount();
         if ("PAYMENT".equals(actionType)) {
-            return String.format("Dear %s, your payment request processed successfully. Amount: %s. Merchant: %s. Reference: %s. Thank you. Get lelo, Paykesho.", transaction.getClient(), txnAmount, transaction.getMerchant().getName(), transaction.getReference());
+            return String.format("Dear %s, your payment request processed successfully. Amount: %s. Merchant: %s. Reference: %s. Thank you. Get lelo, Pay Kesho.", transaction.getClient(), txnAmount, transaction.getMerchant().getName(), transaction.getReference());
         }
         return "Unknown action type.";
     }

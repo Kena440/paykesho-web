@@ -111,9 +111,9 @@ public class ClientController {
     }
 
     @PostMapping(value = "/save-client")
-    public String signUpClient(Client client, Model model, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
+    public String signUpClient(Client client, Model model, HttpServletRequest request) {
         clientService.registerClient(client);
-        sendVerificationEmail(request, client);
+        sendNotification(client, request);
 
         model.addAttribute("pageTitle", "Registration Successful");
         return "register/register_success";
@@ -202,7 +202,6 @@ public class ClientController {
         }
     }
 
-
     private String generateEmailMessage(Client client, String actionType, String verifyURL) {
         StringBuilder message = new StringBuilder("<p>Greetings ").append(client.getFullName()).append(",</p>");
 
@@ -216,10 +215,9 @@ public class ClientController {
         return message.toString();
     }
 
-    // Generate SMS content based on voucher action type
     private String generateSmsMessage(Client client, String actionType, String verifyURL) {
         if ("REGISTRATION".equals(actionType)) {
-            return String.format("Greetings %s, Your registration has been received. Verification URL: %s. Thank you. Get lelo, Paykesho.", client, verifyURL);
+            return String.format("Greetings %s, Your registration has been received. Verification URL: %s. Thank you. Get lelo, Pay Kesho.", client, verifyURL);
         }
         return "Unknown action type.";
     }
