@@ -90,6 +90,7 @@ public class VoucherController {
             voucher.setVoucherStatus(VoucherStatus.PENDING);
             voucher.setReason(voucherRequestDto.getReason());
             voucher.setClient(client);
+            voucher.setInterestPercent(15);
             voucher.setAmount(voucherRequestDto.getAmount());
             voucher.setAvailableAmount(voucherRequestDto.getAmount());
             voucher.setRequestDate(new Date());

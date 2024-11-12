@@ -5,17 +5,17 @@ server:
 
 spring:
   datasource:
-    password: fbxYJJJ1KwhQ7Bl$$$$$
+    password: p@ssw0rd
     url: jdbc:mysql://127.0.0.1:3306/paykesho_db
-    username: mek
+    username: root
     hikari:
-      minimum-idle: 10                          # Increased minimum idle connections
-      maximum-pool-size: 50                     # Increased maximum pool size
-      connection-timeout: 30000                 # Increased connection timeout to 30 seconds
-      max-lifetime: 1800000                      # This remains unchanged; controls max connection lifetime
-      idle-timeout: 300000                       # Increased idle timeout to 5 minutes
-      leak-detection-threshold: 5000             # Increased leak detection threshold to 5 seconds
-      pool-name: SpringBootHikariCP              # Pool name remains unchanged
+      minimum-idle: 10
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      idle-timeout: 300000
+      leak-detection-threshold: 5000
+      pool-name: SpringBootHikariCP
 
   jpa:
     hibernate:

@@ -162,7 +162,7 @@ public class VoucherController {
 
     private void updateVoucherForApproval(Voucher voucher, HttpServletRequest request) {
         //voucher.setInterestPercent(Float.parseFloat(request.getParameter("voucherInterestPercent")));
-        voucher.setInterestPercent(30);
+        voucher.setInterestPercent(15);
         BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.CEILING);
         voucher.setRepaymentAmount(totalRepaymentAmount);
         voucher.setApproved(true);

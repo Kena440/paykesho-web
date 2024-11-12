@@ -41,6 +41,7 @@
                                         <th>Code</th>
                                         <th>Client</th>
                                         <th>Amount</th>
+                                        <th>Interest (%)</th>
                                         <th>Status</th>
                                         <th>Date</th>
                                         <th>File</th>
@@ -59,6 +60,9 @@
                                         </td>
                                         <td><span class="font-weight-normal"
                                                   th:replace="fragments/fragments :: format_currency(${voucher.amount})"></span>
+                                        </td>
+                                        <td><span class="font-weight-normal"
+                                                  th:replace="fragments/fragments :: format_number(${voucher.interestPercent})"></span>
                                         </td>
                                         <td>
                                             <span class="font-weight-normal">[[${voucher.voucherStatus}]]</span>

@@ -27,17 +27,18 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert"
-                         th:if="${message != null}">
-
-                        <!-- Text -->
-                        <strong>[[${message}]] 😎👍</strong>
-
-                        <!-- Button -->
-                        <button aria-label="Close" class="close" data-dismiss="alert" type="button">
-                            <span aria-hidden="true">×</span>
-                        </button>
-
+                    <div class="col-md-12">
+                        <div class="alert alert-warning alert-dismissible" role="alert" th:if="${message != null}">
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
+                                    type="button"></button>
+                            <div class="alert-icon">
+                                <i class="far fa-fw fa-lock"></i>
+                            </div>
+                            <div class="alert-message">
+                                <strong>Hello there!</strong>
+                                <span class="alert-inner--text">[[${message}]] 😎👍</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12">
                         <div class="card">
@@ -52,6 +53,7 @@
                                         <th>#</th>
                                         <th>Code</th>
                                         <th>Amount</th>
+                                        <th>Interest (%)</th>
                                         <th>Approved</th>
                                         <th>Date</th>
                                     </tr>
@@ -66,6 +68,9 @@
                                         </td>
                                         <td><span class="font-weight-normal"
                                                   th:replace="fragments/fragments :: format_currency(${voucher.amount})"></span>
+                                        </td>
+                                        <td><span class="font-weight-normal"
+                                                  th:replace="fragments/fragments :: format_number(${voucher.interestPercent})"></span>
                                         </td>
                                         <td>
                                             <span class="font-weight-normal">[[${voucher.voucherStatus}]]</span>
