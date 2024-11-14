@@ -4,6 +4,25 @@
       lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Vouchers','none')"></head>
+<style>
+    .table {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+
+    .table th.text-center {
+        font-weight: bold;
+    }
+</style>
+
 <body>
 <div class="wrapper">
     <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
@@ -18,7 +37,6 @@
                     </div>
 
                     <div class="col-auto ms-auto text-end mt-n1">
-
                         <a class="btn btn-primary shadow-sm" th:href="@{/vouchers}">
                             <i class="align-middle" data-lucide="list">&nbsp;</i> My Vouchers
                         </a>
@@ -28,78 +46,85 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-xl-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">[[${pageTitle}]]</h5>
-                                <h6 class="card-subtitle text-muted">Request for a quick voucher.</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="alert alert-warning alert-dismissible" role="alert">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">[[${pageTitle}]]</h5>
+                            <h6 class="card-subtitle text-muted">Request for a quick voucher.</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form enctype="multipart/form-data"
+                                          method="post"
+                                          th:action="@{/vouchers/save}"
+                                          th:object="${voucherRequest}">
+                                        <div class="mb-3">
+                                            <label class="form-label">Amount</label>
+                                            <input class="form-control" id="amount"
+                                                   max="999999" min="20" maxlength="5"
+                                                   placeholder="amount" required step="0.1"
+                                                   th:field="*{amount}" type="number"
+                                                   oninput="calculateVoucherDetails()">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Reason</label>
+                                            <textarea class="form-control" id="reason"
+                                                      placeholder="Reason" required rows="3"
+                                                      th:field="*{reason}"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Latest Payslip</label>
+                                            <input accept=".pdf, image/png, image/jpeg"
+                                                   class="form-control" id="payslip"
+                                                   name="payslip" type="file"
+                                                   onchange="validateFileSize(this)">
+                                        </div>
+                                        <div class="alert alert-warning alert-dismissible" role="alert"
+                                             id="fileSizeAlert" style="display: none;">
                                             <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
                                                     type="button"></button>
                                             <div class="alert-icon">
                                                 <i class="far fa-fw fa-lock"></i>
                                             </div>
                                             <div class="alert-message">
-                                                <strong>Voucher Interest Calculations</strong>
-                                                <span class="alert-inner--text"><strong>Hi!</strong> Kindly note that the voucher interest is 15%</span>
+                                                <span class="alert-inner--text"><strong>Warning!</strong>File size exceeds 1MB. Please upload a smaller file.</span>
                                             </div>
                                         </div>
-                                    </div>
+                                        <button class="btn btn-primary" type="submit">Submit</button>
+                                    </form>
                                 </div>
-                                <form enctype="multipart/form-data"
-                                      method="post"
-                                      th:action="@{/vouchers/save}"
-                                      th:object="${voucherRequest}">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Amount</label>
-                                                <input
-                                                        class="form-control" id="amount"
-                                                        max="999999" min="20"
-                                                        placeholder="amount"
-                                                        required
-                                                        step="0.1"
-                                                        th:field="*{amount}"
-                                                        type="number">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Reason</label>
-                                                <textarea class="form-control" id="reason" placeholder="Reason"
-                                                          required
-                                                          rows="3" th:field="*{reason}"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Latest Payslip</label>
-                                                <input accept=".pdf, image/png, image/jpeg"
-                                                       class="form-control"
-                                                       id="payslip"
-                                                       name="payslip"
-                                                       type="file">
-                                            </div>
-                                        </div>
+
+                                <div class="col-md-6">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                            <tr>
+                                                <th colspan="2" class="text-center">Voucher Calculation Details</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td><strong>Interest Amount (15%):</strong></td>
+                                                <td><span id="interestAmount">0</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Total Repayment:</strong></td>
+                                                <td><span id="totalRepayment">0</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Repayment Date:</strong></td>
+                                                <td><span id="repaymentDate">--</span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <button class="btn btn-primary" type="submit">Submit</button>
-                                        </div>
-                                    </div>
-                                </form>
+
+                                </div>
                             </div>
+
                         </div>
                     </div>
-
                 </div>
-
-
             </div>
         </main>
 
@@ -108,6 +133,50 @@
 </div>
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
+
+<script>
+    function calculateVoucherDetails() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const interestRate = 0.15;
+        const interestAmount = amount * interestRate;
+        const totalRepayment = amount + interestAmount;
+
+        // Display calculated values
+        document.getElementById('interestAmount').innerText = interestAmount.toFixed(2);
+        document.getElementById('totalRepayment').innerText = totalRepayment.toFixed(2);
+
+        // Calculate repayment date (1 month from today)
+        const today = new Date();
+        const repaymentDate = new Date(today.setMonth(today.getMonth() + 1));
+        document.getElementById('repaymentDate').innerText = repaymentDate.toISOString().split('T')[0];
+    }
+</script>
+
+<script>
+    let isFileValid = true;
+
+    function validateFileSize(input) {
+        const file = input.files[0];
+        const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+        const alertBox = document.getElementById('fileSizeAlert');
+
+        if (file && file.size > maxSize) {
+            alertBox.style.display = 'block'; // Show alert
+            input.value = ''; // Clear the file input
+            isFileValid = false; // Mark file as invalid
+        } else {
+            alertBox.style.display = 'none'; // Hide alert if valid
+            isFileValid = true; // Mark file as valid
+        }
+    }
+
+    document.querySelector('form').onsubmit = function (event) {
+        if (!isFileValid) {
+            event.preventDefault(); // Prevent form submission
+            alert('Please upload a valid payslip file under 1MB.');
+        }
+    };
+</script>
 
 </body>
 </html>

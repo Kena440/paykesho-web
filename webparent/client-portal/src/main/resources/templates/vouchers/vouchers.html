@@ -53,6 +53,7 @@
                                         <th>#</th>
                                         <th>Code</th>
                                         <th>Amount</th>
+                                        <th>Repayment Amount</th>
                                         <th>Interest (%)</th>
                                         <th>Approved</th>
                                         <th>Date</th>
@@ -70,6 +71,9 @@
                                                   th:replace="fragments/fragments :: format_currency(${voucher.amount})"></span>
                                         </td>
                                         <td><span class="font-weight-normal"
+                                                  th:replace="fragments/fragments :: format_currency(${voucher.repaymentAmount})"></span>
+                                        </td>
+                                        <td><span class="font-weight-normal text-center"
                                                   th:replace="fragments/fragments :: format_number(${voucher.interestPercent})"></span>
                                         </td>
                                         <td>

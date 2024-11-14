@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -93,6 +95,8 @@ public class VoucherController {
             voucher.setInterestPercent(15);
             voucher.setAmount(voucherRequestDto.getAmount());
             voucher.setAvailableAmount(voucherRequestDto.getAmount());
+            BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.CEILING);
+            voucher.setRepaymentAmount(totalRepaymentAmount);
             voucher.setRequestDate(new Date());
 
             if (!multipartFile.isEmpty()) {
@@ -131,6 +135,10 @@ public class VoucherController {
         return "redirect:/vouchers";
     }
 
+    private BigDecimal calculateTotalRepayment(Voucher voucher) {
+        BigDecimal interestAmount = BigDecimal.valueOf(voucher.getInterestPercent() / 100).multiply(voucher.getAmount());
+        return voucher.getAmount().add(interestAmount);
+    }
 
     private boolean isValidFileType(MultipartFile file) {
         String contentType = file.getContentType();
