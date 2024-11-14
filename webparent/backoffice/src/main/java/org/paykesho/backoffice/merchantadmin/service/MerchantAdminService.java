@@ -32,13 +32,13 @@ public class MerchantAdminService {
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
+    NotificationService notificationService;
+    @Autowired
     private MerchantAdminRepository merchantAdminRepository;
     @Autowired
     private CountryRepository countryRepository;
     @Autowired
     private SettingService settingService;
-    @Autowired
-    NotificationService notificationService;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, merchantAdminRepository);

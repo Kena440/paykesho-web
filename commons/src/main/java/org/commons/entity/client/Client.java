@@ -3,7 +3,6 @@ package org.commons.entity.client;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.commons.entity.IdBasedEntity;
 import org.commons.entity.organization.Organization;
 import org.commons.enums.AuthenticationType;

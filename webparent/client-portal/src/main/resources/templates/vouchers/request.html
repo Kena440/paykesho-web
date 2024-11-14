@@ -61,10 +61,10 @@
                                         <div class="mb-3">
                                             <label class="form-label">Amount</label>
                                             <input class="form-control" id="amount"
-                                                   max="999999" min="20" maxlength="5"
-                                                   placeholder="amount" required step="0.1"
-                                                   th:field="*{amount}" type="number"
-                                                   oninput="calculateVoucherDetails()">
+                                                   max="999999" maxlength="5" min="20"
+                                                   oninput="calculateVoucherDetails()" placeholder="amount" required
+                                                   step="0.1" th:field="*{amount}"
+                                                   type="number">
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Reason</label>
@@ -76,11 +76,11 @@
                                             <label class="form-label">Latest Payslip</label>
                                             <input accept=".pdf, image/png, image/jpeg"
                                                    class="form-control" id="payslip"
-                                                   name="payslip" type="file"
-                                                   onchange="validateFileSize(this)">
+                                                   name="payslip" onchange="validateFileSize(this)"
+                                                   type="file">
                                         </div>
-                                        <div class="alert alert-warning alert-dismissible" role="alert"
-                                             id="fileSizeAlert" style="display: none;">
+                                        <div class="alert alert-warning alert-dismissible" id="fileSizeAlert"
+                                             role="alert" style="display: none;">
                                             <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
                                                     type="button"></button>
                                             <div class="alert-icon">
@@ -99,7 +99,7 @@
                                         <table class="table table-bordered table-striped">
                                             <thead>
                                             <tr>
-                                                <th colspan="2" class="text-center">Voucher Calculation Details</th>
+                                                <th class="text-center" colspan="2">Voucher Calculation Details</th>
                                             </tr>
                                             </thead>
                                             <tbody>

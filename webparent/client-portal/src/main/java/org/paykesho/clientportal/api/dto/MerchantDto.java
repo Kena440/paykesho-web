@@ -2,7 +2,6 @@ package org.paykesho.clientportal.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
 import org.commons.enums.MerchantType;
 
 @Data

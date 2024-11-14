@@ -1,30 +1,23 @@
 package org.paykesho.backoffice.organizationadmin.service;
 
 import net.bytebuddy.utility.RandomString;
-import org.commons.entity.client.Client;
-import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.backoffice.config.Utility;
 import org.paykesho.backoffice.notifications.service.NotificationService;
 import org.paykesho.backoffice.organizationadmin.repository.OrganizationAdminRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.settings.email.EmailSettingBag;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
@@ -39,13 +32,13 @@ public class OrganizationAdminService {
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
+    NotificationService notificationService;
+    @Autowired
     private OrganizationAdminRepository organizationAdminRepository;
     @Autowired
     private CountryRepository countryRepository;
     @Autowired
     private SettingService settingService;
-    @Autowired
-    NotificationService notificationService;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, organizationAdminRepository);

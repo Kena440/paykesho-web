@@ -3,6 +3,7 @@ package org.commons.entity.announcement;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.commons.entity.IdBasedEntity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
