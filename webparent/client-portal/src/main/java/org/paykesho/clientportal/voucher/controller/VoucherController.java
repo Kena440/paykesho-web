@@ -129,7 +129,7 @@ public class VoucherController {
 
         } catch (PaykeshoError e) {
             redirectAttributes.addFlashAttribute(Constants.ERROR, "Error saving voucher: " + e.getMessage());
-            return "redirect:/users";
+            return "redirect:/vouchers";
         }
 
         return "redirect:/vouchers";
