@@ -36,6 +36,8 @@ public class User extends IdBasedEntity {
     @Column(name = "lock_time")
     private Date lockTime;
     private String photoPath;
+
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
