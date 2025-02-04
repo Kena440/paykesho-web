@@ -82,12 +82,6 @@ public class VoucherController {
         return "redirect:/vouchers";
     }
 
-/*    @GetMapping("/reject/{id}")
-    public String rejectVoucherRequest(@PathVariable("id") Integer voucherId, HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
-        Voucher rejectedVoucher = runVoucherRejectionProcess(voucherId, request);
-        redirectAttributes.addFlashAttribute("message", "Voucher has been rejected #" + rejectedVoucher.getReference());
-        return "redirect:/vouchers";
-    }*/
 
     @PostMapping(value = "/reject")
     public String rejectVoucherRequest(Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError {

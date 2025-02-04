@@ -21,9 +21,7 @@
                         <a class="btn btn-primary shadow-sm" th:href="@{/vouchers}">
                             <i class="align-middle" data-lucide="list">&nbsp;</i> My Vouchers
                         </a>
-                        <a class="btn btn-primary shadow-sm" th:href="@{/vouchers/request}">
-                            <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Request
-                        </a>
+
                     </div>
                 </div>
                 <div class="row">
@@ -83,9 +81,8 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <th:block th:if="${voucher.approved == false}">
-                                                <a class="dropdown-item" href="#"
-                                                   th:if="${voucher.payslipPath != null}">
+                                            <th:block th:if="${voucher.approved == false and not #strings.equals(voucher.voucherStatus, 'REJECTED')}">
+                                                <a class="dropdown-item" href="#" th:if="${voucher.payslipPath != null}">
                                                     <div th:replace="fragments/fragments :: approve('voucher', '/vouchers/approve/' + ${voucher.id})"></div>
                                                 </a>
                                                 &nbsp;
@@ -97,10 +94,8 @@
                                                     Reject
                                                 </a>
                                                 &nbsp;
-                                                <!--       <a class="dropdown-item text-danger" href="#">
-                                                           <div th:replace="fragments/fragments :: adjust('voucher', '/vouchers/adjust/' + ${voucher.id})"></div>
-                                                       </a>-->
                                             </th:block>
+
                                         </td>
 
                                     </tr>

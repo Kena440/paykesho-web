@@ -38,9 +38,9 @@ public class MerchantService {
         List<Merchant> merchants = (List<Merchant>) merchantRepository.findAll(Sort.by("name").ascending());
 
         for (Merchant merchant : merchants) {
-            if (merchant.getPhotoPath() != null) {
+            if (merchant.getPhotoPath() != null && merchant.getRemoteFileId() != null) {
                 FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
-                if (fileAccessResponse != null) {
+                if (fileAccessResponse != null && fileAccessResponse.getFileUrl() != null) {
                     merchant.setPhotoPath(fileAccessResponse.getFileUrl());
                 }
             }

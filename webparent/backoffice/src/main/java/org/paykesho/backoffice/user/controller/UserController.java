@@ -60,17 +60,37 @@ public class UserController {
 
     @PostMapping("/save")
     @Transactional
-    public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
+    public String saveUser(
+            @ModelAttribute User user,
+            RedirectAttributes redirectAttributes,
+            @RequestParam(value = "image", required = false) MultipartFile multipartFile
+    ) throws PaykeshoError {
         try {
-            if (!multipartFile.isEmpty()) {
+            User existingUser = null;
+
+            // Handle user edit scenario
+            if (user.getId() != null) {
+                existingUser = userService.getUserById(user.getId());
+                if (existingUser == null) {
+                    throw new PaykeshoError("User not found");
+                }
+
+                // Preserve important fields during update
+               // user.setRegistrationDate(existingUser.getRegistrationDate());
+               // user.setRole(existingUser.getRole());
+                user.setPassword(existingUser.getPassword()); // Ensure password isn't reset unintentionally
+            }
+
+            // Handle image upload (if provided)
+            if (multipartFile != null && !multipartFile.isEmpty()) {
                 String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
 
                 if (!isValidImageType(multipartFile)) {
                     throw new PaykeshoError("Invalid image type uploaded");
                 }
 
-                user.setPhotos(originalFileName);
-                FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.photo, 1, "profile photo for " + user.getEmail());
+                FileUploadResponse uploadResponse = fileUploadService.uploadFile(
+                        multipartFile, FileType.photo, 1, "profile photo for " + user.getEmail());
 
                 if (!uploadResponse.isStatus()) {
                     throw new PaykeshoError("File upload failed.");
@@ -79,16 +99,19 @@ public class UserController {
                 user.setRemoteFileId(uploadResponse.getFileId());
                 user.setPhotos(uploadResponse.getFilePath());
                 user.setPhotoPath(uploadResponse.getFilePath());
-                userService.save(user);
-
+            } else if (existingUser != null) {
+                // Preserve existing image if no new image is uploaded
+                user.setRemoteFileId(existingUser.getRemoteFileId());
+                user.setPhotos(existingUser.getPhotos());
+                user.setPhotoPath(existingUser.getPhotoPath());
             } else {
-                if (user.getPhotos() == null || user.getPhotos().isEmpty()) {
-                    user.setPhotos(null);
-                    user.setPhotoPath(null);
-                }
-                userService.save(user);
+                // No image provided for a new user
+                user.setPhotos(null);
+                user.setPhotoPath(null);
             }
 
+            // Save the user
+            userService.save(user);
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "User Operation Successful: " + user.getEmail());
 
         } catch (PaykeshoError e) {

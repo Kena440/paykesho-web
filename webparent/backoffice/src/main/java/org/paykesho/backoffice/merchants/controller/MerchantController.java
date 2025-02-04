@@ -56,6 +56,8 @@ public class MerchantController {
         Merchant merchant = new Merchant();
         List<State> stateList = settingService.listStatesByCountry("Zambia");
 
+        merchant.setLongitude(28.3228F);
+        merchant.setLatitude((float) -15.3875);
         merchant.setEnabled(true);
 
         model.addAttribute("merchant", merchant);
@@ -89,32 +91,58 @@ public class MerchantController {
     }
 
     @PostMapping("/save")
-    public String saveMerchant(Merchant merchant, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
+    public String saveMerchant(
+            @ModelAttribute Merchant merchant,
+            RedirectAttributes redirectAttributes,
+            @RequestParam(value = "image", required = false) MultipartFile multipartFile
+    ) throws PaykeshoError {
 
-        if (merchant.getId() == null || merchant.getCode() == null) {
+        if (merchant.getId() == null) { // New merchant case
             String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_MNT");
             if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
             merchant.setCode(paykeshoRef);
             merchant.setRegistrationDate(new Date());
+        } else { // Editing an existing merchant
+            Merchant existingMerchant = merchantService.getMerchantById(merchant.getId());
+            if (existingMerchant == null) {
+                throw new PaykeshoError("Merchant not found");
+            }
+
+            merchant.setCode(existingMerchant.getCode()); // Preserve the original code
+            merchant.setRegistrationDate(existingMerchant.getRegistrationDate()); // Preserve registration date
+
+            // If no new image is uploaded, keep the old image
+            if (multipartFile == null || multipartFile.isEmpty()) {
+                merchant.setRemoteFileId(existingMerchant.getRemoteFileId());
+                merchant.setPhotos(existingMerchant.getPhotos());
+                merchant.setPhotoPath(existingMerchant.getPhotoPath());
+            }
         }
 
-        FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.logo, 1, "logo photo for " + merchant.getEmail());
+        // Handle new image upload if provided
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            FileUploadResponse uploadResponse = fileUploadService.uploadFile(
+                    multipartFile, FileType.logo, 1, "logo photo for " + merchant.getEmail());
 
-        if (!uploadResponse.isStatus()) {
-            throw new PaykeshoError("File upload failed.");
+            if (!uploadResponse.isStatus()) {
+                throw new PaykeshoError("File upload failed.");
+            }
+
+            merchant.setRemoteFileId(uploadResponse.getFileId());
+            merchant.setPhotos(uploadResponse.getFilePath());
+            merchant.setPhotoPath(uploadResponse.getFilePath());
         }
-
-        merchant.setRemoteFileId(uploadResponse.getFileId());
-        merchant.setPhotos(uploadResponse.getFilePath());
-        merchant.setPhotoPath(uploadResponse.getFilePath());
 
         // Save the merchant
         merchantService.save(merchant);
 
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant Operation Successful: " + merchant.getEmail());
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE,
+                "Merchant Operation Successful: " + merchant.getEmail());
+
         return "redirect:/merchants";
     }
+
 
 
     @GetMapping("/view/{id}")

@@ -55,7 +55,7 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Type</label>
-                                                <select class="form-control" th:field="*{merchantType}">
+                                                <select class="form-control" th:field="*{merchantType}" required>
                                                     <option value="">Select...</option>
                                                     <th:block
                                                             th:each="ps : ${T(org.commons.enums.MerchantType).values()}">
@@ -112,7 +112,7 @@
                                                        class="form-control"
                                                        id="fileImage"
                                                        name="image"
-                                                       type="file">
+                                                       type="file" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-check m-0">

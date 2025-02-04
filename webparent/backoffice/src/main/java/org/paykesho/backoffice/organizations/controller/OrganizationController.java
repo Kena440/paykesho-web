@@ -50,6 +50,8 @@ public class OrganizationController {
         Organization organization = new Organization();
         List<State> stateList = settingService.listStatesByCountry("Zambia");
 
+        organization.setLongitude(28.3228F);
+        organization.setLatitude((float) -15.3875);
         organization.setEnabled(true);
 
         model.addAttribute("organization", organization);
@@ -59,25 +61,55 @@ public class OrganizationController {
     }
 
     @PostMapping("/save")
-    public String saveOrganization(Organization organization, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws PaykeshoError {
+    public String saveOrganization(
+            @ModelAttribute Organization organization,
+            RedirectAttributes redirectAttributes,
+            @RequestParam(value = "image", required = false) MultipartFile multipartFile
+    ) throws PaykeshoError {
 
-        if (organization.getId() == null || organization.getOrganizationType() == null) {
+        if (organization.getId() == null) { // New organization case
             organization.setRegistrationDate(new Date());
+        } else { // Editing an existing organization
+            Organization existingOrganization = organizationService.getOrganizationById(organization.getId());
+            if (existingOrganization == null) {
+                throw new PaykeshoError("Organization not found");
+            }
+
+            // Preserve existing values
+            organization.setRegistrationDate(existingOrganization.getRegistrationDate());
+            organization.setOrganizationType(existingOrganization.getOrganizationType());
+
+            // If no new image is uploaded, keep the old image
+            if (multipartFile == null || multipartFile.isEmpty()) {
+                organization.setRemoteFileId(existingOrganization.getRemoteFileId());
+                organization.setPhotos(existingOrganization.getPhotos());
+                organization.setPhotoPath(existingOrganization.getPhotoPath());
+            }
         }
 
-        FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.logo, 1, "logo photo for " + organization.getEmail());
+        // Handle new image upload if provided
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            FileUploadResponse uploadResponse = fileUploadService.uploadFile(
+                    multipartFile, FileType.logo, 1, "logo photo for " + organization.getEmail());
 
-        if (!uploadResponse.isStatus()) {
-            throw new PaykeshoError("File upload failed.");
+            if (!uploadResponse.isStatus()) {
+                throw new PaykeshoError("File upload failed.");
+            }
+
+            organization.setRemoteFileId(uploadResponse.getFileId());
+            organization.setPhotos(uploadResponse.getFilePath());
+            organization.setPhotoPath(uploadResponse.getFilePath());
         }
 
-        organization.setRemoteFileId(uploadResponse.getFileId());
-        organization.setPhotos(uploadResponse.getFilePath());
-        organization.setPhotoPath(uploadResponse.getFilePath());
+        // Save the organization
         organizationService.save(organization);
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization Operation Successful: " + organization.getEmail());
+
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE,
+                "Organization Operation Successful: " + organization.getEmail());
+
         return "redirect:/organizations";
     }
+
 
     @GetMapping("/view/{id}")
     public String viewOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
