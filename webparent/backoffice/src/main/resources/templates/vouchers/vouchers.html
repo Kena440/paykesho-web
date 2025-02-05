@@ -81,8 +81,10 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <th:block th:if="${voucher.approved == false and not #strings.equals(voucher.voucherStatus, 'REJECTED')}">
-                                                <a class="dropdown-item" href="#" th:if="${voucher.payslipPath != null}">
+                                            <th:block
+                                                    th:if="${voucher.approved == false and not #strings.equals(voucher.voucherStatus, 'REJECTED')}">
+                                                <a class="dropdown-item" href="#"
+                                                   th:if="${voucher.payslipPath != null}">
                                                     <div th:replace="fragments/fragments :: approve('voucher', '/vouchers/approve/' + ${voucher.id})"></div>
                                                 </a>
                                                 &nbsp;

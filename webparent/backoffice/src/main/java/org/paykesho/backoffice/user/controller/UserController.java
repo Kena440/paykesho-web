@@ -76,8 +76,8 @@ public class UserController {
                 }
 
                 // Preserve important fields during update
-               // user.setRegistrationDate(existingUser.getRegistrationDate());
-               // user.setRole(existingUser.getRole());
+                // user.setRegistrationDate(existingUser.getRegistrationDate());
+                // user.setRole(existingUser.getRole());
                 user.setPassword(existingUser.getPassword()); // Ensure password isn't reset unintentionally
             }
 

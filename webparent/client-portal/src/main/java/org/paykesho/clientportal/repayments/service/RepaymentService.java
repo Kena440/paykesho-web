@@ -10,8 +10,6 @@ import org.paykesho.clientportal.repayments.repository.RepaymentScheduleReposito
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,7 +27,7 @@ public class RepaymentService {
     }
 
     public List<PayrollDeduction> getPayrollDeductions(Client client) throws PaykeshoError {
-        if (client == null ) {
+        if (client == null) {
             throw new PaykeshoError("no client id");
         } else {
             return payrollDeductionRepository.findByClient(client);

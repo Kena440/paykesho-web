@@ -3,8 +3,6 @@ package org.paykesho.clientportal.repayments.controller;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.PayrollDeduction;
 import org.commons.entity.client.RepaymentSchedule;
-import org.commons.entity.organization.Organization;
-import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;

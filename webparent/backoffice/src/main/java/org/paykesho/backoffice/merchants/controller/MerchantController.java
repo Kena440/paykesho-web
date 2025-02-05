@@ -144,7 +144,6 @@ public class MerchantController {
     }
 
 
-
     @GetMapping("/view/{id}")
     public String viewMerchant(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
         if (id == null) {
