@@ -3,6 +3,7 @@ package org.paykesho.clientportal.repayments.service;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.PayrollDeduction;
 import org.commons.entity.client.RepaymentSchedule;
+import org.commons.enums.PaymentStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.repayments.repository.PayrollDeductionRepository;
@@ -33,4 +34,9 @@ public class RepaymentService {
             return payrollDeductionRepository.findByClient(client);
         }
     }
+
+    public List<RepaymentSchedule> findPendingRepayments(Integer clientId) {
+        return repaymentScheduleRepository.findByClientIdAndStatus(clientId, PaymentStatus.PENDING);
+    }
+
 }

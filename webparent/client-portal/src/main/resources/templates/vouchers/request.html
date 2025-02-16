@@ -53,6 +53,21 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                <div class="col-md-12">
+                                    <div th:if="${hasOutstandingDebt}" class="alert alert-danger" role="alert">
+                                        <div class="alert-icon">
+                                            <i class="far fa-fw fa-money-bill"></i>
+                                        </div>
+                                        <div class="alert-message">
+                                            <strong>Warning!</strong> You have outstanding payments. You cannot request a voucher until all dues are cleared.
+                                        </div>
+
+                                    </div>
+
+                                    <input type="hidden" th:value="${hasOutstandingDebt}" id="hasOutstandingDebt">
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <form enctype="multipart/form-data"
                                           method="post"
@@ -141,15 +156,15 @@
         const interestAmount = amount * interestRate;
         const totalRepayment = amount + interestAmount;
 
-        // Display calculated values
         document.getElementById('interestAmount').innerText = interestAmount.toFixed(2);
         document.getElementById('totalRepayment').innerText = totalRepayment.toFixed(2);
 
-        // Calculate repayment date (1 month from today)
-        const today = new Date();
-        const repaymentDate = new Date(today.setMonth(today.getMonth() + 1));
+        let today = new Date();
+        let repaymentDate = new Date(today);
+        repaymentDate.setMonth(repaymentDate.getMonth() + 1);
         document.getElementById('repaymentDate').innerText = repaymentDate.toISOString().split('T')[0];
     }
+
 </script>
 
 <script>
@@ -177,6 +192,18 @@
         }
     };
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let hasDebt = document.getElementById('hasOutstandingDebt');
 
+        // Ensure hasDebt element exists and check its value
+        if (hasDebt && hasDebt.value === "true") {
+            document.querySelectorAll("form input, form textarea, form button").forEach(el => {
+                el.disabled = true;
+            });
+        }
+    });
+
+</script>
 </body>
 </html>

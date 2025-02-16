@@ -2,6 +2,7 @@ package org.paykesho.clientportal.voucher.controller;
 
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
+import org.commons.entity.client.RepaymentSchedule;
 import org.commons.enums.FileType;
 import org.commons.enums.NotificationType;
 import org.commons.enums.VoucherStatus;
@@ -12,6 +13,7 @@ import org.paykesho.clientportal.events.enums.Constants;
 import org.paykesho.clientportal.files.dto.FileUploadResponse;
 import org.paykesho.clientportal.files.service.FileUploadService;
 import org.paykesho.clientportal.notifications.service.NotificationService;
+import org.paykesho.clientportal.repayments.service.RepaymentService;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
@@ -47,6 +50,8 @@ public class VoucherController {
     private NotificationService notificationService;
     @Autowired
     private FileUploadService fileUploadService;
+    @Autowired
+    private RepaymentService repaymentService;
 
     // Show list of client's vouchers
     @GetMapping("")
@@ -66,11 +71,21 @@ public class VoucherController {
 
     // Show form to request a new voucher
     @GetMapping("/request")
-    public String showClientVoucherRequestForm(Model model) {
+    public String showClientVoucherRequestForm(Model model, HttpServletRequest request) {
+        Client client = clientService.getAuthenticatedClient(request); // Fetch client by logged-in user
+        List<RepaymentSchedule> pendingRepayments = repaymentService.findPendingRepayments(client.getId());
+
+        boolean hasOutstandingDebt = pendingRepayments.stream()
+                .anyMatch(schedule -> schedule.getAmountDue().compareTo(schedule.getAmountPaid()) > 0);
+
+
         model.addAttribute("voucherRequest", new VoucherRequestDto());
         model.addAttribute("pageTitle", "Voucher Request");
+        model.addAttribute("hasOutstandingDebt", hasOutstandingDebt);
+
         return "vouchers/request";
     }
+
 
     @PostMapping("/save")
     public String saveSubmittedRequest(VoucherRequestDto voucherRequestDto, @AuthenticationPrincipal ClientUserDetails loggedInUser, RedirectAttributes redirectAttributes, @RequestParam("payslip") MultipartFile multipartFile) {
