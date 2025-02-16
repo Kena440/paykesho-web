@@ -67,8 +67,15 @@
                                                   th:replace="fragments/fragments :: format_number(${voucher.interestPercent})"></span>
                                         </td>
                                         <td>
-                                            <span class="font-weight-normal">[[${voucher.voucherStatus}]]</span>
+                                            <span class="font-weight-normal"
+                                                  style="color:
+                                                    [[${voucher.voucherStatus} == 'APPROVED' ? 'green' :
+                                                      (voucher.voucherStatus == 'REJECTED' ? 'red' :
+                                                       (voucher.voucherStatus == 'PENDING' ? 'orange' : 'black'))]];">
+                                                [[${voucher.voucherStatus}]]
+                                            </span>
                                         </td>
+
                                         <td><span class="font-weight-normal">[[${voucher.requestDate}]]</span></td>
                                         <td>
                                             <a class="dropdown-item text-primary fas fa-file-pdf"

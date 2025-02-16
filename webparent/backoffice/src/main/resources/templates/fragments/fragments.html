@@ -82,10 +82,8 @@
                     <i class="align-middle" data-lucide="landmark"></i> <span class="align-middle">Financials</span>
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="icons">
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-lucide.html'>Reports</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Projections</a>
-                    <li class="sidebar-item"><a class='sidebar-link' href='icons-font-awesome.html'>Configurations</a>
-                    </li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/}">Reports</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/}">Projections</a></li>
                 </ul>
             </li>
             <li class="sidebar-item">
@@ -96,7 +94,6 @@
                     <li class="sidebar-item"><a class='sidebar-link' th:href="@{/merchants}">Manage</a></li>
                     <li class="sidebar-item"><a class='sidebar-link' th:href="@{/settlements}">Settlements/Reconciliation</a>
                     </li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/}">Configurations</a></li>
 
                 </ul>
             </li>
@@ -107,8 +104,6 @@
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="organizations">
                     <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Reconciliation</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/organizations}">Configurations</a></li>
 
                 </ul>
             </li>
@@ -118,8 +113,6 @@
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="clients">
                     <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Repayments</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/clients}">Configurations</a></li>
 
                 </ul>
             </li>
@@ -129,8 +122,11 @@
                 </a>
                 <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="vouchers">
                     <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">Manage</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">Repayments</a></li>
-                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/vouchers}">Configurations</a></li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/repayments/schedules}">Repayment
+                        Schedules</a>
+                    </li>
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/repayments/payroll-deductions}">Deductions</a>
+                    </li>
 
                 </ul>
             </li>
