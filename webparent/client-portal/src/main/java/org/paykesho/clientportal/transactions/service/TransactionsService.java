@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.transactions.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.entity.client.Client;
 import org.commons.utils.PaykeshoError;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class TransactionsService {
 

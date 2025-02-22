@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.clients.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
@@ -25,6 +26,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 
+@Slf4j
 @Controller
 public class ForgotPasswordController {
 
@@ -125,9 +127,9 @@ public class ForgotPasswordController {
         boolean emailNotificationSent = notificationService.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
 
         if (emailNotificationSent) {
-            System.out.println("Notification sent successfully for " + toAddress);
+            log.info("Notification sent successfully for " + toAddress);
         } else {
-            System.err.println("Failed to send notification for " + toAddress);
+            log.error("Failed to send notification for " + toAddress);
         }
     }
 

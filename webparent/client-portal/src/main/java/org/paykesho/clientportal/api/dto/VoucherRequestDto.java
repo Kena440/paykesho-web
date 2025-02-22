@@ -9,5 +9,6 @@ import java.math.BigDecimal;
 public class VoucherRequestDto {
     private BigDecimal amount;
     private String reason;
+    private Integer repaymentCycle;
     private MultipartFile payslip;
 }

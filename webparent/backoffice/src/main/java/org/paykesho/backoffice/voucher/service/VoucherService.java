@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.voucher.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.utils.PaykeshoError;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 public class VoucherService {

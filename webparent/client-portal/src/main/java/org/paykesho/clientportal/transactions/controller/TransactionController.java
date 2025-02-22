@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.transactions.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequestMapping("/transactions")
 public class TransactionController {
@@ -147,17 +149,17 @@ public class TransactionController {
         // Send email notification
         boolean emailSent = notificationService.sendNotification(transaction.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
-            System.out.println("Email sent successfully to " + transaction.getClient().getEmail());
+            log.info("Email sent successfully to " + transaction.getClient().getEmail());
         } else {
-            System.err.println("Failed to send email to " + transaction.getClient().getEmail());
+            log.error("Failed to send email to " + transaction.getClient().getEmail());
         }
 
         // Send SMS notification
         boolean smsSent = notificationService.sendNotification(transaction.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
-            System.out.println("SMS sent successfully to " + transaction.getClient().getPhoneNumber());
+            log.info("SMS sent successfully to " + transaction.getClient().getPhoneNumber());
         } else {
-            System.err.println("Failed to send SMS to " + transaction.getClient().getPhoneNumber());
+            log.error("Failed to send SMS to " + transaction.getClient().getPhoneNumber());
         }
     }
 

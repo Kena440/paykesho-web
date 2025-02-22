@@ -1,5 +1,6 @@
 package org.paykesho.backoffice;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Role;
 import org.commons.entity.User;
 import org.commons.enums.GenderType;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(value = false)
@@ -52,13 +54,13 @@ public class UserRepositoryTest {
     //@Test
     public void listAllUsers() {
         Iterable<User> allUsers = userRepository.findAll();
-        allUsers.forEach(user -> System.out.println(user));
+        allUsers.forEach(user -> log.info(String.valueOf(user)));
     }
 
     //@Test
     public void getUserById() {
         User user = userRepository.findById(1).get();
-        System.out.println(user);
+        log.info(String.valueOf(user));
         assertThat(user).isNotNull();
     }
 

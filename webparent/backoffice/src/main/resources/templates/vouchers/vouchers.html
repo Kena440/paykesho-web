@@ -40,6 +40,7 @@
                                         <th>Client</th>
                                         <th>Amount</th>
                                         <th>Repayment Amount</th>
+                                        <th>Repayment Cycle (month)</th>
                                         <th>Interest (%)</th>
                                         <th>Status</th>
                                         <th>Date</th>
@@ -62,6 +63,9 @@
                                         </td>
                                         <td><span class="font-weight-normal"
                                                   th:replace="fragments/fragments :: format_currency(${voucher.repaymentAmount})"></span>
+                                        </td>
+                                        <td><span class="font-weight-normal"
+                                                  th:replace="fragments/fragments :: format_number(${voucher.repaymentCycle})"></span>
                                         </td>
                                         <td><span class="font-weight-normal text-center"
                                                   th:replace="fragments/fragments :: format_number(${voucher.interestPercent})"></span>

@@ -1,9 +1,9 @@
-package org.paykesho.backoffice.settlement.scheduler;
+package org.paykesho.paymentservice.settlement.scheduler;
 
 import org.commons.entity.merchant.Merchant;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.backoffice.merchants.repository.MerchantRepository;
-import org.paykesho.backoffice.settlement.service.SettlementService;
+import org.paykesho.paymentservice.merchants.repository.MerchantRepository;
+import org.paykesho.paymentservice.settlement.service.SettlementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

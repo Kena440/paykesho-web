@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.settlement.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.entity.merchant.Merchant;
 import org.commons.entity.merchant.MerchantMoneyAccountDetail;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 
+@Slf4j
 @Service
 public class SettlementService {
     @Autowired
@@ -99,7 +101,7 @@ public class SettlementService {
 
                 return response.contains("\"response_code\": \"100\"");
             } else {
-                System.out.println("Payment failed with response code: " + responseCode);
+                log.info("Payment failed with response code: " + responseCode);
                 return false;
             }
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package org.commons.entity.client;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.commons.entity.Voucher;
 import org.commons.enums.PaymentStatus;
 
 import javax.persistence.*;
@@ -18,6 +19,9 @@ public class RepaymentSchedule {
     private Integer id;
     @Column(name = "reference", length = 128, nullable = false, unique = true)
     private String reference;
+    @ManyToOne
+    @JoinColumn(name = "voucher_id")
+    private Voucher voucher;
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;

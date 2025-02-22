@@ -1,5 +1,6 @@
 package org.paykesho.organizationportal.client.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
 import org.commons.entity.organization.Organization;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class ClientService {

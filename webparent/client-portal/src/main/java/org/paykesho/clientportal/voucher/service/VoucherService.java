@@ -1,9 +1,9 @@
 package org.paykesho.clientportal.voucher.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.clientportal.api.dto.VoucherDto;
 import org.paykesho.clientportal.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @Service
 public class VoucherService {
 
@@ -52,27 +53,4 @@ public class VoucherService {
         return totalBalance;
     }
 
-    public Voucher getVoucherById(Integer id) {
-        return vouchersRepository.getVoucherById(id);
-    }
-
-    public List<VoucherDto> getClientVouchersFlat(Client client) throws PaykeshoError {
-        if (client == null) {
-            throw new PaykeshoError("no client id");
-        } else {
-            return vouchersRepository.getVouchersByClientFlat(client);
-        }
-    }
-
-   /* public List<VoucherDto> getClientVouchersByMerchantFlat(Client client, MerchantDto merchant) throws PaykeshoError {
-        if (client == null ) {
-            throw new PaykeshoError("no client id");
-        } else {
-            return vouchersRepository.getVouchersByClientAndMerchantFlat(client, merchant.getCode());
-        }
-    }*/
-
-    public Voucher getVoucherByCode(String voucherCode) {
-        return vouchersRepository.getVoucherByReference(voucherCode);
-    }
 }

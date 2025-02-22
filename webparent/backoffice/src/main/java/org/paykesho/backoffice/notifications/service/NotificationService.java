@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.notifications.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Notification;
 import org.commons.enums.NotificationType;
 import org.paykesho.backoffice.notifications.dto.NotificationRequest;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.transaction.Transactional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 public class NotificationService {

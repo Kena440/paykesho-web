@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.settings.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.State;
 import org.commons.entity.settings.Country;
 import org.commons.entity.settings.Currency;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class SettingService {
     @Autowired

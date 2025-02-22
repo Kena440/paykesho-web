@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.user.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Role;
 import org.commons.entity.User;
 import org.commons.utils.PaykeshoError;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @Transactional
 public class UserService {

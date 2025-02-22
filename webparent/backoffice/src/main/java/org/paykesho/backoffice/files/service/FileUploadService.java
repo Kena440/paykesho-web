@@ -2,6 +2,7 @@ package org.paykesho.backoffice.files.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.FileUpload;
 import org.commons.enums.FileType;
 import org.paykesho.backoffice.files.dto.FileAccessResponse;
@@ -25,7 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Slf4j
 @Service
 @Transactional
 public class FileUploadService {

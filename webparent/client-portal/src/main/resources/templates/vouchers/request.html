@@ -54,17 +54,18 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div th:if="${hasOutstandingDebt}" class="alert alert-danger" role="alert">
+                                    <div class="alert alert-danger" role="alert" th:if="${hasOutstandingDebt}">
                                         <div class="alert-icon">
                                             <i class="far fa-fw fa-money-bill"></i>
                                         </div>
                                         <div class="alert-message">
-                                            <strong>Warning!</strong> You have outstanding payments. You cannot request a voucher until all dues are cleared.
+                                            <strong>Warning!</strong> You have outstanding payments. You cannot request
+                                            a voucher until all dues are cleared.
                                         </div>
 
                                     </div>
 
-                                    <input type="hidden" th:value="${hasOutstandingDebt}" id="hasOutstandingDebt">
+                                    <input id="hasOutstandingDebt" th:value="${hasOutstandingDebt}" type="hidden">
                                 </div>
                             </div>
                             <div class="row">
@@ -87,6 +88,16 @@
                                                       placeholder="Reason" required rows="3"
                                                       th:field="*{reason}"></textarea>
                                         </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Repayment Period</label>
+                                            <select class="form-select" id="repaymentCycle" onchange="calculateRepaymentSchedule()"
+                                                    required th:field="*{repaymentCycle}">
+                                                <option value="1">1 Month</option>
+                                                <option value="2">2 Months</option>
+                                                <option value="3">3 Months</option>
+                                            </select>
+                                        </div>
+
                                         <div class="mb-3">
                                             <label class="form-label">Latest Payslip</label>
                                             <input accept=".pdf, image/png, image/jpeg"
@@ -127,13 +138,33 @@
                                                 <td><span id="totalRepayment">0</span></td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Repayment Date:</strong></td>
+                                                <td><strong>First Repayment Date:</strong></td>
                                                 <td><span id="repaymentDate">--</span></td>
                                             </tr>
                                             </tbody>
                                         </table>
                                     </div>
-
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center" colspan="3">Repayment Breakdown</th>
+                                            </tr>
+                                            <tr>
+                                                <th>Month</th>
+                                                <th>Repayment Amount</th>
+                                                <th>Due Date</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="repaymentScheduleBody">
+                                            <tr>
+                                                <td class="text-center" colspan="3">Enter an amount to see the repayment
+                                                    schedule.
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
 
@@ -152,6 +183,7 @@
 <script>
     function calculateVoucherDetails() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const repaymentCycle = parseInt(document.getElementById('repaymentCycle').value) || 1;
         const interestRate = 0.15;
         const interestAmount = amount * interestRate;
         const totalRepayment = amount + interestAmount;
@@ -161,7 +193,7 @@
 
         let today = new Date();
         let repaymentDate = new Date(today);
-        repaymentDate.setMonth(repaymentDate.getMonth() + 1);
+        repaymentDate.setMonth(repaymentDate.getMonth() + repaymentCycle);
         document.getElementById('repaymentDate').innerText = repaymentDate.toISOString().split('T')[0];
     }
 
@@ -204,6 +236,36 @@
         }
     });
 
+</script>
+<script>
+    function calculateRepaymentSchedule() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const repaymentCycle = parseInt(document.getElementById('repaymentCycle').value) || 1;
+        const interestRate = 0.15;
+        const totalRepayment = amount + (amount * interestRate);
+        const monthlyRepayment = totalRepayment / repaymentCycle;
+
+        const tbody = document.getElementById("repaymentScheduleBody");
+        tbody.innerHTML = ""; // Clear previous rows
+
+        let today = new Date();
+
+        for (let i = 1; i <= repaymentCycle; i++) {
+            let dueDate = new Date(today);
+            dueDate.setMonth(dueDate.getMonth() + i);
+
+            const row = `
+                <tr>
+                    <td>Month ${i}</td>
+                    <td>${monthlyRepayment.toFixed(2)}</td>
+                    <td>${dueDate.toISOString().split('T')[0]}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        }
+    }
+
+    document.getElementById('amount').addEventListener('input', calculateRepaymentSchedule);
 </script>
 </body>
 </html>

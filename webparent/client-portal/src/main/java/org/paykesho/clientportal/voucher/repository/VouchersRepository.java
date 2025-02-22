@@ -2,7 +2,6 @@ package org.paykesho.clientportal.voucher.repository;
 
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
-import org.paykesho.clientportal.api.dto.VoucherDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,9 +14,6 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
     @Query("select v from Voucher v where v.client = :client order by v.requestDate desc")
     public List<Voucher> getVouchersByClient(@Param("client") Client client);
 
-    @Query("select new org.paykesho.clientportal.api.dto.VoucherDto(v.reference, v.amount, v.availableAmount, v.repaymentAmount, v.interestPercent, v.repaymentCycle, v.repaymentDate, v.requestDate, v.approved) from Voucher v where v.client = :client")
-    public List<VoucherDto> getVouchersByClientFlat(@Param("client") Client client);
-
     @Query("select v from Voucher v where v.client = :client and v.approved = true and v.availableAmount > 0")
     public List<Voucher> getApprovedAndValidVouchers(@Param("client") Client client);
 
@@ -27,12 +23,7 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
     @Query("select v from Voucher v where v.id = ?1")
     Voucher getVoucherById(Integer id);
 
-    /*  @Query("select new org.paykesho.clientportal.api.dto.VoucherDto(v.reference, v.amount, v.availableAmount, v.repaymentAmount, v.interestPercent, v.repaymentCycle, v.repaymentDate, v.requestDate, v.approved) from Voucher v where v.client = :client and v.merchant.paykeshoId = :merchantCode")
-      List<VoucherDto> getVouchersByClientAndMerchantFlat(Client client, String merchantCode);
-  */
-    Voucher getVoucherByReference(String voucherCode);
-
-    @Query("SELECT COUNT(v) FROM Voucher v WHERE v.client.id = :clientId AND v.repaymentDate IS NOT NULL AND v.repaymentDate > CURRENT_DATE")
+    @Query("SELECT COUNT(v) FROM Voucher v WHERE v.client.id = :clientId AND v.firstRepaymentDate IS NOT NULL AND v.firstRepaymentDate > CURRENT_DATE")
     long countDelayedPayments(@Param("clientId") Integer clientId);
 
     // Custom query to get the outstanding balance for a client

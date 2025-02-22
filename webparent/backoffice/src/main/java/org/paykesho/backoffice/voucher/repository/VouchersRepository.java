@@ -33,7 +33,7 @@ public interface VouchersRepository extends SearchRepository<Voucher, Integer> {
     @Modifying
     void updateApprovedStatus(Integer id, boolean approved);
 
-    @Query("SELECT COUNT(v) FROM Voucher v WHERE v.client.id = :clientId AND v.repaymentDate IS NOT NULL AND v.repaymentDate > CURRENT_DATE")
+    @Query("SELECT COUNT(v) FROM Voucher v WHERE v.client.id = :clientId AND v.firstRepaymentDate IS NOT NULL AND v.firstRepaymentDate > CURRENT_DATE")
     long countDelayedPayments(@Param("clientId") Integer clientId);
 
     // Custom query to get the outstanding balance for a client

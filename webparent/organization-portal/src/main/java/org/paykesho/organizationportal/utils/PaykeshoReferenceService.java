@@ -1,5 +1,6 @@
 package org.paykesho.organizationportal.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.paykesho.organizationportal.client.repository.ClientRepository;
 import org.paykesho.organizationportal.repayments.repository.PayrollDeductionRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Locale;
 
+@Slf4j
 @Service
 public class PaykeshoReferenceService {
 

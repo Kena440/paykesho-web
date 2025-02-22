@@ -2,6 +2,7 @@ package org.commons.entity.merchant;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.commons.enums.PaymentMethod;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,6 +15,9 @@ public class MerchantMoneyAccountDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
+    private PaymentMethod paymentMethod;
     @OneToOne
     @JoinColumn(name = "merchant_id", nullable = false)
     private Merchant merchant;

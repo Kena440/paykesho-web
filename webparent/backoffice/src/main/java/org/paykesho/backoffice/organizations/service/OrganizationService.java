@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.organizations.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.organization.Organization;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @Transactional
 public class OrganizationService {

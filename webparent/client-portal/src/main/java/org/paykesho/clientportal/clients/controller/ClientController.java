@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.clients.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
@@ -36,6 +37,7 @@ import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/clients")
 public class ClientController {
@@ -186,17 +188,17 @@ public class ClientController {
         // Send email notification
         boolean emailSent = notificationService.sendNotification(client.getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
-            System.out.println("Email sent successfully to " + client.getEmail());
+            log.info("Email sent successfully to " + client.getEmail());
         } else {
-            System.err.println("Failed to send email to " + client.getEmail());
+            log.error("Failed to send email to " + client.getEmail());
         }
 
         // Send SMS notification
         boolean smsSent = notificationService.sendNotification(client.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
-            System.out.println("SMS sent successfully to " + client.getPhoneNumber());
+            log.info("SMS sent successfully to " + client.getPhoneNumber());
         } else {
-            System.err.println("Failed to send SMS to " + client.getPhoneNumber());
+            log.error("Failed to send SMS to " + client.getPhoneNumber());
         }
     }
 

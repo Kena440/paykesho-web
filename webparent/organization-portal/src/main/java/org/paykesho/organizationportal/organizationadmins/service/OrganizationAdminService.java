@@ -1,6 +1,7 @@
 package org.paykesho.organizationportal.organizationadmins.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Country;
@@ -18,6 +19,7 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class OrganizationAdminService {

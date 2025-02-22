@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.events.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.announcement.Announcement;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.events.repository.EventsRepository;
@@ -15,6 +16,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @Transactional
 public class EventsService {

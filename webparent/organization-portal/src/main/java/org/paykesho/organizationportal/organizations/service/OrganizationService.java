@@ -1,5 +1,6 @@
 package org.paykesho.organizationportal.organizations.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.utils.PaykeshoError;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @Transactional
 public class OrganizationService {

@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.client.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.CreditScore;
 import org.paykesho.backoffice.client.repository.ClientRepository;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 
+@Slf4j
 @Service
 public class CreditScoreService {
 
@@ -46,10 +48,10 @@ public class CreditScoreService {
                 score -= 50;
             }
         } catch (ArithmeticException e) {
-            System.err.println("Arithmetic error while calculating credit score: " + e.getMessage());
+            log.error("Arithmetic error while calculating credit score: " + e.getMessage());
             score -= 50;
         } catch (Exception e) {
-            System.err.println("Unexpected error while calculating credit score: " + e.getMessage());
+            log.error("Unexpected error while calculating credit score: " + e.getMessage());
             score -= 50;
         }
 

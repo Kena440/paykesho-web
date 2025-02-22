@@ -27,6 +27,11 @@ public enum PaymentStatus {
         public String defaultDescription() {
             return "PAID";
         }
+    }, FAILED {
+        @Override
+        public String defaultDescription() {
+            return "FAILED";
+        }
     };
 
     public abstract String defaultDescription();

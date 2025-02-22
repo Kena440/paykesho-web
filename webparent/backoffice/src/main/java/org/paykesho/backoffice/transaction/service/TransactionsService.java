@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.transaction.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 public class TransactionsService {

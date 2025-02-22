@@ -1,6 +1,7 @@
 package org.paykesho.clientportal.clients.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class ClientService {

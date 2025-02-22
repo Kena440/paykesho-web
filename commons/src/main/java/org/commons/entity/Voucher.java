@@ -22,24 +22,28 @@ public class Voucher {
     @OneToOne
     @JoinColumn(name = "client_id")
     private Client client;
-    @Column(name = "amount", length = 128, nullable = false, unique = false)
+    @Column(name = "amount", length = 128, nullable = false)
     private BigDecimal amount;
-    @Column(name = "available_amount", length = 128, nullable = false, unique = false)
+    @Column(name = "available_amount", length = 128, nullable = false)
     private BigDecimal availableAmount;
 
-    @Column(name = "repayment_amount", length = 128, nullable = true, unique = false)
+    @Column(name = "repayment_amount", length = 128)
     private BigDecimal repaymentAmount;
 
-    @Column(name = "interest_amount", length = 128, nullable = true, unique = false)
+    @Column(name = "interest_amount", length = 128)
     private float interestPercent;
 
-    @Column(name = "repayment_cyle", length = 128, nullable = true, unique = false)
-    private String repaymentCycle;
+    @Column(name = "repayment_cyle", length = 128)
+    private Integer repaymentCycle;
 
-    @Column(name = "repayment_date", length = 128, nullable = true, unique = false)
-    private Date repaymentDate;
+    @Column(name = "first_repayment_date", length = 128)
+    private Date firstRepaymentDate;
 
-    @Column(name = "request_date", length = 128, nullable = false, unique = false)
+    @Column(name = "last_repayment_date", length = 128)
+    private Date lastRepaymentDate;
+
+
+    @Column(name = "request_date", length = 128, nullable = false)
     private Date requestDate;
 
     @Column(name = "reason", length = 128, nullable = false)

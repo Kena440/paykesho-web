@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.repayments.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.PayrollDeduction;
 import org.commons.entity.client.RepaymentSchedule;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class RepaymentService {
 

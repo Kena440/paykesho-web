@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.merchants.repository.MerchantRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Locale;
 
+@Slf4j
 @Service
 public class PaykeshoReferenceService {
 

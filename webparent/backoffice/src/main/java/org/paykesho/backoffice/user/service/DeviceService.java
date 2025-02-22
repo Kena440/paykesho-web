@@ -1,10 +1,12 @@
 package org.paykesho.backoffice.user.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @Component

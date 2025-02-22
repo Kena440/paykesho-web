@@ -1,5 +1,6 @@
 package org.paykesho.merchantportal.transactions.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.entity.merchant.Merchant;
 import org.commons.utils.PaykeshoError;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class TransactionsService {
 

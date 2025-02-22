@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.organizationadmin.service;
 
+import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Country;
@@ -24,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class OrganizationAdminService {
@@ -128,17 +130,17 @@ public class OrganizationAdminService {
         // Send email notification
         boolean emailSent = notificationService.sendNotification(organizationAdmin.getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
-            System.out.println("Email sent successfully to " + organizationAdmin.getEmail());
+            log.info("Email sent successfully to " + organizationAdmin.getEmail());
         } else {
-            System.err.println("Failed to send email to " + organizationAdmin.getEmail());
+            log.error("Failed to send email to " + organizationAdmin.getEmail());
         }
 
         // Send SMS notification
         boolean smsSent = notificationService.sendNotification(organizationAdmin.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
-            System.out.println("SMS sent successfully to " + organizationAdmin.getPhoneNumber());
+            log.info("SMS sent successfully to " + organizationAdmin.getPhoneNumber());
         } else {
-            System.err.println("Failed to send SMS to " + organizationAdmin.getPhoneNumber());
+            log.error("Failed to send SMS to " + organizationAdmin.getPhoneNumber());
         }
     }
 

@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.merchantadmin.service;
 
+import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.settings.Country;
@@ -24,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class MerchantAdminService {
@@ -120,17 +122,17 @@ public class MerchantAdminService {
         // Send email notification
         boolean emailSent = notificationService.sendNotification(merchantAdmin.getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
-            System.out.println("Email sent successfully to " + merchantAdmin.getEmail());
+            log.info("Email sent successfully to {}", merchantAdmin.getEmail());
         } else {
-            System.err.println("Failed to send email to " + merchantAdmin.getEmail());
+            log.error("Failed to send email to {}", merchantAdmin.getEmail());
         }
 
         // Send SMS notification
         boolean smsSent = notificationService.sendNotification(merchantAdmin.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
-            System.out.println("SMS sent successfully to " + merchantAdmin.getPhoneNumber());
+            log.info("SMS sent successfully to {}", merchantAdmin.getPhoneNumber());
         } else {
-            System.err.println("Failed to send SMS to " + merchantAdmin.getPhoneNumber());
+            log.error("Failed to send SMS to {}", merchantAdmin.getPhoneNumber());
         }
     }
 

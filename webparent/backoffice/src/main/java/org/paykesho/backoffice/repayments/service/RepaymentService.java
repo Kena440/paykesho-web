@@ -1,9 +1,9 @@
 package org.paykesho.backoffice.repayments.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.PayrollDeduction;
 import org.commons.entity.client.RepaymentSchedule;
 import org.commons.enums.PaymentStatus;
-import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.backoffice.repayments.repository.PayrollDeductionRepository;
 import org.paykesho.backoffice.repayments.repository.RepaymentScheduleRepository;
@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 public class RepaymentService {
 
@@ -33,24 +33,21 @@ public class RepaymentService {
         return payrollDeductionRepository.findAll();
     }
 
-    public void createRepaymentSchedule(RepaymentScheduleRequest request) throws PaykeshoError {
-        BigDecimal amountDue = request.getAmountDue();
-        // Date dueDate = request.getDueDate();
-
+    public void createRepaymentSchedule(RepaymentScheduleRequest request) {
         RepaymentSchedule schedule = new RepaymentSchedule();
 
-        String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_RPS");
-        if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
-
-        //BigDecimal totals = vouchersService.getApprovedAndValidClientVouchers(request.getClient()).stream().map(Voucher::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        schedule.setReference(paykeshoRef);
+        // Set values from request
+        schedule.setReference(request.getReference());
         schedule.setClient(request.getClient());
+        schedule.setVoucher(request.getVoucher());
+        schedule.setDueDate(request.getDueDate());
         schedule.setAmountDue(request.getAmountDue());
+
+        // Default values
         schedule.setAmountPaid(BigDecimal.ZERO);
-        schedule.setDueDate(new Date());
         schedule.setStatus(PaymentStatus.PENDING);
 
         repaymentScheduleRepository.save(schedule);
     }
+
 }

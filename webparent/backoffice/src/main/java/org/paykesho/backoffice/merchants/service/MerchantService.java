@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.merchants.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.merchant.Merchant;
 import org.commons.enums.MerchantType;
 import org.commons.utils.PaykeshoError;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @Transactional
 public class MerchantService {

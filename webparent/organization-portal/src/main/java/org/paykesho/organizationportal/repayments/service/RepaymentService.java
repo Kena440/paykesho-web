@@ -1,5 +1,6 @@
 package org.paykesho.organizationportal.repayments.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.PayrollDeduction;
 import org.commons.entity.client.RepaymentSchedule;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 public class RepaymentService {
 

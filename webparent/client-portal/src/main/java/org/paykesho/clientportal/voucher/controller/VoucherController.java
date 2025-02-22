@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.voucher.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.RepaymentSchedule;
@@ -36,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Controller
 @RequestMapping("/vouchers")
 public class VoucherController {
@@ -109,8 +111,9 @@ public class VoucherController {
             voucher.setClient(client);
             voucher.setInterestPercent(15);
             voucher.setAmount(voucherRequestDto.getAmount());
+            voucher.setRepaymentCycle(voucherRequestDto.getRepaymentCycle());
             voucher.setAvailableAmount(voucherRequestDto.getAmount());
-            BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.CEILING);
+            BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.HALF_EVEN);
             voucher.setRepaymentAmount(totalRepaymentAmount);
             voucher.setRequestDate(new Date());
 
@@ -177,17 +180,17 @@ public class VoucherController {
         // Send email notification
         boolean emailSent = notificationService.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
-            System.out.println("Email sent successfully to " + voucher.getClient().getEmail());
+            log.info("Email sent successfully to {}", voucher.getClient().getEmail());
         } else {
-            System.err.println("Failed to send email to " + voucher.getClient().getEmail());
+            log.error("Failed to send email to {}", voucher.getClient().getEmail());
         }
 
         // Send SMS notification
         boolean smsSent = notificationService.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
-            System.out.println("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
+            log.info("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
         } else {
-            System.err.println("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
+            log.error("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
         }
     }
 

@@ -1,6 +1,8 @@
 package org.paykesho.backoffice.voucher.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Voucher;
+import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Setting;
 import org.commons.enums.NotificationType;
@@ -11,7 +13,7 @@ import org.paykesho.backoffice.notifications.service.NotificationService;
 import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.backoffice.repayments.service.RepaymentService;
 import org.paykesho.backoffice.settings.service.SettingService;
-import org.paykesho.backoffice.user.service.UserService;
+import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.paykesho.backoffice.voucher.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/vouchers")
 public class VoucherController {
@@ -40,7 +43,7 @@ public class VoucherController {
     @Autowired
     private VoucherService voucherService;
     @Autowired
-    private UserService userService;
+    private PaykeshoReferenceService paykeshoReferenceService;
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -93,37 +96,76 @@ public class VoucherController {
     }
 
     private Voucher runVoucherApprovalProcess(Integer voucherId, HttpServletRequest request) throws PaykeshoError {
+        // Retrieve and validate voucher
         Voucher voucher = getVoucherOrThrow(voucherId);
+
+        if (!isVoucherApprovable(voucher)) {
+            throw new PaykeshoError("Voucher cannot be approved in its current state.");
+        }
+
+        // Update and save voucher
         updateVoucherForApproval(voucher, request);
         Voucher approvedVoucher = voucherService.save(voucher);
 
+        // Post-approval processes
         updateClientBalance(approvedVoucher);
         runRepaymentScheduleProcess(approvedVoucher);
         sendNotification(approvedVoucher, "APPROVAL", null, null);
+
         return approvedVoucher;
     }
 
-    private void runRepaymentScheduleProcess(Voucher approvedVoucher) throws PaykeshoError {
-        RepaymentScheduleRequest scheduleRequest = new RepaymentScheduleRequest();
-        scheduleRequest.setClient(approvedVoucher.getClient());
-        scheduleRequest.setDueDate(new Date());
-        scheduleRequest.setAmountDue(approvedVoucher.getRepaymentAmount());
+    private boolean isVoucherApprovable(Voucher voucher) {
+        return voucher != null && voucher.getVoucherStatus() == VoucherStatus.PENDING;
+    }
 
-        repaymentService.createRepaymentSchedule(scheduleRequest);
+    private void runRepaymentScheduleProcess(Voucher approvedVoucher) throws PaykeshoError {
+        int repaymentCycle = approvedVoucher.getRepaymentCycle(); // Get the cycle (e.g., 3 months, 6 months)
+        BigDecimal totalAmount = approvedVoucher.getRepaymentAmount();
+        BigDecimal monthlyRepayment = totalAmount.divide(BigDecimal.valueOf(repaymentCycle), 2, RoundingMode.HALF_EVEN);
+
+        Date startDate = new Date(); // Assuming first repayment starts today
+
+        for (int i = 1; i <= repaymentCycle; i++) {
+            String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_RPS");
+            if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
+
+            RepaymentScheduleRequest scheduleRequest = new RepaymentScheduleRequest();
+            scheduleRequest.setReference(paykeshoRef);
+            scheduleRequest.setClient(approvedVoucher.getClient());
+            scheduleRequest.setVoucher(approvedVoucher);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(startDate);
+            calendar.add(Calendar.MONTH, i);
+            Date dueDate = calendar.getTime();
+
+            scheduleRequest.setDueDate(dueDate);
+            scheduleRequest.setAmountDue(monthlyRepayment);
+
+            repaymentService.createRepaymentSchedule(scheduleRequest);
+        }
     }
 
     private void updateClientBalance(Voucher approvedVoucher) {
-        ClientBalance balance = clientService.getClientBalance(approvedVoucher.getClient());
+        if (approvedVoucher == null || approvedVoucher.getAmount() == null) {
+            throw new IllegalArgumentException("Approved voucher or amount cannot be null.");
+        }
+
+        Client client = approvedVoucher.getClient();
+        ClientBalance balance = clientService.getClientBalance(client);
 
         if (balance == null) {
             balance = new ClientBalance();
-            balance.setClient(approvedVoucher.getClient());
+            balance.setClient(client);
             balance.setCurrentBalance(BigDecimal.ZERO);
             balance.setAvailableBalance(BigDecimal.ZERO);
         }
 
-        balance.setCurrentBalance(balance.getCurrentBalance().add(approvedVoucher.getAmount()));
-        balance.setAvailableBalance(balance.getAvailableBalance().add(approvedVoucher.getAmount()));
+        BigDecimal updatedBalance = balance.getCurrentBalance().add(approvedVoucher.getAmount());
+
+        balance.setCurrentBalance(updatedBalance);
+        balance.setAvailableBalance(updatedBalance);
         balance.setLastUpdate(new Date());
 
         clientService.saveClientBalance(balance);
@@ -155,24 +197,21 @@ public class VoucherController {
     }
 
     private void updateVoucherForApproval(Voucher voucher, HttpServletRequest request) {
-        //voucher.setInterestPercent(Float.parseFloat(request.getParameter("voucherInterestPercent")));
         voucher.setInterestPercent(15);
-        BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.CEILING);
+        BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.HALF_EVEN);
         voucher.setRepaymentAmount(totalRepaymentAmount);
         voucher.setApproved(true);
         voucher.setVoucherStatus(VoucherStatus.APPROVED);
     }
 
     private void updateVoucherForAdjustment(Voucher voucher, HttpServletRequest request) {
-        String repaymentCycle = request.getParameter("voucherRepaymentCycle");
-        Date repaymentDate = calculateRepaymentDate(repaymentCycle, voucher);
+        Integer repaymentCycle = Integer.valueOf(request.getParameter("voucherRepaymentCycle"));
         BigDecimal adjustedAmount = new BigDecimal(request.getParameter("voucherAdjustedAmount"));
-        BigDecimal totalRepaymentAmount = calculateTotalRepayment(request).setScale(2, RoundingMode.CEILING);
+        BigDecimal totalRepaymentAmount = calculateTotalRepayment(request).setScale(2, RoundingMode.HALF_EVEN);
 
         voucher.setRepaymentCycle(repaymentCycle);
         voucher.setAvailableAmount(adjustedAmount);
         voucher.setRepaymentAmount(totalRepaymentAmount);
-        voucher.setRepaymentDate(repaymentDate);
         voucher.setApproved(true);
         voucher.setVoucherStatus(VoucherStatus.APPROVED);
     }
@@ -184,17 +223,17 @@ public class VoucherController {
         boolean emailSent = notificationService.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
 
         if (emailSent) {
-            System.out.println("Email sent successfully to " + voucher.getClient().getEmail());
+            log.info("Email sent successfully to {}", voucher.getClient().getEmail());
         } else {
-            System.err.println("Failed to send email to " + voucher.getClient().getEmail());
+            log.error("Failed to send email to " + voucher.getClient().getEmail());
         }
 
         boolean smsSent = notificationService.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
 
         if (smsSent) {
-            System.out.println("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
+            log.info("SMS sent successfully to {}", voucher.getClient().getPhoneNumber());
         } else {
-            System.err.println("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
+            log.error("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
         }
     }
 
@@ -211,20 +250,11 @@ public class VoucherController {
         return adjustedAmount.add(interestAmount);
     }
 
-    private Date calculateRepaymentDate(String repaymentCycle, Voucher voucher) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(voucher.getRequestDate());
-        calendar.add(Calendar.MONTH, Integer.parseInt(repaymentCycle));
-        return calendar.getTime();
-    }
-
     private String generateEmailMessage(Voucher voucher, String actionType, BigDecimal voucherAmount, String message1) {
         StringBuilder message = new StringBuilder("<p>Greetings!</p>");
 
         String repaymentAmount = "K" + voucher.getRepaymentAmount();
-        //String repaymentDate = voucher.getRepaymentDate().toString();
         String repaymentDate = new Date().toString();
-        String voucherReference = voucher.getReference();
 
         switch (actionType) {
             case "APPROVAL":
@@ -250,16 +280,15 @@ public class VoucherController {
         String repaymentDate = new Date().toString();
         String voucherReference = voucher.getReference();
 
-        switch (actionType) {
-            case "APPROVAL":
-                return String.format("Voucher request approved. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Kesho.", repaymentAmount, repaymentDate, voucherReference);
-            case "REJECTION":
-                return String.format("Voucher request rejected for the following reason: %s. Reference: %s. Get lelo, Pay Kesho.", message, voucherReference);
-            case "ADJUSTMENT":
-                return String.format("Voucher request adjusted. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Kesho.", repaymentAmount, repaymentDate, voucherReference);
-            default:
-                return "Unknown action type.";
-        }
+        return switch (actionType) {
+            case "APPROVAL" ->
+                    String.format("Voucher request approved. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Kesho.", repaymentAmount, repaymentDate, voucherReference);
+            case "REJECTION" ->
+                    String.format("Voucher request rejected for the following reason: %s. Reference: %s. Get lelo, Pay Kesho.", message, voucherReference);
+            case "ADJUSTMENT" ->
+                    String.format("Voucher request adjusted. Repayment amount: %s, to be paid on %s. Reference: %s. Get lelo, Pay Kesho.", repaymentAmount, repaymentDate, voucherReference);
+            default -> "Unknown action type.";
+        };
     }
 
     private void loadCurrencySetting(HttpServletRequest request) {
