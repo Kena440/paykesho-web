@@ -1,0 +1,28 @@
+<!-- Modal Body -->
+<div class="modal-body">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Select</th>
+            <th>Reference</th>
+            <th>Client</th>
+            <th>Amount Due</th>
+            <th>Due Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="schedule : ${dueSchedules}">
+            <td>
+                <input type="checkbox" class="selectedSchedule" name="selectedSchedules" th:value="${schedule.id}" data-id="${schedule.id}">
+            </td>
+            <td th:text="${schedule.reference}"></td>
+            <td th:text="${schedule.client.name}"></td>
+            <td th:text="${schedule.amountDue}"></td>
+            <td th:text="${#dates.format(schedule.dueDate, 'yyyy-MM-dd')}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Hidden Field to Store Selected Schedule IDs -->
+<input type="hidden" name="selectedScheduleIds" id="selectedScheduleIds">

@@ -8,7 +8,6 @@ import org.commons.enums.PaymentStatus;
 import org.commons.enums.ProcessingStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.client.service.ClientService;
-import org.paykesho.organizationportal.repayments.dto.RepaymentRequest;
 import org.paykesho.organizationportal.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.organizationportal.repayments.repository.PayrollDeductionRepository;
 import org.paykesho.organizationportal.repayments.repository.RepaymentScheduleRepository;
@@ -18,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -57,37 +58,42 @@ public class RepaymentService {
         repaymentScheduleRepository.save(schedule);
     }
 
-    public void processRepayment(RepaymentRequest repaymentRequest) throws PaykeshoError {
-        RepaymentSchedule schedule = repaymentScheduleRepository.findDistinctFirstByClientIdOrderByIdDesc(repaymentRequest.getClient().getId());
+    public void processPayrollDeductions(List<RepaymentSchedule> dueSchedules) throws PaykeshoError {
+        for (RepaymentSchedule schedule : dueSchedules) {
+            if (schedule != null && schedule.getStatus() == PaymentStatus.PENDING) {
+                BigDecimal amountDue = schedule.getAmountDue();
+                BigDecimal amountPaid = schedule.getAmountPaid() != null ? schedule.getAmountPaid() : BigDecimal.ZERO;
+                BigDecimal repaymentAmount = schedule.getAmountDue();
 
-        if (schedule != null && schedule.getStatus() == PaymentStatus.PENDING) {
-            BigDecimal repaymentAmount = repaymentRequest.getAmount();
-            BigDecimal amountDue = schedule.getAmountDue();
-            BigDecimal amountPaid = schedule.getAmountPaid().add(repaymentAmount);
+                // Update amountPaid and check if the payment is complete
+                amountPaid = amountPaid.add(repaymentAmount);
 
-            if (amountPaid.compareTo(amountDue) >= 0) {
-                schedule.setAmountPaid(amountDue);
-                schedule.setStatus(PaymentStatus.COMPLETED);
-            } else {
-                schedule.setAmountPaid(amountPaid);
+                if (amountPaid.compareTo(amountDue) >= 0) {
+                    schedule.setAmountPaid(amountDue);
+                    schedule.setStatus(PaymentStatus.COMPLETED);
+                } else {
+                    schedule.setAmountPaid(amountPaid);
+                }
+
+                repaymentScheduleRepository.save(schedule);
+
+                // Create payroll deduction record
+                PayrollDeduction payrollDeduction = new PayrollDeduction();
+
+                String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_PRD");
+                if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
+
+                payrollDeduction.setReference(paykeshoRef);
+                payrollDeduction.setClient(schedule.getClient());
+                payrollDeduction.setAmountDeducted(repaymentAmount);
+                payrollDeduction.setPayrollDate(new Date());
+                payrollDeduction.setStatus(ProcessingStatus.COMPLETED);
+
+                payrollDeductionRepository.save(payrollDeduction);
             }
-
-            repaymentScheduleRepository.save(schedule);
-
-            PayrollDeduction payrollDeduction = new PayrollDeduction();
-
-            String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_PRD");
-            if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
-
-            payrollDeduction.setReference(paykeshoRef);
-            payrollDeduction.setClient(schedule.getClient());
-            payrollDeduction.setAmountDeducted(repaymentAmount);
-            payrollDeduction.setPayrollDate(new Date());
-            payrollDeduction.setStatus(ProcessingStatus.COMPLETED);
-
-            payrollDeductionRepository.save(payrollDeduction);
         }
     }
+
 
     public List<RepaymentSchedule> getRepaymentSchedule(Long clientId) {
         return repaymentScheduleRepository.findByClientId(clientId);
@@ -99,5 +105,13 @@ public class RepaymentService {
 
     public List<PayrollDeduction> getPayrollDeductions(Integer organizationId) {
         return payrollDeductionRepository.findByClientOrganizationId(organizationId);
+    }
+
+    public List<RepaymentSchedule> findByDueDateBetween(Integer organizationId, Date oneMonthAgo, Date today) {
+        return repaymentScheduleRepository.findByDueDateBetween(organizationId, oneMonthAgo, today);
+    }
+
+    public Date convertToDate(LocalDate localDate) {
+        return java.util.Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 }
