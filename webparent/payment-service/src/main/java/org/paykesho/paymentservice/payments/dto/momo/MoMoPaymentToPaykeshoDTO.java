@@ -3,15 +3,16 @@ package org.paykesho.paymentservice.payments.dto.momo;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.commons.dto.MoMoPaymentToPaykeshoRequest;
 import org.paykesho.paymentservice.utils.PaymentConfigProperties;
 
 @Data
-public class MoMoPaymentDTO {
+public class MoMoPaymentToPaykeshoDTO {
 
     private Auth auth;
     private Data data;
 
-    public MoMoPaymentDTO(PaymentConfigProperties paymentConfig, MoMoPaymentRequest request) {
+    public MoMoPaymentToPaykeshoDTO(PaymentConfigProperties paymentConfig, MoMoPaymentToPaykeshoRequest request) {
         this.auth = new Auth(paymentConfig);
         this.data = new Data(request);
     }
@@ -40,7 +41,7 @@ public class MoMoPaymentDTO {
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
     static class Data {
         @JsonProperty("method")
-        private String method = "runPayToEwallet";
+        private String method = "runBillPayment";
 
         @JsonProperty("reference_no")
         private String referenceNo;
@@ -48,13 +49,13 @@ public class MoMoPaymentDTO {
         @JsonProperty("amount")
         private String amount;
 
-        @JsonProperty("receiver_id")
-        private String receiverId;
+        @JsonProperty("sender_id")
+        private String senderId;
 
-        public Data(MoMoPaymentRequest request) {
+        public Data(MoMoPaymentToPaykeshoRequest request) {
             this.referenceNo = request.getReferenceNo();
             this.amount = request.getAmount();
-            this.receiverId = request.getReceiverId();
+            this.senderId = request.getSenderId();
         }
     }
 }

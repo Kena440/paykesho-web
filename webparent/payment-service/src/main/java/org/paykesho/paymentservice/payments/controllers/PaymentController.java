@@ -2,8 +2,12 @@ package org.paykesho.paymentservice.payments.controllers;
 
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentRequest;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentResponse;
-import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentRequest;
-import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentResponse;
+import org.commons.dto.CardPaymentInitialResponse;
+import org.commons.dto.CardPaymentRequest;
+import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantRequest;
+import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantResponse;
+import org.commons.dto.MoMoPaymentToPaykeshoRequest;
+import org.commons.dto.MoMoPaymentToPaykeshoResponse;
 import org.paykesho.paymentservice.payments.services.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,9 +30,21 @@ public class PaymentController {
         return ResponseEntity.ok(bankPaymentResponse);
     }
 
-    @PostMapping("/pay/momo")
-    public ResponseEntity<MoMoPaymentResponse> processPayment(@RequestBody MoMoPaymentRequest moMoPaymentRequest) {
-        MoMoPaymentResponse moMoPaymentResponse = paymentService.runMoMoPayment(moMoPaymentRequest);
-        return ResponseEntity.ok(moMoPaymentResponse);
+    @PostMapping("/pay/momo/to-merchant")
+    public ResponseEntity<MoMoPaymentToMerchantResponse> processPayment(@RequestBody MoMoPaymentToMerchantRequest moMoPaymentToMerchantRequest) {
+        MoMoPaymentToMerchantResponse moMoPaymentToMerchantResponse = paymentService.runMoMoPaymentToMerchant(moMoPaymentToMerchantRequest);
+        return ResponseEntity.ok(moMoPaymentToMerchantResponse);
+    }
+
+    @PostMapping("/pay/momo/to-paykesho")
+    public ResponseEntity<MoMoPaymentToPaykeshoResponse> processPayment(@RequestBody MoMoPaymentToPaykeshoRequest moMoPaymentToPaykeshoRequest) {
+        MoMoPaymentToPaykeshoResponse moMoPaymentToPaykeshoResponse = paymentService.runMoMoPaymentToPaykesho(moMoPaymentToPaykeshoRequest);
+        return ResponseEntity.ok(moMoPaymentToPaykeshoResponse);
+    }
+
+    @PostMapping("/pay/card")
+    public ResponseEntity<CardPaymentInitialResponse> processPayment(@RequestBody CardPaymentRequest moMoPaymentRequest) {
+        CardPaymentInitialResponse cardPaymentInitialResponse = paymentService.runCardPayment(moMoPaymentRequest);
+        return ResponseEntity.ok(cardPaymentInitialResponse);
     }
 }

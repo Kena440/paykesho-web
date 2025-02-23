@@ -3,15 +3,18 @@ package org.paykesho.paymentservice.payments.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.commons.dto.MoMoPaymentToPaykeshoRequest;
+import org.commons.dto.MoMoPaymentToPaykeshoResponse;
 import org.commons.entity.payments.Payment;
 import org.commons.enums.PaymentMethod;
 import org.commons.enums.PaymentStatus;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentDTO;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentRequest;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentResponse;
-import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentDTO;
-import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentRequest;
-import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentResponse;
+import org.paykesho.paymentservice.payments.dto.card.CardPaymentDTO;
+import org.commons.dto.CardPaymentInitialResponse;
+import org.commons.dto.CardPaymentRequest;
+import org.paykesho.paymentservice.payments.dto.momo.*;
 import org.paykesho.paymentservice.payments.repositories.PaymentRepository;
 import org.paykesho.paymentservice.utils.PaymentConfigProperties;
 import org.springframework.http.*;
@@ -57,27 +60,73 @@ public class PaymentService {
         }
     }
 
-    public MoMoPaymentResponse runMoMoPayment(MoMoPaymentRequest moMoPaymentRequest) {
+    public MoMoPaymentToMerchantResponse runMoMoPaymentToMerchant(MoMoPaymentToMerchantRequest moMoPaymentToMerchantRequest) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            moMoPaymentRequest.setReferenceNo(UUID.randomUUID().toString());
-            MoMoPaymentDTO moMoPaymentDTO = new MoMoPaymentDTO(paymentConfig, moMoPaymentRequest);
-            BigDecimal amount = new BigDecimal(moMoPaymentRequest.getAmount());
+            moMoPaymentToMerchantRequest.setReferenceNo(UUID.randomUUID().toString());
+            MoMoPaymentToMerchantDTO moMoPaymentToMerchantDTO = new MoMoPaymentToMerchantDTO(paymentConfig, moMoPaymentToMerchantRequest);
+            BigDecimal amount = new BigDecimal(moMoPaymentToMerchantRequest.getAmount());
 
-            String requestBody = objectMapper.writeValueAsString(moMoPaymentDTO);
+            String requestBody = objectMapper.writeValueAsString(moMoPaymentToMerchantDTO);
             HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<MoMoPaymentResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, MoMoPaymentResponse.class);
+            ResponseEntity<MoMoPaymentToMerchantResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, MoMoPaymentToMerchantResponse.class);
 
-            MoMoPaymentResponse moMoPaymentResponse = responseEntity.getBody();
-            handleMoMoPaymentResponse(moMoPaymentResponse, amount);
-            return moMoPaymentResponse;
+            MoMoPaymentToMerchantResponse moMoPaymentToMerchantResponse = responseEntity.getBody();
+            handleMoMoPaymentToMerchantResponse(moMoPaymentToMerchantResponse, amount);
+            return moMoPaymentToMerchantResponse;
 
         } catch (Exception e) {
             log.error("Error processing MoMo payment", e);
             throw new RuntimeException("MoMo payment processing failed", e);
+        }
+    }
+
+    public MoMoPaymentToPaykeshoResponse runMoMoPaymentToPaykesho(MoMoPaymentToPaykeshoRequest moMoPaymentToPaykeshoRequest) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            moMoPaymentToPaykeshoRequest.setReferenceNo(UUID.randomUUID().toString());
+            MoMoPaymentToPaykeshoDTO moMoPaymentToPaykeshoDTO = new MoMoPaymentToPaykeshoDTO(paymentConfig, moMoPaymentToPaykeshoRequest);
+            BigDecimal amount = new BigDecimal(moMoPaymentToPaykeshoRequest.getAmount());
+
+            String requestBody = objectMapper.writeValueAsString(moMoPaymentToPaykeshoDTO);
+            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<MoMoPaymentToPaykeshoResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, MoMoPaymentToPaykeshoResponse.class);
+
+            MoMoPaymentToPaykeshoResponse moMoPaymentToPaykeshoResponse = responseEntity.getBody();
+            handleMoMoPaymentToPaykeshoResponse(moMoPaymentToPaykeshoResponse, amount);
+            return moMoPaymentToPaykeshoResponse;
+
+        } catch (Exception e) {
+            log.error("Error processing MoMo payment", e);
+            throw new RuntimeException("MoMo payment processing failed", e);
+        }
+    }
+
+    public CardPaymentInitialResponse runCardPayment(CardPaymentRequest cardPaymentRequest) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            cardPaymentRequest.setReferenceNo(UUID.randomUUID().toString());
+            CardPaymentDTO cardPaymentDTO = new CardPaymentDTO(paymentConfig, cardPaymentRequest);
+            BigDecimal amount = new BigDecimal(cardPaymentRequest.getAmount());
+
+            String requestBody = objectMapper.writeValueAsString(cardPaymentDTO);
+            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<CardPaymentInitialResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, CardPaymentInitialResponse.class);
+
+            return responseEntity.getBody();
+
+        } catch (Exception e) {
+            log.error("Error processing card payment", e);
+            throw new RuntimeException("card payment processing failed", e);
         }
     }
 
@@ -103,24 +152,46 @@ public class PaymentService {
         }
     }
 
-    private void handleMoMoPaymentResponse(MoMoPaymentResponse moMoPaymentResponse, BigDecimal amount) {
-        if (moMoPaymentResponse == null || moMoPaymentResponse.getResponse().getResponseCode() == null) {
+    private void handleMoMoPaymentToMerchantResponse(MoMoPaymentToMerchantResponse moMoPaymentToMerchantResponse, BigDecimal amount) {
+        if (moMoPaymentToMerchantResponse == null || moMoPaymentToMerchantResponse.getResponse().getResponseCode() == null) {
             log.error("Invalid response from MoMo provider");
             throw new RuntimeException("Invalid response from MoMo provider");
         }
 
-        switch (moMoPaymentResponse.getResponse().getResponseCode()) {
+        switch (moMoPaymentToMerchantResponse.getResponse().getResponseCode()) {
             case "100":
-                saveSuccessfulMoMoPayment(moMoPaymentResponse, amount);
+                saveSuccessfulMoMoPaymentToMerchant(moMoPaymentToMerchantResponse, amount);
                 break;
             case "990":
-                logMoMoTransactionPending(moMoPaymentResponse);
+                logMoMoTransactionPendingToMerchant(moMoPaymentToMerchantResponse);
                 break;
             case "995":
-                saveFailedMoMoPayment(moMoPaymentResponse, "Transaction failed", amount);
+                saveFailedMoMoPaymentToMerchant(moMoPaymentToMerchantResponse, "Transaction failed", amount);
                 break;
             default:
-                saveFailedMoMoPayment(moMoPaymentResponse, "Unknown response code", amount);
+                saveFailedMoMoPaymentToMerchant(moMoPaymentToMerchantResponse, "Unknown response code", amount);
+                break;
+        }
+    }
+
+    private void handleMoMoPaymentToPaykeshoResponse(MoMoPaymentToPaykeshoResponse moMoPaymentToPaykeshoResponse, BigDecimal amount) {
+        if (moMoPaymentToPaykeshoResponse == null || moMoPaymentToPaykeshoResponse.getResponse().getResponseCode() == null) {
+            log.error("Invalid response from MoMo provider");
+            throw new RuntimeException("Invalid response from MoMo provider");
+        }
+
+        switch (moMoPaymentToPaykeshoResponse.getResponse().getResponseCode()) {
+            case "100":
+                saveSuccessfulMoMoPaymentToPaykesho(moMoPaymentToPaykeshoResponse, amount);
+                break;
+            case "990":
+                logMoMoTransactionPendingToPaykesho(moMoPaymentToPaykeshoResponse);
+                break;
+            case "995":
+                saveFailedMoMoPaymentToPaykesho(moMoPaymentToPaykeshoResponse, "Transaction failed", amount);
+                break;
+            default:
+                saveFailedMoMoPaymentToPaykesho(moMoPaymentToPaykeshoResponse, "Unknown response code", amount);
                 break;
         }
     }
@@ -153,7 +224,7 @@ public class PaymentService {
         log.error("Bank payment failed [{}]: {}", response.getReference_no(), reason);
     }
 
-    private void saveSuccessfulMoMoPayment(MoMoPaymentResponse response, BigDecimal amount) {
+    private void saveSuccessfulMoMoPaymentToMerchant(MoMoPaymentToMerchantResponse response, BigDecimal amount) {
         Payment payment = new Payment();
         payment.setPaymentReference(response.getResponse().getReferenceNo());
         payment.setPaymentStatus(PaymentStatus.COMPLETED);
@@ -167,7 +238,35 @@ public class PaymentService {
         log.info("MoMo payment successful: {}", response.getResponse().getReferenceNo());
     }
 
-    private void saveFailedMoMoPayment(MoMoPaymentResponse response, String reason, BigDecimal amount) {
+    private void saveSuccessfulMoMoPaymentToPaykesho(MoMoPaymentToPaykeshoResponse response, BigDecimal amount) {
+        Payment payment = new Payment();
+        payment.setPaymentReference(response.getResponse().getReferenceNo());
+        payment.setPaymentStatus(PaymentStatus.COMPLETED);
+        payment.setPaymentMethod(PaymentMethod.MOBILE_MONEY);
+        payment.setAmount(new BigDecimal(String.valueOf(amount)));
+        payment.setFinancialInstitution("Zynlepay");
+        payment.setAccountNumber(response.getResponse().getSenderId());
+        payment.setPaymentDate(new Date());
+
+        paymentRepository.save(payment);
+        log.info("MoMo payment successful: {}", response.getResponse().getReferenceNo());
+    }
+
+    private void saveFailedMoMoPaymentToMerchant(MoMoPaymentToMerchantResponse response, String reason, BigDecimal amount) {
+        Payment payment = new Payment();
+        payment.setPaymentReference(response.getResponse().getReferenceNo());
+        payment.setPaymentStatus(PaymentStatus.FAILED);
+        payment.setPaymentMethod(PaymentMethod.MOBILE_MONEY);
+        payment.setAmount(new BigDecimal(String.valueOf(amount)));
+        payment.setFinancialInstitution("Zynlepay");
+        payment.setAccountNumber(response.getResponse().getSenderId());
+        payment.setPaymentDate(new Date());
+
+        paymentRepository.save(payment);
+        log.error("MoMo payment failed [{}]: {}", response.getResponse().getReferenceNo(), reason);
+    }
+
+    private void saveFailedMoMoPaymentToPaykesho(MoMoPaymentToPaykeshoResponse response, String reason, BigDecimal amount) {
         Payment payment = new Payment();
         payment.setPaymentReference(response.getResponse().getReferenceNo());
         payment.setPaymentStatus(PaymentStatus.FAILED);
@@ -185,7 +284,11 @@ public class PaymentService {
         log.warn("Bank transaction pending: {}", response.getReference_no());
     }
 
-    private void logMoMoTransactionPending(MoMoPaymentResponse response) {
+    private void logMoMoTransactionPendingToMerchant(MoMoPaymentToMerchantResponse response) {
+        log.warn("MoMo transaction pending: {}", response.getResponse().getReferenceNo());
+    }
+
+    private void logMoMoTransactionPendingToPaykesho(MoMoPaymentToPaykeshoResponse response) {
         log.warn("MoMo transaction pending: {}", response.getResponse().getReferenceNo());
     }
 }

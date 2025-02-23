@@ -10,8 +10,8 @@ import org.commons.enums.SettlementStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentRequest;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentResponse;
-import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentRequest;
-import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentResponse;
+import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantRequest;
+import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantResponse;
 import org.paykesho.paymentservice.payments.services.PaymentService;
 import org.paykesho.paymentservice.settlement.repository.MerchantMoneyAccountDetailsRepository;
 import org.paykesho.paymentservice.settlement.repository.SettlementRepository;
@@ -91,12 +91,12 @@ public class SettlementService {
 
     private boolean processMoMoPayment(Merchant merchant, Settlement settlement, MerchantMoneyAccountDetail detail) {
         try {
-            MoMoPaymentRequest request = new MoMoPaymentRequest();
+            MoMoPaymentToMerchantRequest request = new MoMoPaymentToMerchantRequest();
             request.setReferenceNo(settlement.getReference());
             request.setAmount(settlement.getSettlementAmount().toString());
             request.setReceiverId(detail.getAccountNumber());
 
-            MoMoPaymentResponse response = paymentService.runMoMoPayment(request);
+            MoMoPaymentToMerchantResponse response = paymentService.runMoMoPaymentToMerchant(request);
             return isPaymentSuccessful(response != null ? response.getResponse().getResponseCode() : null);
         } catch (Exception e) {
             log.error("MoMo payment failed for merchant {}: {}", merchant.getId(), e.getMessage(), e);

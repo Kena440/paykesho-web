@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MoMoPaymentResponse {
+public class MoMoPaymentToMerchantResponse {
 
     @JsonProperty("response")
     private Response response;
