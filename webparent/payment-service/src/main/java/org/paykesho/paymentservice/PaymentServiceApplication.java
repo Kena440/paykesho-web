@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableAsync
 @EntityScan({"org.commons.entity", "org.paykesho.paymentservice"})
 public class PaymentServiceApplication {
     public static void main(String[] args) {

@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableAsync
 @EntityScan({"org.commons.entity", "org.paykesho.backoffice.user"})
 public class BackOfficeApplication {
     public static void main(String[] args) {

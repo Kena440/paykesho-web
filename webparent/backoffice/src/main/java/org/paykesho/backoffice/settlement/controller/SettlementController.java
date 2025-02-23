@@ -58,11 +58,11 @@ public class SettlementController {
 
     @GetMapping("/process-settlements")
     public String triggerSettlementProcessing() {
-        processSettlementAsync();
+        //processSettlementAsync();
         return "redirect:/settlements/process-settlements";
     }
 
-    @Async
+/*    @Async
     public void processSettlementAsync() {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(
@@ -74,7 +74,7 @@ public class SettlementController {
             log.error("Error processing settlements: {}", e.getMessage(), e);
         }
         CompletableFuture.completedFuture(null);
-    }
+    }*/
 
     private void loadCurrencySetting(HttpServletRequest request) {
         List<Setting> currencySettings = settingService.getCurrencySettings();
