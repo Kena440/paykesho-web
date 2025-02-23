@@ -31,9 +31,9 @@ import java.util.List;
 public class SettlementController {
 
 
-    private SettlementService settlementService;
-    private SettingService settingService;
-    private MerchantService merchantService;
+    private final SettlementService settlementService;
+    private final SettingService settingService;
+    private final MerchantService merchantService;
     private final RestTemplate restTemplate;
 
     @GetMapping("")
