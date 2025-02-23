@@ -6,10 +6,7 @@ import org.paykesho.paymentservice.payments.dto.bank.BankPaymentResponse;
 import org.paykesho.paymentservice.payments.services.PaymentService;
 import org.paykesho.paymentservice.settlement.scheduler.SettlementScheduler;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/rest/api/settlements")
@@ -20,7 +17,7 @@ public class SettlementsController {
         this.settlementScheduler = settlementScheduler;
     }
 
-    @PostMapping("/process-settlements")
+    @GetMapping("/process-settlements")
     public ResponseEntity<String> processSettlements() throws PaykeshoError {
         settlementScheduler.settleAllMerchants();
         return ResponseEntity.ok("done");
