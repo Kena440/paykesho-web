@@ -95,6 +95,7 @@
                                             <th:block
                                                     th:if="${voucher.approved == false and not #strings.equals(voucher.voucherStatus, 'REJECTED')}">
                                                 <a class="dropdown-item" href="#"
+                                                   th:data-approve-url="@{'/vouchers/approve/' + ${voucher.id}}"
                                                    th:if="${voucher.payslipPath != null}">
                                                     <div th:replace="fragments/fragments :: approve('voucher', '/vouchers/approve/' + ${voucher.id})"></div>
                                                 </a>
@@ -235,6 +236,29 @@
         });
     });
 
+</script>
+<script>
+    $(document).ready(function () {
+        // Event listener for approve button
+        $(document).on('click', '.approve-button', function (e) {
+            e.preventDefault();
+            var approveUrl = $(this).data('approve-url');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to approve this voucher?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, approve it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = approveUrl;
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>
