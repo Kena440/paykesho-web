@@ -216,29 +216,6 @@
             isFileValid = true; // Mark file as valid
         }
     }
-
-    document.querySelector('form').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent default submission initially
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to submit this form?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, submit it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                if (isFileValid) {
-                    event.target.submit(); // Ensure form submits only after confirmation
-                } else {
-                    Swal.fire('Error', 'Please upload a valid payslip file under 1MB.', 'error');
-                }
-            }
-        });
-    });
-
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -248,13 +225,6 @@
         if (hasDebt && hasDebt.value === "true") {
             document.querySelectorAll("form input, form textarea, form button").forEach(el => {
                 el.disabled = true;
-            });
-
-            Swal.fire({
-                title: 'Outstanding Debt',
-                text: 'You have outstanding payments. You cannot request a voucher until all dues are cleared.',
-                icon: 'warning',
-                confirmButtonText: 'OK'
             });
         }
     });
@@ -290,6 +260,5 @@
 
     document.getElementById('amount').addEventListener('input', calculateRepaymentSchedule);
 </script>
-
 </body>
 </html>
