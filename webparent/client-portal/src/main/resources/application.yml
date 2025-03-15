@@ -5,9 +5,9 @@ server:
 
 spring:
   datasource:
-    password: p@ssw0rd
+    password: fbxYJJJ1KwhQ7Bl$$$$$
     url: jdbc:mysql://127.0.0.1:3306/paykesho_db
-    username: root
+    username: mek
     hikari:
       minimum-idle: 10
       maximum-pool-size: 50
