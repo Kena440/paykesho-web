@@ -3,6 +3,7 @@ package org.paykesho.clientportal.transactions.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.entity.Voucher;
+import org.commons.entity.merchant.Merchant;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
 import org.commons.enums.NotificationType;
@@ -77,7 +78,12 @@ public class TransactionController {
     public ResponseEntity<?> saveSubmittedPayment(@AuthenticationPrincipal ClientUserDetails loggedInUser, @RequestBody Map<String, String> requestBody) {
 
         String merchantCode = requestBody.get("merchantCode");
-        BigDecimal amount = BigDecimal.valueOf(Long.parseLong(requestBody.get("amount")));
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(requestBody.get("amount"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format. Please enter a valid number."));
+        }
 
         try {
             Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
@@ -96,21 +102,24 @@ public class TransactionController {
             Transaction trx = runPaymentSubmission(client, merchant, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
-                return updateClientBalance(amount, client, availableBalance);
+                return updateClientBalance(amount, client, clientService.getClientBalance(client).getCurrentBalance());
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment failed. Please try again."));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment failed. Could not create transaction reference."));
             }
-        } catch (NumberFormatException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format."));
+        } catch (PaykeshoError e) {
+            log.error("Paykesho Error during payment submission: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment processing failed: " + e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "An error occurred while processing your payment."));
+            log.error("An unexpected error occurred during payment submission:", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "An unexpected error occurred while processing your payment."));
         }
     }
 
     private ResponseEntity<Map<String, Boolean>> updateClientBalance(BigDecimal amount, Client client, BigDecimal currentBalance) {
         ClientBalance clientBalance = clientService.getClientBalance(client);
-        clientBalance.setCurrentBalance(currentBalance.subtract(amount));
-        clientBalance.setAvailableBalance(currentBalance.subtract(amount));
+        BigDecimal newBalance = currentBalance.subtract(amount);
+        clientBalance.setCurrentBalance(newBalance);
+        clientBalance.setAvailableBalance(newBalance);
         clientService.saveClientBalance(clientBalance);
         return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
@@ -119,34 +128,44 @@ public class TransactionController {
 
         Transaction savedTxn = null;
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_TRX");
-        if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
-
-        BigDecimal availableBalance = voucherService.getApprovedAndValidClientVouchersBalance(client);
-        if (availableBalance == null || availableBalance.compareTo(amount) < 0) {
-            throw new PaykeshoError("error processing payment. payment amount is larger or insufficient balance.");
-        }
+        if (paykeshoRef == null) throw new PaykeshoError("Failed to generate transaction reference.");
 
         Transaction transaction = new Transaction();
         transaction.setClient(client);
-        transaction.setMerchant(merchantService.getMerchantByPaykeshoRef(merchantDto.getCode()));
+        Merchant merchant = merchantService.getMerchantByPaykeshoRef(merchantDto.getCode());
+        if (merchant == null) {
+             throw new PaykeshoError("Could not find merchant with the provided code.");
+        }
+        transaction.setMerchant(merchant);
         transaction.setAmount(amount);
         transaction.setReference(paykeshoRef);
         transaction.setNaration(paykeshoRef);
         transaction.setTxnDate(new Date());
         transaction.setSettled(false);
 
-        savedTxn = transactionsService.save(transaction);
+        try {
+            savedTxn = transactionsService.save(transaction);
+        } catch (Exception e) {
+            log.error("Error saving transaction:", e);
+            throw new PaykeshoError("Failed to save transaction: " + e.getMessage());
+        }
 
-        sendNotification(savedTxn);
+        if (savedTxn != null) {
+             sendNotification(savedTxn);
+        }
+
         return savedTxn;
     }
 
     private void sendNotification(Transaction transaction) {
-        // Generate messages
+        if (transaction == null || transaction.getClient() == null || transaction.getMerchant() == null) {
+            log.error("Cannot send notification: Transaction or related details are null.");
+            return;
+        }
+
         String emailMessage = generateEmailMessage(transaction, "PAYMENT");
         String smsMessage = generateSmsMessage(transaction, "PAYMENT");
 
-        // Send email notification
         boolean emailSent = notificationService.sendNotification(transaction.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
             log.info("Email sent successfully to " + transaction.getClient().getEmail());
@@ -154,7 +173,6 @@ public class TransactionController {
             log.error("Failed to send email to " + transaction.getClient().getEmail());
         }
 
-        // Send SMS notification
         boolean smsSent = notificationService.sendNotification(transaction.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
             log.info("SMS sent successfully to " + transaction.getClient().getPhoneNumber());
@@ -164,10 +182,15 @@ public class TransactionController {
     }
 
     private String generateEmailMessage(Transaction transaction, String actionType) {
+        if (transaction == null || transaction.getClient() == null || transaction.getMerchant() == null) {
+            log.error("Cannot generate email message: Transaction or related details are null.");
+            return "";
+        }
+
         StringBuilder message = new StringBuilder("<p>Dear ").append(transaction.getClient().getFullName()).append(",</p>");
 
         if ("PAYMENT".equals(actionType)) {
-            message.append("<p>Your payment request has been processed successfully. ").append("Transaction Amount: K").append(transaction.getAmount()).append("Merchant: ").append(transaction.getMerchant().getName()).append("Transaction Reference: ").append(transaction.getReference()).append(".</p>");
+            message.append("<p>Your payment request has been processed successfully. Transaction Amount: K").append(transaction.getAmount()).append(" Merchant: ").append(transaction.getMerchant().getName()).append(" Transaction Reference: ").append(transaction.getReference()).append(".</p>");
         } else {
             message.append("<p>Unknown action type.</p>");
         }
@@ -176,11 +199,16 @@ public class TransactionController {
         return message.toString();
     }
 
-    // Generate SMS content based on voucher action type
     private String generateSmsMessage(Transaction transaction, String actionType) {
+        if (transaction == null || transaction.getClient() == null || transaction.getMerchant() == null) {
+            log.error("Cannot generate SMS message: Transaction or related details are null.");
+            return "Unknown action type.";
+        }
+
         String txnAmount = "K" + transaction.getAmount();
         if ("PAYMENT".equals(actionType)) {
-            return String.format("Dear %s, your payment request processed successfully. Amount: %s. Merchant: %s. Reference: %s. Thank you. Get lelo, Pay Kesho.", transaction.getClient(), txnAmount, transaction.getMerchant().getName(), transaction.getReference());
+            String clientName = transaction.getClient().getFullName() != null ? transaction.getClient().getFullName() : "Client";
+            return String.format("Dear %s, your payment request processed successfully. Amount: %s. Merchant: %s. Reference: %s. Thank you. Get lelo, Pay Kesho.", clientName, txnAmount, transaction.getMerchant().getName(), transaction.getReference());
         }
         return "Unknown action type.";
     }

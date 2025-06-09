@@ -469,7 +469,37 @@
     </div>
 </div>
 
-<footer th:replace="fragments/fragments :: js_code"></footer>
+<!-- Toast Container -->
+<div th:replace="fragments/fragments :: toast_container"></div>
+
+<!-- Loader -->
+<div th:replace="fragments/fragments :: loader"></div>
+
+<!-- Help Modal -->
+<div th:replace="fragments/fragments :: help_modal"></div>
+
+<!-- Quick Amounts Dropdown -->
+<div th:replace="fragments/fragments :: quick_amounts"></div>
+
+<!-- Common JavaScript Functions -->
+<script th:replace="fragments/fragments :: common_js"></script>
+
+<script>
+    // Format currency values
+    document.querySelectorAll('.currency-value').forEach(element => {
+        const amount = parseFloat(element.textContent);
+        element.textContent = formatCurrency(amount);
+    });
+
+    // Initialize tooltips
+    initTooltips();
+
+    // Show welcome notification
+    document.addEventListener('DOMContentLoaded', function() {
+        showNotification('Welcome', 'Welcome to your merchant dashboard!', 'info');
+    });
+</script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Bar chart

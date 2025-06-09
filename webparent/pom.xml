@@ -25,6 +25,8 @@
         <module>organization-portal</module>
         <module>merchant-portal</module>
         <module>payment-service</module>
+        <module>notification-service</module>
+        <module>file-service</module>
     </modules>
 
     <dependencies>

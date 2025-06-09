@@ -18,7 +18,7 @@
                     </div>
 
                     <div class="col-auto ms-auto text-end mt-n1">
-
+                        <!-- Date Picker/Filter Dropdown -->
                         <div class="dropdown me-2 d-inline-block position-relative">
                             <a class="btn btn-light bg-white shadow-sm dropdown-toggle" data-bs-display="static"
                                data-bs-toggle="dropdown" href="#">
@@ -36,118 +36,151 @@
                         </div>
 
                         <button class="btn btn-primary shadow-sm">
-                            <i class="align-middle" data-lucide="filter">&nbsp;</i>
+                            <i class="align-middle" data-lucide="filter">&nbsp;</i> Filter
                         </button>
                         <button class="btn btn-primary shadow-sm">
-                            <i class="align-middle" data-lucide="refresh-cw">&nbsp;</i>
+                            <i class="align-middle" data-lucide="refresh-cw">&nbsp;</i> Refresh
                         </button>
                     </div>
                 </div>
+
+                <!-- Quick Actions Card (Mobile Friendly) -->
                 <div class="row">
-                    <div class="col-lg-6 col-xl-12 d-flex">
-                        <div class="w-100">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                    <a th:href="@{/vouchers/request}" class="btn btn-primary btn-lg">
+                                        <i class="align-middle me-2" data-lucide="credit-card"></i> Request Voucher
+                                    </a>
+                                    <a th:href="@{/transactions/initiate}" class="btn btn-success btn-lg">
+                                        <i class="align-middle me-2" data-lucide="dollar-sign"></i> Make Payment
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="row">
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card illustration flex-fill">
-                                        <div class="card-body p-0 d-flex flex-fill">
-                                            <div class="row g-0 w-100">
-                                                <div class="col-6">
-                                                    <div class="illustration-text p-3 m-1">
-                                                        <h4 class="illustration-text">[[${greeting}]]
-                                                            [[${client}]]!</h4>
-                                                        <p class="mb-0">Paykesho Dashboard</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6 align-self-end text-end">
-                                                    <img alt="Searching"
-                                                         class="img-fluid illustration-img"
-                                                         th:src="@{/assets/img/illustrations/searching.png}">
-                                                </div>
-                                            </div>
+                <div class="row">
+                    <!-- Illustration Card -->
+                    <div class="col-12 col-md-6 d-flex">
+                        <div class="card illustration flex-fill">
+                            <div class="card-body p-0 d-flex flex-fill">
+                                <div class="row g-0 w-100">
+                                    <div class="col-6">
+                                        <div class="illustration-text p-3 m-1">
+                                            <h4 class="illustration-text">[[${greeting}]]
+                                                [[${client}]]!</h4>
+                                            <p class="mb-0">Paykesho Dashboard</p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Balance</h5>
-                                                </div>
-
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="arrow-up-right"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:if="${availableBalance != null}">
-                                                <span class="font-weight-normal"
-                                                      th:replace="fragments/fragments :: format_currency(${availableBalance})"></span>
-                                            </span>
-                                            <!--   <div class="mb-0">
-                                                   <span class="badge badge-subtle-success me-2"> +3.65% </span>
-                                                   <span class="text-muted">Since last week</span>
-                                               </div>-->
-                                        </div>
+                                    <div class="col-6 align-self-end text-end">
+                                        <img alt="Searching"
+                                             class="img-fluid illustration-img"
+                                             th:src="@{/assets/img/illustrations/searching.png}">
                                     </div>
                                 </div>
                             </div>
-                            <div class="row d-lg-none d-xxl-flex">
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Credit Score</h5>
-                                                </div>
-
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="clock"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:if="${creditScore != null}">
-                                                <span class="font-weight-normal"
-                                                      th:replace="fragments/fragments :: format_number(${creditScore})"></span>
-                                            </span>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Transactions</h5>
-                                                </div>
-
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="users"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">17.212</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-danger me-2"> -1.25% </span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
+                    <!-- Balance Card -->
+                    <div class="col-12 col-md-6 d-flex">
+                        <div class="card flex-fill">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Balance</h5>
+                                    </div>
+
+                                    <div class="col-auto">
+                                        <div class="stat stat-sm">
+                                            <i class="align-middle" data-lucide="arrow-up-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="h1 d-inline-block mt-1 mb-4"
+                                      th:if="${availableBalance != null}">
+                                    <span class="font-weight-normal"
+                                          th:replace="fragments/fragments :: format_currency(${availableBalance})"></span>
+                                </span>
+                                <!--   <div class="mb-0">
+                                       <span class="badge badge-subtle-success me-2"> +3.65% </span>
+                                       <span class="text-muted">Since last week</span>
+                                   </div>-->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="row">
+                    <!-- Credit Score Card -->
+                     <div class="col-12 col-md-6 d-flex">
+                        <div class="card flex-fill">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Credit Score</h5>
+                                    </div>
+
+                                    <div class="col-auto">
+                                        <div class="stat stat-sm">
+                                            <i class="align-middle" data-lucide="clock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="h1 d-inline-block mt-1 mb-4"
+                                      th:if="${creditScore != null}">
+                                    <span class="font-weight-normal"
+                                          th:replace="fragments/fragments :: format_number(${creditScore})"></span>
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transactions Card (Placeholder/Example) -->
+                    <div class="col-12 col-md-6 d-flex">
+                        <div class="card flex-fill">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Transactions</h5>
+                                    </div>
+
+                                    <div class="col-auto">
+                                        <div class="stat stat-sm">
+                                            <i class="align-middle" data-lucide="users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="h1 d-inline-block mt-1 mb-4">Loading...</span>
+                                <div class="mb-0">
+                                    <span class="badge badge-subtle-secondary me-2"> Data Not Available </span>
+                                    <span class="text-muted">Placeholder</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Placeholder for Charts or other sections if needed -->
+                <div class="row">
+                     <div class="col-12 d-none">
+                         <div class="card">
+                             <div class="card-header">
+                                 <h5 class="card-title">Charts</h5>
+                             </div>
+                             <div class="card-body">
+                                 <p>Placeholder for charts or other dashboard elements.</p>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
 
             </div>
         </main>
@@ -157,6 +190,17 @@
 </div>
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
+
+<!-- Keep existing scripts if they are still needed for other functionality -->
+<!-- You may need to adjust these or remove if not used on this specific dashboard -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Example: Initialize any specific JS needed for this dashboard
+        // If Chart.js or jsVectorMap are not used here, these scripts can be removed.
+    });
+</script>
+<!-- Remove chart and map scripts if not used -->
+<!--
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Bar chart

@@ -12,6 +12,7 @@ import org.paykesho.paymentservice.payments.dto.bank.BankPaymentDTO;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentRequest;
 import org.paykesho.paymentservice.payments.dto.bank.BankPaymentResponse;
 import org.paykesho.paymentservice.payments.dto.card.CardPaymentDTO;
+import org.paykesho.paymentservice.payments.dto.card.CardPaymentCallBackResponse;
 import org.commons.dto.CardPaymentInitialResponse;
 import org.commons.dto.CardPaymentRequest;
 import org.paykesho.paymentservice.payments.dto.momo.*;
@@ -290,5 +291,59 @@ public class PaymentService {
 
     private void logMoMoTransactionPendingToPaykesho(MoMoPaymentToPaykeshoResponse response) {
         log.warn("MoMo transaction pending: {}", response.getResponse().getReferenceNo());
+    }
+
+    public void handleZynlePayCallback(CardPaymentCallBackResponse callbackResponse) {
+        if (callbackResponse == null || callbackResponse.getResponseCode() == null) {
+            log.error("Invalid callback response from ZynlePay");
+            throw new RuntimeException("Invalid callback response from ZynlePay");
+        }
+
+        switch (callbackResponse.getResponseCode()) {
+            case "100":
+                saveSuccessfulCardPayment(callbackResponse);
+                break;
+            case "990":
+                logCardTransactionPending(callbackResponse);
+                break;
+            case "995":
+                saveFailedCardPayment(callbackResponse, "Transaction failed");
+                break;
+            default:
+                saveFailedCardPayment(callbackResponse, "Unknown response code");
+                break;
+        }
+    }
+
+    private void saveSuccessfulCardPayment(CardPaymentCallBackResponse response) {
+        Payment payment = new Payment();
+        payment.setPaymentReference(response.getReferenceNo());
+        payment.setPaymentStatus(PaymentStatus.COMPLETED);
+        payment.setPaymentMethod(PaymentMethod.CARD);
+        payment.setAmount(new BigDecimal(response.getAmount()));
+        payment.setFinancialInstitution("Zynlepay");
+        payment.setAccountNumber(response.getOperatorReference());
+        payment.setPaymentDate(new Date());
+
+        paymentRepository.save(payment);
+        log.info("Card payment successful: {}", response.getReferenceNo());
+    }
+
+    private void saveFailedCardPayment(CardPaymentCallBackResponse response, String reason) {
+        Payment payment = new Payment();
+        payment.setPaymentReference(response.getReferenceNo());
+        payment.setPaymentStatus(PaymentStatus.FAILED);
+        payment.setPaymentMethod(PaymentMethod.CARD);
+        payment.setAmount(new BigDecimal(response.getAmount()));
+        payment.setFinancialInstitution("Zynlepay");
+        payment.setAccountNumber(response.getOperatorReference());
+        payment.setPaymentDate(new Date());
+
+        paymentRepository.save(payment);
+        log.error("Card payment failed [{}]: {}", response.getReferenceNo(), reason);
+    }
+
+    private void logCardTransactionPending(CardPaymentCallBackResponse response) {
+        log.warn("Card transaction pending: {}", response.getReferenceNo());
     }
 }

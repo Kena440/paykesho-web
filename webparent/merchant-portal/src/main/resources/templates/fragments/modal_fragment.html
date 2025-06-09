@@ -1,23 +1,74 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div class="modal fade text-center" id="modalDialog" th:fragment="modal_dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="modalTitle">Warning</h4>
-                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
 
+<div th:fragment="modal(id, title)" 
+     class="modal fade" 
+     :class="{ 'show': isOpen }"
+     :style="isOpen ? 'display: block;' : 'display: none;'"
+     x-data="{ isOpen: false }"
+     x-show="isOpen"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     th:id="${id}"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="modalTitle"
+     aria-hidden="true">
+    
+    <div class="modal-dialog modal-dialog-centered" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95">
+        
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="modalTitle" th:text="${title}">Modal Title</h5>
+                <button type="button" 
+                        class="btn-close" 
+                        @click="isOpen = false"
+                        aria-label="Close">
+                </button>
             </div>
+            
             <div class="modal-body">
-                <span id="modalBody">
-
-                </span>
+                <div th:replace="${content}">
+                    <!-- Modal content will be inserted here -->
+                </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Close</button>
+            
+            <div class="modal-footer border-top-0">
+                <button type="button" 
+                        class="btn btn-light" 
+                        @click="isOpen = false">
+                    Cancel
+                </button>
+                <button type="button" 
+                        class="btn btn-primary" 
+                        @click="submitForm">
+                    Save Changes
+                </button>
             </div>
         </div>
+    </div>
+    
+    <!-- Backdrop -->
+    <div class="modal-backdrop fade" 
+         :class="{ 'show': isOpen }"
+         x-show="isOpen"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-50"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-50"
+         x-transition:leave-end="opacity-0">
     </div>
 </div>
 
@@ -41,5 +92,32 @@
         </div>
     </div>
 </div>
+
+<script th:fragment="modal_scripts">
+    // Function to open modal
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.__x.$data.isOpen = true;
+        }
+    }
+    
+    // Function to close modal
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.__x.$data.isOpen = false;
+        }
+    }
+    
+    // Function to submit form in modal
+    function submitForm() {
+        const form = this.$el.querySelector('form');
+        if (form) {
+            form.submit();
+        }
+    }
+</script>
+
 </body>
 </html>

@@ -9,11 +9,9 @@ import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantRespon
 import org.commons.dto.MoMoPaymentToPaykeshoRequest;
 import org.commons.dto.MoMoPaymentToPaykeshoResponse;
 import org.paykesho.paymentservice.payments.services.PaymentService;
+import org.paykesho.paymentservice.payments.dto.card.CardPaymentCallBackResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/rest/api/payments")
@@ -46,5 +44,15 @@ public class PaymentController {
     public ResponseEntity<CardPaymentInitialResponse> processPayment(@RequestBody CardPaymentRequest moMoPaymentRequest) {
         CardPaymentInitialResponse cardPaymentInitialResponse = paymentService.runCardPayment(moMoPaymentRequest);
         return ResponseEntity.ok(cardPaymentInitialResponse);
+    }
+
+    @PostMapping("/callback/zynlepay")
+    public ResponseEntity<String> handleZynlePayCallback(@RequestBody CardPaymentCallBackResponse callbackResponse) {
+        try {
+            paymentService.handleZynlePayCallback(callbackResponse);
+            return ResponseEntity.ok("Callback processed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error processing callback: " + e.getMessage());
+        }
     }
 }
