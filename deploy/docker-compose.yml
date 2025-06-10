@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Paykesho@2024
+      MYSQL_DATABASE: paykesho
+      MYSQL_USER: paykesho_user
+      MYSQL_PASSWORD: Paykesho@2024
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - paykesho-network
+
+  backoffice:
+    build: ./backoffice
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
+      SPRING_DATASOURCE_USERNAME: paykesho_user
+      SPRING_DATASOURCE_PASSWORD: Paykesho@2024
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - paykesho-network
+
+  client-portal:
+    build: ./client-portal
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
+      SPRING_DATASOURCE_USERNAME: paykesho_user
+      SPRING_DATASOURCE_PASSWORD: Paykesho@2024
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+    networks:
+      - paykesho-network
+
+  merchant-portal:
+    build: ./merchant-portal
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
+      SPRING_DATASOURCE_USERNAME: paykesho_user
+      SPRING_DATASOURCE_PASSWORD: Paykesho@2024
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+    networks:
+      - paykesho-network
+
+  organization-portal:
+    build: ./organization-portal
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
+      SPRING_DATASOURCE_USERNAME: paykesho_user
+      SPRING_DATASOURCE_PASSWORD: Paykesho@2024
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+    networks:
+      - paykesho-network
+
+  payment-service:
+    build: ./payment-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
+      SPRING_DATASOURCE_USERNAME: paykesho_user
+      SPRING_DATASOURCE_PASSWORD: Paykesho@2024
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mysql
+    networks:
+      - paykesho-network
+
+  notification-service:
+    build: ./notification-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
+      SPRING_DATASOURCE_USERNAME: paykesho_user
+      SPRING_DATASOURCE_PASSWORD: Paykesho@2024
+    ports:
+      - "8085:8085"
+    depends_on:
+      - mysql
+    networks:
+      - paykesho-network
+
+  file-service:
+    build: ./file-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
+      SPRING_DATASOURCE_USERNAME: paykesho_user
+      SPRING_DATASOURCE_PASSWORD: Paykesho@2024
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mysql
+    networks:
+      - paykesho-network
+
+networks:
+  paykesho-network:
+    driver: bridge
+
+volumes:
+  mysql_data: 
