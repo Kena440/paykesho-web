@@ -35,8 +35,8 @@ public class OrganizationAdminService {
     private final OrganizationAdminRepository organizationAdminRepository;
     private final CountryRepository countryRepository;
     private final SettingService settingService;
-    PasswordEncoder passwordEncoder;
-    NotificationClient notificationClient;
+    private final PasswordEncoder passwordEncoder;
+    private final NotificationClient notificationClient;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, organizationAdminRepository);

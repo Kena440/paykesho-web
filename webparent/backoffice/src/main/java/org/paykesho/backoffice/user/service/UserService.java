@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.user.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Role;
 import org.commons.entity.User;
@@ -22,19 +23,16 @@ import java.util.NoSuchElementException;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService {
 
     public static final int USERS_PER_PAGE = 10;
     public static final int MAX_FAILED_ATTEMPTS = 3;
     private static final long LOCK_TIME_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private FileUploadService fileUploadService;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final FileUploadService fileUploadService;
 
     /**
      * +

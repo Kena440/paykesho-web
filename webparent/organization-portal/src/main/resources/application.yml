@@ -5,9 +5,9 @@ server:
 
 spring:
   datasource:
-    password: root
+    password: p@ssw0rd
     url: jdbc:mysql://127.0.0.1:3306/paykesho_db
-    username: p@ssw0rd
+    username: root
     hikari:
       minimum-idle: 10                          # Increased minimum idle connections
       maximum-pool-size: 50                     # Increased maximum pool size

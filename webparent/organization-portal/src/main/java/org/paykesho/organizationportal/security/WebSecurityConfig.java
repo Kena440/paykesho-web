@@ -1,10 +1,12 @@
 package org.paykesho.organizationportal.security;
 
+import lombok.RequiredArgsConstructor;
 import org.paykesho.organizationportal.security.oauth.OAuth2LoginSuccessHandler;
 import org.paykesho.organizationportal.security.oauth.OrganizationAdminOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -17,16 +19,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private OrganizationAdminOAuth2UserService oAuth2UserService;
-    @Autowired
-    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    @Autowired
-    private DatabaseLoginSuccessHandler databaseLoginSuccessHandler;
-    @Autowired
-    private CustomLoginFailureHandler loginFailureHandler;
+
+    private final OrganizationAdminOAuth2UserService oAuth2UserService;
+
+    private final @Lazy OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    private final DatabaseLoginSuccessHandler databaseLoginSuccessHandler;
+
+    private final CustomLoginFailureHandler loginFailureHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {

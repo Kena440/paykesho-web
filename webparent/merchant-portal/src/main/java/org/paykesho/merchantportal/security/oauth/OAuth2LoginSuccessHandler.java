@@ -1,9 +1,11 @@
 package org.paykesho.merchantportal.security.oauth;
 
+import lombok.RequiredArgsConstructor;
 import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.enums.AuthenticationType;
 import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -13,11 +15,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@RequiredArgsConstructor
 @Component
 public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     @Autowired
-    private MerchantAdminService MerchantAdminService;
+    @Lazy
+    private MerchantAdminService merchantAdminService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -31,13 +35,13 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         AuthenticationType authenticationType = getAuthenticationType(clientName);
 
-        MerchantAdmin assessor = MerchantAdminService.getMerchantAdminByEmail(email);
+        MerchantAdmin assessor = merchantAdminService.getMerchantAdminByEmail(email);
 
         if (assessor == null) {
-            MerchantAdminService.addNewMerchantAdminUponOAuthLogin(name, email, countryCode, authenticationType);
+            merchantAdminService.addNewMerchantAdminUponOAuthLogin(name, email, countryCode, authenticationType);
         } else {
             oAuth2User.setFullName(assessor.getFullName());
-            MerchantAdminService.updateAuthenticationType(assessor, authenticationType);
+            merchantAdminService.updateAuthenticationType(assessor, authenticationType);
         }
 
         super.onAuthenticationSuccess(request, response, authentication);

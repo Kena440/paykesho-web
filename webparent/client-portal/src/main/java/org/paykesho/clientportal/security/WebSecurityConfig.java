@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.security;
 
+import lombok.RequiredArgsConstructor;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2UserService;
 import org.paykesho.clientportal.security.oauth.OAuth2LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private ClientOAuth2UserService oAuth2UserService;
-    @Autowired
-    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    @Autowired
-    private DatabaseLoginSuccessHandler databaseLoginSuccessHandler;
-    @Autowired
-    private CustomLoginFailureHandler loginFailureHandler;
+    private final ClientOAuth2UserService oAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final DatabaseLoginSuccessHandler databaseLoginSuccessHandler;
+    private final CustomLoginFailureHandler loginFailureHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
