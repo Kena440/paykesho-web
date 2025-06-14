@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light" data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left"
-      data-sidebar-theme="dark"
+<html data-bs-theme="light" data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en"
       xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="fragments/fragments :: page_head('Repayments','none')"></head>
@@ -75,13 +75,13 @@
 
 <!-- Payroll Deduction Modal -->
 <!-- Payroll Deduction Modal -->
-<div class="modal modal-lg fade" id="modal-add-payroll-deduction-record" tabindex="-1" aria-hidden="true"
-     aria-labelledby="modal-add-payroll-deduction-record">
+<div aria-hidden="true" aria-labelledby="modal-add-payroll-deduction-record" class="modal modal-lg fade" id="modal-add-payroll-deduction-record"
+     tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h6 class="modal-title">Repayment Schedules (Due)</h6>
-                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <!-- Modal Body -->
@@ -102,8 +102,8 @@
                             <tr>
                                 <th>
                                     <div class="form-check mb-3">
-                                        <span><input type="checkbox" class="form-check-input" id="selectAllSchedules"
-                                                     checked readonly> &nbsp;Select All</span>
+                                        <span><input checked class="form-check-input" id="selectAllSchedules"
+                                                     readonly type="checkbox"> &nbsp;Select All</span>
                                     </div>
                                 </th>
                                 <th>Reference</th>
@@ -115,8 +115,8 @@
                             <tbody>
                             <tr th:each="schedule : ${dueSchedules}">
                                 <td>
-                                    <input type="checkbox" class="selectedSchedule" name="selectedSchedules" checked
-                                           readonly th:value="${schedule.id}" data-id="${schedule.id}">
+                                    <input checked class="selectedSchedule" data-id="${schedule.id}" name="selectedSchedules"
+                                           readonly th:value="${schedule.id}" type="checkbox">
                                 </td>
                                 <td th:text="${schedule.reference}"></td>
                                 <td th:text="${schedule.client.name}"></td>
@@ -136,30 +136,30 @@
                         </div>
 
                         <!-- Hidden Field to Store Selected Schedule IDs -->
-                        <input type="hidden" name="selectedScheduleIds" id="selectedScheduleIds">
+                        <input id="selectedScheduleIds" name="selectedScheduleIds" type="hidden">
 
                         <!-- Hidden Field to Store Selected Payment Method -->
-                        <input type="hidden" name="paymentMethod" id="paymentMethod">
+                        <input id="paymentMethod" name="paymentMethod" type="hidden">
 
                         <!-- Payment Method Buttons -->
                         <div class="mt-4">
                             <h6 class="text-center">Select Payment Method</h6>
                             <div class="d-flex justify-content-between">
-                                <button type="button" id="cashButton"
-                                        class="btn btn-lg btn-outline-primary w-100 m-1 payment-method-btn"
-                                        onclick="selectPaymentMethod('Cash')">Cash
+                                <button class="btn btn-lg btn-outline-primary w-100 m-1 payment-method-btn" id="cashButton"
+                                        onclick="selectPaymentMethod('Cash')"
+                                        type="button">Cash
                                 </button>
-                                <button type="button" id="mobileMoneyButton"
-                                        class="btn btn-lg btn-outline-success w-100 m-1 payment-method-btn"
-                                        onclick="selectPaymentMethod('Mobile Money')">Mobile Money
+                                <button class="btn btn-lg btn-outline-success w-100 m-1 payment-method-btn" id="mobileMoneyButton"
+                                        onclick="selectPaymentMethod('Mobile Money')"
+                                        type="button">Mobile Money
                                 </button>
-                                <button type="button" id="cardButton"
-                                        class="btn btn-lg btn-outline-danger w-100 m-1 payment-method-btn"
-                                        onclick="selectPaymentMethod('Card')">Card
+                                <button class="btn btn-lg btn-outline-danger w-100 m-1 payment-method-btn" id="cardButton"
+                                        onclick="selectPaymentMethod('Card')"
+                                        type="button">Card
                                 </button>
-                                <button type="button" id="bankTransferButton"
-                                        class="btn btn-lg btn-outline-info w-100 m-1 payment-method-btn"
-                                        onclick="selectPaymentMethod('Bank Transfer')">Bank Transfer
+                                <button class="btn btn-lg btn-outline-info w-100 m-1 payment-method-btn" id="bankTransferButton"
+                                        onclick="selectPaymentMethod('Bank Transfer')"
+                                        type="button">Bank Transfer
                                 </button>
                             </div>
                         </div>

@@ -13,18 +13,19 @@
             <div class="container-fluid p-0">
                 <!-- Toast Container for Notifications -->
                 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;">
-                    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div aria-atomic="true" aria-live="assertive" class="toast" id="notificationToast" role="alert">
                         <div class="toast-header">
                             <i class="align-middle me-2" data-lucide="info"></i>
                             <strong class="me-auto" id="toastTitle">Notification</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="toast" type="button"></button>
                         </div>
                         <div class="toast-body" id="toastMessage"></div>
                     </div>
                 </div>
 
                 <!-- Loader with Overlay -->
-                <div id="loader" class="position-fixed top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center" 
+                <div class="position-fixed top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center"
+                     id="loader"
                      style="background: rgba(0,0,0,0.5); z-index: 1050;">
                     <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
                         <span class="visually-hidden">Loading...</span>
@@ -55,17 +56,22 @@
                                     <h6 class="card-subtitle text-muted">Make a quick payment.</h6>
                                 </div>
                                 <div class="dropdown">
-                                    <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button aria-expanded="false" class="btn btn-link text-muted" data-bs-toggle="dropdown"
+                                            type="button">
                                         <i class="align-middle" data-lucide="help-circle"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><h6 class="dropdown-header">How to make a payment</h6></li>
-                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
+                                        <li><a class="dropdown-item" data-bs-target="#helpModal" data-bs-toggle="modal"
+                                               href="#">
                                             <i class="align-middle me-2" data-lucide="info"></i>
                                             View Instructions
                                         </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#faqModal">
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" data-bs-target="#faqModal" data-bs-toggle="modal"
+                                               href="#">
                                             <i class="align-middle me-2" data-lucide="help-circle"></i>
                                             FAQ
                                         </a></li>
@@ -73,20 +79,20 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form id="paymentForm" class="needs-validation" novalidate>
+                                <form class="needs-validation" id="paymentForm" novalidate>
                                     <div class="row g-3">
                                         <div class="col-12">
                                             <div class="form-floating">
-                                                <input class="form-control" id="merchantCode"
-                                                       placeholder="Enter Merchant Code"
-                                                       required type="text"
-                                                       autocomplete="off"
-                                                       pattern="[A-Za-z0-9]+"
-                                                       title="Please enter a valid merchant code">
+                                                <input autocomplete="off" class="form-control"
+                                                       id="merchantCode"
+                                                       pattern="[A-Za-z0-9]+" placeholder="Enter Merchant Code"
+                                                       required
+                                                       title="Please enter a valid merchant code"
+                                                       type="text">
                                                 <label for="merchantCode">
                                                     Merchant Code
-                                                    <i class="align-middle ms-1" data-lucide="info" 
-                                                       data-bs-toggle="tooltip" 
+                                                    <i class="align-middle ms-1" data-bs-toggle="tooltip"
+                                                       data-lucide="info"
                                                        title="Enter the merchant code or scan their QR code"></i>
                                                 </label>
                                                 <div class="invalid-feedback">
@@ -94,24 +100,27 @@
                                                 </div>
                                             </div>
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-                                                <button class="btn btn-outline-primary" type="button" id="scanQrButton">
+                                                <button class="btn btn-outline-primary" id="scanQrButton" type="button">
                                                     <i class="align-middle" data-lucide="qr-code"></i> Scan QR Code
                                                 </button>
                                             </div>
                                         </div>
 
                                         <div class="col-12">
-                                            <div id="qrScannerContainer" class="card card-body bg-light" style="display: none;">
+                                            <div class="card card-body bg-light" id="qrScannerContainer"
+                                                 style="display: none;">
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                                     <h6 class="mb-0">QR Code Scanner</h6>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id="torchToggle">
+                                                        <input class="form-check-input" id="torchToggle"
+                                                               type="checkbox">
                                                         <label class="form-check-label" for="torchToggle">Torch</label>
                                                     </div>
                                                 </div>
-                                                <div id="reader" class="w-100"></div>
+                                                <div class="w-100" id="reader"></div>
                                                 <div class="text-center mt-2">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" id="stopScanButton">
+                                                    <button class="btn btn-sm btn-outline-danger" id="stopScanButton"
+                                                            type="button">
                                                         <i class="align-middle" data-lucide="x"></i> Stop Scanning
                                                     </button>
                                                 </div>
@@ -138,7 +147,8 @@
 
                                                     <hr>
 
-                                                    <div class="form-floating mb-3" id="amountSection" style="display: none;">
+                                                    <div class="form-floating mb-3" id="amountSection"
+                                                         style="display: none;">
                                                         <input class="form-control" id="amount"
                                                                min="20"
                                                                placeholder="Enter Amount"
@@ -147,8 +157,8 @@
                                                                type="number">
                                                         <label for="amount">
                                                             Amount (K)
-                                                            <i class="align-middle ms-1" data-lucide="info" 
-                                                               data-bs-toggle="tooltip" 
+                                                            <i class="align-middle ms-1" data-bs-toggle="tooltip"
+                                                               data-lucide="info"
                                                                title="Minimum amount: K20"></i>
                                                         </label>
                                                         <div class="invalid-feedback">
@@ -156,21 +166,43 @@
                                                         </div>
                                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
                                                             <div class="dropdown">
-                                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="quickAmounts" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <i class="align-middle" data-lucide="dollar-sign"></i> Quick Amounts
+                                                                <button aria-expanded="false"
+                                                                        class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                                                        id="quickAmounts" type="button">
+                                                                    <i class="align-middle"
+                                                                       data-lucide="dollar-sign"></i> Quick Amounts
                                                                 </button>
-                                                                <ul class="dropdown-menu" aria-labelledby="quickAmounts">
-                                                                    <li><h6 class="dropdown-header">Quick Amounts</h6></li>
-                                                                    <li><button class="dropdown-item" type="button" data-amount="20">K20</button></li>
-                                                                    <li><button class="dropdown-item" type="button" data-amount="50">K50</button></li>
-                                                                    <li><button class="dropdown-item" type="button" data-amount="100">K100</button></li>
-                                                                    <li><button class="dropdown-item" type="button" data-amount="200">K200</button></li>
+                                                                <ul aria-labelledby="quickAmounts"
+                                                                    class="dropdown-menu">
+                                                                    <li><h6 class="dropdown-header">Quick Amounts</h6>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="dropdown-item" data-amount="20"
+                                                                                type="button">K20
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="dropdown-item" data-amount="50"
+                                                                                type="button">K50
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="dropdown-item" data-amount="100"
+                                                                                type="button">K100
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="dropdown-item" data-amount="200"
+                                                                                type="button">K200
+                                                                        </button>
+                                                                    </li>
                                                                 </ul>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div class="d-grid gap-2 mt-3" id="submitSection" style="display: none;">
+                                                    <div class="d-grid gap-2 mt-3" id="submitSection"
+                                                         style="display: none;">
                                                         <button class="btn btn-success" type="submit">
                                                             <i class="align-middle me-2" data-lucide="check-circle"></i>
                                                             Confirm Payment
@@ -197,7 +229,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">How to Make a Payment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
                 <div class="list-group list-group-flush">
@@ -280,11 +312,11 @@
         if (modalBody) modalBody.innerHTML = `<p>${message}</p>`;
 
         if (modalHeader) {
-             modalHeader.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
-             if (type === 'success') modalHeader.classList.add('bg-success');
-             else if (type === 'error') modalHeader.classList.add('bg-danger');
-             else if (type === 'warning') modalHeader.classList.add('bg-warning');
-             else if (type === 'info') modalHeader.classList.add('bg-info');
+            modalHeader.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+            if (type === 'success') modalHeader.classList.add('bg-success');
+            else if (type === 'error') modalHeader.classList.add('bg-danger');
+            else if (type === 'warning') modalHeader.classList.add('bg-warning');
+            else if (type === 'info') modalHeader.classList.add('bg-info');
         }
 
         const genericModal = new bootstrap.Modal(genericModalEl);
@@ -301,7 +333,7 @@
             html5QrCode = new Html5Qrcode("reader");
             const config = {
                 fps: 10,
-                qrbox: { width: 250, height: 250 },
+                qrbox: {width: 250, height: 250},
                 aspectRatio: 1.0
             };
 
@@ -311,14 +343,14 @@
                 const devices = await Html5Qrcode.getCameras();
                 if (devices && devices.length > 0) {
                     // Find the back camera if available
-                    const backCamera = devices.find(device => 
-                        device.label.toLowerCase().includes('back') || 
+                    const backCamera = devices.find(device =>
+                        device.label.toLowerCase().includes('back') ||
                         device.label.toLowerCase().includes('rear'));
-                    
+
                     const cameraId = backCamera ? backCamera.id : devices[0].id;
-                    
+
                     await html5QrCode.start(
-                        { deviceId: cameraId },
+                        {deviceId: cameraId},
                         config,
                         onScanSuccess,
                         onScanFailure
@@ -330,7 +362,7 @@
                 // For regular web browsers
                 const cameraId = isAndroid ? "environment" : "user";
                 await html5QrCode.start(
-                    { facingMode: cameraId },
+                    {facingMode: cameraId},
                     config,
                     onScanSuccess,
                     onScanFailure
@@ -368,12 +400,12 @@
     // Fetch Merchant Details Function
     function fetchMerchantDetails(merchantCode) {
         showLoader();
-        
+
         fetch(`/merchants/rest/merchant-details?code=${merchantCode}`)
             .then(response => response.json())
             .then(data => {
                 hideLoader();
-                
+
                 if (data != null) {
                     merchantNameSpan.textContent = data.name;
                     merchantTypeSpan.textContent = data.type;
@@ -468,7 +500,7 @@
     // Form validation
     paymentForm.addEventListener('submit', event => {
         event.preventDefault();
-        
+
         if (!paymentForm.checkValidity()) {
             event.stopPropagation();
             paymentForm.classList.add('was-validated');

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <meta content="text/html;charset=UTF-8" http-equiv="content-type"/>
-<head th:replace="fragments/fragments :: page_head('Login','none')"></head>
+<head th:replace="fragments/fragments :: page_head('Register','none')"></head>
 
 <body>
 
@@ -10,6 +10,14 @@
 
 <section class="py-5 bg-white">
     <div class="container">
+        <!-- Loader Overlay -->
+        <div id="loaderOverlay"
+             style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.7);z-index:2000;align-items:center;justify-content:center;">
+            <div class="spinner-border text-primary" role="status" style="width:4rem;height:4rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <!-- End Loader Overlay -->
 
         <div class="row">
             <div class="col-md-6 col-lg-9 mx-auto">
@@ -24,7 +32,7 @@
                                     <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
                                             type="button"></button>
                                     <div class="alert-icon">
-                                        <i class="far fa-fw fa-lock"></i>
+                                        <i class="fas fa-fw fa-lock"></i>
                                     </div>
                                     <div class="alert-message">
                                         <strong>Hello there!</strong>
@@ -34,139 +42,147 @@
                             </div>
                         </div>
                         <form method="post"
-                              onsubmit="return checkClientStatus(this)"
+                              onsubmit="return confirmSubmit(event, this)"
                               th:action="@{/clients/save-client}"
                               th:object="${client}">
-                            <div class="row">
-                                <div class="col-md-6">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Salutation</label>
-                                        <select class="form-control"
-                                                placeholder="Salutation" required
+                                        <label class="form-label" data-bs-toggle="tooltip" for="salutation"
+                                               title="Select your title (e.g., Mr, Mrs, Ms)">Salutation</label>
+                                        <select class="form-control" id="salutation" placeholder="Salutation" required
                                                 th:field="*{salutation}">
                                             <option selected value="">Select</option>
                                             <option th:each="os : ${T(org.commons.enums.SalutationType).values()}"
-                                                    th:text="${os}"
-                                                    th:value="${os}"></option>
+                                                    th:text="${os}" th:value="${os}"></option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Name</label>
-                                        <input class="form-control" placeholder="Name" required
-                                               th:field="*{name}" type="text">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="name"
+                                               title="Enter your full name">Name</label>
+                                        <input autocomplete="name" class="form-control" id="name" placeholder="Full Name"
+                                               required th:field="*{name}" type="text">
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-
-                                        <label class="form-label">NRC</label>
-                                        <input class="form-control" placeholder="NRC" required
-                                               th:field="*{nrc}" type="text">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="nrc"
+                                               title="Enter your National Registration Card number">NRC</label>
+                                        <input autocomplete="off" class="form-control" id="nrc" placeholder="NRC"
+                                               required th:field="*{nrc}" type="text">
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-
-                                        <label class="form-label">Phone Number</label>
-                                        <input class="form-control" placeholder="Phone Number" required
-                                               th:field="*{phoneNumber}" type="text">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="phoneNumber"
+                                               title="Enter your mobile phone number">Phone Number</label>
+                                        <input autocomplete="tel" class="form-control" id="phoneNumber" inputmode="tel"
+                                               placeholder="Phone Number" required th:field="*{phoneNumber}" type="tel">
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-
-                                        <label class="form-label">TPIN</label>
-                                        <input class="form-control" placeholder="TPIN" required
-                                               th:field="*{tpin}" type="text">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="tpin"
+                                               title="Enter your Tax Payer Identification Number">TPIN</label>
+                                        <input autocomplete="off" class="form-control" id="tpin" placeholder="TPIN"
+                                               required th:field="*{tpin}" type="text">
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-
-                                        <label class="form-label">Man Number</label>
-                                        <input class="form-control" placeholder="Man Number" required
-                                               th:field="*{manNumber}" type="text">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="manNumber"
+                                               title="Enter your Man Number as per employer records">Man Number</label>
+                                        <input autocomplete="off" class="form-control" id="manNumber" placeholder="Man Number"
+                                               required th:field="*{manNumber}" type="text">
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-
-                                        <label class="form-label">Net Income</label>
-                                        <input class="form-control" max="999999999999" min="20"
-                                               placeholder="Net Income" required
-                                               step="0.1"
-                                               th:field="*{clientIncome}"
-                                               type="number">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="clientIncome"
+                                               title="Enter your monthly net income">Net Income</label>
+                                        <input autocomplete="off" class="form-control" id="clientIncome" inputmode="decimal"
+                                               max="999999999999" min="20" placeholder="Net Income" required
+                                               step="0.1" th:field="*{clientIncome}" type="number">
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-
-                                        <label class="form-label">Gender</label>
-                                        <select class="form-control"
-                                                placeholder="Gender" required
+                                        <label class="form-label" data-bs-toggle="tooltip" for="genderType"
+                                               title="Select your gender">Gender</label>
+                                        <select class="form-control" id="genderType" placeholder="Gender" required
                                                 th:field="*{genderType}">
                                             <option selected value="">Select Gender</option>
                                             <option th:each="os : ${T(org.commons.enums.GenderType).values()}"
-                                                    th:text="${os}"
-                                                    th:value="${os}"></option>
+                                                    th:text="${os}" th:value="${os}"></option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-
-                                        <label class="form-label">Address</label>
-                                        <input class="form-control" placeholder="Address" required
-                                               th:field="*{address}" type="text">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="address"
+                                               title="Enter your current residential address">Address</label>
+                                        <input autocomplete="street-address" class="form-control" id="address" placeholder="Address"
+                                               required th:field="*{address}" type="text">
                                     </div>
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Type</label>
-                                        <select class="form-control "
-                                                disabled placeholder="Client Type" required
-                                                th:field="*{clientType}">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="clientType"
+                                               title="Client type is set by the system">Type</label>
+                                        <select class="form-control" disabled id="clientType" placeholder="Client Type"
+                                                required th:field="*{clientType}">
                                             <option th:each="os : ${T(org.commons.enums.ClientType).values()}"
-                                                    th:text="${os}"
-                                                    th:value="${os}"></option>
+                                                    th:text="${os}" th:value="${os}"></option>
                                         </select>
                                     </div>
-
+                                </div>
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Organization</label>
-                                        <select class="form-control"
-                                                placeholder="Organization" required
-                                                th:field="*{organization}">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="organization"
+                                               title="Select your employer organization">Organization</label>
+                                        <select class="form-control" id="organization" placeholder="Organization"
+                                                required th:field="*{organization}">
                                             <option selected value="">Select Organization</option>
-                                            <option th:each="os : ${organizationList}"
-                                                    th:text="${os}"
+                                            <option th:each="os : ${organizationList}" th:text="${os}"
                                                     th:value="${os.id}"></option>
                                         </select>
-
-                                    </div>
-                                    <div class="mb-3">
-
-                                        <label class="form-label">Email</label>
-
-                                        <input class="form-control" placeholder="Email" required
-                                               th:field="*{email}" type="email">
-
-                                    </div>
-                                    <div class="mb-3">
-
-                                        <label class="form-label">Password</label>
-
-                                        <input class="form-control" id="password" maxlength="15"
-                                               minlength="6"
-                                               oninput="checkPasswordMatch(document.getElementById('confirmPassword'))"
-                                               placeholder="Password"
-                                               required
-                                               th:field="*{password}" type="password">
-                                    </div>
-
-                                    <div class="mb-3">
-
-                                        <label class="form-label">Confirm Password</label>
-
-                                        <input class="form-control" id="confirmPassword"
-                                               maxlength="15" minlength="6"
-                                               oninput="checkPasswordMatch(this)"
-                                               placeholder="Confrm Password *"
-                                               required
-                                               th:field="*{password}" type="password">
                                     </div>
                                 </div>
-                                <div class="col-md-6 text-right">
-                                    <button class="btn mb-2 mr-2 btn-lg btn-secondary" type="button">Cancel</button>
-                                    <button class="btn mb-2 mr-2 btn-lg btn-warning" type="reset">Reset</button>
-                                    <button class="btn mb-2 mr-2 btn-lg btn-primary" type="submit">Submit</button>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="email"
+                                               title="Enter your email address">Email</label>
+                                        <input autocomplete="email" class="form-control" id="email" placeholder="Email"
+                                               required th:field="*{email}" type="email">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="password"
+                                               title="Password must be 6-15 characters">Password</label>
+                                        <input autocomplete="new-password" class="form-control" id="password" maxlength="15"
+                                               minlength="6"
+                                               oninput="checkPasswordMatch(document.getElementById('confirmPassword'))" placeholder="Password" required th:field="*{password}"
+                                               type="password">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" for="confirmPassword"
+                                               title="Re-enter your password to confirm">Confirm Password</label>
+                                        <input autocomplete="new-password" class="form-control" id="confirmPassword" maxlength="15"
+                                               minlength="6" oninput="checkPasswordMatch(this)"
+                                               placeholder="Confirm Password *" required type="password">
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+                                    <button class="btn btn-secondary btn-lg flex-fill me-2" onclick="showCancelDialog()"
+                                            type="button">Cancel
+                                    </button>
+                                    <button class="btn btn-warning btn-lg flex-fill me-2" type="reset">Reset</button>
+                                    <button class="btn btn-primary btn-lg flex-fill" type="submit">Submit</button>
                                 </div>
                             </div>
                         </form>
@@ -184,12 +200,58 @@
 <script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
 <script th:src="@{/assets/js/common_modal.js}" type="text/javascript"></script>
 <script th:src="@{/assets/js/customer/customer_form.js}" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.all.min.js"></script>
+<script>
+    // Enable Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 
-<script type="text/javascript">
+    function showCancelDialog() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Your registration will be cancelled.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel',
+            cancelButtonText: 'No, stay',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = moduleURL;
+            }
+        });
+    }
+
+    function showWarningModal(msg) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: msg
+        });
+    }
+
+    function showErrorModal(msg) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: msg
+        });
+    }
+
     moduleURL = "[[@{/}]]";
     MAX_FILE_SIZE = 502400; // 500KB
 
+    function showLoader() {
+        document.getElementById('loaderOverlay').style.display = 'flex';
+    }
+
+    function hideLoader() {
+        document.getElementById('loaderOverlay').style.display = 'none';
+    }
+
     function checkClientStatus(form) {
+        showLoader();
         const url = "[[@{/clients/rest/check-client}]]";
         const name = $("#name").val();
         const nrc = $("#nrc").val();
@@ -207,8 +269,9 @@
         };
 
         $.post(url, params, function (resp) {
-            console.log(resp)
+            hideLoader();
             if (resp === "OK") {
+                showLoader();
                 form.submit();
             } else if (resp === "Duplicated") {
                 showWarningModal("Client already exists : " + nrc);
@@ -223,6 +286,42 @@
         return false;
     }
 
+    function confirmSubmit(event, form) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Submit Registration?',
+            text: 'Please confirm your details before submitting.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, submit',
+            cancelButtonText: 'Review',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                checkClientStatus(form);
+            }
+        });
+        return false;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var successMsg = '[[${successMessage}]]';
+        var errorMsg = '[[${errorMessage}]]';
+        if (successMsg && successMsg !== 'null' && successMsg !== '') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: successMsg
+            }).then(() => {
+                window.location.href = '[[@{/login}]]';
+            });
+        } else if (errorMsg && errorMsg !== 'null' && errorMsg !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed',
+                text: errorMsg
+            });
+        }
+    });
 </script>
 
 </body>

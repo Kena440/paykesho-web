@@ -1,17 +1,17 @@
 package org.paykesho.clientportal.clients.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.config.Utility;
-import org.paykesho.clientportal.notifications.service.NotificationService;
+import org.paykesho.clientportal.notification.general.NotificationClient;
 import org.paykesho.clientportal.settings.email.EmailSettingBag;
 import org.paykesho.clientportal.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
@@ -28,15 +28,16 @@ import java.io.UnsupportedEncodingException;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class ForgotPasswordController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgotPasswordController.class);
-    @Autowired
-    NotificationService notificationService;
-    @Autowired
-    private ClientService clientService;
-    @Autowired
-    private SettingService settingService;
+
+    private final NotificationClient notificationClient;
+
+    private final ClientService clientService;
+
+    private final SettingService settingService;
 
     @PostMapping(value = "/forgot-password")
     public String forgotPasswordForm(Model model, HttpServletRequest request) throws PaykeshoError {
@@ -124,12 +125,12 @@ public class ForgotPasswordController {
 
         ////mailSender.send(mimeMessage);
 
-        boolean emailNotificationSent = notificationService.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
+        boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
 
         if (emailNotificationSent) {
-            log.info("Notification sent successfully for " + toAddress);
+            log.info("Notification sent successfully for {}", toAddress);
         } else {
-            log.error("Failed to send notification for " + toAddress);
+            log.error("Failed to send notification for {}", toAddress);
         }
     }
 

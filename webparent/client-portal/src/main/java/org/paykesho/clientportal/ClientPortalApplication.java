@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EntityScan({"org.commons.entity"})
+@EntityScan({"org.commons.entity", "org.paykesho.clientportal"})
 public class ClientPortalApplication {
 
     public static void main(String[] args) {

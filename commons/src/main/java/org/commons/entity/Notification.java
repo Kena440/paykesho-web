@@ -11,10 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "notifications")
-public class Notification {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Notification extends IdBasedEntity {
     @Column(name = "reference", length = 128, nullable = false, unique = true)
     private String reference;
     @Column(name = "recipient", length = 128)

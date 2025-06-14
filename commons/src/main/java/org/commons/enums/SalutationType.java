@@ -4,49 +4,42 @@ public enum SalutationType {
     MR {
         @Override
         public String defaultDescription() {
-            return "MR";
+            return "Mr";
         }
     },
 
     MRS {
         @Override
         public String defaultDescription() {
-            return "MRS";
+            return "Mrs";
         }
     },
 
     MISS {
         @Override
         public String defaultDescription() {
-            return "MISS";
+            return "Miss";
         }
     },
 
     MS {
         @Override
         public String defaultDescription() {
-            return "MS";
+            return "Ms";
         }
     },
 
     DR {
         @Override
         public String defaultDescription() {
-            return "DR";
+            return "Dr";
         }
     },
 
     PROF {
         @Override
         public String defaultDescription() {
-            return "PROF";
-        }
-    },
-
-    REV {
-        @Override
-        public String defaultDescription() {
-            return "REV";
+            return "Prof";
         }
     };
 

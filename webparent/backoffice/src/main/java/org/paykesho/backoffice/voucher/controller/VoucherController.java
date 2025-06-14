@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.voucher.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
@@ -9,13 +10,12 @@ import org.commons.enums.NotificationType;
 import org.commons.enums.VoucherStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.service.ClientService;
-import org.paykesho.backoffice.notifications.service.NotificationService;
+import org.paykesho.backoffice.notification.general.NotificationClient;
 import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.backoffice.repayments.service.RepaymentService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.paykesho.backoffice.voucher.service.VoucherService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,20 +36,21 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequestMapping("/vouchers")
+@RequiredArgsConstructor
 public class VoucherController {
 
-    @Autowired
-    NotificationService notificationService;
-    @Autowired
-    private VoucherService voucherService;
-    @Autowired
-    private PaykeshoReferenceService paykeshoReferenceService;
-    @Autowired
-    private ClientService clientService;
-    @Autowired
-    private SettingService settingService;
-    @Autowired
-    private RepaymentService repaymentService;
+
+    private final NotificationClient notificationClient;
+
+    private final VoucherService voucherService;
+
+    private final PaykeshoReferenceService paykeshoReferenceService;
+
+    private final ClientService clientService;
+
+    private final SettingService settingService;
+
+    private final RepaymentService repaymentService;
 
     @GetMapping("")
     public String listAllVouchersByPage(Model model, HttpServletRequest request) throws PaykeshoError {
@@ -220,7 +221,7 @@ public class VoucherController {
         String emailMessage = generateEmailMessage(voucher, actionType, voucherAmount, message);
         String smsMessage = generateSmsMessage(voucher, actionType, message);
 
-        boolean emailSent = notificationService.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
 
         if (emailSent) {
             log.info("Email sent successfully to {}", voucher.getClient().getEmail());
@@ -228,7 +229,7 @@ public class VoucherController {
             log.error("Failed to send email to " + voucher.getClient().getEmail());
         }
 
-        boolean smsSent = notificationService.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
 
         if (smsSent) {
             log.info("SMS sent successfully to {}", voucher.getClient().getPhoneNumber());

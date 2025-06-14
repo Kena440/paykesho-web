@@ -1,23 +1,22 @@
 package org.paykesho.clientportal.clients.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.ClientType;
-import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.clients.service.CreditScoreService;
 import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.merchant.service.MerchantService;
-import org.paykesho.clientportal.notifications.service.NotificationService;
+import org.paykesho.clientportal.notification.general.NotificationClient;
 import org.paykesho.clientportal.organizations.service.OrganizationService;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2User;
 import org.paykesho.clientportal.settings.service.SettingService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,22 +38,23 @@ import java.util.List;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/clients")
 public class ClientController {
-    @Autowired
-    NotificationService notificationService;
-    @Autowired
-    private ClientService clientService;
-    @Autowired
-    private CreditScoreService creditScoreService;
-    @Autowired
-    private MerchantService merchantService;
-    @Autowired
-    private OrganizationService organizationService;
-    @Autowired
-    private SettingService settingService;
-    @Autowired
-    private VoucherService voucherService;
+
+    private final NotificationClient notificationClient;
+
+    private final ClientService clientService;
+
+    private final CreditScoreService creditScoreService;
+
+    private final MerchantService merchantService;
+
+    private final OrganizationService organizationService;
+
+    private final SettingService settingService;
+
+    private final VoucherService voucherService;
 
     private static String getGreeting() {
         String greeting = null;
@@ -112,11 +112,27 @@ public class ClientController {
 
     @PostMapping(value = "/save-client")
     public String signUpClient(Client client, Model model, HttpServletRequest request) {
-        clientService.registerClient(client);
-        sendNotification(client, request);
-
-        model.addAttribute("pageTitle", "Registration Successful");
-        return "register/register_success";
+        List<Organization> organizationList = organizationService.organizationListEnabled();
+        model.addAttribute("organizationList", organizationList);
+        model.addAttribute("pageTitle", "Client Registration");
+        try {
+            clientService.registerClient(client);
+            // sendNotification(client, request);
+            model.addAttribute("client", new Client()); // clear form
+            model.addAttribute("successMessage", "Registration successful! Please check your email for verification.");
+        } catch (Exception ex) {
+            log.error("Registration failed", ex); // log full stack trace
+            model.addAttribute("client", client); // keep user input
+            String userMessage = "Registration failed. Please check your details and try again.";
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                String causeMsg = ex.getCause().getMessage();
+                if (causeMsg.contains("constraint") || causeMsg.contains("duplicate")) {
+                    userMessage = "A user with similar details already exists.";
+                }
+            }
+            model.addAttribute("errorMessage", userMessage);
+        }
+        return "register/register_form";
     }
 
     @PostMapping(value = "/update-account")
@@ -186,20 +202,20 @@ public class ClientController {
 
 
         // Send email notification
-        boolean emailSent = notificationService.sendNotification(client.getEmail(), emailMessage, NotificationType.email.defaultDescription());
+       /* boolean emailSent = notificationService.sendNotification(client.getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
             log.info("Email sent successfully to " + client.getEmail());
         } else {
             log.error("Failed to send email to " + client.getEmail());
-        }
+        }*/
 
         // Send SMS notification
-        boolean smsSent = notificationService.sendNotification(client.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+       /* boolean smsSent = notificationService.sendNotification(client.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
             log.info("SMS sent successfully to " + client.getPhoneNumber());
         } else {
             log.error("Failed to send SMS to " + client.getPhoneNumber());
-        }
+        }*/
     }
 
     private String generateEmailMessage(Client client, String actionType, String verifyURL) {
