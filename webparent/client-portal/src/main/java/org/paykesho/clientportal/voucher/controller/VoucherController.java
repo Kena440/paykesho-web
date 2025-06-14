@@ -1,5 +1,6 @@
 package org.paykesho.clientportal.voucher.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
@@ -13,12 +14,11 @@ import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.events.enums.Constants;
 import org.paykesho.clientportal.files.dto.FileUploadResponse;
 import org.paykesho.clientportal.files.service.FileUploadService;
-import org.paykesho.clientportal.notifications.service.NotificationService;
+import org.paykesho.clientportal.notification.general.NotificationClient;
 import org.paykesho.clientportal.repayments.service.RepaymentService;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,21 +39,21 @@ import java.util.Objects;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/vouchers")
 public class VoucherController {
 
-    @Autowired
-    private ClientService clientService;
-    @Autowired
-    private VoucherService voucherService;
-    @Autowired
-    private PaykeshoReferenceService paykeshoReferenceService;
-    @Autowired
-    private NotificationService notificationService;
-    @Autowired
-    private FileUploadService fileUploadService;
-    @Autowired
-    private RepaymentService repaymentService;
+    private final ClientService clientService;
+
+    private final VoucherService voucherService;
+
+    private final PaykeshoReferenceService paykeshoReferenceService;
+
+    private final NotificationClient notificationClient;
+
+    private final FileUploadService fileUploadService;
+
+    private final RepaymentService repaymentService;
 
     // Show list of client's vouchers
     @GetMapping("")
@@ -178,7 +178,7 @@ public class VoucherController {
         String smsMessage = generateSmsMessage(voucher, "REQUEST");
 
         // Send email notification
-        boolean emailSent = notificationService.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
             log.info("Email sent successfully to {}", voucher.getClient().getEmail());
         } else {
@@ -186,7 +186,7 @@ public class VoucherController {
         }
 
         // Send SMS notification
-        boolean smsSent = notificationService.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
             log.info("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
         } else {

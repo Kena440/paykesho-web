@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.organizationadmin.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.organization.OrganizationAdmin;
@@ -7,14 +8,13 @@ import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.backoffice.notifications.service.NotificationService;
+import org.paykesho.backoffice.notification.general.NotificationClient;
 import org.paykesho.backoffice.organizationadmin.repository.OrganizationAdminRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,19 +28,15 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OrganizationAdminService {
     public static final int MEMBER_ADMINS_PER_PAGE = 20;
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationAdminService.class);
-    @Autowired
+    private final OrganizationAdminRepository organizationAdminRepository;
+    private final CountryRepository countryRepository;
+    private final SettingService settingService;
     PasswordEncoder passwordEncoder;
-    @Autowired
-    NotificationService notificationService;
-    @Autowired
-    private OrganizationAdminRepository organizationAdminRepository;
-    @Autowired
-    private CountryRepository countryRepository;
-    @Autowired
-    private SettingService settingService;
+    NotificationClient notificationClient;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, organizationAdminRepository);
@@ -128,7 +124,7 @@ public class OrganizationAdminService {
 
 
         // Send email notification
-        boolean emailSent = notificationService.sendNotification(organizationAdmin.getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        boolean emailSent = notificationClient.sendNotification(organizationAdmin.getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
             log.info("Email sent successfully to " + organizationAdmin.getEmail());
         } else {
@@ -136,7 +132,7 @@ public class OrganizationAdminService {
         }
 
         // Send SMS notification
-        boolean smsSent = notificationService.sendNotification(organizationAdmin.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        boolean smsSent = notificationClient.sendNotification(organizationAdmin.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
             log.info("SMS sent successfully to " + organizationAdmin.getPhoneNumber());
         } else {

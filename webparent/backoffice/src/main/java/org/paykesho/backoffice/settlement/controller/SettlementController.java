@@ -9,8 +9,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchants.service.MerchantService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.settlement.service.SettlementService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequiredArgsConstructor

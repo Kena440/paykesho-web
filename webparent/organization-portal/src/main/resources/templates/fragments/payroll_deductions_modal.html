@@ -13,7 +13,8 @@
         <tbody>
         <tr th:each="schedule : ${dueSchedules}">
             <td>
-                <input type="checkbox" class="selectedSchedule" name="selectedSchedules" th:value="${schedule.id}" data-id="${schedule.id}">
+                <input class="selectedSchedule" data-id="${schedule.id}" name="selectedSchedules" th:value="${schedule.id}"
+                       type="checkbox">
             </td>
             <td th:text="${schedule.reference}"></td>
             <td th:text="${schedule.client.name}"></td>
@@ -25,4 +26,4 @@
 </div>
 
 <!-- Hidden Field to Store Selected Schedule IDs -->
-<input type="hidden" name="selectedScheduleIds" id="selectedScheduleIds">
+<input id="selectedScheduleIds" name="selectedScheduleIds" type="hidden">

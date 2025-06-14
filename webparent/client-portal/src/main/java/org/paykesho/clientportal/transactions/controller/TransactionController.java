@@ -1,23 +1,23 @@
 package org.paykesho.clientportal.transactions.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.entity.Voucher;
-import org.commons.entity.merchant.Merchant;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
+import org.commons.entity.merchant.Merchant;
 import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.MerchantDto;
 import org.paykesho.clientportal.api.dto.PaymentDto;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.merchant.service.MerchantService;
-import org.paykesho.clientportal.notifications.service.NotificationService;
+import org.paykesho.clientportal.notification.general.NotificationClient;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,22 +35,21 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    @Autowired
     private ClientService clientService;
-    @Autowired
     private VoucherService voucherService;
-    @Autowired
+
     private MerchantService merchantService;
-    @Autowired
+
     private PaykeshoReferenceService paykeshoReferenceService;
-    @Autowired
+
     private TransactionsService transactionsService;
-    @Autowired
-    private NotificationService notificationService;
+
+    private NotificationClient notificationClient;
 
     @GetMapping("")
     public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
@@ -134,7 +133,7 @@ public class TransactionController {
         transaction.setClient(client);
         Merchant merchant = merchantService.getMerchantByPaykeshoRef(merchantDto.getCode());
         if (merchant == null) {
-             throw new PaykeshoError("Could not find merchant with the provided code.");
+            throw new PaykeshoError("Could not find merchant with the provided code.");
         }
         transaction.setMerchant(merchant);
         transaction.setAmount(amount);
@@ -151,7 +150,7 @@ public class TransactionController {
         }
 
         if (savedTxn != null) {
-             sendNotification(savedTxn);
+            sendNotification(savedTxn);
         }
 
         return savedTxn;
@@ -166,14 +165,14 @@ public class TransactionController {
         String emailMessage = generateEmailMessage(transaction, "PAYMENT");
         String smsMessage = generateSmsMessage(transaction, "PAYMENT");
 
-        boolean emailSent = notificationService.sendNotification(transaction.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        boolean emailSent = notificationClient.sendNotification(transaction.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
             log.info("Email sent successfully to " + transaction.getClient().getEmail());
         } else {
             log.error("Failed to send email to " + transaction.getClient().getEmail());
         }
 
-        boolean smsSent = notificationService.sendNotification(transaction.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        boolean smsSent = notificationClient.sendNotification(transaction.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
             log.info("SMS sent successfully to " + transaction.getClient().getPhoneNumber());
         } else {

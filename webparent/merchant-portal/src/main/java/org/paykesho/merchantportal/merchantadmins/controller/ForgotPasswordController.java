@@ -1,16 +1,15 @@
 package org.paykesho.merchantportal.merchantadmins.controller;
 
 import org.commons.entity.merchant.MerchantAdmin;
+import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.merchantportal.config.Utility;
 import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
-import org.paykesho.merchantportal.settings.email.EmailSettingBag;
+import org.paykesho.merchantportal.notification.general.NotificationClient;
 import org.paykesho.merchantportal.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 
 @Controller
 public class ForgotPasswordController {
@@ -31,6 +27,8 @@ public class ForgotPasswordController {
     private MerchantAdminService merchantAdminService;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private NotificationClient notificationClient;
 
     @PostMapping(value = "/forgot-password")
     public String forgotPasswordForm(
@@ -104,10 +102,7 @@ public class ForgotPasswordController {
     }
 
 
-    private void sendTokenEmail(String verifyURL, String email) throws MessagingException, UnsupportedEncodingException {
-        EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBags);
-
+    private void sendTokenEmail(String verifyURL, String email) {
         String toAddress = email;
         String subject = "Password Reset";
         String content = "<p>Hello, </p>" +
@@ -117,16 +112,12 @@ public class ForgotPasswordController {
                 "<br>" +
                 "<p>Ignore this email if you do remember your password, or you have not made the request. </p>";
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-
-        helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
-
-        helper.setText(content, true);
-
-        //mailSender.send(mimeMessage);
+        boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
+        if (emailNotificationSent) {
+            LOGGER.info("Notification sent successfully for " + toAddress);
+        } else {
+            LOGGER.error("Failed to send notification for " + toAddress);
+        }
     }
 
 }

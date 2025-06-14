@@ -69,16 +69,17 @@ public class ClientService {
 
     private void createClientBalance(Client client) {
         ClientBalance balance = getClientBalance(client);
-
         if (balance == null) {
             balance = new ClientBalance();
             balance.setClient(client);
             balance.setCurrentBalance(BigDecimal.ZERO);
             balance.setAvailableBalance(BigDecimal.ZERO);
+            balance.setHeldBalance(BigDecimal.ZERO);
             balance.setLastUpdate(new Date());
+            saveClientBalance(balance);
+        } else {
+            log.warn("ClientBalance already exists for client id: {}. Skipping creation.", client.getId());
         }
-
-        saveClientBalance(balance);
     }
 
     private void encodePassword(Client client) {
@@ -256,6 +257,12 @@ public class ClientService {
     }
 
     public ClientBalance getClientBalance(Client client) {
-        return clientBalanceRepository.getClientBalanceByClientId(client.getId());
+        try {
+            ClientBalance balance = clientBalanceRepository.getClientBalanceByClientId(client.getId());
+            return balance;
+        } catch (Exception ex) {
+            log.warn("No ClientBalance found for client id: {}. Returning null.", client.getId());
+            return null;
+        }
     }
 }

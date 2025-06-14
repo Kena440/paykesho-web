@@ -5,9 +5,9 @@ server:
 
 spring:
   datasource:
-    password: mek
+    password: p@ssw0rd
     url: jdbc:mysql://127.0.0.1:3306/paykesho_db
-    username: fbxYJJJ1KwhQ7Bl$$$$$
+    username: root
     hikari:
       minimum-idle: 10
       maximum-pool-size: 50
@@ -47,3 +47,7 @@ logging:
     com:
       zaxxer:
         hikari: ERROR
+
+notification:
+  service:
+    url: http://localhost:8085

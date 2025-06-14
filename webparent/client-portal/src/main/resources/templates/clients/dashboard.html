@@ -53,10 +53,10 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                                    <a th:href="@{/vouchers/request}" class="btn btn-primary btn-lg">
+                                    <a class="btn btn-primary btn-lg" th:href="@{/vouchers/request}">
                                         <i class="align-middle me-2" data-lucide="credit-card"></i> Request Voucher
                                     </a>
-                                    <a th:href="@{/transactions/initiate}" class="btn btn-success btn-lg">
+                                    <a class="btn btn-success btn-lg" th:href="@{/transactions/initiate}">
                                         <i class="align-middle me-2" data-lucide="dollar-sign"></i> Make Payment
                                     </a>
                                 </div>
@@ -119,7 +119,7 @@
 
                 <div class="row">
                     <!-- Credit Score Card -->
-                     <div class="col-12 col-md-6 d-flex">
+                    <div class="col-12 col-md-6 d-flex">
                         <div class="card flex-fill">
                             <div class="card-body">
                                 <div class="row">
@@ -168,19 +168,19 @@
                     </div>
                 </div>
 
-                 <!-- Placeholder for Charts or other sections if needed -->
+                <!-- Placeholder for Charts or other sections if needed -->
                 <div class="row">
-                     <div class="col-12 d-none">
-                         <div class="card">
-                             <div class="card-header">
-                                 <h5 class="card-title">Charts</h5>
-                             </div>
-                             <div class="card-body">
-                                 <p>Placeholder for charts or other dashboard elements.</p>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
+                    <div class="col-12 d-none">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Charts</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Placeholder for charts or other dashboard elements.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </main>
@@ -191,271 +191,3 @@
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
 
-<!-- Keep existing scripts if they are still needed for other functionality -->
-<!-- You may need to adjust these or remove if not used on this specific dashboard -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Example: Initialize any specific JS needed for this dashboard
-        // If Chart.js or jsVectorMap are not used here, these scripts can be removed.
-    });
-</script>
-<!-- Remove chart and map scripts if not used -->
-<!--
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Bar chart
-        new Chart(document.getElementById("chartjs-dashboard-bar-devices"), {
-            type: "bar",
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile",
-                    backgroundColor: window.cssVariables.primary,
-                    borderColor: window.cssVariables.primary,
-                    hoverBackgroundColor: window.cssVariables.primary,
-                    hoverBorderColor: window.cssVariables.primary,
-                    data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
-                    barPercentage: .5,
-                    categoryPercentage: .5
-                }, {
-                    label: "Desktop",
-                    backgroundColor: window.cssVariables.primarySubtle,
-                    borderColor: window.cssVariables.primarySubtle,
-                    hoverBackgroundColor: window.cssVariables.primarySubtle,
-                    hoverBorderColor: window.cssVariables.primarySubtle,
-                    data: [69, 66, 24, 48, 52, 51, 44, 53, 62, 79, 51, 68],
-                    barPercentage: .5,
-                    categoryPercentage: .5
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                cornerRadius: 15,
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            stepSize: 20
-                        },
-                        stacked: true,
-                    }],
-                    xAxes: [{
-                        gridLines: {
-                            color: "transparent"
-                        },
-                        stacked: true,
-                    }]
-                }
-            }
-        });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var markers = [{
-            coords: [31.230391, 121.473701],
-            name: "Shanghai"
-        },
-            {
-                coords: [39.904202, 116.407394],
-                name: "Beijing"
-            },
-            {
-                coords: [28.704060, 77.102493],
-                name: "Delhi"
-            },
-            {
-                coords: [6.524379, 3.379206],
-                name: "Lagos"
-            },
-            {
-                coords: [39.343357, 117.361649],
-                name: "Tianjin"
-            },
-            {
-                coords: [24.860735, 67.001137],
-                name: "Karachi"
-            },
-            {
-                coords: [41.008240, 28.978359],
-                name: "Istanbul"
-            },
-            {
-                coords: [35.689487, 139.691711],
-                name: "Tokyo"
-            },
-            {
-                coords: [23.129110, 113.264381],
-                name: "Guangzhou"
-            },
-            {
-                coords: [19.075983, 72.877655],
-                name: "Mumbai"
-            },
-            {
-                coords: [40.7127837, -74.0059413],
-                name: "New York"
-            },
-            {
-                coords: [34.052235, -118.243683],
-                name: "Los Angeles"
-            },
-            {
-                coords: [41.878113, -87.629799],
-                name: "Chicago"
-            },
-            {
-                coords: [29.760427, -95.369804],
-                name: "Houston"
-            },
-            {
-                coords: [33.448376, -112.074036],
-                name: "Phoenix"
-            },
-            {
-                coords: [51.507351, -0.127758],
-                name: "London"
-            },
-            {
-                coords: [48.856613, 2.352222],
-                name: "Paris"
-            },
-            {
-                coords: [55.755825, 37.617298],
-                name: "Moscow"
-            },
-            {
-                coords: [40.416775, -3.703790],
-                name: "Madrid"
-            }
-        ];
-        var map = new jsVectorMap({
-            map: "world",
-            selector: "#world_map",
-            zoomButtons: true,
-            markers: markers,
-            markerStyle: {
-                initial: {
-                    r: 9,
-                    stroke: window.cssVariables.secondaryBg,
-                    strokeWidth: 7,
-                    stokeOpacity: .4,
-                    fill: window.cssVariables.primary
-                },
-                hover: {
-                    fill: window.cssVariables.primary,
-                    stroke: window.cssVariables.primary
-                }
-            },
-            regionStyle: {
-                initial: {
-                    fill: window.cssVariables.quaternaryBg
-                }
-            },
-            zoomOnScroll: false
-        });
-        window.addEventListener("resize", () => {
-            map.updateSize();
-        });
-        setTimeout(function () {
-            map.updateSize();
-        }, 250);
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Pie chart
-        new Chart(document.getElementById("chartjs-dashboard-pie"), {
-            type: "pie",
-            data: {
-                labels: ["Direct", "Affiliate", "E-mail", "Other"],
-                datasets: [{
-                    data: [2602, 1253, 541, 1465],
-                    backgroundColor: [
-                        window.cssVariables.primary,
-                        window.cssVariables.warning,
-                        window.cssVariables.danger,
-                        "#E8EAED"
-                    ],
-                }]
-            },
-            options: {
-                responsive: !window.MSInputMethodContext,
-                maintainAspectRatio: false,
-                cutoutPercentage: 70,
-                legend: {
-                    display: false
-                },
-                elements: {
-                    arc: {
-                        borderWidth: 5,
-                        borderColor: window.cssVariables.secondaryBg
-                    }
-                },
-            }
-        });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Radar chart
-        new Chart(document.getElementById("chartjs-dashboard-radar"), {
-            type: "radar",
-            data: {
-                labels: ["Technology", "Sports", "Media", "Gaming", "Arts"],
-                datasets: [{
-                    label: "Interests",
-                    backgroundColor: "rgba(0, 123, 255, 0.2)",
-                    borderColor: window.cssVariables.primary,
-                    pointBackgroundColor: window.cssVariables.primary,
-                    pointBorderColor: "#fff",
-                    pointHoverBackgroundColor: "#fff",
-                    pointHoverBorderColor: window.cssVariables.primary,
-                    data: [70, 53, 82, 60, 33]
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                legend: {
-                    display: false,
-                },
-                scale: {
-                    gridLines: {
-                        color: window.cssVariables.quaternaryColor
-                    },
-                    ticks: {
-                        backdropColor: window.cssVariables.secondaryBg,
-                        fontColor: window.cssVariables.bodyColor
-                    },
-                    angleLines: {
-                        color: window.cssVariables.quaternaryColor
-                    },
-                    pointLabels: {
-                        fontColor: window.cssVariables.bodyColor
-                    }
-                }
-            }
-        });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        $("#datatables-dashboard-traffic").DataTable({
-            destroy: true,
-            pageLength: 8,
-            lengthChange: false,
-            bFilter: false,
-            autoWidth: false,
-            order: [
-                [1, "desc"]
-            ]
-        });
-    });
-</script>
-</body>
-</html>
