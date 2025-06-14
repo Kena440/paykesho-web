@@ -62,7 +62,8 @@
                                     <div class="mb-3">
                                         <label class="form-label" data-bs-toggle="tooltip" for="name"
                                                title="Enter your full name">Name</label>
-                                        <input autocomplete="name" class="form-control" id="name" placeholder="Full Name"
+                                        <input autocomplete="name" class="form-control" id="name"
+                                               placeholder="Full Name"
                                                required th:field="*{name}" type="text">
                                     </div>
                                 </div>
@@ -94,7 +95,8 @@
                                     <div class="mb-3">
                                         <label class="form-label" data-bs-toggle="tooltip" for="manNumber"
                                                title="Enter your Man Number as per employer records">Man Number</label>
-                                        <input autocomplete="off" class="form-control" id="manNumber" placeholder="Man Number"
+                                        <input autocomplete="off" class="form-control" id="manNumber"
+                                               placeholder="Man Number"
                                                required th:field="*{manNumber}" type="text">
                                     </div>
                                 </div>
@@ -102,7 +104,8 @@
                                     <div class="mb-3">
                                         <label class="form-label" data-bs-toggle="tooltip" for="clientIncome"
                                                title="Enter your monthly net income">Net Income</label>
-                                        <input autocomplete="off" class="form-control" id="clientIncome" inputmode="decimal"
+                                        <input autocomplete="off" class="form-control" id="clientIncome"
+                                               inputmode="decimal"
                                                max="999999999999" min="20" placeholder="Net Income" required
                                                step="0.1" th:field="*{clientIncome}" type="number">
                                     </div>
@@ -123,7 +126,8 @@
                                     <div class="mb-3">
                                         <label class="form-label" data-bs-toggle="tooltip" for="address"
                                                title="Enter your current residential address">Address</label>
-                                        <input autocomplete="street-address" class="form-control" id="address" placeholder="Address"
+                                        <input autocomplete="street-address" class="form-control" id="address"
+                                               placeholder="Address"
                                                required th:field="*{address}" type="text">
                                     </div>
                                 </div>
@@ -162,9 +166,11 @@
                                     <div class="mb-3">
                                         <label class="form-label" data-bs-toggle="tooltip" for="password"
                                                title="Password must be 6-15 characters">Password</label>
-                                        <input autocomplete="new-password" class="form-control" id="password" maxlength="15"
+                                        <input autocomplete="new-password" class="form-control" id="password"
+                                               maxlength="15"
                                                minlength="6"
-                                               oninput="checkPasswordMatch(document.getElementById('confirmPassword'))" placeholder="Password" required th:field="*{password}"
+                                               oninput="checkPasswordMatch(document.getElementById('confirmPassword'))"
+                                               placeholder="Password" required th:field="*{password}"
                                                type="password">
                                     </div>
                                 </div>
@@ -172,7 +178,8 @@
                                     <div class="mb-3">
                                         <label class="form-label" data-bs-toggle="tooltip" for="confirmPassword"
                                                title="Re-enter your password to confirm">Confirm Password</label>
-                                        <input autocomplete="new-password" class="form-control" id="confirmPassword" maxlength="15"
+                                        <input autocomplete="new-password" class="form-control" id="confirmPassword"
+                                               maxlength="15"
                                                minlength="6" oninput="checkPasswordMatch(this)"
                                                placeholder="Confirm Password *" required type="password">
                                     </div>

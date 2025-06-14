@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.client.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
@@ -20,18 +21,19 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ClientService {
     public static final int CUSTOMERS_PER_PAGE = 10;
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
-    private ClientRepository clientRepository;
-    @Autowired
-    private CountryRepository countryRepository;
-    @Autowired
-    private ClientBalanceRepository clientBalanceRepository;
-    @Autowired
-    private CreditScoreService creditScoreService;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final ClientRepository clientRepository;
+
+    private final CountryRepository countryRepository;
+
+    private final ClientBalanceRepository clientBalanceRepository;
+
+    private final CreditScoreService creditScoreService;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);

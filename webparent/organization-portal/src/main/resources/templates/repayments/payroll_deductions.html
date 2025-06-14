@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html data-bs-theme="light" data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+<html data-bs-theme="light" data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left"
+      data-sidebar-theme="dark"
       lang="en"
       xmlns:th="http://www.thymeleaf.org">
 
@@ -75,7 +76,8 @@
 
 <!-- Payroll Deduction Modal -->
 <!-- Payroll Deduction Modal -->
-<div aria-hidden="true" aria-labelledby="modal-add-payroll-deduction-record" class="modal modal-lg fade" id="modal-add-payroll-deduction-record"
+<div aria-hidden="true" aria-labelledby="modal-add-payroll-deduction-record" class="modal modal-lg fade"
+     id="modal-add-payroll-deduction-record"
      tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -115,7 +117,8 @@
                             <tbody>
                             <tr th:each="schedule : ${dueSchedules}">
                                 <td>
-                                    <input checked class="selectedSchedule" data-id="${schedule.id}" name="selectedSchedules"
+                                    <input checked class="selectedSchedule" data-id="${schedule.id}"
+                                           name="selectedSchedules"
                                            readonly th:value="${schedule.id}" type="checkbox">
                                 </td>
                                 <td th:text="${schedule.reference}"></td>
@@ -145,19 +148,23 @@
                         <div class="mt-4">
                             <h6 class="text-center">Select Payment Method</h6>
                             <div class="d-flex justify-content-between">
-                                <button class="btn btn-lg btn-outline-primary w-100 m-1 payment-method-btn" id="cashButton"
+                                <button class="btn btn-lg btn-outline-primary w-100 m-1 payment-method-btn"
+                                        id="cashButton"
                                         onclick="selectPaymentMethod('Cash')"
                                         type="button">Cash
                                 </button>
-                                <button class="btn btn-lg btn-outline-success w-100 m-1 payment-method-btn" id="mobileMoneyButton"
+                                <button class="btn btn-lg btn-outline-success w-100 m-1 payment-method-btn"
+                                        id="mobileMoneyButton"
                                         onclick="selectPaymentMethod('Mobile Money')"
                                         type="button">Mobile Money
                                 </button>
-                                <button class="btn btn-lg btn-outline-danger w-100 m-1 payment-method-btn" id="cardButton"
+                                <button class="btn btn-lg btn-outline-danger w-100 m-1 payment-method-btn"
+                                        id="cardButton"
                                         onclick="selectPaymentMethod('Card')"
                                         type="button">Card
                                 </button>
-                                <button class="btn btn-lg btn-outline-info w-100 m-1 payment-method-btn" id="bankTransferButton"
+                                <button class="btn btn-lg btn-outline-info w-100 m-1 payment-method-btn"
+                                        id="bankTransferButton"
                                         onclick="selectPaymentMethod('Bank Transfer')"
                                         type="button">Bank Transfer
                                 </button>

@@ -14,17 +14,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
+                .authorizeRequests()
                 .antMatchers("/api/notifications/**").permitAll()
                 .anyRequest().authenticated()
-            .and()
+                .and()
                 .csrf().disable()
-            .formLogin().loginPage("/login").usernameParameter("email")
+                .formLogin().loginPage("/login").usernameParameter("email")
 //                .failureHandler(loginFailureHandler)
                 .permitAll()
-            .and()
+                .and()
                 .logout().permitAll()
-            .and()
+                .and()
                 .rememberMe().key("AbcDefgHijklmnOpqrs_1234567890").tokenValiditySeconds(7 * 24 * 60 * 60);
         http.headers().frameOptions().sameOrigin();
 

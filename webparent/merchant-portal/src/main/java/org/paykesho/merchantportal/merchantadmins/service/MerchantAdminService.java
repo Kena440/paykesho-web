@@ -1,6 +1,7 @@
 package org.paykesho.merchantportal.merchantadmins.service;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
 import org.commons.entity.merchant.MerchantAdmin;
@@ -22,18 +23,14 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MerchantAdminService {
 
     public static final int MAX_FAILED_ATTEMPTS = 3;
     private static final long LOCK_TIME_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
-    private CountryRepository countryRepository;
-    @Autowired
-    private MerchantAdminRepository merchantAdminRepository;
-
-    @Autowired
+    private final PasswordEncoder passwordEncoder;
+    private final CountryRepository countryRepository;
+    private final MerchantAdminRepository merchantAdminRepository;
 
     public List<Country> countryList() {
         return countryRepository.findAllByOrderByNameDesc();

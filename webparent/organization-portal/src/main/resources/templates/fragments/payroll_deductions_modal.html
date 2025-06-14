@@ -13,7 +13,8 @@
         <tbody>
         <tr th:each="schedule : ${dueSchedules}">
             <td>
-                <input class="selectedSchedule" data-id="${schedule.id}" name="selectedSchedules" th:value="${schedule.id}"
+                <input class="selectedSchedule" data-id="${schedule.id}" name="selectedSchedules"
+                       th:value="${schedule.id}"
                        type="checkbox">
             </td>
             <td th:text="${schedule.reference}"></td>
