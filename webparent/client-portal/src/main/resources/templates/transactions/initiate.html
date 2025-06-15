@@ -264,18 +264,16 @@
                 aspectRatio: 1.0
             };
 
-            // For WebView, we need to handle camera access differently
-            if (isWebView) {
-                // Try to use the back camera first
+            // Always use back camera on mobile devices
+            if (isMobile) {
                 const devices = await Html5Qrcode.getCameras();
                 if (devices && devices.length > 0) {
-                    // Find the back camera if available
+                    // Prefer back/rear camera
                     const backCamera = devices.find(device =>
                         device.label.toLowerCase().includes('back') ||
-                        device.label.toLowerCase().includes('rear'));
-
+                        device.label.toLowerCase().includes('rear')
+                    );
                     const cameraId = backCamera ? backCamera.id : devices[0].id;
-
                     await html5QrCode.start(
                         {deviceId: cameraId},
                         config,
@@ -287,7 +285,7 @@
                 }
             } else {
                 // For regular web browsers
-                const cameraId = isAndroid ? "environment" : "user";
+                const cameraId = "environment";
                 await html5QrCode.start(
                     {facingMode: cameraId},
                     config,
@@ -303,7 +301,10 @@
     }
 
     // QR Scan Success Handler
+    let scanHandled = false;
     function onScanSuccess(decodedText) {
+        if (scanHandled) return;
+        scanHandled = true;
         try {
             if (html5QrCode) {
                 html5QrCode.stop().catch(console.error);
@@ -315,6 +316,8 @@
         } catch (error) {
             console.error('Error handling scan success:', error);
             showNotification('Error', 'Error processing QR code scan.', 'error');
+        } finally {
+            setTimeout(() => { scanHandled = false; }, 1000); // Reset for next scan
         }
     }
 
@@ -370,6 +373,23 @@
         const merchantCode = merchantCodeInput.value.trim();
         if (merchantCode.length >= 3) {
             fetchMerchantDetails(merchantCode);
+        }
+    });
+
+    // Add support for button click to fetch merchant details
+    const fetchMerchantButton = document.createElement('button');
+    fetchMerchantButton.type = 'button';
+    fetchMerchantButton.className = 'btn btn-outline-primary ms-2';
+    fetchMerchantButton.id = 'fetchMerchantButton';
+    fetchMerchantButton.innerHTML = '<i class="align-middle" data-lucide="search"></i> Fetch Merchant';
+    merchantCodeInput.parentNode.appendChild(fetchMerchantButton);
+
+    fetchMerchantButton.addEventListener('click', () => {
+        const merchantCode = merchantCodeInput.value.trim();
+        if (merchantCode.length >= 3) {
+            fetchMerchantDetails(merchantCode);
+        } else {
+            showNotification('Error', 'Please enter a valid merchant code.', 'error');
         }
     });
 
