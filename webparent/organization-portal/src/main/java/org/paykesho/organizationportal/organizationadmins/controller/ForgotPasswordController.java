@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.paykesho.organizationportal.settings.email.EmailSettingBag;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -102,21 +104,32 @@ public class ForgotPasswordController {
     }
 
 
-    private void sendTokenEmail(String verifyURL, String email) {
+    private void sendTokenEmail(String verifyURL, String email) throws javax.mail.MessagingException, java.io.UnsupportedEncodingException {
+        EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
+        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBags);
+
         String toAddress = email;
         String subject = "Password Reset";
-        String content = "<p>Hello, </p>" +
-                "<p>You requested for a password reset.</p>" +
-                "<p>Click the link below to change the password</>" +
-                "<p><a href=\"" + verifyURL + "\" >Change Password</a></p>" +
-                "<br>" +
-                "<p>Ignore this email if you do remember your password, or you have not made the request. </p>";
+        String content = "<p>Hello,</p>"
+                + "<p>You requested a password reset. Click the link below to change your password:</p>"
+                + "<p><a href=\"" + verifyURL + "\">Change Password</a></p>"
+                + "<p>If you did not request this, please ignore the email.</p>";
+
+        javax.mail.internet.MimeMessage mimeMessage = mailSender.createMimeMessage();
+        org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(mimeMessage);
+
+        helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        // mailSender.send(mimeMessage); // Uncomment if you want to send directly
 
         boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
         if (emailNotificationSent) {
-            LOGGER.info("Notification sent successfully for " + toAddress);
+            LOGGER.info("Notification sent successfully for {}", toAddress);
         } else {
-            LOGGER.error("Failed to send notification for " + toAddress);
+            LOGGER.error("Failed to send notification for {}", toAddress);
         }
     }
 
