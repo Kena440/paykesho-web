@@ -5,6 +5,14 @@
 <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Transactions','none')"></head>
 <body>
+<!-- Loader Overlay: Move directly under <body> for global centering -->
+<div id="loader" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center d-none" style="background: rgba(0,0,0,0.7) !important; z-index: 3000 !important; inset:0;">
+    <div class="d-flex flex-column align-items-center justify-content-center w-100 h-100">
+        <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;"></div>
+        <div class="text-white mt-4 fs-5 fw-semibold text-center">Processing, please wait...</div>
+    </div>
+</div>
+
 <div class="wrapper">
     <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
     <div class="main">
@@ -23,191 +31,117 @@
                     </div>
                 </div>
 
-                <!-- Loader with Overlay -->
-                <div class="position-fixed top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center"
-                     id="loader"
-                     style="background: rgba(0,0,0,0.5); z-index: 1050;">
-                    <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-
                 <div class="row mb-2 mb-xl-3">
                     <div class="col-auto d-none d-sm-block">
-                        <h3>Transaction Management</h3>
+                        <h3><i class="align-middle me-2" data-lucide="credit-card"></i> Transaction Management</h3>
                     </div>
-
                     <div class="col-auto ms-auto text-end mt-n1">
-                        <a class="btn btn-primary shadow-sm" th:href="@{/transactions}">
-                            <i class="align-middle" data-lucide="list">&nbsp;</i> My Transactions
+                        <a class="btn btn-outline-primary shadow-sm me-2" th:href="@{/transactions}">
+                            <i class="align-middle" data-lucide="list"></i> My Transactions
                         </a>
                         <a class="btn btn-primary shadow-sm" th:href="@{/transactions/initiate}">
-                            <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Initiate
+                            <i class="align-middle" data-lucide="plus-circle"></i> Initiate
                         </a>
                     </div>
                 </div>
 
                 <div class="row justify-content-center">
                     <div class="col-12 col-xl-8">
-                        <div class="card shadow-sm">
-                            <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="card shadow-lg border-0">
+                            <div class="card-header d-flex justify-content-between align-items-center bg-primary bg-opacity-10">
                                 <div>
-                                    <h5 class="card-title mb-0">[[${pageTitle}]]</h5>
-                                    <h6 class="card-subtitle text-muted">Make a quick payment.</h6>
+                                    <h5 class="card-title mb-0"><i class="align-middle me-1 text-primary" data-lucide="zap"></i> [[${pageTitle}]]</h5>
+                                    <h6 class="card-subtitle text-muted">Make a quick payment with confidence.</h6>
                                 </div>
                                 <div class="dropdown">
-                                    <button aria-expanded="false" class="btn btn-link text-muted"
-                                            data-bs-toggle="dropdown"
-                                            type="button">
+                                    <button aria-expanded="false" class="btn btn-link text-muted" data-bs-toggle="dropdown" type="button">
                                         <i class="align-middle" data-lucide="help-circle"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><h6 class="dropdown-header">How to make a payment</h6></li>
-                                        <li><a class="dropdown-item" data-bs-target="#helpModal" data-bs-toggle="modal"
-                                               href="#">
-                                            <i class="align-middle me-2" data-lucide="info"></i>
-                                            View Instructions
+                                        <li><a class="dropdown-item" data-bs-target="#helpModal" data-bs-toggle="modal" href="#">
+                                            <i class="align-middle me-2" data-lucide="info"></i> View Instructions
                                         </a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" data-bs-target="#faqModal" data-bs-toggle="modal"
-                                               href="#">
-                                            <i class="align-middle me-2" data-lucide="help-circle"></i>
-                                            FAQ
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" data-bs-target="#faqModal" data-bs-toggle="modal" href="#">
+                                            <i class="align-middle me-2" data-lucide="help-circle"></i> FAQ
                                         </a></li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form class="needs-validation" id="paymentForm" novalidate>
-                                    <div class="row g-3">
+                                <form class="needs-validation" id="paymentForm" novalidate autocomplete="off">
+                                    <div class="row g-4">
                                         <div class="col-12">
-                                            <div class="form-floating">
-                                                <input autocomplete="off" class="form-control"
-                                                       id="merchantCode"
-                                                       pattern="[A-Za-z0-9]+" placeholder="Enter Merchant Code"
-                                                       required
-                                                       title="Please enter a valid merchant code"
-                                                       type="text">
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" id="merchantCode" pattern="[A-Za-z0-9]+" placeholder="Enter Merchant Code" required title="Please enter a valid merchant code" type="text">
                                                 <label for="merchantCode">
                                                     Merchant Code
-                                                    <i class="align-middle ms-1" data-bs-toggle="tooltip"
-                                                       data-lucide="info"
-                                                       title="Enter the merchant code or scan their QR code"></i>
+                                                    <i class="align-middle ms-1 text-info" data-bs-toggle="tooltip" data-lucide="info" title="Enter the merchant code or scan their QR code"></i>
                                                 </label>
-                                                <div class="invalid-feedback">
-                                                    Please enter a valid merchant code.
-                                                </div>
+                                                <div class="invalid-feedback">Please enter a valid merchant code.</div>
                                             </div>
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-                                                <button class="btn btn-outline-primary" id="scanQrButton" type="button">
+                                                <button class="btn btn-outline-secondary" id="scanQrButton" type="button">
                                                     <i class="align-middle" data-lucide="qr-code"></i> Scan QR Code
                                                 </button>
                                             </div>
                                         </div>
-
                                         <div class="col-12">
-                                            <div class="card card-body bg-light" id="qrScannerContainer"
-                                                 style="display: none;">
+                                            <div class="card card-body bg-light border-0" id="qrScannerContainer" style="display: none;">
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <h6 class="mb-0">QR Code Scanner</h6>
+                                                    <h6 class="mb-0"><i class="align-middle me-1 text-primary" data-lucide="scan"></i> QR Code Scanner</h6>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" id="torchToggle"
-                                                               type="checkbox">
+                                                        <input class="form-check-input" id="torchToggle" type="checkbox">
                                                         <label class="form-check-label" for="torchToggle">Torch</label>
                                                     </div>
                                                 </div>
                                                 <div class="w-100" id="reader"></div>
                                                 <div class="text-center mt-2">
-                                                    <button class="btn btn-sm btn-outline-danger" id="stopScanButton"
-                                                            type="button">
+                                                    <button class="btn btn-sm btn-outline-danger" id="stopScanButton" type="button">
                                                         <i class="align-middle" data-lucide="x"></i> Stop Scanning
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div class="col-12" id="merchantDetails" style="display: none;">
-                                            <div class="card bg-light">
+                                            <div class="card bg-light border-0">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h5 class="card-title mb-0">Merchant Information</h5>
+                                                    <h5 class="card-title mb-0"><i class="align-middle me-1 text-success" data-lucide="user-check"></i> Merchant Information</h5>
                                                     <span class="badge bg-success" id="merchantStatus">Verified</span>
                                                 </div>
                                                 <div class="card-body">
                                                     <dl class="row mb-1">
                                                         <dt class="col-4 col-xxl-3">Name</dt>
-                                                        <dd class="col-8 col-xxl-9">
-                                                            <span id="merchantName"></span>
-                                                        </dd>
+                                                        <dd class="col-8 col-xxl-9"><span id="merchantName"></span></dd>
                                                         <dt class="col-4 col-xxl-3">Type</dt>
-                                                        <dd class="col-8 col-xxl-9">
-                                                            <span id="merchantType"></span>
-                                                        </dd>
+                                                        <dd class="col-8 col-xxl-9"><span id="merchantType"></span></dd>
                                                     </dl>
-
                                                     <hr>
-
-                                                    <div class="form-floating mb-3" id="amountSection"
-                                                         style="display: none;">
-                                                        <input class="form-control" id="amount"
-                                                               min="20"
-                                                               placeholder="Enter Amount"
-                                                               required
-                                                               step="0.1"
-                                                               type="number">
+                                                    <div class="form-floating mb-3" id="amountSection" style="display: none;">
+                                                        <input class="form-control" id="amount" min="20" placeholder="Enter Amount" required step="0.1" type="number">
                                                         <label for="amount">
                                                             Amount (K)
-                                                            <i class="align-middle ms-1" data-bs-toggle="tooltip"
-                                                               data-lucide="info"
-                                                               title="Minimum amount: K20"></i>
+                                                            <i class="align-middle ms-1 text-info" data-bs-toggle="tooltip" data-lucide="info" title="Minimum amount: K20"></i>
                                                         </label>
-                                                        <div class="invalid-feedback">
-                                                            Please enter a valid amount (minimum K20).
-                                                        </div>
+                                                        <div class="invalid-feedback">Please enter a valid amount (minimum K20).</div>
                                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
                                                             <div class="dropdown">
-                                                                <button aria-expanded="false"
-                                                                        class="btn btn-outline-secondary dropdown-toggle"
-                                                                        data-bs-toggle="dropdown"
-                                                                        id="quickAmounts" type="button">
-                                                                    <i class="align-middle"
-                                                                       data-lucide="dollar-sign"></i> Quick Amounts
+                                                                <button aria-expanded="false" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="quickAmounts" type="button">
+                                                                    <i class="align-middle" data-lucide="dollar-sign"></i> Quick Amounts
                                                                 </button>
-                                                                <ul aria-labelledby="quickAmounts"
-                                                                    class="dropdown-menu">
-                                                                    <li><h6 class="dropdown-header">Quick Amounts</h6>
-                                                                    </li>
-                                                                    <li>
-                                                                        <button class="dropdown-item" data-amount="20"
-                                                                                type="button">K20
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <button class="dropdown-item" data-amount="50"
-                                                                                type="button">K50
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <button class="dropdown-item" data-amount="100"
-                                                                                type="button">K100
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <button class="dropdown-item" data-amount="200"
-                                                                                type="button">K200
-                                                                        </button>
-                                                                    </li>
+                                                                <ul class="dropdown-menu">
+                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="20">K20</a></li>
+                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="50">K50</a></li>
+                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="100">K100</a></li>
+                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="200">K200</a></li>
                                                                 </ul>
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    <div class="d-grid gap-2 mt-3" id="submitSection"
-                                                         style="display: none;">
-                                                        <button class="btn btn-success" type="submit">
-                                                            <i class="align-middle me-2" data-lucide="check-circle"></i>
-                                                            Confirm Payment
+                                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                                        <button class="btn btn-success px-4" id="submitPayment" type="submit">
+                                                            <i class="align-middle" data-lucide="send"></i> Pay Now
                                                         </button>
                                                     </div>
                                                 </div>
@@ -219,41 +153,45 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
-        <footer th:replace="fragments/fragments :: footer1()"></footer>
-    </div>
-</div>
-
-<!-- Help Modal -->
-<div class="modal fade" id="helpModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">How to Make a Payment</h5>
-                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
-            </div>
-            <div class="modal-body">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item">
-                        <h6 class="mb-1">1. Enter Merchant Code</h6>
-                        <p class="mb-0">Type in the merchant code or use the scan button to scan their QR code.</p>
+                <!-- Modals for Help and FAQ -->
+                <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="helpModalLabel">How to Make a Payment</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ol>
+                                    <li>Enter or scan the merchant code.</li>
+                                    <li>Verify merchant details.</li>
+                                    <li>Enter the amount and click <b>Pay Now</b>.</li>
+                                    <li>Wait for confirmation and notification.</li>
+                                </ol>
+                            </div>
+                        </div>
                     </div>
-                    <div class="list-group-item">
-                        <h6 class="mb-1">2. Verify Merchant</h6>
-                        <p class="mb-0">Check the merchant details to ensure you're paying the correct business.</p>
-                    </div>
-                    <div class="list-group-item">
-                        <h6 class="mb-1">3. Enter Amount</h6>
-                        <p class="mb-0">Type in the payment amount (minimum K20).</p>
-                    </div>
-                    <div class="list-group-item">
-                        <h6 class="mb-1">4. Confirm Payment</h6>
-                        <p class="mb-0">Review the details and click confirm to complete the payment.</p>
+                </div>
+                <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="faqModalLabel">Frequently Asked Questions</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ul>
+                                    <li><b>What is a merchant code?</b> <br> It's a unique code for each merchant. You can get it from the merchant or scan their QR code.</li>
+                                    <li><b>Is my payment secure?</b> <br> Yes, all payments are processed securely and you receive instant confirmation.</li>
+                                    <li><b>What if I enter the wrong amount?</b> <br> You can cancel before confirming. Double-check before submitting.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
+        <footer th:replace="fragments/fragments :: footer1()"></footer>
     </div>
 </div>
 
@@ -265,6 +203,8 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Custom Scripts -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -299,30 +239,15 @@
 
     // Show notification using the generic modal
     function showNotification(title, message, type = 'info') {
-        const genericModalEl = document.getElementById('genericModal');
-        if (!genericModalEl) {
-            console.error('Generic modal element not found!');
-            alert(`${title}: ${message}`);
-            return;
-        }
-
-        const modalTitle = genericModalEl.querySelector('.modal-title');
-        const modalBody = genericModalEl.querySelector('.modal-body');
-        const modalHeader = genericModalEl.querySelector('.modal-header');
-
-        if (modalTitle) modalTitle.textContent = title;
-        if (modalBody) modalBody.innerHTML = `<p>${message}</p>`;
-
-        if (modalHeader) {
-            modalHeader.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
-            if (type === 'success') modalHeader.classList.add('bg-success');
-            else if (type === 'error') modalHeader.classList.add('bg-danger');
-            else if (type === 'warning') modalHeader.classList.add('bg-warning');
-            else if (type === 'info') modalHeader.classList.add('bg-info');
-        }
-
-        const genericModal = new bootstrap.Modal(genericModalEl);
-        genericModal.show();
+        Swal.fire({
+            title: title,
+            html: message,
+            icon: type,
+            confirmButtonColor: '#3085d6',
+            customClass: {
+                popup: 'swal2-border-radius'
+            }
+        });
     }
 
     // Initialize QR Scanner with WebView support
@@ -402,27 +327,41 @@
     // Fetch Merchant Details Function
     function fetchMerchantDetails(merchantCode) {
         showLoader();
-
         fetch(`/merchants/rest/merchant-details?code=${merchantCode}`)
-            .then(response => response.json())
-            .then(data => {
+            .then(async response => {
                 hideLoader();
-
-                if (data != null) {
+                if (!response.ok) {
+                    // HTTP error (e.g. 404, 500)
+                    const text = await response.text();
+                    console.error('Merchant fetch HTTP error:', response.status, text);
+                    showNotification('Error', `Merchant fetch failed: ${response.statusText}`, 'error');
+                    return;
+                }
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Merchant fetch JSON error:', e);
+                    showNotification('Error', 'Invalid response from server.', 'error');
+                    return;
+                }
+                // Log for debugging
+                console.log('Merchant details response:', data);
+                if (data && data.name && data.type) {
                     merchantNameSpan.textContent = data.name;
                     merchantTypeSpan.textContent = data.type;
                     merchantDetailsDiv.style.display = 'block';
                     amountSection.style.display = 'block';
-                    submitSection.style.display = 'block';
+                    submitSection && (submitSection.style.display = 'block');
                     showNotification('Success', 'Merchant details loaded successfully!', 'success');
                 } else {
-                    showNotification('Error', 'Merchant not found.', 'error');
+                    showNotification('Error', 'Merchant not found or incomplete data.', 'error');
                 }
             })
             .catch(error => {
                 hideLoader();
                 console.error('Error fetching merchant details:', error);
-                showNotification('Error', 'An error occurred while fetching merchant details.', 'error');
+                showNotification('Error', 'A network error occurred while fetching merchant details.', 'error');
             });
     }
 
@@ -526,22 +465,34 @@
             },
             body: JSON.stringify({merchantCode, amount})
         })
-            .then(response => response.json())
-            .then(data => {
+            .then(async response => {
                 hideLoader();
-
-                if (data.success) {
+                let data;
+                try {
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.indexOf('application/json') !== -1) {
+                        data = await response.json();
+                    } else {
+                        throw new Error('Response is not JSON');
+                    }
+                } catch (e) {
+                    showNotification('Error', 'Invalid response from server.', 'error');
+                    return;
+                }
+                // Accept multiple success patterns
+                if (data.success === true || data.status === 'success' || data.paymentId || data.id) {
                     showNotification('Success', 'Payment successful!', 'success');
                     paymentForm.reset();
                     paymentForm.classList.remove('was-validated');
                     merchantDetailsDiv.style.display = 'none';
                     amountSection.style.display = 'none';
-                    submitSection.style.display = 'none';
+                    submitSection && (submitSection.style.display = 'none');
                     setTimeout(() => {
                         window.location.href = '/transactions';
                     }, 2000);
                 } else {
-                    showNotification('Error', 'Payment failed: ' + data.message, 'error');
+                    showNotification('Error', 'Payment failed: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
             .catch(error => {
@@ -555,11 +506,21 @@
     function showLoader() {
         loader.classList.remove('d-none');
         loader.classList.add('d-flex');
+        loader.style.display = 'flex';
+        loader.style.alignItems = 'center';
+        loader.style.justifyContent = 'center';
+        loader.style.position = 'fixed';
+        loader.style.top = '0';
+        loader.style.left = '0';
+        loader.style.width = '100vw';
+        loader.style.height = '100vh';
+        loader.style.zIndex = '3000';
+        loader.style.background = 'rgba(0,0,0,0.7)';
     }
-
     function hideLoader() {
         loader.classList.remove('d-flex');
         loader.classList.add('d-none');
+        loader.style.display = 'none';
     }
 
     // Cleanup on page unload

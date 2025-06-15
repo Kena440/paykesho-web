@@ -273,7 +273,7 @@
             $btnFileUpload = $('<a />', {
                 class: "richText-btn",
                 "title": settings.translations.addFile,
-                html: '<span class="fa fa-file-text-o far fa-file-alt"></span>'
+                html: '<span class="fa fa-file-text-o fas fa-file-alt"></span>'
             }), // file
             $btnURLs = $('<a />', {
                 class: "richText-btn",

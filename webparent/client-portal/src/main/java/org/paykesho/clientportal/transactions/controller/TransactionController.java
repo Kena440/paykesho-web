@@ -18,6 +18,7 @@ import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,15 +41,17 @@ import java.util.Map;
 @RequestMapping("/transactions")
 public class TransactionController {
 
+    @Autowired
     private ClientService clientService;
+    @Autowired
     private VoucherService voucherService;
-
+    @Autowired
     private MerchantService merchantService;
-
+    @Autowired
     private PaykeshoReferenceService paykeshoReferenceService;
-
+    @Autowired
     private TransactionsService transactionsService;
-
+    @Autowired
     private NotificationClient notificationClient;
 
     @GetMapping("")
