@@ -32,7 +32,7 @@ public class MerchantAdminController {
         if (merchant != null) {
             merchantAdmin.setAccountNonLocked(true);
             merchantAdmin.setFailedAttempt(0);
-            MerchantAdmin admin = memberAdminService.save(request, merchantAdmin);
+            MerchantAdmin admin = memberAdminService.save(request, merchantAdmin, merchant);
             merchant.setContactPerson(admin);
             merchantService.save(merchant);
         } else {

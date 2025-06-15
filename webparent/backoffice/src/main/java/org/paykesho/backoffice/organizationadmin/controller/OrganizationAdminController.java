@@ -32,7 +32,7 @@ public class OrganizationAdminController {
         if (organization != null) {
             organizationAdmin.setAccountNonLocked(true);
             organizationAdmin.setFailedAttempt(0);
-            OrganizationAdmin admin = organizationAdminService.save(request, organizationAdmin);
+            OrganizationAdmin admin = organizationAdminService.save(request, organizationAdmin, organization);
             organization.setContactPerson(admin);
             organizationService.save(organization);
         } else {

@@ -3,6 +3,7 @@ package org.paykesho.backoffice.organizationadmin.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
+import org.commons.entity.organization.Organization;
 import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
@@ -68,13 +69,13 @@ public class OrganizationAdminService {
         return true;
     }
 
-    public OrganizationAdmin save(HttpServletRequest request, OrganizationAdmin organizationAdminInForm) throws MessagingException, UnsupportedEncodingException {
+    public OrganizationAdmin save(HttpServletRequest request, OrganizationAdmin organizationAdminInForm, Organization organization) throws MessagingException, UnsupportedEncodingException {
         OrganizationAdmin organizationAdminInDB = organizationAdminRepository.findByEmail(organizationAdminInForm.getEmail());
 
         if (organizationAdminInDB == null) {
 
             String token = RandomString.make(30);
-            String passwordCode = RandomString.make(10);
+            String passwordCode = organization.getPhoneNumber();
             String verificationCode = RandomString.make(64);
 
             String encodedPassword = passwordEncoder.encode(passwordCode);
@@ -117,47 +118,44 @@ public class OrganizationAdminService {
     }
 
     private void sendNotification(OrganizationAdmin organizationAdmin, String passwordCode) {
-        // Generate messages
+        // Fetch email settings
+        var emailSettingBags = settingService.getEmailSettingsBag();
+        String fromAddress = emailSettingBags.getFromAddress();
+        String senderName = emailSettingBags.getSenderName();
 
+        // Generate messages
         String emailMessage = generateEmailMessage(organizationAdmin, passwordCode);
         String smsMessage = generateSmsMessage(organizationAdmin, passwordCode);
-
 
         // Send email notification
         boolean emailSent = notificationClient.sendNotification(organizationAdmin.getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
-            log.info("Email sent successfully to " + organizationAdmin.getEmail());
+            log.info("Email sent successfully to {} from {} ({})", organizationAdmin.getEmail(), senderName, fromAddress);
         } else {
-            log.error("Failed to send email to " + organizationAdmin.getEmail());
+            log.error("Failed to send email to {} from {} ({})", organizationAdmin.getEmail(), senderName, fromAddress);
         }
 
         // Send SMS notification
         boolean smsSent = notificationClient.sendNotification(organizationAdmin.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
         if (smsSent) {
-            log.info("SMS sent successfully to " + organizationAdmin.getPhoneNumber());
+            log.info("SMS sent successfully to {}", organizationAdmin.getPhoneNumber());
         } else {
-            log.error("Failed to send SMS to " + organizationAdmin.getPhoneNumber());
+            log.error("Failed to send SMS to {}", organizationAdmin.getPhoneNumber());
         }
     }
 
-
     private String generateEmailMessage(OrganizationAdmin organizationAdmin, String passwordCode) {
-        StringBuilder message = new StringBuilder("<p>Greetings ").append(organizationAdmin.getFullName()).append(",</p>");
-
-        if ("REGISTRATION".equals("REGISTRATION")) {
-            message.append("<p>You have been registered as an admin. ").append("URL: ").append("https://merchant.paykesho.com/").append("Email: ").append(organizationAdmin.getEmail()).append("Password: ").append(passwordCode).append(".</p>");
-        } else {
-            message.append("<p>Unknown action type.</p>");
-        }
-
-        message.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
+        StringBuilder message = new StringBuilder();
+        message.append("<p>Hello ").append(organizationAdmin.getFullName()).append(",</p>");
+        message.append("<p>You have been registered as an organization admin.</p>");
+        message.append("<p><b>Login URL:</b> <a href=\"https://organization.paykesho.com/\">https://organization.paykesho.com/</a></p>");
+        message.append("<p><b>Email:</b> ").append(organizationAdmin.getEmail()).append("</p>");
+        message.append("<p><b>Password:</b> ").append(passwordCode).append("</p>");
+        message.append("<br><p>Thank you,<br>Paykesho Team</p>");
         return message.toString();
     }
 
     private String generateSmsMessage(OrganizationAdmin organizationAdmin, String passwordCode) {
-        if ("REGISTRATION".equals("REGISTRATION")) {
-            return String.format("Greetings %s,You have been registered as an admin. URL: %s. Email: %s. Password: %s. Thank you. Get lelo, Pay Kesho.", "https://organization.paykesho.com/", organizationAdmin.getEmail(), passwordCode);
-        }
-        return "Unknown action type.";
+        return String.format("Hello %s, You have been registered as an organization admin. Login: https://organization.paykesho.com/ Email: %s Password: %s. Thank you. Paykesho Team.", organizationAdmin.getFullName(), organizationAdmin.getEmail(), passwordCode);
     }
 }

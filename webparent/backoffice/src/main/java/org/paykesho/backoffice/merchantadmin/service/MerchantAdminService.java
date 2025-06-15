@@ -3,6 +3,7 @@ package org.paykesho.backoffice.merchantadmin.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
+import org.commons.entity.merchant.Merchant;
 import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
@@ -68,13 +69,13 @@ public class MerchantAdminService {
         return true;
     }
 
-    public MerchantAdmin save(HttpServletRequest request, MerchantAdmin merchantAdmin) throws MessagingException, UnsupportedEncodingException {
+    public MerchantAdmin save(HttpServletRequest request, MerchantAdmin merchantAdmin, Merchant merchant) throws MessagingException, UnsupportedEncodingException {
         MerchantAdmin merchantAdminInDB = merchantAdminRepository.findByEmail(merchantAdmin.getEmail());
 
         if (merchantAdminInDB == null) {
 
             String token = RandomString.make(30);
-            String passwordCode = RandomString.make(10);
+            String passwordCode = merchant.getCode();
             String verificationCode = RandomString.make(64);
 
             String encodedPassword = passwordEncoder.encode(passwordCode);
@@ -109,18 +110,21 @@ public class MerchantAdminService {
     }
 
     private void sendNotification(MerchantAdmin merchantAdmin, String passwordCode) {
-        // Generate messages
+        // Fetch email settings
+        var emailSettingBags = settingService.getEmailSettingsBag();
+        String fromAddress = emailSettingBags.getFromAddress();
+        String senderName = emailSettingBags.getSenderName();
 
+        // Generate messages
         String emailMessage = generateEmailMessage(merchantAdmin, passwordCode);
         String smsMessage = generateSmsMessage(merchantAdmin, passwordCode);
-
 
         // Send email notification
         boolean emailSent = notificationClient.sendNotification(merchantAdmin.getEmail(), emailMessage, NotificationType.email.defaultDescription());
         if (emailSent) {
-            log.info("Email sent successfully to {}", merchantAdmin.getEmail());
+            log.info("Email sent successfully to {} from {} ({})", merchantAdmin.getEmail(), senderName, fromAddress);
         } else {
-            log.error("Failed to send email to {}", merchantAdmin.getEmail());
+            log.error("Failed to send email to {} from {} ({})", merchantAdmin.getEmail(), senderName, fromAddress);
         }
 
         // Send SMS notification
@@ -132,25 +136,18 @@ public class MerchantAdminService {
         }
     }
 
-
     private String generateEmailMessage(MerchantAdmin merchantAdmin, String passwordCode) {
-        StringBuilder message = new StringBuilder("<p>Greetings ").append(merchantAdmin.getFullName()).append(",</p>");
-
-        if ("REGISTRATION".equals("REGISTRATION")) {
-            message.append("<p>You have been registered as an admin. ").append("URL: ").append("https://merchant.paykesho.com/").append("Email: ").append(merchantAdmin.getEmail()).append("Password: ").append(passwordCode).append(".</p>");
-        } else {
-            message.append("<p>Unknown action type.</p>");
-        }
-
-        message.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
+        StringBuilder message = new StringBuilder();
+        message.append("<p>Hello ").append(merchantAdmin.getFullName()).append(",</p>");
+        message.append("<p>You have been registered as a merchant admin.</p>");
+        message.append("<p><b>Login URL:</b> <a href=\"https://merchant.paykesho.com/\">https://merchant.paykesho.com/</a></p>");
+        message.append("<p><b>Email:</b> ").append(merchantAdmin.getEmail()).append("</p>");
+        message.append("<p><b>Password:</b> ").append(passwordCode).append("</p>");
+        message.append("<br><p>Thank you,<br>Paykesho Team</p>");
         return message.toString();
     }
 
-
     private String generateSmsMessage(MerchantAdmin merchantAdmin, String passwordCode) {
-        if ("REGISTRATION".equals("REGISTRATION")) {
-            return String.format("Greetings %s,You have been registered as an admin. URL: %s. Email: %s. Password: %s. Thank you. Get lelo, Pay Kesho.", "https://merchant.paykesho.com/", merchantAdmin.getEmail(), passwordCode);
-        }
-        return "Unknown action type.";
+        return String.format("Hello %s, You have been registered as a merchant admin. Login: https://merchant.paykesho.com/ Email: %s Password: %s. Thank you. Paykesho Team.", merchantAdmin.getFullName(), merchantAdmin.getEmail(), passwordCode);
     }
 }

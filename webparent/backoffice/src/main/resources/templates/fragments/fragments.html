@@ -517,18 +517,18 @@
 </div>
 
 <div th:fragment="format_currency(amount)" th:remove="tag">
-    <span th:if="${CURRENCY_SYMBOL_POSITION == 'before price'}" th:remove="tag">[[${CURRENCY_SYMBOL}]]</span>
-    [[${#numbers.formatDecimal(amount, 1, THOUSAND_POINT_TYPE, DECIMAL_DIGITS, DECIMAL_POINT_TYPE)}]]
-    <span th:if="${CURRENCY_SYMBOL_POSITION == 'after price'}" th:remove="tag">[[${CURRENCY_SYMBOL}]]</span>
+    <span th:if="true" th:remove="tag">K</span>
+    [[${#numbers.formatDecimal(amount, 1, 'COMMA', 2, 'POINT')}]]
+    <span th:if="false" th:remove="tag"></span>
 </div>
 
 <div th:fragment="format_number(amount)" th:remove="tag">
-    [[${#numbers.formatDecimal(amount, 1, THOUSAND_POINT_TYPE, 0, DECIMAL_POINT_TYPE)}]]
+    [[${#numbers.formatDecimal(amount, 1, 'COMMA', 0, 'POINT')}]]
 </div>
 
 <div th:fragment="currency_input(amount)" th:remove="tag">
     <input class="form-control" readonly
-           th:value="${(CURRENCY_SYMBOL_POSITION == 'before price' ? CURRENCY_SYMBOL : '') + #numbers.formatDecimal(amount, 1, THOUSANDS_POINT_TYPE, DECIMAL_DIGITS, DECIMAL_POINT_TYPE) + (CURRENCY_SYMBOL_POSITION == 'after price' ? CURRENCY_SYMBOL : '')}"
+           th:value="${'K' + #numbers.formatDecimal(amount, 1, 'COMMA', 2, 'POINT')}"
            type="text">
 </div>
 
@@ -624,3 +624,4 @@
 </th:block>
 </body>
 </html>
+
