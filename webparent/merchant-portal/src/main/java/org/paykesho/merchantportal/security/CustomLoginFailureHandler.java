@@ -4,6 +4,10 @@ package org.paykesho.merchantportal.security;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
+import org.commons.entity.merchant.MerchantAdmin;
+import org.springframework.security.authentication.LockedException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,38 +17,31 @@ import java.io.IOException;
 @Component
 public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-/*    @Autowired
-    private AssessorService assessorService;*/
+    @Autowired
+    private MerchantAdminService merchantAdminService;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-/*        String email = request.getParameter("email");
-        Assessor assessor = assessorService.getAssessorByEmail(email);
+        String email = request.getParameter("email");
+        MerchantAdmin merchantAdmin = merchantAdminService.getMerchantAdminByEmail(email);
 
-        if (assessor != null) {
-            if (assessor.isEnabled() && assessor.isAccountNonLocked()) {
-                if (assessor.getFailedAttempt() < AssessorService.MAX_FAILED_ATTEMPTS - 1) {
-                    assessorService.increaseFailedAttempts(assessor);
-
-                    //todo code for email to user on failed login
+        if (merchantAdmin != null) {
+            if (merchantAdmin.isEnabled() && merchantAdmin.isAccountNonLocked()) {
+                if (merchantAdmin.getFailedAttempt() < MerchantAdminService.MAX_FAILED_ATTEMPTS - 1) {
+                    merchantAdminService.increaseFailedAttempts(merchantAdmin);
                 } else {
-                    assessorService.lock(assessor);
-                    exception = new LockedException("Your account has been locked due to 3 failed attempts."
-                            + " It will be unlocked after 24 hours.");
-                    //todo code for email to user on failed login
+                    merchantAdminService.lock(merchantAdmin);
+                    exception = new LockedException("Your account has been locked due to 3 failed attempts. It will be unlocked after 24 hours.");
                 }
-            } else if (!assessor.isAccountNonLocked()) {
-                if (assessorService.unlockWhenTimeExpired(assessor)) {
+            } else if (!merchantAdmin.isAccountNonLocked()) {
+                if (merchantAdminService.unlockWhenTimeExpired(merchantAdmin)) {
                     exception = new LockedException("Your account has been unlocked. Please try to login again.");
-                    //todo code for email to user on failed login
                 }
             }
-
         }
-
         super.setDefaultFailureUrl("/login?error");
-        super.onAuthenticationFailure(request, response, exception);*/
+        super.onAuthenticationFailure(request, response, exception);
     }
 
 }
