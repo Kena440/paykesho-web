@@ -73,9 +73,12 @@
                                 <form class="needs-validation" id="paymentForm" novalidate autocomplete="off">
                                     <div class="row g-4">
                                         <div class="col-12">
-                                            <div class="form-floating mb-3">
+                                            <div class="input-group mb-3">
                                                 <input class="form-control" id="merchantCode" pattern="[A-Za-z0-9]+" placeholder="Enter Merchant Code" required title="Please enter a valid merchant code" type="text">
-                                                <label for="merchantCode">
+                                                <button class="btn btn-outline-primary" type="button" id="fetchMerchantButton">
+                                                    <i class="align-middle" data-lucide="search"></i> Fetch Merchant
+                                                </button>
+                                                <label for="merchantCode" class="input-group-text bg-white border-start-0">
                                                     Merchant Code
                                                     <i class="align-middle ms-1 text-info" data-bs-toggle="tooltip" data-lucide="info" title="Enter the merchant code or scan their QR code"></i>
                                                 </label>
@@ -126,16 +129,11 @@
                                                         </label>
                                                         <div class="invalid-feedback">Please enter a valid amount (minimum K20).</div>
                                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-                                                            <div class="dropdown">
-                                                                <button aria-expanded="false" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="quickAmounts" type="button">
-                                                                    <i class="align-middle" data-lucide="dollar-sign"></i> Quick Amounts
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="20">K20</a></li>
-                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="50">K50</a></li>
-                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="100">K100</a></li>
-                                                                    <li><a class="dropdown-item quick-amount" href="#" data-amount="200">K200</a></li>
-                                                                </ul>
+                                                            <div class="btn-group" role="group" aria-label="Quick Amounts">
+                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="20">K20</button>
+                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="50">K50</button>
+                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="100">K100</button>
+                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="200">K200</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -232,6 +230,7 @@
     const torchToggle = document.getElementById('torchToggle');
 
     let html5QrCode = null;
+    let merchantFetchTimeout = null;
 
     // Initialize tooltips
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -371,25 +370,23 @@
     // Event Listeners
     merchantCodeInput.addEventListener('input', () => {
         const merchantCode = merchantCodeInput.value.trim();
-        if (merchantCode.length >= 3) {
-            fetchMerchantDetails(merchantCode);
+        if (merchantFetchTimeout) clearTimeout(merchantFetchTimeout);
+        // Only fetch if code is exactly 11 characters (e.g. M20241MT6ZW)
+        if (merchantCode.length === 11) {
+            merchantFetchTimeout = setTimeout(() => {
+                fetchMerchantDetails(merchantCode);
+            }, 500); // 500ms debounce
         }
     });
 
-    // Add support for button click to fetch merchant details
-    const fetchMerchantButton = document.createElement('button');
-    fetchMerchantButton.type = 'button';
-    fetchMerchantButton.className = 'btn btn-outline-primary ms-2';
-    fetchMerchantButton.id = 'fetchMerchantButton';
-    fetchMerchantButton.innerHTML = '<i class="align-middle" data-lucide="search"></i> Fetch Merchant';
-    merchantCodeInput.parentNode.appendChild(fetchMerchantButton);
-
+    const fetchMerchantButton = document.getElementById('fetchMerchantButton');
     fetchMerchantButton.addEventListener('click', () => {
         const merchantCode = merchantCodeInput.value.trim();
-        if (merchantCode.length >= 3) {
+        if (merchantFetchTimeout) clearTimeout(merchantFetchTimeout);
+        if (merchantCode.length === 11) {
             fetchMerchantDetails(merchantCode);
         } else {
-            showNotification('Error', 'Please enter a valid merchant code.', 'error');
+            showNotification('Error', 'Please enter a valid merchant code (11 characters).', 'error');
         }
     });
 
@@ -433,9 +430,9 @@
     //     dropdown.show();
     // });
 
-    // Use event delegation for dropdown items as the menu is now part of the DOM structure
+    // Update event delegation for quick-amount buttons
     document.getElementById('amountSection').addEventListener('click', (event) => {
-        if (event.target.classList.contains('dropdown-item')) {
+        if (event.target.classList.contains('quick-amount')) {
             const amount = event.target.dataset.amount;
             document.getElementById('amount').value = amount;
             showNotification('Info', `Amount set to K${amount}`, 'info');
