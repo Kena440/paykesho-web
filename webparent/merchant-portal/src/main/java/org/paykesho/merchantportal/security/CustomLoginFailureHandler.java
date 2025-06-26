@@ -1,6 +1,7 @@
 package org.paykesho.merchantportal.security;
 
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -17,8 +18,12 @@ import java.io.IOException;
 @Component
 public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    @Autowired
     private MerchantAdminService merchantAdminService;
+
+    @Autowired
+    public CustomLoginFailureHandler(@Lazy MerchantAdminService merchantAdminService) {
+        this.merchantAdminService = merchantAdminService;
+    }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
