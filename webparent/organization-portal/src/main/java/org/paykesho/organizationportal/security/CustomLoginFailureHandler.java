@@ -1,6 +1,7 @@
 package org.paykesho.organizationportal.security;
 
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -18,8 +19,12 @@ import org.springframework.security.authentication.LockedException;
 @Component
 public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    @Autowired
     private OrganizationAdminService organizationAdminService;
+
+    @Autowired
+    public CustomLoginFailureHandler(@Lazy OrganizationAdminService organizationAdminService) {
+        this.organizationAdminService = organizationAdminService;
+    }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
