@@ -67,7 +67,7 @@ public class ForgotPasswordController {
             model.addAttribute("pageTitle", "Password Reset");
 
         } else {
-            model.addAttribute("message", "invalid token. Member Admin not found");
+            model.addAttribute("message", "Invalid token. Organization admin not found");
             model.addAttribute("pageTitle", "Invalid Token");
             model.addAttribute("emoji", "128529");
 
@@ -95,7 +95,7 @@ public class ForgotPasswordController {
             return "register/password_reset_message";
 
         } catch (PaykeshoError e) {
-            model.addAttribute("message", "Invalid token. Member Admin not found");
+            model.addAttribute("message", "Invalid token. Organization admin not found");
             model.addAttribute("pageTitle", "Password Reset Failed");
             model.addAttribute("emoji", "128529");
             return "register/password_reset_message";
@@ -105,25 +105,12 @@ public class ForgotPasswordController {
 
 
     private void sendTokenEmail(String verifyURL, String email) throws javax.mail.MessagingException, java.io.UnsupportedEncodingException {
-        EmailSettingBag emailSettingBags = settingService.getEmailSettingsBag();
-        JavaMailSenderImpl mailSender = Utility.prepareMailSender(emailSettingBags);
-
         String toAddress = email;
         String subject = "Password Reset";
         String content = "<p>Hello,</p>"
                 + "<p>You requested a password reset. Click the link below to change your password:</p>"
                 + "<p><a href=\"" + verifyURL + "\">Change Password</a></p>"
                 + "<p>If you did not request this, please ignore the email.</p>";
-
-        javax.mail.internet.MimeMessage mimeMessage = mailSender.createMimeMessage();
-        org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(mimeMessage);
-
-        helper.setFrom(emailSettingBags.getFromAddress(), emailSettingBags.getSenderName());
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
-        helper.setText(content, true);
-
-        // mailSender.send(mimeMessage); // Uncomment if you want to send directly
 
         boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
         if (emailNotificationSent) {

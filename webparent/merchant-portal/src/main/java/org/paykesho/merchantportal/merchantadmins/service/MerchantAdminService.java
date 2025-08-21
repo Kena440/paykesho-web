@@ -142,14 +142,14 @@ public class MerchantAdminService {
 
             return token;
         } else {
-            throw new PaykeshoError("customer not found");
+            throw new PaykeshoError("Merchant admin not found with this email address");
         }
     }
 
     public void updatePassword(String token, String newPassword) throws PaykeshoError {
         MerchantAdmin merchantAdmin = merchantAdminRepository.findByResetToken(token);
         if (merchantAdmin == null) {
-            throw new PaykeshoError("no customer found. invalid token");
+            throw new PaykeshoError("Invalid reset token. Merchant admin not found");
         }
 
         merchantAdmin.setPassword(newPassword);

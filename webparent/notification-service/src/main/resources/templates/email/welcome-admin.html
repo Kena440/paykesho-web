@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/base :: html}">
+<head>
+    <title>Welcome to Paykesho - Admin Account Created</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <p>Welcome to <strong>Paykesho</strong>! We're excited to have you on board as an administrator.</p>
+        
+        <p>Your account has been successfully created and you now have access to our comprehensive admin portal.</p>
+        
+        <div class="highlight-box">
+            <h3>Your Login Credentials</h3>
+            <p><strong>Portal URL:</strong> <a th:href="${portalUrl}" th:text="${portalUrl}">https://admin.paykesho.com</a></p>
+            <p><strong>Email:</strong> <span th:text="${adminEmail}">admin@example.com</span></p>
+            <p><strong>Temporary Password:</strong> <code style="background-color: #fff; padding: 2px 6px; border-radius: 3px; font-family: monospace;" th:text="${temporaryPassword}">temp123</code></p>
+        </div>
+        
+        <div class="warning-box">
+            <h4>Security Recommendations</h4>
+            <ul>
+                <li>Change your password immediately after your first login</li>
+                <li>Use a strong, unique password with at least 8 characters</li>
+                <li>Enable two-factor authentication if available</li>
+                <li>Never share your credentials with others</li>
+                <li>Log out when accessing from shared devices</li>
+            </ul>
+        </div>
+        
+        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+        
+        <p>Best regards,<br><strong>The Paykesho Team</strong></p>
+    </div>
+</body>
+</html>

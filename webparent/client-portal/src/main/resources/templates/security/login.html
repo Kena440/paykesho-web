@@ -3,6 +3,39 @@
 
 <meta content="text/html;charset=UTF-8" http-equiv="content-type"/>
 <head th:replace="fragments/fragments :: page_head('Login','none')"></head>
+<style>
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.alert {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 
 <body>
 
@@ -70,12 +103,18 @@
                                 <input class="form-control form-control-lg" id="email" name="email"
                                        placeholder="Enter your email"
                                        type="email"/>
+                                <div class="invalid-feedback" id="emailError">
+                                    Please enter a valid email address.
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Password</label>
                                 <input class="form-control form-control-lg" id="password" name="password"
                                        placeholder="Enter your password"
                                        type="password"/>
+                                <div class="invalid-feedback" id="passwordError">
+                                    Please enter your password.
+                                </div>
                                 <small>
                                     <a class=" my-1" data-bs-target="#passwordResetModal" data-bs-toggle="modal"
                                        type="button">
@@ -148,6 +187,94 @@
 <footer th:replace="fragments/fragments :: footer1()"></footer>
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.querySelector('form[th\\:action="@{/login}"]');
+    const submitButton = loginForm.querySelector('button[type="submit"]');
+    
+    // Show loading state on form submission
+    loginForm.addEventListener('submit', function(e) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing in...';
+    });
+    
+    // Handle form validation
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    
+    function validateForm() {
+        let isValid = true;
+        
+        // Clear previous error states
+        emailInput.classList.remove('is-invalid');
+        passwordInput.classList.remove('is-invalid');
+        
+        // Validate email
+        if (!emailInput.value.trim()) {
+            emailInput.classList.add('is-invalid');
+            document.getElementById('emailError').textContent = 'Please enter your email address.';
+            isValid = false;
+        } else if (!isValidEmail(emailInput.value)) {
+            emailInput.classList.add('is-invalid');
+            document.getElementById('emailError').textContent = 'Please enter a valid email address.';
+            isValid = false;
+        }
+        
+        // Validate password
+        if (!passwordInput.value.trim()) {
+            passwordInput.classList.add('is-invalid');
+            document.getElementById('passwordError').textContent = 'Please enter your password.';
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    // Add validation on form submission
+    loginForm.addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Sign in';
+            return false;
+        }
+    });
+    
+    // Add real-time validation
+    emailInput.addEventListener('blur', function() {
+        if (this.value.trim() && !isValidEmail(this.value)) {
+            this.classList.add('is-invalid');
+            document.getElementById('emailError').textContent = 'Please enter a valid email address.';
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+    
+    passwordInput.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+            this.classList.add('is-invalid');
+            document.getElementById('passwordError').textContent = 'Please enter your password.';
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+    
+    // Auto-hide alerts after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+});
+</script>
 
 </body>
 
