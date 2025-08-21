@@ -142,14 +142,14 @@ public class OrganizationAdminService {
 
             return token;
         } else {
-            throw new PaykeshoError("customer not found");
+            throw new PaykeshoError("Organization admin not found with this email address");
         }
     }
 
     public void updatePassword(String token, String newPassword) throws PaykeshoError {
         OrganizationAdmin organizationAdmin = organizationAdminRepository.findByResetToken(token);
         if (organizationAdmin == null) {
-            throw new PaykeshoError("no customer found. invalid token");
+            throw new PaykeshoError("Invalid reset token. Organization admin not found");
         }
 
         organizationAdmin.setPassword(newPassword);

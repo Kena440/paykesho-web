@@ -1,5 +1,6 @@
 package org.paykesho.backoffice.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,6 +22,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ROLE_GENERAL = "General";
     private static final String ROLE_MERCHANT = "Merchant";
     private static final String ROLE_ORGANIZATION_ADMIN = "OrganizationAdmin";
+    
+    @Autowired
+    private CustomLoginFailureHandler loginFailureHandler;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -48,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/events/registration/**", "/events/generateQRCode", "/assessments/registration/**", "/assessments/generateQRCode").permitAll().antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN).anyRequest().authenticated().and().formLogin().loginPage("/login").usernameParameter("email")
-//                .failureHandler(loginFailureHandler)
+                .failureHandler(loginFailureHandler)
                 .permitAll().and().logout().permitAll().and().rememberMe().key("AbcDefgHijklmnOpqrs_1234567890").tokenValiditySeconds(7 * 24 * 60 * 60);
         http.headers().frameOptions().sameOrigin();
 

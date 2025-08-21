@@ -65,7 +65,7 @@ public class ForgotPasswordController {
             model.addAttribute("pageTitle", "Password Reset");
 
         } else {
-            model.addAttribute("message", "invalid token. Member Admin not found");
+            model.addAttribute("message", "Invalid token. Merchant admin not found");
             model.addAttribute("pageTitle", "Invalid Token");
             model.addAttribute("emoji", "128529");
 
@@ -93,7 +93,7 @@ public class ForgotPasswordController {
             return "register/password_reset_message";
 
         } catch (PaykeshoError e) {
-            model.addAttribute("message", "Invalid token. Member Admin not found");
+            model.addAttribute("message", "Invalid token. Merchant admin not found");
             model.addAttribute("pageTitle", "Password Reset Failed");
             model.addAttribute("emoji", "128529");
             return "register/password_reset_message";

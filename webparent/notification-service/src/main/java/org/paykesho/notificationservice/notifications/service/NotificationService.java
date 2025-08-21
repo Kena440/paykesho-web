@@ -6,6 +6,7 @@ import org.commons.entity.Notification;
 import org.commons.enums.NotificationType;
 import org.paykesho.notificationservice.notifications.repository.NotificationsRepository;
 import org.paykesho.notificationservice.utils.general.ApplicationProperties;
+import org.paykesho.notificationservice.utils.EmailTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -34,7 +36,7 @@ public class NotificationService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final NotificationsRepository notificationRepository;
     private final ApplicationProperties applicationProperties;
-
+    private final EmailTemplateService emailTemplateService;
 
     public static String trimString(String input) {
         if (input != null && input.length() > MAX_MESSAGE_LENGTH) {
@@ -84,6 +86,88 @@ public class NotificationService {
             logger.error("Error updating notification status: {}", e.getMessage());
         }
         return result;
+    }
+
+    /**
+     * Send welcome email to new admin users using template
+     */
+    public boolean sendWelcomeAdminEmail(String adminName, String adminEmail, String portalUrl, String temporaryPassword) {
+        try {
+            String emailContent = emailTemplateService.generateWelcomeAdminEmail(adminName, adminEmail, portalUrl, temporaryPassword);
+            return sendEmail(adminEmail, "Welcome to Paykesho - Admin Account Created", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending welcome admin email: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send welcome email to merchant admin using template
+     */
+    public boolean sendMerchantAdminWelcomeEmail(String adminName, String adminEmail, String merchantName, String portalUrl, String temporaryPassword) {
+        try {
+            String emailContent = emailTemplateService.generateMerchantAdminWelcomeEmail(adminName, adminEmail, merchantName, portalUrl, temporaryPassword);
+            return sendEmail(adminEmail, "Welcome to Paykesho Merchant Portal", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending merchant admin welcome email: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send welcome email to organization admin using template
+     */
+    public boolean sendOrganizationAdminWelcomeEmail(String adminName, String adminEmail, String organizationName, String portalUrl, String temporaryPassword) {
+        try {
+            String emailContent = emailTemplateService.generateOrganizationAdminWelcomeEmail(adminName, adminEmail, organizationName, portalUrl, temporaryPassword);
+            return sendEmail(adminEmail, "Welcome to Paykesho Organization Portal", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending organization admin welcome email: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send password reset email using template
+     */
+    public boolean sendPasswordResetEmail(String userName, String userEmail, String resetUrl) {
+        try {
+            String emailContent = emailTemplateService.generatePasswordResetEmail(userName, userEmail, resetUrl);
+            return sendEmail(userEmail, "Password Reset Request - Paykesho", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending password reset email: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send account locked notification email using template
+     */
+    public boolean sendAccountLockedEmail(String userName, String userEmail, LocalDateTime lockTime, LocalDateTime unlockTime) {
+        try {
+            String emailContent = emailTemplateService.generateAccountLockedEmail(userName, userEmail, lockTime, unlockTime);
+            return sendEmail(userEmail, "Account Security Alert - Paykesho", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending account locked email: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send custom templated email
+     */
+    public boolean sendCustomTemplatedEmail(String recipient, String subject, String greeting, String content, 
+                                          String highlightTitle, String highlightContent,
+                                          String warningTitle, String warningContent,
+                                          String actionUrl, String actionText) {
+        try {
+            String emailContent = emailTemplateService.generateCustomEmail(subject, greeting, content, recipient,
+                    highlightTitle, highlightContent, warningTitle, warningContent, actionUrl, actionText);
+            return sendEmail(recipient, subject, emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending custom templated email: {}", e.getMessage());
+            return false;
+        }
     }
 
     public boolean sendSms(String phoneNumber, String message) {
