@@ -39,18 +39,31 @@ public class VoucherService {
      * @return
      */
     public List<Voucher> listAll() {
-        List<Voucher> vouchers = (List<Voucher>) vouchersRepository.findAll(Sort.by("requestDate").descending());
+        try {
+            log.debug("Retrieving all vouchers");
+            List<Voucher> vouchers = (List<Voucher>) vouchersRepository.findAll(Sort.by("requestDate").descending());
+            log.debug("Found {} vouchers, enriching with file access details", vouchers.size());
 
-        for (Voucher voucher : vouchers) {
-            if (voucher.getPayslip() != null) {
-                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(voucher.getRemoteFileId());
-                if (fileAccessResponse != null) {
-                    voucher.setPayslipPath(fileAccessResponse.getFileUrl());
+            for (Voucher voucher : vouchers) {
+                if (voucher.getPayslip() != null) {
+                    try {
+                        FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(voucher.getRemoteFileId());
+                        if (fileAccessResponse != null) {
+                            voucher.setPayslipPath(fileAccessResponse.getFileUrl());
+                        }
+                    } catch (Exception ex) {
+                        log.warn("Failed to get file access details for voucher ID {}: {}", voucher.getId(), ex.getMessage());
+                        voucher.setPayslipPath(null);
+                    }
                 }
             }
-        }
 
-        return vouchers;
+            log.debug("Successfully retrieved and enriched {} vouchers", vouchers.size());
+            return vouchers;
+        } catch (Exception ex) {
+            log.error("Error retrieving all vouchers: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve all vouchers", ex);
+        }
     }
 
     /**
@@ -60,15 +73,45 @@ public class VoucherService {
      * @return
      */
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
-        helper.listEntities(pageNum, VOUCHERS_PER_PAGE, vouchersRepository);
+        try {
+            log.debug("Listing vouchers by page: {}", pageNum);
+            helper.listEntities(pageNum, VOUCHERS_PER_PAGE, vouchersRepository);
+            log.debug("Successfully listed vouchers for page: {}", pageNum);
+        } catch (PaykeshoError ex) {
+            log.warn("PaykeshoError listing vouchers by page {}: {}", pageNum, ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Error listing vouchers by page {}: {}", pageNum, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to list vouchers by page", ex);
+        }
     }
 
     public Long countAllVouchers() {
-        return vouchersRepository.countAllVouchers();
+        try {
+            log.debug("Counting all vouchers");
+            Long count = vouchersRepository.countAllVouchers();
+            log.debug("Total voucher count: {}", count);
+            return count;
+        } catch (Exception ex) {
+            log.error("Error counting all vouchers: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to count all vouchers", ex);
+        }
     }
 
     public Voucher getVoucherById(Integer id) {
-        return vouchersRepository.getVoucherById(id);
+        try {
+            log.debug("Retrieving voucher by ID: {}", id);
+            Voucher voucher = vouchersRepository.getVoucherById(id);
+            if (voucher != null) {
+                log.debug("Found voucher with ID: {}", id);
+            } else {
+                log.debug("No voucher found with ID: {}", id);
+            }
+            return voucher;
+        } catch (Exception ex) {
+            log.error("Error retrieving voucher by ID {}: {}", id, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve voucher by ID", ex);
+        }
     }
 
     public Voucher save(Voucher voucher) throws PaykeshoError {

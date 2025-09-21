@@ -17,6 +17,7 @@ import org.paykesho.paymentservice.settlement.repository.MerchantMoneyAccountDet
 import org.paykesho.paymentservice.settlement.repository.SettlementRepository;
 import org.paykesho.paymentservice.transaction.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,9 +33,36 @@ public class SettlementService {
     private final SettlementRepository settlementRepository;
     private final MerchantMoneyAccountDetailsRepository merchantMoneyAccountDetailsRepository;
 
-    public void reconcileAndSettleForMerchant(Merchant merchant) throws PaykeshoError {
+    @Transactional
+    public synchronized void reconcileAndSettleForMerchant(Merchant merchant) throws PaykeshoError {
+        if (merchant == null) {
+            throw new PaykeshoError("Merchant cannot be null");
+        }
+
+        log.debug("Starting settlement process for merchant: {}", merchant.getId());
+
+        // RACE CONDITION FIX: Lock merchant for settlement
         List<Transaction> unsettledTransactions = transactionRepository.findUnsettledTransactionsByMerchant(merchant);
-        BigDecimal totalAmount = unsettledTransactions.stream().map(Transaction::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (unsettledTransactions == null || unsettledTransactions.isEmpty()) {
+            log.debug("No unsettled transactions found for merchant: {}", merchant.getId());
+            return;
+        }
+
+        // Validate all transactions are still unsettled (prevent race condition)
+        List<Transaction> validUnsettledTransactions = unsettledTransactions.stream()
+                .filter(txn -> !txn.isSettled())
+                .collect(java.util.stream.Collectors.toList());
+
+        if (validUnsettledTransactions.isEmpty()) {
+            log.debug("All transactions already settled for merchant: {}", merchant.getId());
+            return;
+        }
+
+        BigDecimal totalAmount = validUnsettledTransactions.stream()
+                .map(Transaction::getAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (totalAmount.compareTo(BigDecimal.ZERO) > 0) {
             String paykeshoRef = UUID.randomUUID().toString();

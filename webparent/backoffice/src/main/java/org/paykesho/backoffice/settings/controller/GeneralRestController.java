@@ -32,9 +32,12 @@ public class GeneralRestController {
         List<Merchant> merchants = merchantRepository.findMerchantTypesEnabled(true);
 
         for (Merchant merchant : merchants) {
-            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
-            if (fileAccessResponse != null) {
-                merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+            // Check if remoteFileId is not null before calling getFileAccessDetails
+            if (merchant.getRemoteFileId() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
             }
             items.add(new MapDataDto(merchant.getName(), merchant.getMerchantType().name(), merchant.getPhotoPath(), merchant.getLatitude(), merchant.getLongitude()));
         }
@@ -42,9 +45,12 @@ public class GeneralRestController {
         List<Organization> organizations = organizationRepository.findOrganizationTypesEnabled(true);
 
         for (Organization organization : organizations) {
-            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
-            if (fileAccessResponse != null) {
-                organization.setPhotoPath(fileAccessResponse.getFileUrl());
+            // Check if remoteFileId is not null before calling getFileAccessDetails
+            if (organization.getRemoteFileId() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    organization.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
             }
             items.add(new MapDataDto(organization.getName(), organization.getOrganizationType().name(), organization.getPhotoPath(), organization.getLatitude(), organization.getLongitude()));
         }

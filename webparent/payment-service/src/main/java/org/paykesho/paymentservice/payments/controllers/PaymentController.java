@@ -1,5 +1,6 @@
 package org.paykesho.paymentservice.payments.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.commons.dto.CardPaymentInitialResponse;
 import org.commons.dto.CardPaymentRequest;
 import org.commons.dto.MoMoPaymentToPaykeshoRequest;
@@ -11,11 +12,9 @@ import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantReques
 import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantResponse;
 import org.paykesho.paymentservice.payments.services.PaymentService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/rest/api/payments")
 public class PaymentController {
@@ -26,9 +25,60 @@ public class PaymentController {
     }
 
     @PostMapping("/pay/bank-transfer")
-    public ResponseEntity<BankPaymentResponse> processPayment(@RequestBody BankPaymentRequest bankPaymentRequest) {
-        BankPaymentResponse bankPaymentResponse = paymentService.runWalletToBankPayment(bankPaymentRequest);
-        return ResponseEntity.ok(bankPaymentResponse);
+    public ResponseEntity<BankPaymentResponse> processPayment(
+            @RequestBody BankPaymentRequest bankPaymentRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        try {
+            // SECURITY CHECK #1: Validate idempotency key for duplicate prevention
+            if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(createErrorBankResponse("Idempotency-Key header is required"));
+            }
+
+            // Check if this payment was already processed
+            if (paymentService.isPaymentAlreadyProcessed(idempotencyKey)) {
+                log.warn("Duplicate payment attempt detected with idempotency key: {}", idempotencyKey);
+                return ResponseEntity.badRequest().body(createErrorBankResponse("Payment already processed"));
+            }
+
+            // Input validation
+            if (bankPaymentRequest == null) {
+                return ResponseEntity.badRequest().body(createErrorBankResponse("Request body cannot be null"));
+            }
+
+            if (bankPaymentRequest.getAmount() == null || bankPaymentRequest.getAmount().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(createErrorBankResponse("Amount is required"));
+            }
+
+            if (bankPaymentRequest.getReceiverId() == null || bankPaymentRequest.getReceiverId().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(createErrorBankResponse("Receiver ID is required"));
+            }
+
+            // Validate amount format
+            try {
+                double amount = Double.parseDouble(bankPaymentRequest.getAmount());
+                if (amount <= 0) {
+                    return ResponseEntity.badRequest().body(createErrorBankResponse("Amount must be greater than 0"));
+                }
+                if (amount > 1000000) { // Max transaction limit
+                    return ResponseEntity.badRequest().body(createErrorBankResponse("Amount exceeds maximum transaction limit"));
+                }
+            } catch (NumberFormatException e) {
+                return ResponseEntity.badRequest().body(createErrorBankResponse("Invalid amount format"));
+            }
+
+            BankPaymentResponse bankPaymentResponse = paymentService.runWalletToBankPayment(bankPaymentRequest);
+            return ResponseEntity.ok(bankPaymentResponse);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(createErrorBankResponse("Payment processing failed: " + e.getMessage()));
+        }
+    }
+
+    private BankPaymentResponse createErrorBankResponse(String errorMessage) {
+        BankPaymentResponse errorResponse = new BankPaymentResponse();
+        errorResponse.setResponse_code("999");
+        errorResponse.setResponse_description(errorMessage);
+        return errorResponse;
     }
 
     @PostMapping("/pay/momo/to-merchant")

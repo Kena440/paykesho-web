@@ -1,15 +1,17 @@
 package org.commons.entity;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 import org.commons.entity.settings.Country;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-@ToString
 @Entity
 @Table(name = "states")
 public class State extends IdBasedEntity {

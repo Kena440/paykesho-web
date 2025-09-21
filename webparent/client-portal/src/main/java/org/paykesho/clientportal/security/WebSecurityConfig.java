@@ -2,8 +2,6 @@ package org.paykesho.clientportal.security;
 
 import lombok.RequiredArgsConstructor;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2UserService;
-import org.paykesho.clientportal.security.oauth.OAuth2LoginSuccessHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -25,9 +24,11 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final ClientOAuth2UserService oAuth2UserService;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final DatabaseLoginSuccessHandler databaseLoginSuccessHandler;
+    // private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler; // Unused field
+    // private final DatabaseLoginSuccessHandler databaseLoginSuccessHandler; // Unused field
     private final CustomLoginFailureHandler loginFailureHandler;
+
+    private final RateLimitingFilter rateLimitingFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,10 +37,40 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.GET, "/api/**", "/clients/register", "/clients/save-client", "/clients/verify", "/business", "/how-it-works", "/faq", "/contact").permitAll();
-        http.authorizeRequests().antMatchers("/clients/dashboard", "/vouchers/**", "/transactions/**").authenticated().and().formLogin().loginPage("/login").usernameParameter("email").successHandler(authenticationSuccessHandler()).failureHandler(loginFailureHandler).permitAll().and().oauth2Login().loginPage("/login").userInfoEndpoint().userService(oAuth2UserService).and().and().logout().permitAll().and().rememberMe().key("1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ").tokenValiditySeconds(14 * 24 * 60 * 60);
-
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(csrf -> csrf
+                        .ignoringAntMatchers("/api/public/**") // Only public API endpoints
+                )
+                .authorizeRequests(authz -> authz
+                        .antMatchers(HttpMethod.GET, "/clients/register", "/clients/save-client", "/clients/verify",
+                                "/business", "/how-it-works", "/faq", "/contact").permitAll()
+                        .antMatchers("/clients/dashboard", "/vouchers/**", "/transactions/**").authenticated()
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .usernameParameter("email")
+                        .successHandler(authenticationSuccessHandler())
+                        .failureHandler(loginFailureHandler)
+                        .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                )
+                .logout(logout -> logout.permitAll())
+                .rememberMe(remember -> remember
+                        .key("${REMEMBER_ME_KEY:1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ}")
+                        .tokenValiditySeconds(14 * 24 * 60 * 60)
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(3)
+                        .maxSessionsPreventsLogin(false)
+                        .and()
+                        .sessionFixation().migrateSession()
+                        .invalidSessionUrl("/login?expired")
+                );
     }
 
     @Override
@@ -52,6 +83,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new ClientUserDetailsService();
     }
 
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());

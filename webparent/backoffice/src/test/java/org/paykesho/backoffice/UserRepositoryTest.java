@@ -41,7 +41,7 @@ public class UserRepositoryTest {
 
     //@Test
     public void testCreateUserWithTwoRole() {
-        Role roleAdmin = entityManager.find(Role.class, 1);
+      
         User user = new User("mekaenga@yahoo.com", "$2a$10$KdMDApyzJeXP6XVpXtutn.BQ42VvFhkXHm67F2OZkbuuuf1jFQbKm", "Elias", "Kaenga");
         Role roleEditor = new Role(3);
         Role roleAssistant = new Role(5);

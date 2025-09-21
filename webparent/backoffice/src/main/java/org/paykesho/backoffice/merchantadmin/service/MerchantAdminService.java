@@ -7,13 +7,11 @@ import org.commons.entity.merchant.Merchant;
 import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
-import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.merchantadmin.repository.MerchantAdminRepository;
 import org.paykesho.backoffice.notification.general.NotificationClient;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
-import org.paykesho.backoffice.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +34,7 @@ public class MerchantAdminService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MerchantAdminService.class);
     private final MerchantAdminRepository merchantAdminRepository;
     private final CountryRepository countryRepository;
-    private final SettingService settingService;
+    // private final SettingService settingService; // Unused field
     private final PasswordEncoder passwordEncoder;
     private final NotificationClient notificationClient;
 
@@ -83,6 +81,10 @@ public class MerchantAdminService {
             String token = RandomString.make(30);
             String verificationCode = RandomString.make(64);
 
+            LOGGER.info("Generated password for new merchant admin: {}", securePassword);
+            LOGGER.info("Generated token: {}", token);
+            LOGGER.info("Generated verification code: {}", verificationCode);
+
             String encodedPassword = passwordEncoder.encode(securePassword);
             merchantAdmin.setPassword(encodedPassword);
 
@@ -94,17 +96,33 @@ public class MerchantAdminService {
             merchantAdmin.setFailedAttempt(0);
             merchantAdmin.setAccountNonLocked(true);
 
-            // Send notifications asynchronously
+            LOGGER.info("Saving new merchant admin to database: {}", merchantAdmin.getEmail());
+            MerchantAdmin savedMerchantAdmin;
+            try {
+                savedMerchantAdmin = merchantAdminRepository.save(merchantAdmin);
+                LOGGER.info("Successfully saved merchant admin with ID: {}", savedMerchantAdmin.getId());
+            } catch (Exception e) {
+                if (e.getMessage() != null && e.getMessage().contains("Duplicate entry") && e.getMessage().contains("email")) {
+                    LOGGER.error("Duplicate email error when saving merchant admin: {}", merchantAdmin.getEmail());
+                    throw new RuntimeException("A merchant admin with email '" + merchantAdmin.getEmail() + "' already exists. Please use a different email address.");
+                }
+                throw e;
+            }
+
+            // Send notifications asynchronously after successful save
             new Thread(() -> {
                 try {
-                    sendWelcomeNotification(merchantAdmin, securePassword, merchant);
+                    sendWelcomeNotification(savedMerchantAdmin, securePassword, merchant);
                 } catch (Exception e) {
                     LOGGER.error("Failed to send welcome notification: {}", e.getMessage());
                 }
             }).start();
 
+            return savedMerchantAdmin;
+
         } else {
             // Update existing admin - preserve existing credentials
+            merchantAdmin.setId(merchantAdminInDB.getId()); // Set the ID to indicate this is an update
             merchantAdmin.setResetPasswordToken(merchantAdminInDB.getResetPasswordToken());
             merchantAdmin.setAuthenticationType(merchantAdminInDB.getAuthenticationType());
             merchantAdmin.setPassword(merchantAdminInDB.getPassword());
@@ -113,9 +131,70 @@ public class MerchantAdminService {
             merchantAdmin.setEnabled(merchantAdminInDB.isEnabled());
             merchantAdmin.setFailedAttempt(merchantAdminInDB.getFailedAttempt());
             merchantAdmin.setAccountNonLocked(merchantAdminInDB.isAccountNonLocked());
-        }
 
-        return merchantAdminRepository.save(merchantAdmin);
+            LOGGER.info("Updating existing merchant admin: {}", merchantAdmin.getEmail());
+            return merchantAdminRepository.save(merchantAdmin);
+        }
+    }
+
+    public AdminSaveResult saveWithResult(HttpServletRequest request, MerchantAdmin merchantAdmin, Merchant merchant) throws MessagingException, UnsupportedEncodingException {
+        MerchantAdmin merchantAdminInDB = merchantAdminRepository.findByEmail(merchantAdmin.getEmail());
+
+        if (merchantAdminInDB == null) {
+            // Generate secure password and tokens
+            String securePassword = generateSecurePassword();
+            String token = RandomString.make(30);
+            String verificationCode = RandomString.make(64);
+
+            LOGGER.info("Generated password for new merchant admin: {}", securePassword);
+            LOGGER.info("Generated token: {}", token);
+            LOGGER.info("Generated verification code: {}", verificationCode);
+
+            // Set admin properties
+            merchantAdmin.setPassword(passwordEncoder.encode(securePassword));
+            merchantAdmin.setVerificationCode(verificationCode);
+            merchantAdmin.setAuthenticationType(AuthenticationType.DATABASE);
+            merchantAdmin.setResetPasswordToken(token);
+            merchantAdmin.setFailedAttempt(0);
+            merchantAdmin.setAccountNonLocked(true);
+
+            LOGGER.info("Saving new merchant admin to database: {}", merchantAdmin.getEmail());
+            MerchantAdmin savedMerchantAdmin;
+            try {
+                savedMerchantAdmin = merchantAdminRepository.save(merchantAdmin);
+                LOGGER.info("Successfully saved merchant admin with ID: {}", savedMerchantAdmin.getId());
+            } catch (Exception e) {
+                if (e.getMessage() != null && e.getMessage().contains("Duplicate entry") && e.getMessage().contains("email")) {
+                    LOGGER.error("Duplicate email error when saving merchant admin: {}", merchantAdmin.getEmail());
+                    throw new RuntimeException("A merchant admin with email '" + merchantAdmin.getEmail() + "' already exists. Please use a different email address.");
+                }
+                throw e;
+            }
+
+            // Send notifications asynchronously and track success
+            boolean notificationsSent = sendWelcomeNotificationWithResult(savedMerchantAdmin, securePassword, merchant);
+
+            return new AdminSaveResult(savedMerchantAdmin, securePassword, notificationsSent);
+        } else {
+            // Update existing admin
+            merchantAdminInDB.setName(merchantAdmin.getName());
+            merchantAdminInDB.setTitle(merchantAdmin.getTitle());
+            merchantAdminInDB.setPhoneNumber(merchantAdmin.getPhoneNumber());
+            merchantAdminInDB.setEnabled(merchantAdmin.isEnabled());
+            merchantAdminInDB.setAuthenticationType(merchantAdmin.getAuthenticationType());
+            merchantAdminInDB.setResetPasswordToken(merchantAdmin.getResetPasswordToken());
+            merchantAdminInDB.setFailedAttempt(merchantAdmin.getFailedAttempt());
+            merchantAdminInDB.setAccountNonLocked(merchantAdmin.isAccountNonLocked());
+            merchantAdminInDB.setVerificationCode(merchantAdmin.getVerificationCode());
+            merchantAdminInDB.setPassword(merchantAdmin.getPassword());
+            merchantAdminInDB.setId(merchantAdminInDB.getId()); // Ensure ID is set for update
+
+            LOGGER.info("Updating existing merchant admin: {}", merchantAdminInDB.getEmail());
+            MerchantAdmin savedMerchantAdmin = merchantAdminRepository.save(merchantAdminInDB);
+            LOGGER.info("Successfully updated merchant admin with ID: {}", savedMerchantAdmin.getId());
+
+            return new AdminSaveResult(savedMerchantAdmin, null, true); // No password for updates
+        }
     }
 
     public Long countAdmins() {
@@ -130,22 +209,22 @@ public class MerchantAdminService {
         String lowerCase = "abcdefghijklmnopqrstuvwxyz";
         String numbers = "0123456789";
         String specialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-        
+
         StringBuilder password = new StringBuilder();
         Random random = new Random();
-        
+
         // Ensure at least one character from each category
         password.append(upperCase.charAt(random.nextInt(upperCase.length())));
         password.append(lowerCase.charAt(random.nextInt(lowerCase.length())));
         password.append(numbers.charAt(random.nextInt(numbers.length())));
         password.append(specialChars.charAt(random.nextInt(specialChars.length())));
-        
+
         // Fill the rest with random characters
         String allChars = upperCase + lowerCase + numbers + specialChars;
         for (int i = 4; i < 12; i++) {
             password.append(allChars.charAt(random.nextInt(allChars.length())));
         }
-        
+
         // Shuffle the password
         char[] passwordArray = password.toString().toCharArray();
         for (int i = passwordArray.length - 1; i > 0; i--) {
@@ -154,7 +233,7 @@ public class MerchantAdminService {
             passwordArray[i] = passwordArray[j];
             passwordArray[j] = temp;
         }
-        
+
         return new String(passwordArray);
     }
 
@@ -162,29 +241,31 @@ public class MerchantAdminService {
         try {
             // Use the new templated email service
             boolean emailSent = notificationClient.sendMerchantAdminWelcomeEmail(
-                merchantAdmin.getFullName(),
-                merchantAdmin.getEmail(),
-                merchant.getName(),
-                "https://merchant.paykesho.com/",
-                password
+                    merchantAdmin.getFullName(),
+                    merchantAdmin.getEmail(),
+                    merchant.getName(),
+                    "https://merchant.paykesho.com/",
+                    password
             );
-            
+
             if (emailSent) {
                 log.info("Welcome email sent successfully to {} for merchant {}", merchantAdmin.getEmail(), merchant.getName());
             } else {
                 log.error("Failed to send welcome email to {} for merchant {}", merchantAdmin.getEmail(), merchant.getName());
+                log.warn("Admin was created successfully but welcome email could not be sent. Please check notification service availability.");
             }
 
             // Send SMS notification if phone number is available
             if (merchantAdmin.getPhoneNumber() != null && !merchantAdmin.getPhoneNumber().trim().isEmpty()) {
-                String smsMessage = String.format("Welcome to Paykesho! You're now a merchant admin for %s. Login: https://merchant.paykesho.com/ Email: %s Password: %s. Change password after first login. Contact support if needed.", 
-                    merchant.getName(), merchantAdmin.getEmail(), password);
-                
+                String smsMessage = String.format("Welcome to Paykesho! You're now a merchant admin for %s. Login: https://merchant.paykesho.com/ Email: %s Password: %s. Change password after first login. Contact support if needed.",
+                        merchant.getName(), merchantAdmin.getEmail(), password);
+
                 boolean smsSent = notificationClient.sendNotification(merchantAdmin.getPhoneNumber(), smsMessage, "sms");
                 if (smsSent) {
                     log.info("Welcome SMS sent successfully to {}", merchantAdmin.getPhoneNumber());
                 } else {
                     log.error("Failed to send welcome SMS to {}", merchantAdmin.getPhoneNumber());
+                    log.warn("Admin was created successfully but welcome SMS could not be sent. Please check notification service availability.");
                 }
             }
         } catch (Exception e) {
@@ -192,37 +273,184 @@ public class MerchantAdminService {
         }
     }
 
-    private String generateWelcomeEmailMessage(MerchantAdmin merchantAdmin, String password, Merchant merchant) {
+    private boolean sendWelcomeNotificationWithResult(MerchantAdmin merchantAdmin, String password, Merchant merchant) {
+        try {
+            // Use the new templated email service
+            boolean emailSent = notificationClient.sendMerchantAdminWelcomeEmail(
+                    merchantAdmin.getFullName(),
+                    merchantAdmin.getEmail(),
+                    merchant.getName(),
+                    "https://merchant.paykesho.com/",
+                    password
+            );
+
+            boolean smsSent = true; // Default to true if no phone number
+            if (merchantAdmin.getPhoneNumber() != null && !merchantAdmin.getPhoneNumber().trim().isEmpty()) {
+                String smsMessage = String.format("Welcome to Paykesho! You're now a merchant admin for %s. Login: https://merchant.paykesho.com/ Email: %s Password: %s. Change password after first login. Contact support if needed.",
+                        merchant.getName(), merchantAdmin.getEmail(), password);
+
+                smsSent = notificationClient.sendNotification(merchantAdmin.getPhoneNumber(), smsMessage, "sms");
+            }
+
+            boolean allNotificationsSent = emailSent && smsSent;
+
+            if (allNotificationsSent) {
+                log.info("All welcome notifications sent successfully to {} for merchant {}", merchantAdmin.getEmail(), merchant.getName());
+            } else {
+                log.warn("Some welcome notifications failed for {} - Email: {}, SMS: {}",
+                        merchantAdmin.getEmail(), emailSent, smsSent);
+            }
+
+            return allNotificationsSent;
+        } catch (Exception e) {
+            log.error("Error sending welcome notification: {}", e.getMessage());
+            return false;
+        }
+    }
+
+
+    public String resetPassword(MerchantAdmin merchantAdmin, Merchant merchant) throws PaykeshoError {
+        try {
+            log.debug("Resetting password for merchant admin: {}", merchantAdmin.getEmail());
+
+            // Generate new temporary password
+            String newPassword = generateTemporaryPassword();
+
+            // Encode and update password
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            merchantAdmin.setPassword(encodedPassword);
+            merchantAdmin.setAccountNonLocked(true);
+            merchantAdmin.setFailedAttempt(0);
+
+            // Save updated admin
+            merchantAdminRepository.save(merchantAdmin);
+
+            // Send password reset notification
+            sendPasswordResetNotification(merchantAdmin, newPassword, merchant);
+
+            log.info("Password reset successful for merchant admin: {}", merchantAdmin.getEmail());
+            return newPassword;
+
+        } catch (Exception e) {
+            log.error("Error resetting password for merchant admin {}: {}", merchantAdmin.getEmail(), e.getMessage(), e);
+            throw new PaykeshoError("Failed to reset password: " + e.getMessage());
+        }
+    }
+
+    private String generateTemporaryPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+
+        // Ensure at least one character from each category
+        password.append("ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(random.nextInt(26))); // Uppercase
+        password.append("abcdefghijklmnopqrstuvwxyz".charAt(random.nextInt(26))); // Lowercase
+        password.append("0123456789".charAt(random.nextInt(10))); // Number
+        password.append("!@#$%^&*".charAt(random.nextInt(8))); // Special character
+
+        // Fill remaining characters
+        for (int i = 4; i < 12; i++) {
+            password.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        // Shuffle the password
+        char[] passwordArray = password.toString().toCharArray();
+        for (int i = passwordArray.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            char temp = passwordArray[i];
+            passwordArray[i] = passwordArray[j];
+            passwordArray[j] = temp;
+        }
+
+        return new String(passwordArray);
+    }
+
+    private void sendPasswordResetNotification(MerchantAdmin merchantAdmin, String newPassword, Merchant merchant) {
+        try {
+            log.debug("Sending password reset notification to: {}", merchantAdmin.getEmail());
+
+            // Send email notification
+            String emailMessage = generatePasswordResetEmailMessage(merchantAdmin, newPassword, merchant);
+            boolean emailSent = notificationClient.sendNotification(merchantAdmin.getEmail(), emailMessage, "email");
+
+            if (emailSent) {
+                log.info("Password reset email sent successfully to {}", merchantAdmin.getEmail());
+            } else {
+                log.error("Failed to send password reset email to {}", merchantAdmin.getEmail());
+            }
+
+            // Send SMS notification if phone number is available
+            if (merchantAdmin.getPhoneNumber() != null && !merchantAdmin.getPhoneNumber().trim().isEmpty()) {
+                String smsMessage = generatePasswordResetSmsMessage(merchantAdmin, newPassword, merchant);
+                boolean smsSent = notificationClient.sendNotification(merchantAdmin.getPhoneNumber(), smsMessage, "sms");
+
+                if (smsSent) {
+                    log.info("Password reset SMS sent successfully to {}", merchantAdmin.getPhoneNumber());
+                } else {
+                    log.error("Failed to send password reset SMS to {}", merchantAdmin.getPhoneNumber());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error sending password reset notification: {}", e.getMessage());
+        }
+    }
+
+    private String generatePasswordResetEmailMessage(MerchantAdmin merchantAdmin, String newPassword, Merchant merchant) {
         StringBuilder message = new StringBuilder();
         message.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
         message.append("<div style='background-color: #f8f9fa; padding: 20px; border-radius: 8px;'>");
-        message.append("<h2 style='color: #007bff; margin-bottom: 20px;'>Welcome to Paykesho Merchant Portal!</h2>");
+        message.append("<h2 style='color: #ffc107; margin-bottom: 20px;'>Password Reset - Paykesho Merchant Portal</h2>");
         message.append("<p>Hello <strong>").append(merchantAdmin.getFullName()).append("</strong>,</p>");
-        message.append("<p>You have been successfully registered as a merchant admin for <strong>").append(merchant.getName()).append("</strong>.</p>");
-        message.append("<div style='background-color: #e9ecef; padding: 15px; border-radius: 5px; margin: 20px 0;'>");
-        message.append("<h4 style='margin-top: 0; color: #495057;'>Your Login Credentials:</h4>");
+        message.append("<p>Your password has been reset for your <strong>").append(merchant.getName()).append("</strong> merchant admin account.</p>");
+        message.append("<div style='background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;'>");
+        message.append("<h4 style='margin-top: 0; color: #856404;'>Your New Login Credentials:</h4>");
         message.append("<p><strong>Login URL:</strong> <a href='https://merchant.paykesho.com/' style='color: #007bff;'>https://merchant.paykesho.com/</a></p>");
         message.append("<p><strong>Email:</strong> ").append(merchantAdmin.getEmail()).append("</p>");
-        message.append("<p><strong>Temporary Password:</strong> <code style='background-color: #fff; padding: 2px 6px; border-radius: 3px;'>").append(password).append("</code></p>");
+        message.append("<p><strong>New Temporary Password:</strong> <code style='background-color: #fff; padding: 2px 6px; border-radius: 3px;'>").append(newPassword).append("</code></p>");
         message.append("</div>");
-        message.append("<div style='background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;'>");
-        message.append("<h4 style='margin-top: 0; color: #856404;'>Security Recommendations:</h4>");
-        message.append("<ul style='color: #856404;'>");
-        message.append("<li>Change your password immediately after first login</li>");
-        message.append("<li>Use a strong, unique password</li>");
-        message.append("<li>Enable two-factor authentication if available</li>");
-        message.append("<li>Never share your credentials with others</li>");
+        message.append("<div style='background-color: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #dc3545;'>");
+        message.append("<h4 style='margin-top: 0; color: #721c24;'>Important Security Notice:</h4>");
+        message.append("<ul style='color: #721c24;'>");
+        message.append("<li><strong>You must change this password immediately</strong> after your first login</li>");
+        message.append("<li>This temporary password will expire in 24 hours</li>");
+        message.append("<li>Use a strong, unique password with at least 8 characters</li>");
+        message.append("<li>Include uppercase, lowercase, numbers, and special characters</li>");
+        message.append("<li>If you did not request this password reset, contact support immediately</li>");
         message.append("</ul>");
         message.append("</div>");
         message.append("<p>If you have any questions or need assistance, please contact our support team.</p>");
-        message.append("<p>Thank you,<br><strong>Paykesho Team</strong></p>");
+        message.append("<p>Best regards,<br><strong>Paykesho Team</strong></p>");
         message.append("</div>");
         message.append("</div>");
         return message.toString();
     }
 
-    private String generateWelcomeSmsMessage(MerchantAdmin merchantAdmin, String password, Merchant merchant) {
-        return String.format("Welcome to Paykesho! You're now a merchant admin for %s. Login: https://merchant.paykesho.com/ Email: %s Password: %s. Change password after first login. Contact support if needed.", 
-            merchant.getName(), merchantAdmin.getEmail(), password);
+    private String generatePasswordResetSmsMessage(MerchantAdmin merchantAdmin, String newPassword, Merchant merchant) {
+        return String.format("Paykesho Password Reset: Your password has been reset for %s. New password: %s. Login: https://merchant.paykesho.com/ Change password immediately after login. Contact support if you didn't request this.",
+                merchant.getName(), newPassword);
+    }
+
+    public static class AdminSaveResult {
+        private final MerchantAdmin admin;
+        private final String password;
+        private final boolean notificationsSent;
+
+        public AdminSaveResult(MerchantAdmin admin, String password, boolean notificationsSent) {
+            this.admin = admin;
+            this.password = password;
+            this.notificationsSent = notificationsSent;
+        }
+
+        public MerchantAdmin getAdmin() {
+            return admin;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public boolean isNotificationsSent() {
+            return notificationsSent;
+        }
     }
 }

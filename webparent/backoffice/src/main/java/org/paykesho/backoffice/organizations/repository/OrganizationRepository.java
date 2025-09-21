@@ -33,4 +33,11 @@ public interface OrganizationRepository extends SearchRepository<Organization, I
     @Query("select m " + "from Organization m " + "where m.enabled = ?1 ")
     List<Organization> findOrganizationTypesEnabled(boolean enabled);
 
+    // Additional methods for dashboard analytics
+    long countByEnabledTrue();
+
+    long countByEnabledFalse();
+
+    long countByRegistrationDateAfter(java.util.Date date);
+
 }

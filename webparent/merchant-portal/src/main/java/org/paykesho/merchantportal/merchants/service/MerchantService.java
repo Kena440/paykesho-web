@@ -6,7 +6,6 @@ import org.commons.entity.merchant.MerchantAdmin;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.merchantportal.merchants.dto.GPSDataItem;
 import org.paykesho.merchantportal.merchants.repository.MerchantRepository;
-import org.paykesho.merchantportal.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +24,7 @@ public class MerchantService {
     protected DateFormat dateFormat;
     @Autowired
     private MerchantRepository merchantRepository;
-    @Autowired
-    private SettingService settingService;
+
 
     public Merchant save(Merchant merchant) {
         if (merchant == null) {

@@ -8,7 +8,6 @@ import org.paykesho.backoffice.files.dto.FileAccessResponse;
 import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.merchants.repository.MerchantRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,8 +30,8 @@ public class MerchantService {
     protected DateFormat dateFormat;
     @Autowired
     private MerchantRepository merchantRepository;
-    @Autowired
-    private SettingService settingService;
+    // @Autowired
+    // private SettingService settingService; // Unused field
     @Autowired
     private FileUploadService fileUploadService;
 

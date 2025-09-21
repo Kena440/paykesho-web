@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${emailTitle} ?: 'Notification from Paykesho'">Notification from Paykesho</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: #007bff;
+        }
+
+        .message-content {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .highlight-box h3 {
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .info-box {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .info-box h4 {
+            color: #0c5460;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box h4 {
+            color: #856404;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .success-box {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .success-box h4 {
+            color: #155724;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .error-box {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .error-box h4 {
+            color: #721c24;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer-content {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .social-links {
+            margin: 20px 0;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .contact-info p {
+            margin-bottom: 5px;
+        }
+
+        /* Responsive design */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .footer {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header with Logo -->
+    <div class="header">
+        <img alt="Paykesho Logo" class="logo" src="https://paykesho.com/assets/images/logo-white.png">
+        <div class="company-name">Paykesho</div>
+        <div class="tagline">Get lelo, Pay Kesho!</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Greeting -->
+        <div class="greeting" th:text="${greeting} ?: 'Hello,'">Hello,</div>
+
+        <!-- Dynamic Content -->
+        <div class="message-content" th:utext="${content}">
+            <p>This is a notification from <strong>Paykesho</strong>.</p>
+            <p>Please review the information below for important updates regarding your account.</p>
+        </div>
+
+        <!-- Dynamic Highlight Box -->
+        <div class="highlight-box" th:if="${highlightContent != null}">
+            <h3 th:text="${highlightTitle} ?: 'Important Information'">Important Information</h3>
+            <div th:utext="${highlightContent}">
+                <p>This is important information that requires your attention.</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Info Box -->
+        <div class="info-box" th:if="${infoContent != null}">
+            <h4 th:text="${infoTitle} ?: 'Information'">Information</h4>
+            <div th:utext="${infoContent}">
+                <p>Additional information for your reference.</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Warning Box -->
+        <div class="warning-box" th:if="${warningContent != null}">
+            <h4 th:text="${warningTitle} ?: 'Warning'">Warning</h4>
+            <div th:utext="${warningContent}">
+                <p>Please pay attention to this warning.</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Success Box -->
+        <div class="success-box" th:if="${successContent != null}">
+            <h4 th:text="${successTitle} ?: 'Success'">Success</h4>
+            <div th:utext="${successContent}">
+                <p>Great news! Your action was successful.</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Error Box -->
+        <div class="error-box" th:if="${errorContent != null}">
+            <h4 th:text="${errorTitle} ?: 'Error'">Error</h4>
+            <div th:utext="${errorContent}">
+                <p>There was an issue that requires your attention.</p>
+            </div>
+        </div>
+
+        <p th:if="${footerMessage != null}" th:utext="${footerMessage}">
+            If you have any questions or need assistance, please don't hesitate to contact our support team.
+        </p>
+
+        <p>Best regards,<br><strong>The Paykesho Team</strong></p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <p><strong>Paykesho</strong> - Your Trusted Digital Payment Partner</p>
+            <p>Empowering businesses and individuals with secure, efficient financial solutions.</p>
+
+            <div class="social-links">
+                <a href="https://facebook.com/paykesho">Facebook</a>
+                <a href="https://twitter.com/paykesho">Twitter</a>
+                <a href="https://linkedin.com/company/paykesho">LinkedIn</a>
+                <a href="https://instagram.com/paykesho">Instagram</a>
+            </div>
+
+            <div class="contact-info">
+                <p><strong>Contact Us:</strong></p>
+                <p>Email: support@paykesho.com</p>
+                <p>Phone: +260 211 123456</p>
+                <p>Address: Lusaka, Zambia</p>
+            </div>
+
+            <p style="margin-top: 20px; font-size: 12px; color: #999;">
+                This email was sent to <span th:text="${recipientEmail}"></span>.
+                If you have any questions, please contact our support team.
+            </p>
+
+            <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                © 2024 Paykesho. All rights reserved. |
+                <a href="https://paykesho.com/privacy" style="color: #007bff;">Privacy Policy</a> |
+                <a href="https://paykesho.com/terms" style="color: #007bff;">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

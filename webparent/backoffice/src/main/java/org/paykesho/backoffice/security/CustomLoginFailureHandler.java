@@ -24,10 +24,14 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
         String email = request.getParameter("email");
+        System.out.println("Login failure for email: " + email);
+        System.out.println("Exception: " + exception.getMessage());
+        
         User user = null;
         try {
             user = userService.getUserByEmail(email);
         } catch (PaykeshoError e) {
+            System.out.println("Error getting user: " + e.getMessage());
             e.printStackTrace();
         }
 

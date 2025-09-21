@@ -15,7 +15,7 @@ public interface MerchantRepository extends CrudRepository<Merchant, Integer> {
     @Query("select m from Merchant m where m.name = :name")
     public Merchant getMerchantByName(@Param("name") String name);
 
-    @Query("select m from Merchant m where m.id = :id")
+    @Query("select m from Merchant m where m.contactPerson.id = :id")
     public Merchant getMerchantByContactPersonId(@Param("id") Integer id);
 
     public Long countById(Integer id);

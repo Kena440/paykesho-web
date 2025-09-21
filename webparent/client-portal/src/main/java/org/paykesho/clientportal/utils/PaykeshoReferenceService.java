@@ -9,7 +9,7 @@ import org.paykesho.clientportal.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Locale;
 
 @Slf4j
@@ -66,9 +66,8 @@ public class PaykeshoReferenceService {
     private String getReference(String itemPrefix, Long count) {
         String reference;
 
-        Date dt = new Date();
-        int year = dt.getYear();
-        int currentYear = year + 1900;
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
 
         String randomCode = RandomString.make(5).toUpperCase(Locale.ENGLISH);
         reference = itemPrefix + currentYear + "" + count + randomCode;

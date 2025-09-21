@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 public class ApplicationProperties {
     private String smtpServer;
     private String smtpPort;
-    private String smtpUsername;
-    private String smtpPassword;
     private String smtpUser;
+    private String smtpPassword;
     private String fromEmail;
     private String fromName;
 

@@ -3,7 +3,6 @@ package org.paykesho.merchantportal.security;
 import lombok.RequiredArgsConstructor;
 import org.paykesho.merchantportal.security.oauth.MerchantAdminOAuth2UserService;
 import org.paykesho.merchantportal.security.oauth.OAuth2LoginSuccessHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -16,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +28,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final DatabaseLoginSuccessHandler databaseLoginSuccessHandler;
     private final CustomLoginFailureHandler loginFailureHandler;
 
+    private final RateLimitingFilter rateLimitingFilter;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -35,8 +37,37 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/forgot-password", "/reset-password", "/reset-password-action").permitAll().antMatchers("/", "/account", "/assessors/update-account").authenticated().anyRequest().authenticated().and().formLogin().loginPage("/login").usernameParameter("email").successHandler(databaseLoginSuccessHandler).failureHandler(loginFailureHandler).permitAll().and().oauth2Login().loginPage("/login").userInfoEndpoint().userService(oAuth2UserService).and().successHandler(oAuth2LoginSuccessHandler).and().logout().permitAll().and().rememberMe().key("1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ").tokenValiditySeconds(14 * 24 * 60 * 60);
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests(authz -> authz
+                        .antMatchers("/forgot-password", "/reset-password", "/reset-password-action").permitAll()
+                        .antMatchers("/", "/account", "/assessors/update-account").authenticated()
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .usernameParameter("email")
+                        .successHandler(databaseLoginSuccessHandler)
+                        .failureHandler(loginFailureHandler)
+                        .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
+                .logout(logout -> logout.permitAll())
+                .rememberMe(remember -> remember
+                        .key("${REMEMBER_ME_KEY:1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ}")
+                        .tokenValiditySeconds(14 * 24 * 60 * 60)
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(3)
+                        .maxSessionsPreventsLogin(false)
+                        .and()
+                        .sessionFixation().migrateSession()
+                        .invalidSessionUrl("/login?expired")
+                );
     }
 
     @Override
@@ -49,6 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new MerchantAdminUserDetailsService();
     }
 
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());

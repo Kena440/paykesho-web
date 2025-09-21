@@ -16,8 +16,8 @@
                         <h3>Merchant Management</h3>
                     </div>
                     <div class="col-auto ms-auto text-end mt-n1">
-                        <div class="btn-group" role="group" aria-label="Merchant Actions">
-                            <a class="btn btn-outline-primary btn-lg shadow-sm me-2" th:href="@{/merchants}">
+                        <div aria-label="Merchant Actions" class="d-flex gap-2" role="group">
+                            <a class="btn btn-outline-primary btn-lg shadow-sm" th:href="@{/merchants}">
                                 <i class="align-middle" data-lucide="list"></i> List Merchants
                             </a>
                             <a class="btn btn-primary btn-lg shadow-sm" th:href="@{/merchants/new}">
@@ -27,8 +27,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <input id="longitude" th:value="${merchant.longitude}" type="hidden"/>
-                    <input id="latitude" th:value="${merchant.latitude}" type="hidden"/>
+                    <input id="longitude" th:value="${merchant?.longitude ?: 0}" type="hidden"/>
+                    <input id="latitude" th:value="${merchant?.latitude ?: 0}" type="hidden"/>
                     <div class="col-md-4 col-xl-3">
                         <div class="card mb-3">
                             <div class="card-header">
@@ -36,25 +36,43 @@
                             </div>
                             <div class="card-body text-center">
                                 <img alt="Logo" class="img-fluid mb-2"
-                                     height="128" th:src="@{${merchant.photoPath}}" width="128"/>
-                                <h5 class="card-title mb-0">[[${merchant.name}]]</h5>
-                                <div class="text-muted mb-2">[[${merchant.merchantType}]]</div>
+                                     height="128"
+                                     th:if="${merchant?.photoPath != null and !#strings.isEmpty(merchant.photoPath)}"
+                                     th:src="@{${merchant.photoPath}}"
+                                     width="128"/>
+                                <div class="bg-light d-flex align-items-center justify-content-center mb-2"
+                                     style="width: 128px; height: 128px; margin: 0 auto;"
+                                     th:unless="${merchant?.photoPath != null and !#strings.isEmpty(merchant.photoPath)}">
+                                    <i class="fas fa-store fa-3x text-muted"></i>
+                                </div>
+                                <h5 class="card-title mb-0"><span th:text="${merchant?.name ?: 'N/A'}">N/A</span></h5>
+                                <div class="text-muted mb-2"><span
+                                        th:text="${merchant?.merchantType ?: 'N/A'}">N/A</span></div>
 
                                 <div>
                                     <a class="btn btn-primary btn-sm" href="#">Follow</a>
-                                    <a class="btn btn-primary btn-sm" th:href="@{/messages/new}" th:title="'Send Message'"><span
+                                    <a class="btn btn-primary btn-sm" th:href="@{/messages/new}"
+                                       th:title="'Send Message'"><span
                                             data-lucide="message-square"></span> Message</a>
                                 </div>
                             </div>
                             <hr class="my-0"/>
                             <div class="card-body text-center">
                                 <h5 class="h6 card-title">Code</h5>
-                                <a class="badge badge-subtle-primary me-1 my-1" href="#">[[${merchant.code}]]</a>
+                                <a class="badge badge-subtle-primary me-1 my-1" href="#"><span
+                                        th:text="${merchant?.code ?: 'N/A'}">N/A</span></a>
                                 <hr>
-                                <div class="img-fluid mb-2"><img
-                                        alt="loading..."
-                                        style="max-width: 8.5rem;"
-                                        th:src="@{${qrCodeContent}}">
+                                <div class="img-fluid mb-2">
+                                    <img alt="QR Code"
+                                         style="max-width: 8.5rem;"
+                                         th:if="${qrCodeContent != null and !#strings.isEmpty(qrCodeContent)}"
+                                         th:src="@{${qrCodeContent}}">
+                                    <div class="text-muted text-center"
+                                         style="max-width: 8.5rem;"
+                                         th:unless="${qrCodeContent != null and !#strings.isEmpty(qrCodeContent)}">
+                                        <i class="fas fa-qrcode fa-2x"></i>
+                                        <p class="small mt-2">QR Code not available</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -130,16 +148,24 @@
 
                                 <div class="d-flex align-items-center pt-3 mr-5">
                                     <div class="d-block"
-                                         th:if="${merchantAdmin.id != null}"><label
+                                         th:if="${merchantAdmin?.id != null}"><label
                                             class="mb-0">Merchant Admin</label>
-                                        <h4 class="mb-0">[[${merchantAdmin}]]</h4>
-                                        &nbsp;
-                                        <button class="btn btn-success btn-lg w-100 my-2"
-                                                data-bs-target="#modal-add-admin-record"
-                                                data-bs-toggle="modal"
-                                                type="button">
-                                            <i class="align-middle" data-lucide="user-check"></i> Update Admin
-                                        </button>
+                                        <h4 class="mb-0"><span th:text="${merchantAdmin?.name ?: 'N/A'}">N/A</span></h4>
+                                        <div class="d-flex gap-2 my-2">
+                                            <button class="btn btn-success btn-lg flex-fill"
+                                                    data-bs-target="#modal-add-admin-record"
+                                                    data-bs-toggle="modal"
+                                                    type="button">
+                                                <i class="align-middle" data-lucide="user-check"></i> Update Admin
+                                            </button>
+                                            <button class="btn btn-warning btn-lg flex-fill"
+                                                    data-bs-target="#modal-reset-password"
+                                                    data-bs-toggle="modal"
+                                                    th:if="${merchantAdmin?.email != null}"
+                                                    type="button">
+                                                <i class="align-middle" data-lucide="key"></i> Reset Password
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="d-block" th:if="${merchantAdmin.id == null}">
                                         <div class="alert alert-primary alert-outline alert-dismissible"
@@ -188,32 +214,35 @@
                     <i class="fas fa-user-plus me-2"></i>
                     <span id="adminModalTitle">Add New Admin</span>
                 </h5>
-                <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+                <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        type="button"></button>
             </div>
-            
+
             <div class="alert alert-info m-3" role="alert">
                 <div class="d-flex align-items-start">
                     <i class="fas fa-info-circle me-2 mt-1"></i>
                     <div>
-                        <strong>Security Notice:</strong> When an admin is added, a secure temporary password will be automatically generated and sent to their email address. The admin should change their password immediately after first login for security purposes.
+                        <strong>Security Notice:</strong> When an admin is added, a secure temporary password will be
+                        automatically generated and sent to their email address. The admin should change their password
+                        immediately after first login for security purposes.
                     </div>
                 </div>
             </div>
-            
-            <form method="post" id="adminForm"
+
+            <form id="adminForm" method="post"
                   th:action="@{/merchant-admin/save}"
                   th:object="${merchantAdmin}">
                 <input id="merchantId" name="merchantId" th:value="${merchant.id}" type="hidden"/>
                 <input id="id" th:field="*{id}" type="hidden"/>
-                
+
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="title" class="form-label">
+                                <label class="form-label" for="title">
                                     <i class="fas fa-user-tag me-1"></i>Salutation <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select" id="title" name="title" th:field="*{title}" required>
+                                <select class="form-select" id="title" name="title" required th:field="*{title}">
                                     <option value="">Select salutation</option>
                                     <option value="Mr.">Mr.</option>
                                     <option value="Ms.">Ms.</option>
@@ -226,62 +255,130 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="name" class="form-label">
+                                <label class="form-label" for="name">
                                     <i class="fas fa-user me-1"></i>Full Name <span class="text-danger">*</span>
                                 </label>
-                                <input class="form-control" id="name" name="name"
-                                       placeholder="Enter full name" required
-                                       th:field="*{name}" type="text" maxlength="100">
+                                <input class="form-control" id="name" maxlength="100"
+                                       name="name" placeholder="Enter full name"
+                                       required th:field="*{name}" type="text">
                                 <div class="invalid-feedback" id="nameError"></div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="email" class="form-label">
+                                <label class="form-label" for="email">
                                     <i class="fas fa-envelope me-1"></i>Email Address <span class="text-danger">*</span>
                                 </label>
-                                <input class="form-control" id="email" name="email"
-                                       placeholder="Enter email address" required
-                                       th:field="*{email}" type="email" maxlength="100">
+                                <input class="form-control" id="email" maxlength="100"
+                                       name="email" placeholder="Enter email address"
+                                       required th:field="*{email}" type="email">
                                 <div class="invalid-feedback" id="emailError"></div>
-                                <small class="form-text text-muted">A welcome email with login credentials will be sent to this address.</small>
+                                <small class="form-text text-muted">A welcome email with login credentials will be sent
+                                    to this address.</small>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="phoneNumber" class="form-label">
+                                <label class="form-label" for="phoneNumber">
                                     <i class="fas fa-phone me-1"></i>Phone Number <span class="text-danger">*</span>
                                 </label>
-                                <input class="form-control" id="phoneNumber" name="phoneNumber"
-                                       placeholder="Enter phone number" required
-                                       th:field="*{phoneNumber}" type="tel" maxlength="20">
+                                <input class="form-control" id="phoneNumber" maxlength="20"
+                                       name="phoneNumber" placeholder="Enter phone number"
+                                       required th:field="*{phoneNumber}" type="tel">
                                 <div class="invalid-feedback" id="phoneError"></div>
-                                <small class="form-text text-muted">SMS notifications will be sent to this number.</small>
+                                <small class="form-text text-muted">SMS notifications will be sent to this
+                                    number.</small>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="alert alert-warning" role="alert" id="emailExistsAlert" style="display: none;">
+
+                    <div class="alert alert-warning" id="emailExistsAlert" role="alert" style="display: none;">
                         <div class="d-flex align-items-start">
                             <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
                             <div>
-                                <strong>Email Already Exists:</strong> This email address is already registered. Updating the admin will preserve their existing credentials.
+                                <strong>Email Already Exists:</strong> This email address is already registered.
+                                Updating the admin will preserve their existing credentials.
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
                         <i class="fas fa-times me-1"></i>Cancel
                     </button>
-                    <button class="btn btn-primary" type="submit" id="saveAdminBtn">
+                    <button class="btn btn-primary" id="saveAdminBtn" type="submit">
                         <i class="fas fa-save me-1"></i>
                         <span id="saveBtnText">Save Admin</span>
-                        <span class="spinner-border spinner-border-sm ms-2" id="saveSpinner" style="display: none;"></span>
+                        <span class="spinner-border spinner-border-sm ms-2" id="saveSpinner"
+                              style="display: none;"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Password Reset Modal -->
+<div aria-hidden="true" aria-labelledby="modal-reset-password" class="modal fade" id="modal-reset-password"
+     role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-key me-2"></i>
+                    Reset Admin Password
+                </h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+
+            <div class="alert alert-info m-3" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-info-circle me-2 mt-1"></i>
+                    <div>
+                        <strong>Password Reset:</strong> A new temporary password will be generated and sent to the
+                        admin's email address. The admin will be required to change their password on next login.
+                    </div>
+                </div>
+            </div>
+
+            <form id="passwordResetForm" method="post"
+                  th:action="@{/merchant-admin/reset-password}">
+                <input id="adminId" name="adminId" th:value="${merchantAdmin?.id}" type="hidden"/>
+                <input id="merchantId" name="merchantId" th:value="${merchant?.id}" type="hidden"/>
+
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-user-circle fa-3x text-muted mb-2"></i>
+                        <h6 class="mb-1">Merchant Admin</h6>
+                        <p class="text-muted mb-0" th:text="${merchantAdmin?.name ?: 'N/A'}">N/A</p>
+                        <small class="text-muted" th:text="${merchantAdmin?.email ?: 'N/A'}">N/A</small>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                            <div>
+                                <strong>Warning:</strong> This action will invalidate the current password and send a
+                                new temporary password via email. The admin will need to log in with the new password
+                                and change it immediately.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button class="btn btn-warning" id="resetPasswordBtn" type="submit">
+                        <i class="fas fa-key me-1"></i>
+                        <span id="resetBtnText">Reset Password</span>
+                        <span class="spinner-border spinner-border-sm ms-2" id="resetSpinner"
+                              style="display: none;"></span>
                     </button>
                 </div>
             </form>
@@ -290,216 +387,244 @@
 </div>
 
 <style>
-.modal-lg {
-    max-width: 700px;
-}
+    .modal-lg {
+        max-width: 700px;
+    }
 
-.form-label {
-    font-weight: 500;
-    color: #495057;
-}
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+    }
 
-.form-control:focus, .form-select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
 
-.invalid-feedback {
-    font-size: 0.875rem;
-}
+    .invalid-feedback {
+        font-size: 0.875rem;
+    }
 
-.alert {
-    border-radius: 8px;
-}
+    .alert {
+        border-radius: 8px;
+    }
 
-.btn {
-    border-radius: 6px;
-    font-weight: 500;
-}
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+    }
 
-.btn-primary {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    border: none;
-}
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+    }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-}
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
 
-.modal-header {
-    border-radius: 8px 8px 0 0;
-}
+    .modal-header {
+        border-radius: 8px 8px 0 0;
+    }
 
-.form-text {
-    font-size: 0.8rem;
-    color: #6c757d;
-}
+    .form-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
 
-#emailExistsAlert {
-    border-left: 4px solid #ffc107;
-}
+    #emailExistsAlert {
+        border-left: 4px solid #ffc107;
+    }
 
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
 </style>
 
 <script>
-$(document).ready(function() {
-    const form = $('#adminForm');
-    const saveBtn = $('#saveAdminBtn');
-    const saveBtnText = $('#saveBtnText');
-    const saveSpinner = $('#saveSpinner');
-    const emailInput = $('#email');
-    const emailExistsAlert = $('#emailExistsAlert');
-    
-    // Real-time email validation
-    let emailCheckTimeout;
-    emailInput.on('input', function() {
-        clearTimeout(emailCheckTimeout);
-        const email = $(this).val();
-        
-        if (email && isValidEmail(email)) {
-            emailCheckTimeout = setTimeout(function() {
-                checkEmailExists(email);
-            }, 500);
-        } else {
-            emailExistsAlert.hide();
-        }
-    });
-    
-    // Form validation
-    form.on('submit', function(e) {
-        e.preventDefault();
-        
-        if (validateForm()) {
-            submitForm();
-        }
-    });
-    
-    // Real-time validation
-    $('input, select').on('blur', function() {
-        validateField($(this));
-    });
-    
-    function validateForm() {
-        let isValid = true;
-        
-        $('input[required], select[required]').each(function() {
-            if (!validateField($(this))) {
-                isValid = false;
-            }
-        });
-        
-        return isValid;
-    }
-    
-    function validateField(field) {
-        const value = field.val().trim();
-        const fieldId = field.attr('id');
-        const errorDiv = $('#' + fieldId + 'Error');
-        
-        // Clear previous errors
-        field.removeClass('is-invalid');
-        errorDiv.text('');
-        
-        // Validation rules
-        if (!value) {
-            showFieldError(field, errorDiv, 'This field is required.');
-            return false;
-        }
-        
-        switch(fieldId) {
-            case 'name':
-                if (value.length < 2) {
-                    showFieldError(field, errorDiv, 'Name must be at least 2 characters long.');
-                    return false;
-                }
-                break;
-            case 'email':
-                if (!isValidEmail(value)) {
-                    showFieldError(field, errorDiv, 'Please enter a valid email address.');
-                    return false;
-                }
-                break;
-            case 'phoneNumber':
-                if (!isValidPhone(value)) {
-                    showFieldError(field, errorDiv, 'Please enter a valid phone number.');
-                    return false;
-                }
-                break;
-        }
-        
-        return true;
-    }
-    
-    function showFieldError(field, errorDiv, message) {
-        field.addClass('is-invalid');
-        errorDiv.text(message);
-    }
-    
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-    
-    function isValidPhone(phone) {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-        return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
-    }
-    
-    function checkEmailExists(email) {
-        // This would typically make an AJAX call to check if email exists
-        // For now, we'll simulate it
-        $.ajax({
-            url: '/api/check-email-exists',
-            method: 'POST',
-            data: { email: email },
-            success: function(response) {
-                if (response.exists) {
-                    emailExistsAlert.show();
-                    $('#adminModalTitle').text('Update Admin');
-                    $('#saveBtnText').text('Update Admin');
-                } else {
-                    emailExistsAlert.hide();
-                    $('#adminModalTitle').text('Add New Admin');
-                    $('#saveBtnText').text('Save Admin');
-                }
-            },
-            error: function() {
-                // If API call fails, hide the alert
+    $(document).ready(function () {
+        const form = $('#adminForm');
+        const saveBtn = $('#saveAdminBtn');
+        const saveBtnText = $('#saveBtnText');
+        const saveSpinner = $('#saveSpinner');
+        const emailInput = $('#email');
+        const emailExistsAlert = $('#emailExistsAlert');
+
+        // Real-time email validation
+        let emailCheckTimeout;
+        emailInput.on('input', function () {
+            clearTimeout(emailCheckTimeout);
+            const email = $(this).val();
+
+            if (email && isValidEmail(email)) {
+                emailCheckTimeout = setTimeout(function () {
+                    checkEmailExists(email);
+                }, 500);
+            } else {
                 emailExistsAlert.hide();
             }
         });
-    }
-    
-    function submitForm() {
-        // Show loading state
-        saveBtn.prop('disabled', true);
-        saveBtnText.text('Saving...');
-        saveSpinner.show();
-        form.addClass('loading');
-        
-        // Submit the form
-        form[0].submit();
-    }
-    
-    // Reset form when modal is closed
-    $('#modal-add-admin-record').on('hidden.bs.modal', function() {
-        form[0].reset();
-        form.removeClass('loading');
-        $('.is-invalid').removeClass('is-invalid');
-        $('.invalid-feedback').text('');
-        emailExistsAlert.hide();
-        saveBtn.prop('disabled', false);
-        saveBtnText.text('Save Admin');
-        saveSpinner.hide();
-        $('#adminModalTitle').text('Add New Admin');
+
+        // Form validation
+        form.on('submit', function (e) {
+            e.preventDefault();
+
+            if (validateForm()) {
+                submitForm();
+            }
+        });
+
+        // Real-time validation
+        $('input, select').on('blur', function () {
+            validateField($(this));
+        });
+
+        function validateForm() {
+            let isValid = true;
+
+            $('input[required], select[required]').each(function () {
+                if (!validateField($(this))) {
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+
+        function validateField(field) {
+            const value = field.val().trim();
+            const fieldId = field.attr('id');
+            const errorDiv = $('#' + fieldId + 'Error');
+
+            // Clear previous errors
+            field.removeClass('is-invalid');
+            errorDiv.text('');
+
+            // Validation rules
+            if (!value) {
+                showFieldError(field, errorDiv, 'This field is required.');
+                return false;
+            }
+
+            switch (fieldId) {
+                case 'name':
+                    if (value.length < 2) {
+                        showFieldError(field, errorDiv, 'Name must be at least 2 characters long.');
+                        return false;
+                    }
+                    break;
+                case 'email':
+                    if (!isValidEmail(value)) {
+                        showFieldError(field, errorDiv, 'Please enter a valid email address.');
+                        return false;
+                    }
+                    break;
+                case 'phoneNumber':
+                    if (!isValidPhone(value)) {
+                        showFieldError(field, errorDiv, 'Please enter a valid phone number.');
+                        return false;
+                    }
+                    break;
+            }
+
+            return true;
+        }
+
+        function showFieldError(field, errorDiv, message) {
+            field.addClass('is-invalid');
+            errorDiv.text(message);
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidPhone(phone) {
+            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+            return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+        }
+
+        function checkEmailExists(email) {
+            // This would typically make an AJAX call to check if email exists
+            // For now, we'll simulate it
+            $.ajax({
+                url: '/api/check-email-exists',
+                method: 'POST',
+                data: {email: email},
+                success: function (response) {
+                    if (response.exists) {
+                        emailExistsAlert.show();
+                        $('#adminModalTitle').text('Update Admin');
+                        $('#saveBtnText').text('Update Admin');
+                    } else {
+                        emailExistsAlert.hide();
+                        $('#adminModalTitle').text('Add New Admin');
+                        $('#saveBtnText').text('Save Admin');
+                    }
+                },
+                error: function () {
+                    // If API call fails, hide the alert
+                    emailExistsAlert.hide();
+                }
+            });
+        }
+
+        function submitForm() {
+            // Show loading state
+            saveBtn.prop('disabled', true);
+            saveBtnText.text('Saving...');
+            saveSpinner.show();
+            form.addClass('loading');
+
+            // Submit the form
+            form[0].submit();
+        }
+
+        // Reset form when modal is closed
+        $('#modal-add-admin-record').on('hidden.bs.modal', function () {
+            form[0].reset();
+            form.removeClass('loading');
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').text('');
+            emailExistsAlert.hide();
+            saveBtn.prop('disabled', false);
+            saveBtnText.text('Save Admin');
+            saveSpinner.hide();
+            $('#adminModalTitle').text('Add New Admin');
+        });
+
+        // Password reset form handling
+        $('#passwordResetForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const resetBtn = $('#resetPasswordBtn');
+            const resetBtnText = $('#resetBtnText');
+            const resetSpinner = $('#resetSpinner');
+
+            // Show loading state
+            resetBtn.prop('disabled', true);
+            resetBtnText.text('Resetting...');
+            resetSpinner.show();
+
+            // Submit the form
+            this.submit();
+        });
+
+        // Reset form when modal is closed
+        $('#modal-reset-password').on('hidden.bs.modal', function () {
+            const resetBtn = $('#resetPasswordBtn');
+            const resetBtnText = $('#resetBtnText');
+            const resetSpinner = $('#resetSpinner');
+
+            resetBtn.prop('disabled', false);
+            resetBtnText.text('Reset Password');
+            resetSpinner.hide();
+        });
     });
-});
 </script>
 
 <footer th:replace="fragments/modal_fragment :: confirm_modal"></footer>

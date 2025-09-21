@@ -32,7 +32,15 @@ public class EventsService {
      * @return
      */
     public List<Announcement> listAll() {
-        return (List<Announcement>) eventsRepository.findAll(Sort.by("name").ascending());
+        try {
+            log.debug("Retrieving all events");
+            List<Announcement> events = (List<Announcement>) eventsRepository.findAll(Sort.by("name").ascending());
+            log.debug("Successfully retrieved {} events", events.size());
+            return events;
+        } catch (Exception ex) {
+            log.error("Error retrieving all events: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve all events", ex);
+        }
     }
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
@@ -102,10 +110,20 @@ public class EventsService {
     }
 
     public List<Announcement> getUpcomingEvents(int i) {
-        if (i > 0) {
-            return eventsRepository.findUpcomingEvents(i);
-        } else {
-            return eventsRepository.findUpcomingEvents(30);
+        try {
+            log.debug("Retrieving upcoming events with limit: {}", i);
+            List<Announcement> events;
+            if (i > 0) {
+                events = eventsRepository.findUpcomingEvents(i);
+            } else {
+                events = eventsRepository.findUpcomingEvents(30);
+            }
+            log.debug("Successfully retrieved {} upcoming events", events.size());
+            return events;
+        } catch (Exception ex) {
+            log.error("Error retrieving upcoming events with limit {}: {}", i, ex.getMessage(), ex);
+            // Return empty list on error to prevent dashboard failures
+            return List.of();
         }
     }
 

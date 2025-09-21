@@ -13,7 +13,6 @@ import org.paykesho.backoffice.organizations.dto.GPSDataItem;
 import org.paykesho.backoffice.organizations.repository.EmployeeRecordRepository;
 import org.paykesho.backoffice.organizations.repository.OrganizationRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
-import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,8 +40,8 @@ public class OrganizationService {
     private EmployeeRecordRepository employeeRecordRepository;
     @Autowired
     private ClientRepository clientRepository;
-    @Autowired
-    private SettingService settingService;
+    // @Autowired
+    // private SettingService settingService; // Unused field
     @Autowired
     private FileUploadService fileUploadService;
 
@@ -267,8 +266,112 @@ public class OrganizationService {
         return clientRepository.listClientRecordsAll(id);
     }
 
+    @Transactional(rollbackOn = {Exception.class})
+    public EmployeeRecord getEmployeeRecordById(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        return employeeRecordRepository.findById(id).orElse(null);
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    public void deleteEmployeeRecord(Integer id) throws PaykeshoError {
+        if (id == null) {
+            throw new PaykeshoError("Employee record ID is required");
+        }
+
+        EmployeeRecord employeeRecord = employeeRecordRepository.findById(id).orElse(null);
+        if (employeeRecord == null) {
+            throw new PaykeshoError("Employee record not found");
+        }
+
+        employeeRecordRepository.deleteById(id);
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    public Client saveClientRecord(Client client) {
+        if (client == null) {
+            return null;
+        }
+        return clientRepository.save(client);
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    public Client getClientRecordById(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        return clientRepository.findById(id).orElse(null);
+    }
+
+    @Transactional(rollbackOn = {Exception.class})
+    public void deleteClientRecord(Integer id) throws PaykeshoError {
+        if (id == null) {
+            throw new PaykeshoError("Client record ID is required");
+        }
+
+        Client client = clientRepository.findById(id).orElse(null);
+        if (client == null) {
+            throw new PaykeshoError("Client record not found");
+        }
+
+        clientRepository.deleteById(id);
+    }
+
 /*    public List<GeneralStatsDto> getOrganizationsCountByLevelOfCare(Integer countryId, boolean enabled) {
         return organizationRepository.getOrganizationsCountByLevelOfCare(countryId, enabled);
     }*/
+
+    /**
+     * Save bulk employee records
+     */
+    @Transactional(rollbackOn = {Exception.class})
+    public int saveBulkEmployeeRecords(List<EmployeeRecord> employeeRecords) {
+        int savedCount = 0;
+        for (EmployeeRecord employee : employeeRecords) {
+            try {
+                // Check if employee with same NRC already exists for this organization
+                EmployeeRecord existing = employeeRecordRepository.findByNrcAndOrganization(
+                        employee.getNrc(), employee.getOrganization());
+
+                if (existing == null) {
+                    employeeRecordRepository.save(employee);
+                    savedCount++;
+                    log.debug("Saved employee record: {}", employee.getNrc());
+                } else {
+                    log.warn("Employee record already exists: {}", employee.getNrc());
+                }
+            } catch (Exception e) {
+                log.error("Error saving employee record {}: {}", employee.getNrc(), e.getMessage());
+            }
+        }
+        return savedCount;
+    }
+
+    /**
+     * Save bulk client records
+     */
+    @Transactional(rollbackOn = {Exception.class})
+    public int saveBulkClientRecords(List<Client> clientRecords) {
+        int savedCount = 0;
+        for (Client client : clientRecords) {
+            try {
+                // Check if client with same email already exists for this organization
+                Client existing = clientRepository.findByEmailAndOrganization(
+                        client.getEmail(), client.getOrganization());
+
+                if (existing == null) {
+                    clientRepository.save(client);
+                    savedCount++;
+                    log.debug("Saved client record: {}", client.getEmail());
+                } else {
+                    log.warn("Client record already exists: {}", client.getEmail());
+                }
+            } catch (Exception e) {
+                log.error("Error saving client record {}: {}", client.getEmail(), e.getMessage());
+            }
+        }
+        return savedCount;
+    }
 
 }

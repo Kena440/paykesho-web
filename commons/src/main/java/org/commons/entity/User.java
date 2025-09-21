@@ -1,7 +1,9 @@
 package org.commons.entity;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.commons.enums.GenderType;
 
 import javax.persistence.*;
@@ -10,8 +12,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "users")
 public class User extends IdBasedEntity {

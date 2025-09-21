@@ -30,7 +30,8 @@
                     <div class="col-12 col-xl-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title">[[${pageTitle}]]</h5>
+                                <h5 class="card-title"><span
+                                        th:text="${pageTitle ?: 'Merchant Form'}">Merchant Form</span></h5>
                                 <h6 class="card-subtitle text-muted">Record merchants onto the system.</h6>
                             </div>
                             <div class="card-body">
@@ -38,7 +39,7 @@
                                       method="post"
                                       onsubmit="return checkMerchantUnique(this)"
                                       th:action="@{/merchants/save}"
-                                      th:object="${merchant}">
+                                      th:object="${merchant ?: new org.commons.entity.merchant.Merchant()}">
                                     <input id="id" th:field="*{id}" type="hidden"/>
                                     <input id="longitude" th:field="*{longitude}" type="hidden"/>
                                     <input id="latitude" th:field="*{latitude}" type="hidden"/>
@@ -51,6 +52,7 @@
                                                         class="form-control" id="name" maxlength="45"
                                                         minlength="2" placeholder="Name" required
                                                         th:field="*{name}"
+                                                        th:value="${merchant?.name ?: ''}"
                                                         type="text">
                                             </div>
                                             <div class="mb-3">
@@ -80,6 +82,7 @@
                                                         class="form-control" id="email" maxlength="100"
                                                         minlength="2" placeholder="Email" required
                                                         th:field="*{email}"
+                                                        th:value="${merchant?.email ?: ''}"
                                                         type="email">
                                             </div>
 

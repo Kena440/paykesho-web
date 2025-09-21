@@ -6,7 +6,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.merchantportal.config.Utility;
 import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
 import org.paykesho.merchantportal.notification.general.NotificationClient;
-import org.paykesho.merchantportal.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,7 @@ public class ForgotPasswordController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgotPasswordController.class);
     @Autowired
     private MerchantAdminService merchantAdminService;
-    @Autowired
-    private SettingService settingService;
+
     @Autowired
     private NotificationClient notificationClient;
 
@@ -102,21 +100,20 @@ public class ForgotPasswordController {
     }
 
 
-    private void sendTokenEmail(String verifyURL, String email) {
+    private void sendTokenEmail(String verifyURL, String email) throws javax.mail.MessagingException, java.io.UnsupportedEncodingException {
         String toAddress = email;
-        String subject = "Password Reset";
-        String content = "<p>Hello, </p>" +
-                "<p>You requested for a password reset.</p>" +
-                "<p>Click the link below to change the password</>" +
-                "<p><a href=\"" + verifyURL + "\" >Change Password</a></p>" +
-                "<br>" +
-                "<p>Ignore this email if you do remember your password, or you have not made the request. </p>";
 
+        String content = "<p>Hello,</p>"
+                + "<p>You requested a password reset. Click the link below to change your password:</p>"
+                + "<p><a href=\"" + verifyURL + "\">Change Password</a></p>"
+                + "<p>If you did not request this, please ignore the email.</p>";
+
+        LOGGER.info("Attempting to send password reset email to: {} with URL: {}", toAddress, verifyURL);
         boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
         if (emailNotificationSent) {
-            LOGGER.info("Notification sent successfully for " + toAddress);
+            LOGGER.info("Notification sent successfully for {}", toAddress);
         } else {
-            LOGGER.error("Failed to send notification for " + toAddress);
+            LOGGER.error("Failed to send notification for {}", toAddress);
         }
     }
 

@@ -4,10 +4,24 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ***REMOVED***
-      MYSQL_DATABASE: paykesho
-      MYSQL_USER: paykesho_user
-      MYSQL_PASSWORD: ***REMOVED***
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+        reservations:
+          memory: 1G
+          cpus: '1'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/init:/docker-entrypoint-initdb.d
@@ -18,92 +32,256 @@ services:
 
   backoffice:
     build: ./backoffice
+    volumes:
+      - ./backoffice/application.properties:/app/application.properties:ro
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
-      SPRING_DATASOURCE_USERNAME: paykesho_user
-      SPRING_DATASOURCE_PASSWORD: ***REMOVED***
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: file:/app/application.properties
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
+      REMEMBER_ME_KEY: ${REMEMBER_ME_KEY:-default_remember_me_key_change_in_production}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - paykesho-network
 
   client-portal:
     build: ./client-portal
+    volumes:
+      - ./client-portal/application.yml:/app/application.yml:ro
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
-      SPRING_DATASOURCE_USERNAME: paykesho_user
-      SPRING_DATASOURCE_PASSWORD: ***REMOVED***
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: file:/app/application.yml
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
+      REMEMBER_ME_KEY: ${REMEMBER_ME_KEY:-default_remember_me_key_change_in_production}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     ports:
       - "8081:8081"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - paykesho-network
 
   merchant-portal:
     build: ./merchant-portal
+    volumes:
+      - ./merchant-portal/application.yml:/app/application.yml:ro
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
-      SPRING_DATASOURCE_USERNAME: paykesho_user
-      SPRING_DATASOURCE_PASSWORD: ***REMOVED***
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: file:/app/application.yml
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
+      REMEMBER_ME_KEY: ${REMEMBER_ME_KEY:-default_remember_me_key_change_in_production}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     ports:
       - "8082:8082"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - paykesho-network
 
   organization-portal:
     build: ./organization-portal
+    volumes:
+      - ./organization-portal/application.yml:/app/application.yml:ro
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
-      SPRING_DATASOURCE_USERNAME: paykesho_user
-      SPRING_DATASOURCE_PASSWORD: ***REMOVED***
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: file:/app/application.yml
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
+      REMEMBER_ME_KEY: ${REMEMBER_ME_KEY:-default_remember_me_key_change_in_production}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID}
+      FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     ports:
       - "8083:8083"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - paykesho-network
 
   payment-service:
     build: ./payment-service
+    volumes:
+      - ./payment-service/application.properties:/app/application.properties:ro
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
-      SPRING_DATASOURCE_USERNAME: paykesho_user
-      SPRING_DATASOURCE_PASSWORD: ***REMOVED***
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: file:/app/application.properties
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      PAYMENT_GATEWAY_URL: ${PAYMENT_GATEWAY_URL}
+      PAYMENT_GATEWAY_API_KEY: ${PAYMENT_GATEWAY_API_KEY}
+      PAYMENT_GATEWAY_SECRET: ${PAYMENT_GATEWAY_SECRET}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8084/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     ports:
       - "8084:8084"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - paykesho-network
 
   notification-service:
     build: ./notification-service
+    volumes:
+      - ./notification-service/application.properties:/app/application.properties:ro
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
-      SPRING_DATASOURCE_USERNAME: paykesho_user
-      SPRING_DATASOURCE_PASSWORD: ***REMOVED***
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: file:/app/application.properties
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMS_API_KEY: ${SMS_API_KEY}
+      SMS_API_SECRET: ${SMS_API_SECRET}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8085/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     ports:
       - "8085:8085"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - paykesho-network
 
   file-service:
     build: ./file-service
+    volumes:
+      - ./file-service/application.properties:/app/application.properties:ro
+      - file_uploads:/app/uploads
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paykesho
-      SPRING_DATASOURCE_USERNAME: paykesho_user
-      SPRING_DATASOURCE_PASSWORD: ***REMOVED***
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: file:/app/application.properties
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      FILE_STORAGE_PATH: ${FILE_STORAGE_PATH:-/app/uploads}
+      FILE_MAX_SIZE: ${FILE_MAX_SIZE:-10MB}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8086/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     ports:
       - "8086:8086"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - paykesho-network
 
@@ -112,4 +290,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data: 
+  mysql_data:
+  file_uploads: 

@@ -14,7 +14,6 @@ import org.paykesho.backoffice.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -23,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
+// import java.util.Objects; // Unused import
 
 @Controller
 @RequestMapping("/users")
@@ -83,7 +82,7 @@ public class UserController {
 
             // Handle image upload (if provided)
             if (multipartFile != null && !multipartFile.isEmpty()) {
-                String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+                // String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename())); // Unused variable
 
                 if (!isValidImageType(multipartFile)) {
                     throw new PaykeshoError("Invalid image type uploaded");
@@ -131,7 +130,7 @@ public class UserController {
         if (user == null) {
             throw new PaykeshoError("no user provided");
         }
-        String firstPartOfEmail = user.getEmail().split("@")[0];
+        // String firstPartOfEmail = user.getEmail().split("@")[0]; // Unused variable
         return Constants.REDIRECT_TO_USERS;
     }
 

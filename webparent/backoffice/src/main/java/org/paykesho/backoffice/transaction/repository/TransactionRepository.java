@@ -36,4 +36,42 @@ public interface TransactionRepository extends SearchRepository<Transaction, Int
 
     long countByTxnDateAfter(Date date);
 
+    // Additional methods for dashboard analytics
+    long countBySettledTrue();
+
+    long countBySettledFalse();
+
+    long countByMerchantId(Integer merchantId);
+
+    long countByMerchantIdAndSettledTrue(Integer merchantId);
+
+    long countByMerchantIdAndSettledFalse(Integer merchantId);
+
+    long countByClientId(Integer clientId);
+
+    long countByClientIdAndSettledTrue(Integer clientId);
+
+    long countByClientIdAndSettledFalse(Integer clientId);
+
+    List<Transaction> findByMerchantId(Integer merchantId);
+
+    List<Transaction> findByClientId(Integer clientId);
+
+    List<Transaction> findByTxnDateAfterAndSettledTrue(Date date);
+
+    List<Transaction> findByTxnDateBetweenAndSettledTrue(Date startDate, Date endDate);
+
+    @Query("SELECT t.merchant.id, t.merchant.name, COUNT(t) as transactionCount " +
+            "FROM Transaction t " +
+            "GROUP BY t.merchant.id, t.merchant.name " +
+            "ORDER BY transactionCount DESC")
+    List<Object[]> findTopMerchantsByTransactionCount(int limit);
+
+    @Query("SELECT t.merchant.id, t.merchant.name, SUM(t.amount) as totalValue " +
+            "FROM Transaction t " +
+            "WHERE t.settled = true " +
+            "GROUP BY t.merchant.id, t.merchant.name " +
+            "ORDER BY totalValue DESC")
+    List<Object[]> findTopMerchantsByTransactionValue(int limit);
+
 }

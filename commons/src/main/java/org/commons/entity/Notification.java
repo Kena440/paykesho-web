@@ -1,6 +1,7 @@
 package org.commons.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.commons.enums.NotificationType;
 
@@ -8,6 +9,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Entity
 @Table(name = "notifications")

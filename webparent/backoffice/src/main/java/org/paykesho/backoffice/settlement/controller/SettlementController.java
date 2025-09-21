@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -29,7 +28,7 @@ public class SettlementController {
     private final SettlementService settlementService;
     private final SettingService settingService;
     private final MerchantService merchantService;
-    private final RestTemplate restTemplate;
+    // private final RestTemplate restTemplate; // Unused field
 
     @GetMapping("")
     public String showSettlements(Model model, HttpServletRequest request) {

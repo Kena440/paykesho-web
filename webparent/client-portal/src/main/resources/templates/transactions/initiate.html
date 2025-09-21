@@ -6,7 +6,9 @@
 <head th:replace="fragments/fragments :: page_head('Transactions','none')"></head>
 <body>
 <!-- Loader Overlay: Move directly under <body> for global centering -->
-<div id="loader" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center d-none" style="background: rgba(0,0,0,0.7) !important; z-index: 3000 !important; inset:0;">
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center d-none"
+     id="loader"
+     style="background: rgba(0,0,0,0.7) !important; z-index: 3000 !important; inset:0;">
     <div class="d-flex flex-column align-items-center justify-content-center w-100 h-100">
         <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;"></div>
         <div class="text-white mt-4 fs-5 fw-semibold text-center">Processing, please wait...</div>
@@ -50,58 +52,75 @@
                         <div class="card shadow-lg border-0">
                             <div class="card-header d-flex justify-content-between align-items-center bg-primary bg-opacity-10">
                                 <div>
-                                    <h5 class="card-title mb-0"><i class="align-middle me-1 text-primary" data-lucide="zap"></i> [[${pageTitle}]]</h5>
+                                    <h5 class="card-title mb-0"><i class="align-middle me-1 text-primary"
+                                                                   data-lucide="zap"></i> [[${pageTitle}]]</h5>
                                     <h6 class="card-subtitle text-muted">Make a quick payment with confidence.</h6>
                                 </div>
                                 <div class="dropdown">
-                                    <button aria-expanded="false" class="btn btn-link text-muted" data-bs-toggle="dropdown" type="button">
+                                    <button aria-expanded="false" class="btn btn-link text-muted"
+                                            data-bs-toggle="dropdown" type="button">
                                         <i class="align-middle" data-lucide="help-circle"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><h6 class="dropdown-header">How to make a payment</h6></li>
-                                        <li><a class="dropdown-item" data-bs-target="#helpModal" data-bs-toggle="modal" href="#">
+                                        <li><a class="dropdown-item" data-bs-target="#helpModal" data-bs-toggle="modal"
+                                               href="#">
                                             <i class="align-middle me-2" data-lucide="info"></i> View Instructions
                                         </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" data-bs-target="#faqModal" data-bs-toggle="modal" href="#">
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" data-bs-target="#faqModal" data-bs-toggle="modal"
+                                               href="#">
                                             <i class="align-middle me-2" data-lucide="help-circle"></i> FAQ
                                         </a></li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form class="needs-validation" id="paymentForm" novalidate autocomplete="off">
+                                <form autocomplete="off" class="needs-validation" id="paymentForm" novalidate>
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="input-group mb-3">
-                                                <input class="form-control" id="merchantCode" pattern="[A-Za-z0-9]+" placeholder="Enter Merchant Code" required title="Please enter a valid merchant code" type="text">
-                                                <button class="btn btn-outline-primary" type="button" id="fetchMerchantButton">
+                                                <input class="form-control" id="merchantCode" pattern="[A-Za-z0-9]+"
+                                                       placeholder="Enter Merchant Code" required
+                                                       title="Please enter a valid merchant code" type="text">
+                                                <button class="btn btn-outline-primary" id="fetchMerchantButton"
+                                                        type="button">
                                                     <i class="align-middle" data-lucide="search"></i> Fetch Merchant
                                                 </button>
-                                                <label for="merchantCode" class="input-group-text bg-white border-start-0">
+                                                <label class="input-group-text bg-white border-start-0"
+                                                       for="merchantCode">
                                                     Merchant Code
-                                                    <i class="align-middle ms-1 text-info" data-bs-toggle="tooltip" data-lucide="info" title="Enter the merchant code or scan their QR code"></i>
+                                                    <i class="align-middle ms-1 text-info" data-bs-toggle="tooltip"
+                                                       data-lucide="info"
+                                                       title="Enter the merchant code or scan their QR code"></i>
                                                 </label>
                                                 <div class="invalid-feedback">Please enter a valid merchant code.</div>
                                             </div>
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-                                                <button class="btn btn-outline-secondary" id="scanQrButton" type="button">
+                                                <button class="btn btn-outline-secondary" id="scanQrButton"
+                                                        type="button">
                                                     <i class="align-middle" data-lucide="qr-code"></i> Scan QR Code
                                                 </button>
                                             </div>
                                         </div>
                                         <div class="col-12">
-                                            <div class="card card-body bg-light border-0" id="qrScannerContainer" style="display: none;">
+                                            <div class="card card-body bg-light border-0" id="qrScannerContainer"
+                                                 style="display: none;">
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <h6 class="mb-0"><i class="align-middle me-1 text-primary" data-lucide="scan"></i> QR Code Scanner</h6>
+                                                    <h6 class="mb-0"><i class="align-middle me-1 text-primary"
+                                                                        data-lucide="scan"></i> QR Code Scanner</h6>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" id="torchToggle" type="checkbox">
+                                                        <input class="form-check-input" id="torchToggle"
+                                                               type="checkbox">
                                                         <label class="form-check-label" for="torchToggle">Torch</label>
                                                     </div>
                                                 </div>
                                                 <div class="w-100" id="reader"></div>
                                                 <div class="text-center mt-2">
-                                                    <button class="btn btn-sm btn-outline-danger" id="stopScanButton" type="button">
+                                                    <button class="btn btn-sm btn-outline-danger" id="stopScanButton"
+                                                            type="button">
                                                         <i class="align-middle" data-lucide="x"></i> Stop Scanning
                                                     </button>
                                                 </div>
@@ -110,7 +129,9 @@
                                         <div class="col-12" id="merchantDetails" style="display: none;">
                                             <div class="card bg-light border-0">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h5 class="card-title mb-0"><i class="align-middle me-1 text-success" data-lucide="user-check"></i> Merchant Information</h5>
+                                                    <h5 class="card-title mb-0"><i
+                                                            class="align-middle me-1 text-success"
+                                                            data-lucide="user-check"></i> Merchant Information</h5>
                                                     <span class="badge bg-success" id="merchantStatus">Verified</span>
                                                 </div>
                                                 <div class="card-body">
@@ -121,24 +142,45 @@
                                                         <dd class="col-8 col-xxl-9"><span id="merchantType"></span></dd>
                                                     </dl>
                                                     <hr>
-                                                    <div class="form-floating mb-3" id="amountSection" style="display: none;">
-                                                        <input class="form-control" id="amount" min="20" placeholder="Enter Amount" required step="0.1" type="number">
+                                                    <div class="form-floating mb-3" id="amountSection"
+                                                         style="display: none;">
+                                                        <input class="form-control" id="amount" min="20"
+                                                               placeholder="Enter Amount" required step="0.1"
+                                                               type="number">
                                                         <label for="amount">
                                                             Amount (K)
-                                                            <i class="align-middle ms-1 text-info" data-bs-toggle="tooltip" data-lucide="info" title="Minimum amount: K20"></i>
+                                                            <i class="align-middle ms-1 text-info"
+                                                               data-bs-toggle="tooltip" data-lucide="info"
+                                                               title="Minimum amount: K20"></i>
                                                         </label>
-                                                        <div class="invalid-feedback">Please enter a valid amount (minimum K20).</div>
+                                                        <div class="invalid-feedback">Please enter a valid amount
+                                                            (minimum K20).
+                                                        </div>
                                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-                                                            <div class="btn-group" role="group" aria-label="Quick Amounts">
-                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="20">K20</button>
-                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="50">K50</button>
-                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="100">K100</button>
-                                                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="200">K200</button>
+                                                            <div aria-label="Quick Amounts" class="btn-group"
+                                                                 role="group">
+                                                                <button class="btn btn-outline-secondary quick-amount"
+                                                                        data-amount="20"
+                                                                        type="button">K20
+                                                                </button>
+                                                                <button class="btn btn-outline-secondary quick-amount"
+                                                                        data-amount="50"
+                                                                        type="button">K50
+                                                                </button>
+                                                                <button class="btn btn-outline-secondary quick-amount"
+                                                                        data-amount="100"
+                                                                        type="button">K100
+                                                                </button>
+                                                                <button class="btn btn-outline-secondary quick-amount"
+                                                                        data-amount="200"
+                                                                        type="button">K200
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                                        <button class="btn btn-success px-4" id="submitPayment" type="submit">
+                                                        <button class="btn btn-success px-4" id="submitPayment"
+                                                                type="submit">
                                                             <i class="align-middle" data-lucide="send"></i> Pay Now
                                                         </button>
                                                     </div>
@@ -152,12 +194,14 @@
                     </div>
                 </div>
                 <!-- Modals for Help and FAQ -->
-                <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+                <div aria-hidden="true" aria-labelledby="helpModalLabel" class="modal fade" id="helpModal"
+                     tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="helpModalLabel">How to Make a Payment</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                        type="button"></button>
                             </div>
                             <div class="modal-body">
                                 <ol>
@@ -170,18 +214,25 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqModalLabel" aria-hidden="true">
+                <div aria-hidden="true" aria-labelledby="faqModalLabel" class="modal fade" id="faqModal" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="faqModalLabel">Frequently Asked Questions</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                        type="button"></button>
                             </div>
                             <div class="modal-body">
                                 <ul>
-                                    <li><b>What is a merchant code?</b> <br> It's a unique code for each merchant. You can get it from the merchant or scan their QR code.</li>
-                                    <li><b>Is my payment secure?</b> <br> Yes, all payments are processed securely and you receive instant confirmation.</li>
-                                    <li><b>What if I enter the wrong amount?</b> <br> You can cancel before confirming. Double-check before submitting.</li>
+                                    <li><b>What is a merchant code?</b> <br> It's a unique code for each merchant. You
+                                        can get it from the merchant or scan their QR code.
+                                    </li>
+                                    <li><b>Is my payment secure?</b> <br> Yes, all payments are processed securely and
+                                        you receive instant confirmation.
+                                    </li>
+                                    <li><b>What if I enter the wrong amount?</b> <br> You can cancel before confirming.
+                                        Double-check before submitting.
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -301,6 +352,7 @@
 
     // QR Scan Success Handler
     let scanHandled = false;
+
     function onScanSuccess(decodedText) {
         if (scanHandled) return;
         scanHandled = true;
@@ -316,7 +368,9 @@
             console.error('Error handling scan success:', error);
             showNotification('Error', 'Error processing QR code scan.', 'error');
         } finally {
-            setTimeout(() => { scanHandled = false; }, 1000); // Reset for next scan
+            setTimeout(() => {
+                scanHandled = false;
+            }, 1000); // Reset for next scan
         }
     }
 
@@ -534,6 +588,7 @@
         loader.style.zIndex = '3000';
         loader.style.background = 'rgba(0,0,0,0.7)';
     }
+
     function hideLoader() {
         loader.classList.remove('d-flex');
         loader.classList.add('d-none');

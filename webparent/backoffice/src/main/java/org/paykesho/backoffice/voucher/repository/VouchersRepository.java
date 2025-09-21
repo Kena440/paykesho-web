@@ -45,5 +45,16 @@ public interface VouchersRepository extends SearchRepository<Voucher, Integer> {
 
     long countByRequestDateAfter(Date date);
 
+    // Additional methods for dashboard analytics
+    long countByApprovedTrue();
+
+    long countByApprovedFalse();
+
+    long countByClientOrganizationId(Integer organizationId);
+
+    long countByClientOrganizationIdAndApprovedTrue(Integer organizationId);
+
+    long countByClientOrganizationIdAndApprovedFalse(Integer organizationId);
+
 }
 

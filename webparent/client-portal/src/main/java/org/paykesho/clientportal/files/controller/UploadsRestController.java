@@ -1,21 +1,12 @@
 package org.paykesho.clientportal.files.controller;
 
 
-import org.paykesho.clientportal.files.service.FileUploadService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/uploads/rest")
 public class UploadsRestController {
-
-    private final FileUploadService fileUploadService;
-
-    @Autowired
-    public UploadsRestController(FileUploadService fileUploadService) {
-        this.fileUploadService = fileUploadService;
-    }
 
 /*    @PostMapping("/upload")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("fileType") FileType fileType, @RequestParam("userId") int userId, @RequestParam("description") String description) {

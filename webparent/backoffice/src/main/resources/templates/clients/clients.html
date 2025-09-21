@@ -29,11 +29,11 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title">[[${pageTitle}]]</h5>
+                                <h5 class="card-title"><span th:text="${pageTitle ?: 'Clients'}">Clients</span></h5>
                                 <h6 class="card-subtitle text-muted">A list of recorded clients.</h6>
                             </div>
                             <div class="card-body">
-                                <table class="table table-striped w-100" id="datatables-reponsive">
+                                <table class="table table-striped w-100" id="datatables-responsive">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -48,36 +48,64 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr th:each="client, clientStat : ${clientList}">
-                                        <td class="hideable-column">[[${clientStat.count}]]</td>
+                                    <tr th:each="client, clientStat : ${clientList ?: {}}"
+                                        th:if="${clientList != null and !clientList.isEmpty()}">
+                                        <td class="hideable-column"><span th:text="${clientStat?.count ?: ''}">-</span>
+                                        </td>
                                         <td>
                                         </td>
                                         <td>
                                             <span class="font-weight-normal">
                                                 <a th:href="@{'/clients/view/'+${client.id}}"
+                                                   th:if="${client?.id != null}"
                                                    title="client View">
-                                                    <span class="font-weight-normal"> [[${client.code}]]</span>
+                                                    <span class="font-weight-normal" th:text="${client?.code ?: 'N/A'}">N/A</span>
                                                 </a>
+                                                <span class="text-muted" th:unless="${client?.id != null}">N/A</span>
                                             </span>
                                         </td>
-                                        </td>
-                                        <td><span class="font-weight-normal">[[${client.name}]] <small>([[${client.organization}]])</small></span>
-                                        </td>
-                                        </td>
-                                        <td><span class="font-weight-normal">[[${client.email}]] <small>([[${client.phoneNumber}]])</small></span>
+                                        <td>
+                                            <span class="font-weight-normal">
+                                                <span th:text="${client?.name ?: 'N/A'}">N/A</span>
+                                                <small th:if="${client?.organization != null}"
+                                                       th:text="'(' + ${client.organization} + ')'">()</small>
+                                            </span>
                                         </td>
                                         <td>
-                                            <div th:replace="fragments/fragments :: status(${client.enabled}, 'client', '/clients/' + ${client.id})"></div>
+                                            <span class="font-weight-normal">
+                                                <span th:text="${client?.email ?: 'N/A'}">N/A</span>
+                                                <small th:if="${client?.phoneNumber != null}"
+                                                       th:text="'(' + ${client.phoneNumber} + ')'">()</small>
+                                            </span>
                                         </td>
-                                        <td><span class="font-weight-normal"
+                                        <td>
+                                            <div th:if="${client?.id != null}"
+                                                 th:replace="fragments/fragments :: status(${client?.enabled ?: false}, 'client', '/clients/' + ${client.id})"></div>
+                                            <span class="text-muted" th:unless="${client?.id != null}">N/A</span>
+                                        </td>
+                                        <td>
+                                            <span class="font-weight-normal"
+                                                  th:if="${client?.clientBalance?.availableBalance != null}"
                                                   th:replace="fragments/fragments :: format_currency(${client.clientBalance.availableBalance})"></span>
+                                            <span class="text-muted"
+                                                  th:unless="${client?.clientBalance?.availableBalance != null}">N/A</span>
                                         </td>
-                                        <td><span class="font-weight-normal" th:if="${client.creditScore != null}"
+                                        <td>
+                                            <span class="font-weight-normal"
+                                                  th:if="${client?.creditScore != null}"
                                                   th:replace="fragments/fragments :: format_number(${client.creditScore})"></span>
+                                            <span class="text-muted"
+                                                  th:unless="${client?.creditScore != null}">N/A</span>
                                         </td>
-                                        <td><span class="font-weight-normal">[[${client.clientType}]]</span></td>
+                                        <td><span class="font-weight-normal" th:text="${client?.clientType ?: 'N/A'}">N/A</span>
+                                        </td>
                                     </tr>
-
+                                    <tr th:if="${clientList == null or clientList.isEmpty()}">
+                                        <td class="text-center text-muted py-4" colspan="9">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No clients found or data could not be loaded.
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -113,9 +141,13 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Datatables Responsive
-        $("#datatables-reponsive").DataTable({
+        $("#datatables-responsive").DataTable({
             destroy: true,
-            responsive: true
+            responsive: true,
+            error: function (xhr, error, thrown) {
+                console.error('DataTable error:', error, thrown);
+                showErrorAlert('Failed to load data table. Please refresh the page.');
+            }
         });
     });
 </script>

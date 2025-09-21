@@ -36,21 +36,49 @@ public class Utility {
     }
 
     public static String getEKeshofAuthenticatedOrganizationAdmin(HttpServletRequest request) {
-        Object principal = request.getUserPrincipal();
-        if (principal == null) return null;
+        try {
+            if (request == null) {
+                return null;
+            }
 
-        String customerEmail = null;
+            Object principal = request.getUserPrincipal();
+            if (principal == null) {
+                return null;
+            }
 
-        if (principal instanceof UsernamePasswordAuthenticationToken || principal instanceof RememberMeAuthenticationToken) {
-            customerEmail = request.getUserPrincipal().getName();
-        } else if (principal instanceof OAuth2AuthenticationToken) {
-            OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) principal;
-            OrganizationAdminOAuth2User OrganizationAdminOAuth2User = (OrganizationAdminOAuth2User) oAuth2AuthenticationToken.getPrincipal();
-            customerEmail = OrganizationAdminOAuth2User.getEmail();
+            String customerEmail = null;
+
+            if (principal instanceof UsernamePasswordAuthenticationToken || principal instanceof RememberMeAuthenticationToken) {
+                try {
+                    customerEmail = request.getUserPrincipal().getName();
+                } catch (Exception e) {
+                    System.err.println("Error getting username from authentication token: " + e.getMessage());
+                    return null;
+                }
+            } else if (principal instanceof OAuth2AuthenticationToken) {
+                try {
+                    OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) principal;
+                    Object principalObj = oAuth2AuthenticationToken.getPrincipal();
+
+                    if (principalObj instanceof OrganizationAdminOAuth2User) {
+                        OrganizationAdminOAuth2User organizationAdminOAuth2User = (OrganizationAdminOAuth2User) principalObj;
+                        customerEmail = organizationAdminOAuth2User.getEmail();
+                    } else {
+                        System.err.println("Unexpected OAuth2 principal type: " + principalObj.getClass().getName());
+                        return null;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error getting email from OAuth2 token: " + e.getMessage());
+                    return null;
+                }
+            }
+
+            return customerEmail;
+
+        } catch (Exception e) {
+            System.err.println("Unexpected error in getEKeshofAuthenticatedOrganizationAdmin: " + e.getMessage());
+            return null;
         }
-
-        return customerEmail;
-
     }
 
     public static String formatCurrency(float amount, CurrencySettingBag currencySettingBag) {

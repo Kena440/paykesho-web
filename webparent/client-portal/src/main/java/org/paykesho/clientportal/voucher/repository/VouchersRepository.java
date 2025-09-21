@@ -29,5 +29,8 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
     // Custom query to get the outstanding balance for a client
     @Query("SELECT SUM(v.availableAmount) FROM Voucher v WHERE v.client.id = :clientId AND v.approved = true AND v.availableAmount > 0")
     BigDecimal getOutstandingBalance(@Param("clientId") Integer clientId);
+
+    // Additional methods for dashboard analytics
+    List<Voucher> findByClient(Client client);
 }
 
