@@ -10,7 +10,6 @@ import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.user.repository.RoleRepository;
 import org.paykesho.backoffice.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

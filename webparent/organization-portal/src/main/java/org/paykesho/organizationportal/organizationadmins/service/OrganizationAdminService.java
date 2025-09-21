@@ -11,7 +11,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.config.Utility;
 import org.paykesho.organizationportal.organizationadmins.repository.OrganizationAdminRepository;
 import org.paykesho.organizationportal.settings.repository.CountryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,23 +32,46 @@ public class OrganizationAdminService {
     private final PasswordEncoder passwordEncoder;
 
     public List<Country> countryList() {
-        return countryRepository.findAllByOrderByNameDesc();
+        try {
+            log.debug("Retrieving country list");
+            List<Country> countries = countryRepository.findAllByOrderByNameDesc();
+            log.debug("Successfully retrieved {} countries", countries.size());
+            return countries;
+        } catch (Exception ex) {
+            log.error("Error retrieving country list: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve country list", ex);
+        }
     }
 
     public boolean isEmailUnique(String email) {
-        OrganizationAdmin organizationAdmin = organizationAdminRepository.findByEmail(email);
-        return organizationAdmin == null;
+        try {
+            log.debug("Checking email uniqueness for: {}", email);
+            OrganizationAdmin organizationAdmin = organizationAdminRepository.findByEmail(email);
+            boolean isUnique = organizationAdmin == null;
+            log.debug("Email {} is unique: {}", email, isUnique);
+            return isUnique;
+        } catch (Exception ex) {
+            log.error("Error checking email uniqueness for {}: {}", email, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to check email uniqueness", ex);
+        }
     }
 
     public void registerOrganizationAdmin(OrganizationAdmin organizationAdmin) {
-        encodePassword(organizationAdmin);
-        organizationAdmin.setEnabled(false);
-        organizationAdmin.setCreatedTime(new Date());
-        organizationAdmin.setAuthenticationType(AuthenticationType.DATABASE);
+        try {
+            log.debug("Registering new organization admin with email: {}", organizationAdmin.getEmail());
+            encodePassword(organizationAdmin);
+            organizationAdmin.setEnabled(false);
+            organizationAdmin.setCreatedTime(new Date());
+            organizationAdmin.setAuthenticationType(AuthenticationType.DATABASE);
 
-        String randomCode = RandomString.make(64);
-        organizationAdmin.setVerificationCode(randomCode);
-        organizationAdminRepository.save(organizationAdmin);
+            String randomCode = RandomString.make(64);
+            organizationAdmin.setVerificationCode(randomCode);
+            organizationAdminRepository.save(organizationAdmin);
+            log.debug("Successfully registered organization admin with ID: {}", organizationAdmin.getId());
+        } catch (Exception ex) {
+            log.error("Error registering organization admin with email {}: {}", organizationAdmin.getEmail(), ex.getMessage(), ex);
+            throw new RuntimeException("Failed to register organization admin", ex);
+        }
     }
 
     private void encodePassword(OrganizationAdmin organizationAdmin) {
@@ -75,7 +97,19 @@ public class OrganizationAdminService {
     }
 
     public OrganizationAdmin getOrganizationAdminByEmail(String email) {
-        return organizationAdminRepository.findByEmail(email);
+        try {
+            log.debug("Retrieving organization admin by email: {}", email);
+            OrganizationAdmin organizationAdmin = organizationAdminRepository.findByEmail(email);
+            if (organizationAdmin != null) {
+                log.debug("Found organization admin with ID: {}", organizationAdmin.getId());
+            } else {
+                log.debug("No organization admin found with email: {}", email);
+            }
+            return organizationAdmin;
+        } catch (Exception ex) {
+            log.error("Error retrieving organization admin by email {}: {}", email, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve organization admin by email", ex);
+        }
     }
 
     public OrganizationAdmin getOrganizationAdminByResetToken(String token) {

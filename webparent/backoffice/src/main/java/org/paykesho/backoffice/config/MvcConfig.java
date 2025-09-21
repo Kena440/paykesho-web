@@ -2,6 +2,7 @@ package org.paykesho.backoffice.config;
 
 import org.paykesho.backoffice.paging.PagingAndSortingArgumentResolver;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -31,7 +32,7 @@ public class MvcConfig implements WebMvcConfigurer {
     }*/
 
     @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+    public void addArgumentResolvers(@NonNull List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new PagingAndSortingArgumentResolver());
     }
 }

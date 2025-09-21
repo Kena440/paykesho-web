@@ -7,7 +7,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.organizationadmins.service.OrganizationAdminService;
 import org.paykesho.organizationportal.organizations.service.OrganizationService;
 import org.paykesho.organizationportal.security.OrganizationAdminUserDetails;
-import org.paykesho.organizationportal.settings.service.SettingService;
 import org.paykesho.organizationportal.vouchers.service.VouchersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,8 +25,7 @@ public class VouchersController {
     private OrganizationService organizationService;
     @Autowired
     private OrganizationAdminService organizationAdminService;
-    @Autowired
-    private SettingService settingService;
+
     @Autowired
     private VouchersService vouchersService;
 

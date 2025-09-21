@@ -6,7 +6,8 @@ import org.paykesho.merchantportal.config.Utility;
 import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
 import org.paykesho.merchantportal.security.MerchantAdminUserDetails;
 import org.paykesho.merchantportal.security.oauth.MerchantAdminOAuth2User;
-import org.paykesho.merchantportal.settings.service.SettingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
@@ -23,10 +24,13 @@ import java.util.List;
 
 @Controller
 public class MerchantAdminController {
+
+    private static final Logger log = LoggerFactory.getLogger(MerchantAdminController.class);
+
     @Autowired
     private MerchantAdminService merchantAdminService;
-    @Autowired
-    private SettingService settingService;
+    // @Autowired
+    // private SettingService settingService; // Unused field
 
     @GetMapping("/sign-up-customer")
     public String showSignUpForm(Model model) {
@@ -45,11 +49,22 @@ public class MerchantAdminController {
                                       RedirectAttributes redirectAttributes,
                                       Model model,
                                       HttpServletRequest request) {
-        merchantAdminService.registerMerchantAdmin(assessor);
-        //sendVerificationEmail(request, assessor);
+        try {
+            log.debug("Processing merchant admin signup for email: {}", assessor.getEmail());
 
-        model.addAttribute("pageTitle", "Registration Successful");
-        return "register/register_success";
+            merchantAdminService.registerMerchantAdmin(assessor);
+            //sendVerificationEmail(request, assessor);
+
+            model.addAttribute("pageTitle", "Registration Successful");
+            log.debug("Successfully registered merchant admin");
+            return "register/register_success";
+
+        } catch (Exception ex) {
+            log.error("Error during merchant admin signup: {}", ex.getMessage(), ex);
+            model.addAttribute("errorMessage", "Registration failed. Please try again later.");
+            model.addAttribute("pageTitle", "Registration Failed");
+            return "error/500";
+        }
     }
 
     @PostMapping(value = "/cso-admins/update-account")
@@ -107,7 +122,7 @@ public class MerchantAdminController {
             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
             MerchantAdminUserDetails = (MerchantAdminUserDetails) token.getPrincipal();
         } else if (principal instanceof RememberMeAuthenticationToken) {
-            RememberMeAuthenticationToken token = (RememberMeAuthenticationToken) principal;
+            // RememberMeAuthenticationToken token = (RememberMeAuthenticationToken) principal; // Unused variable
         }
         return MerchantAdminUserDetails;
     }

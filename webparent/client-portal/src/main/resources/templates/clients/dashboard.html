@@ -12,6 +12,11 @@
         <main class="content">
             <div class="container-fluid p-0">
 
+                <!-- Exception Handling Alert Container -->
+                <div class="mb-3" id="exceptionAlertContainer" style="display: none;">
+                    <!-- Dynamic exception alerts will be inserted here -->
+                </div>
+
                 <div class="row mb-2 mb-xl-3">
                     <div class="col-auto d-none d-sm-block">
                         <h3>Analytics</h3>
@@ -35,22 +40,49 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-primary shadow-sm">
-                            <i class="align-middle" data-lucide="filter">&nbsp;</i> Filter
-                        </button>
-                        <button class="btn btn-primary shadow-sm">
+                        <button class="btn btn-primary shadow-sm" id="refreshDashboardBtn">
                             <i class="align-middle" data-lucide="refresh-cw">&nbsp;</i> Refresh
                         </button>
                     </div>
                 </div>
 
-                <!-- Quick Actions Card (Mobile Friendly) -->
-                <div class="row">
+                <!-- Welcome Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card illustration">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h2 class="mb-2">
+                                            <span class="text-primary" th:text="${greeting ?: 'Hello'}">Hello</span>
+                                            <span class="text-primary" th:text="${client?.name ?: 'User'}">User</span>!
+                                        </h2>
+                                        <p class="text-muted mb-0">Paykesho Client Dashboard - Manage your payments and
+                                            vouchers</p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <img alt="Dashboard" class="img-fluid" style="max-height: 120px;"
+                                             th:src="@{/assets/img/illustrations/searching.png}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="zap"></i>
+                            Quick Actions
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
                     <div class="col-12">
                         <div class="card shadow-sm">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Quick Actions</h5>
-                            </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                                     <a class="btn btn-primary btn-lg" th:href="@{/vouchers/request}">
@@ -65,129 +97,1058 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <!-- Illustration Card -->
-                    <div class="col-12 col-md-6 d-flex">
-                        <div class="card illustration flex-fill">
-                            <div class="card-body p-0 d-flex flex-fill">
-                                <div class="row g-0 w-100">
-                                    <div class="col-6">
-                                        <div class="illustration-text p-3 m-1">
-                                            <h4 class="illustration-text">[[${greeting}]]
-                                                [[${client}]]!</h4>
-                                            <p class="mb-0">Paykesho Dashboard</p>
-                                        </div>
+                <!-- Key Performance Indicators (KPIs) - Primary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-primary">
+                            <i class="align-middle me-2" data-lucide="trending-up"></i>
+                            Account Overview
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Account Balance - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-primary h-100" id="balanceCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-primary">
+                                        <i class="align-middle" data-lucide="wallet"></i>
                                     </div>
-                                    <div class="col-6 align-self-end text-end">
-                                        <img alt="Searching"
-                                             class="img-fluid illustration-img"
-                                             th:src="@{/assets/img/illustrations/searching.png}">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshBalance()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
+                                </div>
+                                <h3 class="text-primary mb-2"
+                                    th:text="${#numbers.formatDecimal(currentBalance ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW'">
+                                    0.00 ZMW</h3>
+                                <h6 class="text-muted mb-3">Account Balance</h6>
+                                <div id="balanceContent">
+                                    <span class="badge badge-subtle-success me-2">Available</span>
+                                    <span class="text-muted small">Current balance</span>
+                                </div>
+                                <div class="text-danger small" id="balanceError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load balance data</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Balance Card -->
-                    <div class="col-12 col-md-6 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col mt-0">
-                                        <h5 class="card-title">Balance</h5>
+                    <!-- Total Transactions - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-success h-100" id="transactionsCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="credit-card"></i>
                                     </div>
-
-                                    <div class="col-auto">
-                                        <div class="stat stat-sm">
-                                            <i class="align-middle" data-lucide="arrow-up-right"></i>
-                                        </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-success" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshTransactionData()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <span class="h1 d-inline-block mt-1 mb-4"
-                                      th:if="${availableBalance != null}">
-                                    <span class="font-weight-normal"
-                                          th:replace="fragments/fragments :: format_currency(${availableBalance})"></span>
-                                </span>
-                                <!--   <div class="mb-0">
-                                       <span class="badge badge-subtle-success me-2"> +3.65% </span>
-                                       <span class="text-muted">Since last week</span>
-                                   </div>-->
+                                <h3 class="text-success mb-2" th:text="${totalTransactions ?: 0}">0</h3>
+                                <h6 class="text-muted mb-3">Total Transactions</h6>
+                                <div id="transactionsContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${successfulTransactions ?: 0} + ' successful'">0 successful</span>
+                                    <span class="text-muted small">All time</span>
+                                </div>
+                                <div class="text-danger small" id="transactionsError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load transaction data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Vouchers - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-info h-100" id="vouchersCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="gift"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshVoucherData()">Refresh</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h3 class="text-info mb-2" th:text="${totalVouchers ?: 0}">0</h3>
+                                <h6 class="text-muted mb-3">Total Vouchers</h6>
+                                <div id="vouchersContent">
+                                    <span class="badge badge-subtle-info me-2"
+                                          th:text="${activeVouchers ?: 0} + ' active'">0 active</span>
+                                    <span class="text-muted small">All time</span>
+                                </div>
+                                <div class="text-danger small" id="vouchersError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load voucher data</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <!-- Credit Score Card -->
-                    <div class="col-12 col-md-6 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col mt-0">
-                                        <h5 class="card-title">Credit Score</h5>
-                                    </div>
-
-                                    <div class="col-auto">
-                                        <div class="stat stat-sm">
-                                            <i class="align-middle" data-lucide="clock"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="h1 d-inline-block mt-1 mb-4"
-                                      th:if="${creditScore != null}">
-                                    <span class="font-weight-normal"
-                                          th:replace="fragments/fragments :: format_number(${creditScore})"></span>
-                                </span>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Transactions Card (Placeholder/Example) -->
-                    <div class="col-12 col-md-6 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col mt-0">
-                                        <h5 class="card-title">Transactions</h5>
-                                    </div>
-
-                                    <div class="col-auto">
-                                        <div class="stat stat-sm">
-                                            <i class="align-middle" data-lucide="users"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="h1 d-inline-block mt-1 mb-4">Loading...</span>
-                                <div class="mb-0">
-                                    <span class="badge badge-subtle-secondary me-2"> Data Not Available </span>
-                                    <span class="text-muted">Placeholder</span>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Activity Overview - Secondary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="activity"></i>
+                            Activity Overview
+                        </h4>
                     </div>
                 </div>
 
-                <!-- Placeholder for Charts or other sections if needed -->
-                <div class="row">
-                    <div class="col-12 d-none">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Charts</h5>
-                            </div>
-                            <div class="card-body">
-                                <p>Placeholder for charts or other dashboard elements.</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row mb-4">
+                    <h5 class="card-title">Balance</h5>
                 </div>
 
+                <div class="col-auto">
+                    <div class="stat stat-sm">
+                        <i class="align-middle" data-lucide="arrow-up-right"></i>
+                    </div>
+                </div>
             </div>
-        </main>
+            <div id="balanceContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4">
+                                        <span class="font-weight-normal"
+                                              th:if="${availableBalance != null}"
+                                              th:replace="fragments/fragments :: format_currency(${availableBalance})"></span>
+                                        <span class="font-weight-normal text-muted"
+                                              th:unless="${availableBalance != null}">N/A</span>
+                                    </span>
+            </div>
+            <div class="text-danger" id="balanceError" style="display: none;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span class="error-message">Failed to load balance</span>
+                <button class="btn btn-sm btn-outline-danger ms-2" onclick="retryLoadBalance()">
+                    <i class="fas fa-redo me-1"></i>Retry
+                </button>
+            </div>
+    </div>
+</div>
+</div>
+</div>
 
-        <footer th:replace="fragments/fragments :: footer1()"></footer>
+<div class="row">
+    <!-- Credit Score Card -->
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card flex-fill" id="creditScoreCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Credit Score</h5>
+                    </div>
+
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="clock"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="creditScoreContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4">
+                                        <span class="font-weight-normal"
+                                              th:if="${creditScore != null}"
+                                              th:replace="fragments/fragments :: format_number(${creditScore})"></span>
+                                        <span class="font-weight-normal text-muted"
+                                              th:unless="${creditScore != null}">N/A</span>
+                                    </span>
+                </div>
+                <div class="text-danger" id="creditScoreError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load credit score</span>
+                    <button class="btn btn-sm btn-outline-danger ms-2" onclick="retryLoadCreditScore()">
+                        <i class="fas fa-redo me-1"></i>Retry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Transactions Card -->
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card flex-fill" id="totalTransactionsCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Total Transactions</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="credit-card"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="totalTransactionsContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4"
+                                          th:text="${totalTransactions ?: 0}">0</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-success me-2"
+                                              th:text="${successfulTransactions ?: 0} + ' successful'">0 successful</span>
+                        <span class="text-muted">Total transactions</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="totalTransactionsError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load transaction data</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Enhanced Analytics Cards Row 1 -->
+<div class="row">
+    <!-- Success Rate Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="successRateCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Success Rate</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="trending-up"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="successRateContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4"
+                                          th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 'POINT')} + '%'">0%</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-success me-2"
+                                              th:text="${successfulTransactions ?: 0} + '/' + ${totalTransactions ?: 0}">0/0</span>
+                        <span class="text-muted">Successful transactions</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="successRateError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load success rate data</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Spent Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="totalSpentCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Total Spent</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="totalSpentContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4">
+                                        <span class="font-weight-normal"
+                                              th:if="${totalSpent != null}"
+                                              th:replace="fragments/fragments :: format_currency(${totalSpent})"></span>
+                                        <span class="font-weight-normal text-muted"
+                                              th:unless="${totalSpent != null}">ZMW 0</span>
+                                    </span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-info me-2"
+                                              th:text="${#numbers.formatDecimal(averageTransactionValue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' avg'">0 avg</span>
+                        <span class="text-muted">Average per transaction</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="totalSpentError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load spending data</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vouchers Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="vouchersCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Vouchers</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="file-text"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="vouchersContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4"
+                                          th:text="${totalVouchers ?: 0}">0</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-success me-2"
+                                              th:text="${approvedVouchers ?: 0} + ' approved'">0 approved</span>
+                        <span class="text-muted">Total vouchers</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="vouchersError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load voucher data</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unique Merchants Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="uniqueMerchantsCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Merchants</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="store"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="uniqueMerchantsContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4"
+                                          th:text="${uniqueMerchants ?: 0}">0</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-primary me-2"
+                                              th:text="${#numbers.formatDecimal(voucherApprovalRate ?: 0, 1, 'POINT')} + '% approval'">0% approval</span>
+                        <span class="text-muted">Unique merchants used</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="uniqueMerchantsError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load merchant data</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Analytics Cards Row 2 -->
+<div class="row">
+    <!-- Today's Activity Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="todayActivityCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Today's Activity</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="calendar"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="todayActivityContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4"
+                                          th:text="${todayTransactions ?: 0}">0</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-success me-2"
+                                              th:if="${todaySpent != null}"
+                                              th:replace="fragments/fragments :: format_currency(${todaySpent})"></span>
+                        <span class="badge badge-subtle-success me-2"
+                              th:unless="${todaySpent != null}">ZMW 0</span>
+                        <span class="text-muted">Today's spending</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="todayActivityError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load today's activity</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Performance Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="weeklyPerformanceCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">This Week</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="trending-up"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="weeklyPerformanceContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4"
+                                          th:text="${weeklyTransactions ?: 0}">0</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-info me-2"
+                                              th:if="${weeklySpent != null}"
+                                              th:replace="fragments/fragments :: format_currency(${weeklySpent})"></span>
+                        <span class="badge badge-subtle-info me-2"
+                              th:unless="${weeklySpent != null}">ZMW 0</span>
+                        <span class="text-muted">Weekly spending</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="weeklyPerformanceError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load weekly performance</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Summary Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="monthlySummaryCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">This Month</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="bar-chart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="monthlySummaryContent">
+                                    <span class="h1 d-inline-block mt-1 mb-4"
+                                          th:text="${monthlyTransactions ?: 0}">0</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-warning me-2"
+                                              th:if="${monthlySpent != null}"
+                                              th:replace="fragments/fragments :: format_currency(${monthlySpent})"></span>
+                        <span class="badge badge-subtle-warning me-2"
+                              th:unless="${monthlySpent != null}">ZMW 0</span>
+                        <span class="text-muted">Monthly spending</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="monthlySummaryError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load monthly summary</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Last Transaction Card -->
+    <div class="col-sm-6 col-lg-3 d-flex">
+        <div class="card flex-fill" id="lastTransactionCard">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mt-0">
+                        <h5 class="card-title">Last Transaction</h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="stat stat-sm">
+                            <i class="align-middle" data-lucide="clock"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="lastTransactionContent">
+                                    <span class="h6 d-inline-block mt-1 mb-4"
+                                          th:text="${lastTransactionDate ?: 'No transactions'}">No transactions</span>
+                    <div class="mb-0">
+                                        <span class="badge badge-subtle-secondary me-2"
+                                              th:text="${#numbers.formatDecimal(transactionFrequency ?: 0, 1, 'POINT')} + ' days avg'">0 days avg</span>
+                        <span class="text-muted">Between transactions</span>
+                    </div>
+                </div>
+                <div class="text-danger" id="lastTransactionError" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="error-message">Failed to load last transaction data</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Analytics & Trends</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Spending Trend Chart -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Spending Trend (Last 30 Days)</h6>
+                            </div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="spendingTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Status Chart -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Transaction Status</h6>
+                            </div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="transactionStatusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Merchant Usage Chart -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Merchant Usage Breakdown</h6>
+                            </div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="merchantUsageChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voucher Trend Chart -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Voucher Trend (Last 12 Months)</h6>
+                            </div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="voucherTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Placeholder for Charts or other sections if needed -->
+<div class="row">
+    <div class="col-12 d-none">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Charts</h5>
+            </div>
+            <div class="card-body">
+                <p>Placeholder for charts or other dashboard elements.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</main>
+
+<footer th:replace="fragments/fragments :: footer1()"></footer>
+</div>
+</div>
+
 <footer th:replace="fragments/fragments :: js_code"></footer>
+
+<!-- Exception Handling Styles -->
+<style>
+    .exception-alert {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<script>
+    // Client Portal Exception Handler
+    const ExceptionHandler = {
+        init: function () {
+            this.setupGlobalErrorHandlers();
+            this.setupNetworkMonitoring();
+            this.initializeComponents();
+        },
+
+        setupGlobalErrorHandlers: function () {
+            window.addEventListener('unhandledrejection', (event) => {
+                this.handleError('Network Error', event.reason, 'PROMISE_REJECTION');
+            });
+
+            window.addEventListener('error', (event) => {
+                this.handleError('JavaScript Error', event.error, 'JS_ERROR');
+            });
+        },
+
+        setupNetworkMonitoring: function () {
+            window.addEventListener('online', () => {
+                this.showNotification('Connection restored', 'success');
+            });
+
+            window.addEventListener('offline', () => {
+                this.showNotification('Connection lost', 'warning');
+            });
+        },
+
+        initializeComponents: function () {
+            this.initializeDataLoading();
+            this.setupRefreshButton();
+        },
+
+        initializeDataLoading: function () {
+            this.loadBalanceData();
+            this.loadCreditScoreData();
+        },
+
+        loadBalanceData: function () {
+            fetch('/api/client/balance')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.updateBalanceDisplay(data);
+                })
+                .catch(error => {
+                    this.handleError('Balance Data Loading Error', error, 'BALANCE_DATA');
+                    this.showBalanceError();
+                });
+        },
+
+        loadCreditScoreData: function () {
+            fetch('/api/client/credit-score')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.updateCreditScoreDisplay(data);
+                })
+                .catch(error => {
+                    this.handleError('Credit Score Data Loading Error', error, 'CREDIT_SCORE_DATA');
+                    this.showCreditScoreError();
+                });
+        },
+
+        updateBalanceDisplay: function (data) {
+            const content = document.getElementById('balanceContent');
+            const error = document.getElementById('balanceError');
+
+            if (content && error) {
+                content.style.display = 'block';
+                error.style.display = 'none';
+
+                const balanceElement = content.querySelector('.h1');
+                if (balanceElement) {
+                    balanceElement.innerHTML = `<span class="font-weight-normal">${data.formattedBalance || 'N/A'}</span>`;
+                }
+            }
+        },
+
+        updateCreditScoreDisplay: function (data) {
+            const content = document.getElementById('creditScoreContent');
+            const error = document.getElementById('creditScoreError');
+
+            if (content && error) {
+                content.style.display = 'block';
+                error.style.display = 'none';
+
+                const scoreElement = content.querySelector('.h1');
+                if (scoreElement) {
+                    scoreElement.innerHTML = `<span class="font-weight-normal">${data.creditScore || 'N/A'}</span>`;
+                }
+            }
+        },
+
+        showBalanceError: function () {
+            const content = document.getElementById('balanceContent');
+            const error = document.getElementById('balanceError');
+
+            if (content && error) {
+                content.style.display = 'none';
+                error.style.display = 'block';
+            }
+        },
+
+        showCreditScoreError: function () {
+            const content = document.getElementById('creditScoreContent');
+            const error = document.getElementById('creditScoreError');
+
+            if (content && error) {
+                content.style.display = 'none';
+                error.style.display = 'block';
+            }
+        },
+
+        setupRefreshButton: function () {
+            const refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    this.refreshDashboard();
+                });
+            }
+        },
+
+        refreshDashboard: function () {
+            const refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) {
+                const icon = refreshBtn.querySelector('i');
+                if (icon) {
+                    icon.className = 'loading-spinner';
+                }
+                refreshBtn.disabled = true;
+            }
+
+            this.clearAllErrors();
+            this.initializeDataLoading();
+
+            setTimeout(() => {
+                if (refreshBtn) {
+                    const icon = refreshBtn.querySelector('i');
+                    if (icon) {
+                        icon.className = 'align-middle';
+                        icon.setAttribute('data-lucide', 'refresh-cw');
+                    }
+                    refreshBtn.disabled = false;
+                }
+            }, 2000);
+        },
+
+        clearAllErrors: function () {
+            const errorElements = document.querySelectorAll('[id$="Error"]');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+
+            const contentElements = document.querySelectorAll('[id$="Content"]');
+            contentElements.forEach(element => {
+                element.style.display = 'block';
+            });
+        },
+
+        handleError: function (title, error, type) {
+            console.error(`[${type}] ${title}:`, error);
+            this.showNotification(`${title}: ${error.message || error}`, 'danger');
+        },
+
+        showNotification: function (message, type) {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    };
+
+    // Retry functions
+    function retryLoadBalance() {
+        ExceptionHandler.loadBalanceData();
+    }
+
+    function retryLoadCreditScore() {
+        ExceptionHandler.loadCreditScoreData();
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        ExceptionHandler.init();
+        initializeClientCharts();
+    });
+
+    // Client Dashboard Charts
+    function initializeClientCharts() {
+        initializeSpendingTrendChart();
+        initializeTransactionStatusChart();
+        initializeMerchantUsageChart();
+        initializeVoucherTrendChart();
+    }
+
+    // Spending Trend Chart
+    function initializeSpendingTrendChart() {
+        const ctx = document.getElementById('spendingTrendChart');
+        if (!ctx) return;
+
+        // Sample data - in real implementation, this would come from the backend
+        const spendingData = {
+            labels: generateLast30DaysLabels(),
+            datasets: [{
+                label: 'Daily Spending',
+                data: generateSampleSpendingData(),
+                borderColor: window.cssVariables.primary || '#007bff',
+                backgroundColor: (window.cssVariables.primary || '#007bff') + '20',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: spendingData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'ZMW ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    }
+
+    // Transaction Status Chart
+    function initializeTransactionStatusChart() {
+        const ctx = document.getElementById('transactionStatusChart');
+        if (!ctx) return;
+
+        const statusData = {
+            labels: ['Successful', 'Failed'],
+            datasets: [{
+                data: [/*[[${successfulTransactions}]]*/ 75, /*[[${failedTransactions}]]*/ 25],
+                backgroundColor: [
+                    window.cssVariables.success || '#28a745',
+                    window.cssVariables.danger || '#dc3545'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: statusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Merchant Usage Chart
+    function initializeMerchantUsageChart() {
+        const ctx = document.getElementById('merchantUsageChart');
+        if (!ctx) return;
+
+        // Sample merchant data - in real implementation, this would come from the backend
+        const merchantData = {
+            labels: ['Store A', 'Store B', 'Store C', 'Store D', 'Others'],
+            datasets: [{
+                data: [35, 25, 20, 15, 5],
+                backgroundColor: [
+                    window.cssVariables.primary || '#007bff',
+                    window.cssVariables.success || '#28a745',
+                    window.cssVariables.warning || '#ffc107',
+                    window.cssVariables.info || '#17a2b8',
+                    window.cssVariables.secondary || '#6c757d'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: merchantData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Voucher Trend Chart
+    function initializeVoucherTrendChart() {
+        const ctx = document.getElementById('voucherTrendChart');
+        if (!ctx) return;
+
+        const voucherData = {
+            labels: generateLast12MonthsLabels(),
+            datasets: [{
+                label: 'Vouchers Requested',
+                data: generateSampleVoucherData(),
+                borderColor: window.cssVariables.success || '#28a745',
+                backgroundColor: (window.cssVariables.success || '#28a745') + '20',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: voucherData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    }
+
+    // Helper functions for generating chart data
+    function generateLast30DaysLabels() {
+        const labels = [];
+        const today = new Date();
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            labels.push(date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}));
+        }
+        return labels;
+    }
+
+    function generateLast12MonthsLabels() {
+        const labels = [];
+        const today = new Date();
+        for (let i = 11; i >= 0; i--) {
+            const date = new Date(today);
+            date.setMonth(date.getMonth() - i);
+            labels.push(date.toLocaleDateString('en-US', {month: 'short', year: '2-digit'}));
+        }
+        return labels;
+    }
+
+    function generateSampleSpendingData() {
+        const data = [];
+        for (let i = 0; i < 30; i++) {
+            data.push(Math.floor(Math.random() * 1000) + 100);
+        }
+        return data;
+    }
+
+    function generateSampleVoucherData() {
+        const data = [];
+        for (let i = 0; i < 12; i++) {
+            data.push(Math.floor(Math.random() * 10) + 1);
+        }
+        return data;
+    }
+
+    // Refresh and export functions
+    function refreshClientDashboard() {
+        location.reload();
+    }
+
+    function exportClientData() {
+        // Placeholder for export functionality
+        alert('Export functionality will be implemented');
+    }
+</script>
 

@@ -1,51 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/base :: html}">
+<html th:replace="~{email/base :: html}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Account Security Alert - Paykesho</title>
 </head>
 <body>
-    <div th:fragment="content">
-        <p>We detected multiple failed login attempts on your Paykesho account.</p>
-        
-        <p>For your security, your account has been temporarily locked to prevent unauthorized access.</p>
-        
-        <div class="warning-box">
-            <h4>Account Locked</h4>
-            <ul>
-                <li>Multiple failed login attempts detected</li>
-                <li>Account locked for security purposes</li>
-                <li>Lock will be automatically removed in 30 minutes</li>
-                <li>If this wasn't you, please contact support immediately</li>
-            </ul>
-        </div>
-        
-        <div class="highlight-box">
-            <h3>What You Can Do</h3>
-            <p><strong>If this was you:</strong></p>
-            <ul>
-                <li>Wait 30 minutes for the lock to expire automatically</li>
-                <li>Use the "Forgot Password" feature to reset your password</li>
-                <li>Ensure you're using the correct email and password</li>
-            </ul>
-            
-            <p><strong>If this wasn't you:</strong></p>
-            <ul>
-                <li>Contact our support team immediately</li>
-                <li>Consider changing your password once unlocked</li>
-                <li>Enable two-factor authentication for added security</li>
-            </ul>
-        </div>
-        
-        <p><strong>Account Details:</strong></p>
+<div th:fragment="content">
+    <p>We detected multiple failed login attempts on your Paykesho account.</p>
+
+    <p>For your security, your account has been temporarily locked to prevent unauthorized access.</p>
+
+    <div class="warning-box">
+        <h4>Account Locked</h4>
         <ul>
-            <li>Email: <span th:text="${userEmail}">user@example.com</span></li>
-            <li>Lock Time: <span th:text="${lockTime}">2024-01-01 12:00:00</span></li>
-            <li>Unlock Time: <span th:text="${unlockTime}">2024-01-01 12:30:00</span></li>
+            <li>Multiple failed login attempts detected</li>
+            <li>Account locked for security purposes</li>
+            <li>Lock will be automatically removed in 30 minutes</li>
+            <li>If this wasn't you, please contact support immediately</li>
         </ul>
-        
-        <p>If you need immediate assistance, please contact our support team.</p>
-        
-        <p>Best regards,<br><strong>The Paykesho Security Team</strong></p>
     </div>
+
+    <div class="highlight-box">
+        <h3>What You Can Do</h3>
+        <p><strong>If this was you:</strong></p>
+        <ul>
+            <li>Wait 30 minutes for the lock to expire automatically</li>
+            <li>Use the "Forgot Password" feature to reset your password</li>
+            <li>Ensure you're using the correct email and password</li>
+        </ul>
+
+        <p><strong>If this wasn't you:</strong></p>
+        <ul>
+            <li>Contact our support team immediately</li>
+            <li>Consider changing your password once unlocked</li>
+            <li>Enable two-factor authentication for added security</li>
+        </ul>
+    </div>
+
+    <p><strong>Account Details:</strong></p>
+    <ul>
+        <li>Email: <span th:text="${userEmail}">user@example.com</span></li>
+        <li>Lock Time: <span th:text="${lockTime}">2024-01-01 12:00:00</span></li>
+        <li>Unlock Time: <span th:text="${unlockTime}">2024-01-01 12:30:00</span></li>
+    </ul>
+
+    <p>If you need immediate assistance, please contact our support team.</p>
+
+    <p>Best regards,<br><strong>The Paykesho Security Team</strong></p>
+</div>
 </body>
 </html>

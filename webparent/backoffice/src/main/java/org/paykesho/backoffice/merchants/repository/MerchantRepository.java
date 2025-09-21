@@ -36,4 +36,11 @@ public interface MerchantRepository extends SearchRepository<Merchant, Integer> 
     @Query("select m " + "from Merchant m " + "where m.enabled = ?1 ")
     List<Merchant> findMerchantTypesEnabled(boolean enabled);
 
+    // Additional methods for dashboard analytics
+    long countByEnabledTrue();
+
+    long countByEnabledFalse();
+
+    long countByRegistrationDateAfter(java.util.Date date);
+
 }

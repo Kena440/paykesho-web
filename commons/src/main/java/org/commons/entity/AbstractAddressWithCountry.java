@@ -1,13 +1,17 @@
 package org.commons.entity;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.commons.entity.settings.Country;
 
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
 @MappedSuperclass
 public abstract class AbstractAddressWithCountry extends AbstractAddress {
     @ManyToOne

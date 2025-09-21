@@ -13,6 +13,11 @@
         <main class="content">
             <div class="container-fluid p-0">
 
+                <!-- Exception Handling Alert Container -->
+                <div class="mb-3" id="exceptionAlertContainer" style="display: none;">
+                    <!-- Dynamic exception alerts will be inserted here -->
+                </div>
+
                 <div class="row mb-2 mb-xl-3">
                     <div class="col-auto d-none d-sm-block">
                         <h3>Analytics</h3>
@@ -36,454 +41,894 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-primary shadow-sm">
-                            <i class="align-middle" data-lucide="filter">&nbsp;</i>
-                        </button>
-                        <button class="btn btn-primary shadow-sm">
+                        <button class="btn btn-primary shadow-sm" id="refreshDashboardBtn">
                             <i class="align-middle" data-lucide="refresh-cw">&nbsp;</i>
                         </button>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-6 col-xl-5 d-flex">
-                        <div class="w-100">
-
-                            <div class="row">
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card illustration flex-fill">
-                                        <div class="card-body p-0 d-flex flex-fill">
-                                            <div class="row g-0 w-100">
-                                                <div class="col-6">
-                                                    <div class="illustration-text p-3 m-1">
-                                                        <h4 class="illustration-text">Welcome Back,
-                                                            <span sec:authentication="principal.fullname"></span>!</h4>
-                                                        <p class="mb-0">Paykesho Dashboard</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6 align-self-end text-end">
-                                                    <img alt="Searching"
-                                                         class="img-fluid illustration-img"
-                                                         th:src="@{/assets/img/illustrations/searching.png}">
-                                                </div>
-                                            </div>
-                                        </div>
+                <!-- Welcome Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card illustration">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h2 class="mb-2">Welcome Back,
+                                            <span class="text-primary"
+                                                  sec:authentication="principal.fullname"
+                                                  th:text="${#authentication.principal?.fullname ?: 'Admin'}">Admin</span>!
+                                        </h2>
+                                        <p class="text-muted mb-0">Paykesho System Dashboard - Monitor your platform
+                                            performance and key metrics</p>
                                     </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Vouchers</h5>
-                                                </div>
-
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="arrow-up-right"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${totalVouchers}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-danger me-2"
-                                                      th:text="${voucherPercentageChange + '%'}">0.00%</span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-4 text-end">
+                                        <img alt="Dashboard" class="img-fluid" style="max-height: 120px;"
+                                             th:src="@{/assets/img/illustrations/searching.png}">
                                     </div>
                                 </div>
                             </div>
-                            <div class="row d-lg-none d-xxl-flex">
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Real-Time</h5>
-                                                </div>
+                        </div>
+                    </div>
+                </div>
 
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="clock"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">1.856</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"> +2.25% </span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
-                                        </div>
+                <!-- Key Performance Indicators (KPIs) - Primary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-primary">
+                            <i class="align-middle me-2" data-lucide="trending-up"></i>
+                            Key Performance Indicators
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Total Revenue - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-primary h-100" id="revenueCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-primary">
+                                        <i class="align-middle" data-lucide="dollar-sign"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshRevenueData()">Refresh</a></li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Transactions</h5>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="users"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${totalTransactions}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-danger me-2"
-                                                      th:text="${txnPercentageChange + '%'}">0.00%</span>
-                                                <span class="text-muted">Since last week</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <h3 class="text-primary mb-2"
+                                    th:text="${totalRevenue != null ? #numbers.formatCurrency(totalRevenue) : '0.00'}">
+                                    0.00</h3>
+                                <h6 class="text-muted mb-3">Total Revenue</h6>
+                                <div id="revenueContent" th:if="${revenuePercentageChange != null}">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${#numbers.formatDecimal(revenuePercentageChange, 1, 'POINT', 2, 'POINT')} + '%'">0.00%</span>
+                                    <span class="text-muted small">vs last month</span>
                                 </div>
-
+                                <div class="text-muted small" th:unless="${revenuePercentageChange != null}">
+                                    <span>Data not available</span>
+                                </div>
+                                <div class="text-danger small" id="revenueError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load revenue data</span>
+                                </div>
                             </div>
-
                         </div>
                     </div>
 
-                    <div class="col-lg-6 col-xl-7">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                    <!-- Total Transactions - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-success h-100" id="transactionsCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="credit-card"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-success" data-bs-toggle="dropdown"
+                                                type="button">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
-
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshTransactionData()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <h5 class="card-title mb-0">Map</h5>
+                                <h3 class="text-success mb-2" th:text="${totalTransactions ?: 0}">0</h3>
+                                <h6 class="text-muted mb-3">Total Transactions</h6>
+                                <div id="transactionsContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${txnPercentageChange ?: '0.00'} + '%'">0.00%</span>
+                                    <span class="text-muted small">vs last month</span>
+                                </div>
+                                <div class="text-danger small" id="transactionsError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load transaction data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Users - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-info h-100" id="usersCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="users"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshUserData()">Refresh</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h3 class="text-info mb-2" th:text="${totalActiveUsers ?: 0}">0</h3>
+                                <h6 class="text-muted mb-3">Active Users</h6>
+                                <div id="usersContent">
+                                    <span class="badge badge-subtle-info me-2"
+                                          th:text="${userPercentageChange ?: '0.00'} + '%'">0.00%</span>
+                                    <span class="text-muted small">vs last month</span>
+                                </div>
+                                <div class="text-danger small" id="usersError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load user data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Overview - Secondary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="bar-chart-3"></i>
+                            System Overview
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Organizations Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="organizationsCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="building"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshOrganizationData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-info mb-2" th:text="${totalOrganizations ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Organizations</h6>
+                                <div id="organizationsContent">
+                                    <span class="badge badge-subtle-info me-2"
+                                          th:text="${activeOrganizations ?: 0} + ' active'">0 active</span>
+                                    <span class="text-muted small">Total registered</span>
+                                </div>
+                                <div class="text-danger small" id="organizationsError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load organization data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Merchants Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="merchantsCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-warning">
+                                        <i class="align-middle" data-lucide="store"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshMerchantData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-warning mb-2" th:text="${totalMerchants ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Merchants</h6>
+                                <div id="merchantsContent">
+                                    <span class="badge badge-subtle-warning me-2"
+                                          th:text="${activeMerchants ?: 0} + ' active'">0 active</span>
+                                    <span class="text-muted small">Total registered</span>
+                                </div>
+                                <div class="text-danger small" id="merchantsError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load merchant data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clients Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="clientsCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="user-check"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshClientData()">Refresh</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-success mb-2" th:text="${totalClients ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Clients</h6>
+                                <div id="clientsContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${activeClients ?: 0} + ' active'">0 active</span>
+                                    <span class="text-muted small">Total registered</span>
+                                </div>
+                                <div class="text-danger small" id="clientsError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load client data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vouchers Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="vouchersCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-danger">
+                                        <i class="align-middle" data-lucide="credit-card"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshVoucherData()">Refresh</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-danger mb-2" th:text="${totalVouchers ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Vouchers</h6>
+                                <div id="vouchersContent">
+                                    <span class="badge badge-subtle-danger me-2"
+                                          th:text="${voucherPercentageChange ?: '0.00'} + '%'">0.00%</span>
+                                    <span class="text-muted small">vs last week</span>
+                                </div>
+                                <div class="text-danger small" id="vouchersError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load voucher data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics - Tertiary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="activity"></i>
+                            Performance Metrics
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Transaction Success Rate Card -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100" id="successRateCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="check-circle"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshSuccessRateData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-success mb-2"
+                                    th:text="${#numbers.formatDecimal(transactionSuccessRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">
+                                    0%</h4>
+                                <h6 class="text-muted mb-3">Transaction Success Rate</h6>
+                                <div id="successRateContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${successfulTransactions ?: 0} + ' successful'">0 successful</span>
+                                    <span class="text-muted small">Out of ${totalTransactions ?: 0} total</span>
+                                </div>
+                                <div class="text-danger small" id="successRateError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load success rate data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voucher Approval Rate Card -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100" id="voucherApprovalCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="thumbs-up"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshVoucherApprovalData()">Refresh</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-info mb-2"
+                                    th:text="${#numbers.formatDecimal(voucherApprovalRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">
+                                    0%</h4>
+                                <h6 class="text-muted mb-3">Voucher Approval Rate</h6>
+                                <div id="voucherApprovalContent">
+                                    <span class="badge badge-subtle-info me-2"
+                                          th:text="${approvedVouchers ?: 0} + ' approved'">0 approved</span>
+                                    <span class="text-muted small">Out of ${totalVouchers ?: 0} total</span>
+                                </div>
+                                <div class="text-danger small" id="voucherApprovalError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load voucher approval data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Growth Card -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100" id="weeklyGrowthCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-warning">
+                                        <i class="align-middle" data-lucide="trending-up"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshGrowthData()">Refresh</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-warning mb-2" th:text="${newClientsThisWeek ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Weekly Growth</h6>
+                                <div id="weeklyGrowthContent">
+                                    <span class="badge badge-subtle-warning me-2">New clients</span>
+                                    <span class="text-muted small">This week</span>
+                                </div>
+                                <div class="text-danger small" id="weeklyGrowthError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load growth data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Analytics Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="bar-chart-2"></i>
+                            Analytics & Trends
+                        </h4>
+                    </div>
+                </div>
+
+                <!-- Primary Charts Row -->
+                <div class="row mb-4">
+                    <!-- Revenue Trend Chart - Primary Chart -->
+                    <div class="col-lg-8 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="trending-up"></i>
+                                        Revenue Trend (Last 30 Days)
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshRevenueChart()">Refresh</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="exportRevenueChart()">Export</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Geographic Distribution Map -->
+                    <div class="col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-info text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="map"></i>
+                                        Geographic Distribution
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshMap()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body p-2">
-                                <div id="map" style='width: 100%; height: 279px'></div>
+                                <div id="map" style='width: 100%; height: 250px'></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!--Todo-->
-                <div class="row d-none">
-                    <div class="col-12 col-lg-4 d-flex">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                <!-- Secondary Charts Row -->
+                <div class="row mb-4">
+                    <!-- Top Merchants Chart -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="store"></i>
+                                        Top Merchants by Volume
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
-
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshMerchantsChart()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <h5 class="card-title mb-0">Languages</h5>
                             </div>
-                            <table class="table table-striped my-0">
-                                <thead>
-                                <tr>
-                                    <th>Language</th>
-                                    <th class="text-end">Users</th>
-                                    <th class="d-none d-xl-table-cell w-75">% Users</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>en-us</td>
-                                    <td class="text-end">735</td>
-                                    <td class="d-none d-xl-table-cell">
-                                        <div class="progress">
-                                            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="43"
-                                                 class="progress-bar bg-primary" role="progressbar" style="width: 43%;">
-                                                43%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>en-gb</td>
-                                    <td class="text-end">223</td>
-                                    <td class="d-none d-xl-table-cell">
-                                        <div class="progress">
-                                            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="27"
-                                                 class="progress-bar bg-primary" role="progressbar" style="width: 27%;">
-                                                27%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>fr-fr</td>
-                                    <td class="text-end">181</td>
-                                    <td class="d-none d-xl-table-cell">
-                                        <div class="progress">
-                                            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="22"
-                                                 class="progress-bar bg-primary" role="progressbar" style="width: 22%;">
-                                                22%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>es-es</td>
-                                    <td class="text-end">132</td>
-                                    <td class="d-none d-xl-table-cell">
-                                        <div class="progress">
-                                            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="16"
-                                                 class="progress-bar bg-primary" role="progressbar" style="width: 16%;">
-                                                16%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>de-de</td>
-                                    <td class="text-end">118</td>
-                                    <td class="d-none d-xl-table-cell">
-                                        <div class="progress">
-                                            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="15"
-                                                 class="progress-bar bg-primary" role="progressbar" style="width: 15%;">
-                                                15%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>ru-ru</td>
-                                    <td class="text-end">98</td>
-                                    <td class="d-none d-xl-table-cell">
-                                        <div class="progress">
-                                            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="13"
-                                                 class="progress-bar bg-primary" role="progressbar" style="width: 13%;">
-                                                13%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-lg-4 d-flex">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
-                                            <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
-
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h5 class="card-title mb-0">Mobile / Desktop</h5>
-                            </div>
-                            <div class="card-body d-flex w-100">
-                                <div class="align-self-center chart">
-                                    <canvas id="chartjs-dashboard-bar-devices"></canvas>
-                                </div>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="merchantsChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-12 col-lg-4 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                    <!-- Transaction Status Distribution -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-warning text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="pie-chart"></i>
+                                        Transaction Status Distribution
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
-
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshTransactionStatusChart()">Refresh</a></li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <h5 class="card-title mb-0">Interests</h5>
                             </div>
-                            <div class="card-body">
-                                <div class="chart">
-                                    <canvas id="chartjs-dashboard-radar"></canvas>
-                                </div>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="transactionStatusChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!--Todo-->
-                <div class="row d-none">
-                    <div class="col-12 col-lg-5 col-xl-4 d-flex">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
-                                            <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
 
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
+                <!-- Tertiary Charts Row -->
+                <div class="row mb-4">
+                    <!-- User Activity Distribution -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="users"></i>
+                                        User Activity Distribution
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshUserActivityChart()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <h5 class="card-title mb-0">Source / Medium</h5>
                             </div>
-                            <div class="card-body d-flex">
-                                <div class="align-self-center w-100">
-                                    <div class="py-3">
-                                        <div class="chart chart-xs">
-                                            <canvas id="chartjs-dashboard-pie"></canvas>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="userActivityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Todo-->
+                    <div class="row d-none">
+                        <div class="col-12 col-lg-4 d-flex">
+                            <div class="card flex-fill w-100">
+                                <div class="card-header">
+                                    <div class="card-actions float-end">
+                                        <div class="dropdown position-relative">
+                                            <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                                                <i class="align-middle" data-lucide="more-horizontal"></i>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#">Action</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
+                                            </div>
                                         </div>
                                     </div>
+                                    <h5 class="card-title mb-0">Languages</h5>
+                                </div>
+                                <table class="table table-striped my-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Language</th>
+                                        <th class="text-end">Users</th>
+                                        <th class="d-none d-xl-table-cell w-75">% Users</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>en-us</td>
+                                        <td class="text-end">735</td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div class="progress">
+                                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="43"
+                                                     class="progress-bar bg-primary" role="progressbar"
+                                                     style="width: 43%;">
+                                                    43%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>en-gb</td>
+                                        <td class="text-end">223</td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div class="progress">
+                                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="27"
+                                                     class="progress-bar bg-primary" role="progressbar"
+                                                     style="width: 27%;">
+                                                    27%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>fr-fr</td>
+                                        <td class="text-end">181</td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div class="progress">
+                                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="22"
+                                                     class="progress-bar bg-primary" role="progressbar"
+                                                     style="width: 22%;">
+                                                    22%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>es-es</td>
+                                        <td class="text-end">132</td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div class="progress">
+                                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="16"
+                                                     class="progress-bar bg-primary" role="progressbar"
+                                                     style="width: 16%;">
+                                                    16%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>de-de</td>
+                                        <td class="text-end">118</td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div class="progress">
+                                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="15"
+                                                     class="progress-bar bg-primary" role="progressbar"
+                                                     style="width: 15%;">
+                                                    15%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ru-ru</td>
+                                        <td class="text-end">98</td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div class="progress">
+                                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="13"
+                                                     class="progress-bar bg-primary" role="progressbar"
+                                                     style="width: 13%;">
+                                                    13%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
-                                    <table class="table mb-0">
-                                        <thead>
-                                        <tr>
-                                            <th>Source</th>
-                                            <th class="text-end">Revenue</th>
-                                            <th class="text-end">Value</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td><i class="fas fa-square-full text-primary"></i> Direct</td>
-                                            <td class="text-end">$ 2602</td>
-                                            <td class="text-end text-success">+43%</td>
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fas fa-square-full text-warning"></i> Affiliate</td>
-                                            <td class="text-end">$ 1253</td>
-                                            <td class="text-end text-success">+13%</td>
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fas fa-square-full text-danger"></i> E-mail</td>
-                                            <td class="text-end">$ 541</td>
-                                            <td class="text-end text-success">+24%</td>
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fas fa-square-full text-dark"></i> Other</td>
-                                            <td class="text-end">$ 1465</td>
-                                            <td class="text-end text-success">+11%</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                        <div class="col-12 col-lg-4 d-flex">
+                            <div class="card flex-fill w-100">
+                                <div class="card-header">
+                                    <div class="card-actions float-end">
+                                        <div class="dropdown position-relative">
+                                            <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                                                <i class="align-middle" data-lucide="more-horizontal"></i>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#">Action</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title mb-0">Mobile / Desktop</h5>
+                                </div>
+                                <div class="card-body d-flex w-100">
+                                    <div class="align-self-center chart" style="height: 300px; width: 100%;">
+                                        <canvas id="chartjs-dashboard-bar-devices"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4 d-flex">
+                            <div class="card flex-fill">
+                                <div class="card-header">
+                                    <div class="card-actions float-end">
+                                        <div class="dropdown position-relative">
+                                            <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                                                <i class="align-middle" data-lucide="more-horizontal"></i>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#">Action</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title mb-0">Interests</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart">
+                                        <canvas id="chartjs-dashboard-radar"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-7 col-xl-8 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
-                                            <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
+                    <!--Todo-->
+                    <div class="row d-none">
+                        <div class="col-12 col-lg-5 col-xl-4 d-flex">
+                            <div class="card flex-fill w-100">
+                                <div class="card-header">
+                                    <div class="card-actions float-end">
+                                        <div class="dropdown position-relative">
+                                            <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                                                <i class="align-middle" data-lucide="more-horizontal"></i>
+                                            </a>
 
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#">Action</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
+                                            </div>
                                         </div>
                                     </div>
+                                    <h5 class="card-title mb-0">Source / Medium</h5>
                                 </div>
-                                <h5 class="card-title mb-0">Traffic</h5>
+                                <div class="card-body d-flex">
+                                    <div class="align-self-center w-100">
+                                        <div class="py-3">
+                                            <div class="chart chart-xs" style="height: 200px; width: 100%;">
+                                                <canvas id="chartjs-dashboard-pie"></canvas>
+                                            </div>
+                                        </div>
+
+                                        <table class="table mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>Source</th>
+                                                <th class="text-end">Revenue</th>
+                                                <th class="text-end">Value</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td><i class="fas fa-square-full text-primary"></i> Direct</td>
+                                                <td class="text-end">$ 2602</td>
+                                                <td class="text-end text-success">+43%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fas fa-square-full text-warning"></i> Affiliate</td>
+                                                <td class="text-end">$ 1253</td>
+                                                <td class="text-end text-success">+13%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fas fa-square-full text-danger"></i> E-mail</td>
+                                                <td class="text-end">$ 541</td>
+                                                <td class="text-end text-success">+24%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fas fa-square-full text-dark"></i> Other</td>
+                                                <td class="text-end">$ 1465</td>
+                                                <td class="text-end text-success">+11%</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                            <table class="table table-striped my-0" id="datatables-dashboard-traffic">
-                                <thead>
-                                <tr>
-                                    <th>Source</th>
-                                    <th class="text-end">Users</th>
-                                    <th class="d-none d-xl-table-cell text-end">Sessions</th>
-                                    <th class="d-none d-xl-table-cell text-end">Bounce Rate</th>
-                                    <th class="d-none d-xl-table-cell text-end">Avg. Session Duration</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Google</td>
-                                    <td class="text-end">1023</td>
-                                    <td class="d-none d-xl-table-cell text-end">1265</td>
-                                    <td class="d-none d-xl-table-cell text-end text-success">27.23%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:06:25</td>
-                                </tr>
-                                <tr>
-                                    <td>Bing</td>
-                                    <td class="text-end">504</td>
-                                    <td class="d-none d-xl-table-cell text-end">623</td>
-                                    <td class="d-none d-xl-table-cell text-end text-danger">66.76%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:04:42</td>
-                                </tr>
-                                <tr>
-                                    <td>Twitter</td>
-                                    <td class="text-end">462</td>
-                                    <td class="d-none d-xl-table-cell text-end">571</td>
-                                    <td class="d-none d-xl-table-cell text-end text-success">31.53%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:08:05</td>
-                                </tr>
-                                <tr>
-                                    <td>Pinterest</td>
-                                    <td class="text-end">623</td>
-                                    <td class="d-none d-xl-table-cell text-end">770</td>
-                                    <td class="d-none d-xl-table-cell text-end text-danger">52.81%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:03:10</td>
-                                </tr>
-                                <tr>
-                                    <td>Facebook</td>
-                                    <td class="text-end">812</td>
-                                    <td class="d-none d-xl-table-cell text-end">1003</td>
-                                    <td class="d-none d-xl-table-cell text-end text-success">24.83%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:05:56</td>
-                                </tr>
-                                <tr>
-                                    <td>DuckDuckGo</td>
-                                    <td class="text-end">693</td>
-                                    <td class="d-none d-xl-table-cell text-end">856</td>
-                                    <td class="d-none d-xl-table-cell text-end text-success">37.36%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:09:12</td>
-                                </tr>
-                                <tr>
-                                    <td>GitHub</td>
-                                    <td class="text-end">713</td>
-                                    <td class="d-none d-xl-table-cell text-end">881</td>
-                                    <td class="d-none d-xl-table-cell text-end text-success">38.09%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:06:19</td>
-                                </tr>
-                                <tr>
-                                    <td>Direct</td>
-                                    <td class="text-end">872</td>
-                                    <td class="d-none d-xl-table-cell text-end">1077</td>
-                                    <td class="d-none d-xl-table-cell text-end text-success">32.70%</td>
-                                    <td class="d-none d-xl-table-cell text-end">00:09:18</td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        </div>
+                        <div class="col-12 col-lg-7 col-xl-8 d-flex">
+                            <div class="card flex-fill">
+                                <div class="card-header">
+                                    <div class="card-actions float-end">
+                                        <div class="dropdown position-relative">
+                                            <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                                                <i class="align-middle" data-lucide="more-horizontal"></i>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#">Action</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title mb-0">Traffic</h5>
+                                </div>
+                                <table class="table table-striped my-0" id="datatables-dashboard-traffic">
+                                    <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th class="text-end">Users</th>
+                                        <th class="d-none d-xl-table-cell text-end">Sessions</th>
+                                        <th class="d-none d-xl-table-cell text-end">Bounce Rate</th>
+                                        <th class="d-none d-xl-table-cell text-end">Avg. Session Duration</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Google</td>
+                                        <td class="text-end">1023</td>
+                                        <td class="d-none d-xl-table-cell text-end">1265</td>
+                                        <td class="d-none d-xl-table-cell text-end text-success">27.23%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:06:25</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bing</td>
+                                        <td class="text-end">504</td>
+                                        <td class="d-none d-xl-table-cell text-end">623</td>
+                                        <td class="d-none d-xl-table-cell text-end text-danger">66.76%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:04:42</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Twitter</td>
+                                        <td class="text-end">462</td>
+                                        <td class="d-none d-xl-table-cell text-end">571</td>
+                                        <td class="d-none d-xl-table-cell text-end text-success">31.53%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:08:05</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pinterest</td>
+                                        <td class="text-end">623</td>
+                                        <td class="d-none d-xl-table-cell text-end">770</td>
+                                        <td class="d-none d-xl-table-cell text-end text-danger">52.81%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:03:10</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Facebook</td>
+                                        <td class="text-end">812</td>
+                                        <td class="d-none d-xl-table-cell text-end">1003</td>
+                                        <td class="d-none d-xl-table-cell text-end text-success">24.83%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:05:56</td>
+                                    </tr>
+                                    <tr>
+                                        <td>DuckDuckGo</td>
+                                        <td class="text-end">693</td>
+                                        <td class="d-none d-xl-table-cell text-end">856</td>
+                                        <td class="d-none d-xl-table-cell text-end text-success">37.36%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:09:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GitHub</td>
+                                        <td class="text-end">713</td>
+                                        <td class="d-none d-xl-table-cell text-end">881</td>
+                                        <td class="d-none d-xl-table-cell text-end text-success">38.09%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:06:19</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Direct</td>
+                                        <td class="text-end">872</td>
+                                        <td class="d-none d-xl-table-cell text-end">1077</td>
+                                        <td class="d-none d-xl-table-cell text-end text-success">32.70%</td>
+                                        <td class="d-none d-xl-table-cell text-end">00:09:18</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+
                 </div>
-
-            </div>
         </main>
 
         <footer th:replace="fragments/fragments :: footer()"></footer>
@@ -492,58 +937,302 @@
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
 
+<!-- Exception Handling Styles -->
+<style>
+    .exception-alert {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Bar chart
-        new Chart(document.getElementById("chartjs-dashboard-bar-devices"), {
-            type: "bar",
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile",
-                    backgroundColor: window.cssVariables.primary,
-                    borderColor: window.cssVariables.primary,
-                    hoverBackgroundColor: window.cssVariables.primary,
-                    hoverBorderColor: window.cssVariables.primary,
-                    data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
-                    barPercentage: .5,
-                    categoryPercentage: .5
-                }, {
-                    label: "Desktop",
-                    backgroundColor: window.cssVariables.primarySubtle,
-                    borderColor: window.cssVariables.primarySubtle,
-                    hoverBackgroundColor: window.cssVariables.primarySubtle,
-                    hoverBorderColor: window.cssVariables.primarySubtle,
-                    data: [69, 66, 24, 48, 52, 51, 44, 53, 62, 79, 51, 68],
-                    barPercentage: .5,
-                    categoryPercentage: .5
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                cornerRadius: 15,
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            stepSize: 20
-                        },
-                        stacked: true,
-                    }],
-                    xAxes: [{
-                        gridLines: {
-                            color: "transparent"
-                        },
-                        stacked: true,
-                    }]
+    // Backoffice Exception Handler
+    const ExceptionHandler = {
+        init: function () {
+            this.setupGlobalErrorHandlers();
+            this.setupNetworkMonitoring();
+            this.initializeComponents();
+        },
+
+        setupGlobalErrorHandlers: function () {
+            window.addEventListener('unhandledrejection', (event) => {
+                this.handleError('Network Error', event.reason, 'PROMISE_REJECTION');
+            });
+
+            window.addEventListener('error', (event) => {
+                this.handleError('JavaScript Error', event.error, 'JS_ERROR');
+            });
+        },
+
+        setupNetworkMonitoring: function () {
+            window.addEventListener('online', () => {
+                this.showNotification('Connection restored', 'success');
+            });
+
+            window.addEventListener('offline', () => {
+                this.showNotification('Connection lost', 'warning');
+            });
+        },
+
+        initializeComponents: function () {
+            this.initializeDataLoading();
+            this.setupRefreshButton();
+            this.initializeCharts();
+        },
+
+        initializeDataLoading: function () {
+            this.loadVoucherData();
+            this.loadTransactionData();
+        },
+
+        loadVoucherData: function () {
+            fetch('/api/admin/vouchers/summary')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.updateVoucherDisplay(data);
+                })
+                .catch(error => {
+                    this.handleError('Voucher Data Loading Error', error, 'VOUCHER_DATA');
+                    this.showVoucherError();
+                });
+        },
+
+        loadTransactionData: function () {
+            fetch('/api/admin/transactions/summary')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.updateTransactionDisplay(data);
+                })
+                .catch(error => {
+                    this.handleError('Transaction Data Loading Error', error, 'TRANSACTION_DATA');
+                });
+        },
+
+        updateVoucherDisplay: function (data) {
+            const content = document.getElementById('vouchersContent');
+            const error = document.getElementById('vouchersError');
+
+            if (content && error) {
+                content.style.display = 'block';
+                error.style.display = 'none';
+
+                const countElement = content.querySelector('.h1');
+                if (countElement) {
+                    countElement.textContent = data.totalVouchers || '0';
                 }
             }
-        });
+        },
+
+        updateTransactionDisplay: function (data) {
+            // Update transaction data
+            console.log('Transaction data loaded:', data);
+        },
+
+        showVoucherError: function () {
+            const content = document.getElementById('vouchersContent');
+            const error = document.getElementById('vouchersError');
+
+            if (content && error) {
+                content.style.display = 'none';
+                error.style.display = 'block';
+            }
+        },
+
+        setupRefreshButton: function () {
+            const refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    this.refreshDashboard();
+                });
+            }
+        },
+
+        refreshDashboard: function () {
+            const refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) {
+                const icon = refreshBtn.querySelector('i');
+                if (icon) {
+                    icon.className = 'loading-spinner';
+                }
+                refreshBtn.disabled = true;
+            }
+
+            this.clearAllErrors();
+            this.initializeDataLoading();
+
+            setTimeout(() => {
+                if (refreshBtn) {
+                    const icon = refreshBtn.querySelector('i');
+                    if (icon) {
+                        icon.className = 'align-middle';
+                        icon.setAttribute('data-lucide', 'refresh-cw');
+                    }
+                    refreshBtn.disabled = false;
+                }
+            }, 2000);
+        },
+
+        clearAllErrors: function () {
+            const errorElements = document.querySelectorAll('[id$="Error"]');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+
+            const contentElements = document.querySelectorAll('[id$="Content"]');
+            contentElements.forEach(element => {
+                element.style.display = 'block';
+            });
+        },
+
+        handleError: function (title, error, type) {
+            console.error(`[${type}] ${title}:`, error);
+            this.showNotification(`${title}: ${error.message || error}`, 'danger');
+        },
+
+        showNotification: function (message, type) {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        },
+
+        initializeCharts: function () {
+            try {
+                this.initializeBarChart();
+            } catch (error) {
+                this.handleError('Chart Initialization Error', error, 'CHART_INIT');
+            }
+        },
+
+        initializeBarChart: function () {
+            const ctx = document.getElementById("chartjs-dashboard-bar-devices");
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    datasets: [{
+                        label: "Mobile",
+                        backgroundColor: window.cssVariables.primary,
+                        borderColor: window.cssVariables.primary,
+                        hoverBackgroundColor: window.cssVariables.primary,
+                        hoverBorderColor: window.cssVariables.primary,
+                        data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
+                        barPercentage: .5,
+                        categoryPercentage: .5
+                    }, {
+                        label: "Desktop",
+                        backgroundColor: window.cssVariables.primarySubtle,
+                        borderColor: window.cssVariables.primarySubtle,
+                        hoverBackgroundColor: window.cssVariables.primarySubtle,
+                        hoverBorderColor: window.cssVariables.primarySubtle,
+                        data: [69, 66, 24, 48, 52, 51, 44, 53, 62, 79, 51, 68],
+                        barPercentage: .5,
+                        categoryPercentage: .5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cornerRadius: 15,
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            gridLines: {
+                                display: false
+                            },
+                            ticks: {
+                                stepSize: 20
+                            },
+                            stacked: true,
+                        }],
+                        xAxes: [{
+                            gridLines: {
+                                color: "transparent"
+                            },
+                            stacked: true,
+                        }]
+                    },
+                    layout: {
+                        padding: {
+                            top: 10,
+                            bottom: 10
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    // Retry functions
+    function retryLoadVouchers() {
+        ExceptionHandler.loadVoucherData();
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        ExceptionHandler.init();
     });
 </script>
 <script>
@@ -590,7 +1279,7 @@
                 }]
             },
             options: {
-                responsive: !window.MSInputMethodContext,
+                responsive: true,
                 maintainAspectRatio: false,
                 cutoutPercentage: 70,
                 legend: {
@@ -602,6 +1291,12 @@
                         borderColor: window.cssVariables.secondaryBg
                     }
                 },
+                layout: {
+                    padding: {
+                        top: 10,
+                        bottom: 10
+                    }
+                }
             }
         });
     });
@@ -661,6 +1356,228 @@
             ]
         });
     });
+</script>
+
+<!-- Enhanced Dashboard Charts -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Initialize all dashboard charts
+        initializeRevenueChart();
+        initializeMerchantsChart();
+        initializeTransactionStatusChart();
+        initializeUserActivityChart();
+    });
+
+    // Revenue Trend Chart
+    function initializeRevenueChart() {
+        const ctx = document.getElementById('revenueChart');
+        if (!ctx) return;
+
+        // Sample data - in real implementation, this would come from the backend
+        const revenueData = {
+            labels: generateLast30DaysLabels(),
+            datasets: [{
+                label: 'Daily Revenue',
+                data: generateSampleRevenueData(),
+                borderColor: window.cssVariables.primary || '#007bff',
+                backgroundColor: (window.cssVariables.primary || '#007bff') + '20',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: revenueData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'ZMW ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    }
+
+    // Top Merchants Chart
+    function initializeMerchantsChart() {
+        const ctx = document.getElementById('merchantsChart');
+        if (!ctx) return;
+
+        // Sample data - in real implementation, this would come from the backend
+        const merchantsData = {
+            labels: ['Merchant A', 'Merchant B', 'Merchant C', 'Merchant D', 'Merchant E'],
+            datasets: [{
+                data: [45, 30, 15, 7, 3],
+                backgroundColor: [
+                    window.cssVariables.primary || '#007bff',
+                    window.cssVariables.success || '#28a745',
+                    window.cssVariables.warning || '#ffc107',
+                    window.cssVariables.info || '#17a2b8',
+                    window.cssVariables.secondary || '#6c757d'
+                ],
+                borderWidth: 0
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: merchantsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // Transaction Status Chart
+    function initializeTransactionStatusChart() {
+        const ctx = document.getElementById('transactionStatusChart');
+        if (!ctx) return;
+
+        const statusData = {
+            labels: ['Successful', 'Failed', 'Pending'],
+            datasets: [{
+                data: [
+                    /*[[${successfulTransactions}]]*/ 75,
+                    /*[[${failedTransactions}]]*/ 15,
+                    /*[[${totalTransactions - successfulTransactions - failedTransactions}]]*/ 10
+                ],
+                backgroundColor: [
+                    window.cssVariables.success || '#28a745',
+                    window.cssVariables.danger || '#dc3545',
+                    window.cssVariables.warning || '#ffc107'
+                ],
+                borderWidth: 0
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: statusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // User Activity Chart
+    function initializeUserActivityChart() {
+        const ctx = document.getElementById('userActivityChart');
+        if (!ctx) return;
+
+        const activityData = {
+            labels: ['Active Clients', 'Inactive Clients', 'Active Merchants', 'Inactive Merchants'],
+            datasets: [{
+                data: [
+                    /*[[${activeClients}]]*/ 120,
+                    /*[[${inactiveClients}]]*/ 30,
+                    /*[[${activeMerchants}]]*/ 45,
+                    /*[[${inactiveMerchants}]]*/ 5
+                ],
+                backgroundColor: [
+                    window.cssVariables.success || '#28a745',
+                    window.cssVariables.secondary || '#6c757d',
+                    window.cssVariables.primary || '#007bff',
+                    window.cssVariables.danger || '#dc3545'
+                ],
+                borderWidth: 0
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: activityData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Helper functions
+    function generateLast30DaysLabels() {
+        const labels = [];
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            labels.push(date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}));
+        }
+        return labels;
+    }
+
+    function generateSampleRevenueData() {
+        const data = [];
+        for (let i = 0; i < 30; i++) {
+            data.push(Math.floor(Math.random() * 50000) + 10000);
+        }
+        return data;
+    }
+
+    // Chart refresh functions
+    function refreshRevenueChart() {
+        console.log('Refreshing revenue chart...');
+        // In real implementation, this would fetch new data from the backend
+    }
+
+    function refreshMerchantsChart() {
+        console.log('Refreshing merchants chart...');
+        // In real implementation, this would fetch new data from the backend
+    }
+
+    function exportRevenueChart() {
+        console.log('Exporting revenue chart...');
+        // In real implementation, this would export the chart data
+    }
 </script>
 </body>
 </html>

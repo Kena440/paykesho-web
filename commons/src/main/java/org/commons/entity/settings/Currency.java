@@ -1,14 +1,18 @@
 package org.commons.entity.settings;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.commons.entity.IdBasedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Entity
 @Table(name = "currencies")

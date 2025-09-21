@@ -6,17 +6,14 @@ import org.commons.entity.client.Client;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.ClientType;
-import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.clients.service.CreditScoreService;
 import org.paykesho.clientportal.config.Utility;
+import org.paykesho.clientportal.dashboard.service.ClientDashboardAnalyticsService;
 import org.paykesho.clientportal.merchant.service.MerchantService;
-import org.paykesho.clientportal.notification.general.NotificationClient;
 import org.paykesho.clientportal.organizations.service.OrganizationService;
 import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.security.oauth.ClientOAuth2User;
-import org.paykesho.clientportal.settings.service.SettingService;
-import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -42,7 +40,7 @@ import java.util.List;
 @RequestMapping("/clients")
 public class ClientController {
 
-    private final NotificationClient notificationClient;
+    // private final NotificationClient notificationClient; // Unused field
 
     private final ClientService clientService;
 
@@ -52,9 +50,11 @@ public class ClientController {
 
     private final OrganizationService organizationService;
 
-    private final SettingService settingService;
+    // private final SettingService settingService; // Unused field
 
-    private final VoucherService voucherService;
+    // private final VoucherService voucherService; // Unused field
+
+    private final ClientDashboardAnalyticsService clientDashboardAnalyticsService;
 
     private static String getGreeting() {
         String greeting = null;
@@ -72,29 +72,78 @@ public class ClientController {
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model, @AuthenticationPrincipal ClientUserDetails loggedInUser) {
+        try {
+            log.debug("Loading client dashboard for user: {}",
+                    loggedInUser != null ? loggedInUser.getClient().getEmail() : "unknown");
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Client client = null;
 
-        Client client;
+            if (principal instanceof UserDetails && loggedInUser != null) {
+                try {
+                    client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
+                } catch (Exception ex) {
+                    log.warn("Failed to get client by email: {}", ex.getMessage());
+                    model.addAttribute("errorMessage", "Failed to load client information.");
+                    return "error/500";
+                }
 
-        if (principal instanceof UserDetails) {
-            client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
+                String greeting = getGreeting();
+                if (client != null) {
+                    try {
+                        BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
+                        model.addAttribute("availableBalance", availableBalance);
+                    } catch (Exception ex) {
+                        log.warn("Failed to get client balance: {}", ex.getMessage());
+                        model.addAttribute("availableBalance", BigDecimal.ZERO);
+                    }
 
-            String greeting = getGreeting();
-            if (client != null) {
-                BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
-                model.addAttribute("availableBalance", availableBalance);
-                int creditScore = creditScoreService.calculateCreditScore(client);
-                model.addAttribute("creditScore", creditScore);
+                    // Get comprehensive client analytics
+                    try {
+                        Map<String, Object> analytics = clientDashboardAnalyticsService.getClientAnalytics(client);
+                        if (analytics != null) {
+                            // Add all analytics to model
+                            model.addAllAttributes(analytics);
+                        } else {
+                            log.warn("Analytics returned null for client: {}", client.getName());
+                        }
+                    } catch (Exception ex) {
+                        log.warn("Failed to get client analytics: {}", ex.getMessage());
+                    }
+
+                    try {
+                        int creditScore = creditScoreService.calculateCreditScore(client);
+                        model.addAttribute("creditScore", creditScore);
+                    } catch (Exception ex) {
+                        log.warn("Failed to calculate credit score: {}", ex.getMessage());
+                        model.addAttribute("creditScore", 0);
+                    }
+                }
+
+                model.addAttribute("greeting", greeting);
+                model.addAttribute("client", client);
+            } else {
+                log.warn("No authenticated user found for dashboard request");
+                model.addAttribute("errorMessage", "Authentication required. Please log in.");
+                return "security/login";
             }
 
-            model.addAttribute("greeting", greeting);
-            model.addAttribute("client", client);
-        }
+            try {
+                model.addAttribute("merchantList", merchantService.listAllEnabledMerchants());
+            } catch (Exception ex) {
+                log.warn("Failed to load merchant list: {}", ex.getMessage());
+                model.addAttribute("merchantList", null);
+            }
 
-        model.addAttribute("merchantList", merchantService.listAllEnabledMerchants());
-        model.addAttribute("pageTitle", "Dashboard");
-        return "clients/dashboard";
+            model.addAttribute("pageTitle", "Dashboard");
+            log.debug("Successfully loaded client dashboard");
+            return "clients/dashboard";
+
+        } catch (Exception ex) {
+            log.error("Error loading client dashboard: {}", ex.getMessage(), ex);
+            model.addAttribute("errorMessage", "Failed to load dashboard. Please try again later.");
+            return "error/500";
+        }
     }
 
     @GetMapping("/register")
@@ -137,33 +186,79 @@ public class ClientController {
 
     @PostMapping(value = "/update-account")
     public String updateAccount(Client client, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-        clientService.updateClient(client);
-        updateNameForAuthenticatedClient(client, request);
-        redirectAttributes.addFlashAttribute("message", "Account update successful");
+        try {
+            log.debug("Updating client account for email: {}", client.getEmail());
 
-        return "redirect:/";
+            clientService.updateClient(client);
+            updateNameForAuthenticatedClient(client, request);
+            redirectAttributes.addFlashAttribute("message", "Account update successful");
+
+            log.debug("Successfully updated client account");
+            return "redirect:/";
+
+        } catch (Exception ex) {
+            log.error("Error updating client account: {}", ex.getMessage(), ex);
+            redirectAttributes.addFlashAttribute("errorMessage", "Account update failed. Please try again later.");
+            return "redirect:/account";
+        }
     }
 
     @GetMapping("/verify")
-    public String verifyClient(@Param("code") String code, Model model) throws PaykeshoError {
-        boolean verified = clientService.verifyClient(code);
+    public String verifyClient(@Param("code") String code, Model model) {
+        try {
+            log.debug("Verifying client with code: {}", code);
 
-        return "register/" + (verified ? "verify_success" : "verify_fail");
+            boolean verified = clientService.verifyClient(code);
+            log.debug("Client verification result: {}", verified);
+
+            return "register/" + (verified ? "verify_success" : "verify_fail");
+
+        } catch (Exception ex) {
+            log.error("Error during client verification: {}", ex.getMessage(), ex);
+            model.addAttribute("errorMessage", "Verification failed. Please try again later.");
+            return "error/500";
+        }
     }
 
     @GetMapping("/account")
     public String viewClientAccount(Model model, HttpServletRequest httpServletRequest) {
+        try {
+            log.debug("Loading client account page");
 
-        String pageTitle = "My Account";
-        List<Country> countryList = clientService.countryList();
+            String pageTitle = "My Account";
+            List<Country> countryList = null;
+            Client client = null;
 
-        String email = Utility.getEKeshofAuthenticatedClient(httpServletRequest);
-        Client client = clientService.getClientByEmail(email);
+            try {
+                countryList = clientService.countryList();
+            } catch (Exception ex) {
+                log.warn("Failed to load country list: {}", ex.getMessage());
+            }
 
-        model.addAttribute("pageTitle", pageTitle);
-        model.addAttribute("countryList", countryList);
-        model.addAttribute("client", client);
-        return "clients/account";
+            String email = Utility.getEKeshofAuthenticatedClient(httpServletRequest);
+            if (email != null) {
+                try {
+                    client = clientService.getClientByEmail(email);
+                } catch (Exception ex) {
+                    log.warn("Failed to get client by email: {}", ex.getMessage());
+                }
+            } else {
+                log.warn("No authenticated client found for account request");
+                model.addAttribute("errorMessage", "Authentication required. Please log in.");
+                return "security/login";
+            }
+
+            model.addAttribute("pageTitle", pageTitle);
+            model.addAttribute("countryList", countryList);
+            model.addAttribute("client", client);
+            log.debug("Successfully loaded client account page");
+            return "clients/account";
+
+        } catch (Exception ex) {
+            log.error("Error loading client account page: {}", ex.getMessage(), ex);
+            model.addAttribute("errorMessage", "Failed to load account page. Please try again later.");
+            return "error/500";
+        }
     }
 
     private void updateNameForAuthenticatedClient(Client client, HttpServletRequest request) {
@@ -187,54 +282,10 @@ public class ClientController {
             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
             clientUserDetails = (ClientUserDetails) token.getPrincipal();
         } else if (principal instanceof RememberMeAuthenticationToken) {
-            RememberMeAuthenticationToken token = (RememberMeAuthenticationToken) principal;
+            // RememberMeAuthenticationToken token = (RememberMeAuthenticationToken) principal; // Unused variable
         }
         return clientUserDetails;
     }
 
 
-    private void sendNotification(Client client, HttpServletRequest request) {
-        // Generate messages
-        String verifyURL = Utility.getSiteUrl(request) + "/clients/verify?code=" + client.getVerificationCode();
-
-        String emailMessage = generateEmailMessage(client, "REGISTRATION", verifyURL);
-        String smsMessage = generateSmsMessage(client, "REGISTRATION", verifyURL);
-
-
-        // Send email notification
-       /* boolean emailSent = notificationService.sendNotification(client.getEmail(), emailMessage, NotificationType.email.defaultDescription());
-        if (emailSent) {
-            log.info("Email sent successfully to " + client.getEmail());
-        } else {
-            log.error("Failed to send email to " + client.getEmail());
-        }*/
-
-        // Send SMS notification
-       /* boolean smsSent = notificationService.sendNotification(client.getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
-        if (smsSent) {
-            log.info("SMS sent successfully to " + client.getPhoneNumber());
-        } else {
-            log.error("Failed to send SMS to " + client.getPhoneNumber());
-        }*/
-    }
-
-    private String generateEmailMessage(Client client, String actionType, String verifyURL) {
-        StringBuilder message = new StringBuilder("<p>Greetings ").append(client.getFullName()).append(",</p>");
-
-        if ("REGISTRATION".equals(actionType)) {
-            message.append("<p>Your registration has been received. ").append("Verification URL: ").append(verifyURL).append(".</p>");
-        } else {
-            message.append("<p>Unknown action type.</p>");
-        }
-
-        message.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
-        return message.toString();
-    }
-
-    private String generateSmsMessage(Client client, String actionType, String verifyURL) {
-        if ("REGISTRATION".equals(actionType)) {
-            return String.format("Greetings %s, Your registration has been received. Verification URL: %s. Thank you. Get lelo, Pay Kesho.", client, verifyURL);
-        }
-        return "Unknown action type.";
-    }
 }

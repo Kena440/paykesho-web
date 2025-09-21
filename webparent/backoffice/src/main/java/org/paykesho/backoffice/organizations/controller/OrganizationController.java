@@ -15,6 +15,8 @@ import org.paykesho.backoffice.organizations.enums.Constants;
 import org.paykesho.backoffice.organizations.service.OrganizationService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +25,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Controller
 @RequestMapping("/organizations")
@@ -140,7 +144,8 @@ public class OrganizationController {
 
             if (employeeRecords != null) model.addAttribute("employeeRecords", employeeRecords);
             if (employeeRecords != null) model.addAttribute("employeeRecordsSize", employeeRecords.size());
-            if (employeeRecords != null) model.addAttribute("clientRecordsSize", clientRecordsSize.size());
+            if (clientRecordsSize != null) model.addAttribute("clientRecords", clientRecordsSize);
+            if (clientRecordsSize != null) model.addAttribute("clientRecordsSize", clientRecordsSize.size());
 
             return "organizations/organization_view";
         } catch (PaykeshoError paykeshoError) {
@@ -149,18 +154,6 @@ public class OrganizationController {
         }
     }
 
-    private String getRedirectURLtoAffectedOrganization(Organization organization) throws PaykeshoError {
-        if (organization == null) {
-            throw new PaykeshoError("no member provided");
-        }
-        String firstPartOfEmail = organization.getName();
-
-        if (organization.getEmail() == null) {
-            return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization.getId();
-        } else {
-            return Constants.REDIRECT_TO_ORGANIZATIONS_KEYWORD + firstPartOfEmail;
-        }
-    }
 
     @GetMapping("/edit/{id}")
     public String editOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) {
@@ -297,5 +290,398 @@ public class OrganizationController {
         for (Setting setting : currencySettings) {
             request.setAttribute(setting.getKey(), setting.getValue());
         }
+    }
+
+    // Employee Record CRUD Operations
+    @GetMapping("/{id}/employee-records")
+    @ResponseBody
+    public ResponseEntity<List<EmployeeRecord>> getEmployeeRecords(@PathVariable Integer id) {
+        try {
+            List<EmployeeRecord> employeeRecords = organizationService.listEmployeeRecordsAll(id);
+            return ResponseEntity.ok(employeeRecords);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping("/employee-record/update")
+    public String updateEmployeeRecord(HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError {
+        String idParam = request.getParameter("id");
+        String organizationIdParam = request.getParameter("organization");
+
+        if (idParam == null || idParam.isEmpty()) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Employee record ID is required.");
+            return "redirect:/organizations";
+        }
+
+        if (organizationIdParam == null || organizationIdParam.isEmpty()) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization ID is required.");
+            return "redirect:/organizations";
+        }
+
+        try {
+            int employeeId = Integer.parseInt(idParam);
+            int organizationId = Integer.parseInt(organizationIdParam);
+
+            Organization organization = organizationService.getOrganizationById(organizationId);
+            if (organization == null) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization not found.");
+                return "redirect:/organizations";
+            }
+
+            EmployeeRecord employeeRecord = organizationService.getEmployeeRecordById(employeeId);
+            if (employeeRecord == null) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Employee record not found.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+            }
+
+            employeeRecord.setName(request.getParameter("name"));
+            employeeRecord.setNrc(request.getParameter("nrc"));
+            employeeRecord.setTpin(request.getParameter("tpin"));
+            employeeRecord.setManNumber(request.getParameter("manNumber"));
+            employeeRecord.setOrganization(organization);
+
+            organizationService.saveEmployeeRecord(employeeRecord);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Employee record updated successfully");
+
+            return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+        } catch (NumberFormatException e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid ID format.");
+            return "redirect:/organizations";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Error updating employee record: " + e.getMessage());
+            return "redirect:/organizations";
+        }
+    }
+
+    @PostMapping("/employee-record/delete")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteEmployeeRecord(@RequestParam Integer id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            organizationService.deleteEmployeeRecord(id);
+            response.put("success", true);
+            response.put("message", "Employee record deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error deleting employee record: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/employee-record/bulk/save")
+    public String saveBulkEmployeeRecords(@RequestParam Integer organization,
+                                          @RequestParam MultipartFile file,
+                                          RedirectAttributes redirectAttributes) throws PaykeshoError {
+        try {
+            Organization org = organizationService.getOrganizationById(organization);
+            if (org == null) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization not found.");
+                return "redirect:/organizations";
+            }
+
+            // Validate file
+            if (file.isEmpty()) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Please select a CSV file to upload.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+            }
+
+            String filename = file.getOriginalFilename();
+            if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Please upload a valid CSV file.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+            }
+
+            List<EmployeeRecord> employeeRecords = parseEmployeeRecordsFromCSV(file, org);
+
+            if (employeeRecords.isEmpty()) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "No valid employee records found in the CSV file.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+            }
+
+            // Save employee records
+            int savedCount = organizationService.saveBulkEmployeeRecords(employeeRecords);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE,
+                    String.format("Successfully uploaded %d employee records out of %d total records.",
+                            savedCount, employeeRecords.size()));
+
+            return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Error processing bulk upload: " + e.getMessage());
+            return "redirect:/organizations";
+        }
+    }
+
+    // Client Record CRUD Operations
+    @GetMapping("/{id}/client-records")
+    @ResponseBody
+    public ResponseEntity<List<Client>> getClientRecords(@PathVariable Integer id) {
+        try {
+            List<Client> clientRecords = organizationService.listClientRecordsAll(id);
+            return ResponseEntity.ok(clientRecords);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping("/client-record/save")
+    public String saveClientRecord(HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError {
+        String organizationIdParam = request.getParameter("organization");
+        if (organizationIdParam == null || organizationIdParam.isEmpty()) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization ID is required.");
+            return "redirect:/organizations";
+        }
+
+        try {
+            int organizationId = Integer.parseInt(organizationIdParam);
+            Organization organization = organizationService.getOrganizationById(organizationId);
+            if (organization == null) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization not found.");
+                return "redirect:/organizations";
+            }
+
+            Client client = new Client();
+            client.setName(request.getParameter("name"));
+            client.setNrc(request.getParameter("nrc"));
+            client.setPhoneNumber(request.getParameter("phoneNumber"));
+            client.setEmail(request.getParameter("email"));
+            client.setOrganization(organization);
+            client.setCreatedTime(new Date());
+            client.setEnabled(true);
+
+            organizationService.saveClientRecord(client);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Client record saved successfully");
+
+            return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+        } catch (NumberFormatException e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid Organization ID.");
+            return "redirect:/organizations";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Error saving client record: " + e.getMessage());
+            return "redirect:/organizations";
+        }
+    }
+
+    @PostMapping("/client-record/update")
+    public String updateClientRecord(HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError {
+        String idParam = request.getParameter("id");
+        String organizationIdParam = request.getParameter("organization");
+
+        if (idParam == null || idParam.isEmpty()) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Client record ID is required.");
+            return "redirect:/organizations";
+        }
+
+        if (organizationIdParam == null || organizationIdParam.isEmpty()) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization ID is required.");
+            return "redirect:/organizations";
+        }
+
+        try {
+            int clientId = Integer.parseInt(idParam);
+            int organizationId = Integer.parseInt(organizationIdParam);
+
+            Organization organization = organizationService.getOrganizationById(organizationId);
+            if (organization == null) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization not found.");
+                return "redirect:/organizations";
+            }
+
+            Client client = organizationService.getClientRecordById(clientId);
+            if (client == null) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Client record not found.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+            }
+
+            client.setName(request.getParameter("name"));
+            client.setNrc(request.getParameter("nrc"));
+            client.setPhoneNumber(request.getParameter("phoneNumber"));
+            client.setEmail(request.getParameter("email"));
+            client.setOrganization(organization);
+
+            organizationService.saveClientRecord(client);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Client record updated successfully");
+
+            return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+        } catch (NumberFormatException e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid ID format.");
+            return "redirect:/organizations";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Error updating client record: " + e.getMessage());
+            return "redirect:/organizations";
+        }
+    }
+
+    @PostMapping("/client-record/delete")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteClientRecord(@RequestParam Integer id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            organizationService.deleteClientRecord(id);
+            response.put("success", true);
+            response.put("message", "Client record deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error deleting client record: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/client-record/bulk/save")
+    public String saveBulkClientRecords(@RequestParam Integer organization,
+                                        @RequestParam MultipartFile file,
+                                        RedirectAttributes redirectAttributes) throws PaykeshoError {
+        try {
+            Organization org = organizationService.getOrganizationById(organization);
+            if (org == null) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization not found.");
+                return "redirect:/organizations";
+            }
+
+            // Validate file
+            if (file.isEmpty()) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Please select a CSV file to upload.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+            }
+
+            String filename = file.getOriginalFilename();
+            if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Please upload a valid CSV file.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+            }
+
+            List<Client> clientRecords = parseClientRecordsFromCSV(file, org);
+
+            if (clientRecords.isEmpty()) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "No valid client records found in the CSV file.");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+            }
+
+            // Save client records
+            int savedCount = organizationService.saveBulkClientRecords(clientRecords);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE,
+                    String.format("Successfully uploaded %d client records out of %d total records.",
+                            savedCount, clientRecords.size()));
+
+            return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Error processing bulk upload: " + e.getMessage());
+            return "redirect:/organizations";
+        }
+    }
+
+    /**
+     * Parse employee records from CSV file
+     * Expected CSV format: name,nrc,tpin,manNumber
+     */
+    private List<EmployeeRecord> parseEmployeeRecordsFromCSV(MultipartFile file, Organization organization) {
+        List<EmployeeRecord> employeeRecords = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            int lineNumber = 0;
+            boolean isHeader = true;
+
+            while ((line = reader.readLine()) != null) {
+                lineNumber++;
+
+                // Skip header row
+                if (isHeader) {
+                    isHeader = false;
+                    continue;
+                }
+
+                // Skip empty lines
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+
+                try {
+                    String[] fields = line.split(",");
+                    if (fields.length < 4) {
+                        System.err.println("Skipping line " + lineNumber + ": insufficient fields");
+                        continue;
+                    }
+
+                    EmployeeRecord employee = new EmployeeRecord();
+                    employee.setName(fields[0].trim());
+                    employee.setNrc(fields[1].trim());
+                    employee.setTpin(fields[2].trim());
+                    employee.setManNumber(fields[3].trim());
+                    employee.setOrganization(organization);
+                    employee.setRegistrationDate(new Date());
+                    employeeRecords.add(employee);
+
+                } catch (Exception e) {
+                    System.err.println("Error parsing line " + lineNumber + ": " + e.getMessage());
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error reading CSV file: " + e.getMessage());
+        }
+
+        return employeeRecords;
+    }
+
+    /**
+     * Parse client records from CSV file
+     * Expected CSV format: name,email,phoneNumber,address,nrc,tpin,manNumber
+     */
+    private List<Client> parseClientRecordsFromCSV(MultipartFile file, Organization organization) {
+        List<Client> clientRecords = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            int lineNumber = 0;
+            boolean isHeader = true;
+
+            while ((line = reader.readLine()) != null) {
+                lineNumber++;
+
+                // Skip header row
+                if (isHeader) {
+                    isHeader = false;
+                    continue;
+                }
+
+                // Skip empty lines
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+
+                try {
+                    String[] fields = line.split(",");
+                    if (fields.length < 7) {
+                        System.err.println("Skipping line " + lineNumber + ": insufficient fields");
+                        continue;
+                    }
+
+                    Client client = new Client();
+                    client.setName(fields[0].trim());
+                    client.setEmail(fields[1].trim());
+                    client.setPhoneNumber(fields[2].trim());
+                    client.setAddress(fields[3].trim());
+                    client.setNrc(fields[4].trim());
+                    client.setTpin(fields[5].trim());
+                    client.setManNumber(fields[6].trim());
+                    client.setOrganization(organization);
+                    client.setEnabled(true);
+                    // Set a default password (should be changed on first login)
+                    client.setPassword("defaultPassword123");
+                    clientRecords.add(client);
+
+                } catch (Exception e) {
+                    System.err.println("Error parsing line " + lineNumber + ": " + e.getMessage());
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error reading CSV file: " + e.getMessage());
+        }
+
+        return clientRecords;
     }
 }

@@ -32,5 +32,27 @@ public interface ClientRepository extends SearchRepository<Client, Integer> {
 
     @Query("select c from Client c where c.organization.id = ?1")
     List<Client> listClientRecordsAll(Integer id);
+
+    // Additional methods for dashboard analytics
+    long countByEnabledTrue();
+
+    long countByEnabledFalse();
+
+    long countByCreatedTimeAfter(java.util.Date date);
+
+    long countByOrganizationId(Integer organizationId);
+
+    long countByOrganizationIdAndEnabledTrue(Integer organizationId);
+
+    long countByOrganizationIdAndEnabledFalse(Integer organizationId);
+
+    @Query("SELECT c.organization.id, c.organization.name, COUNT(c) as clientCount " +
+            "FROM Client c " +
+            "GROUP BY c.organization.id, c.organization.name " +
+            "ORDER BY clientCount DESC")
+    List<Object[]> findTopOrganizationsByClientCount(int limit);
+
+    Client findByEmailAndOrganization(String email, Organization organization);
+
 }
 

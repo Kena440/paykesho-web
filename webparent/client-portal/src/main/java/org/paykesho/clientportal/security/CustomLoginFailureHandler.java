@@ -1,13 +1,13 @@
 package org.paykesho.clientportal.security;
 
 
+import org.commons.entity.client.Client;
+import org.paykesho.clientportal.clients.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import org.paykesho.clientportal.clients.service.ClientService;
-import org.commons.entity.client.Client;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

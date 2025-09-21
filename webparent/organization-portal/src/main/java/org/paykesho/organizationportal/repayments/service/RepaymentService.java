@@ -7,7 +7,6 @@ import org.commons.entity.client.RepaymentSchedule;
 import org.commons.enums.PaymentStatus;
 import org.commons.enums.ProcessingStatus;
 import org.commons.utils.PaykeshoError;
-import org.paykesho.organizationportal.client.service.ClientService;
 import org.paykesho.organizationportal.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.organizationportal.repayments.repository.PayrollDeductionRepository;
 import org.paykesho.organizationportal.repayments.repository.RepaymentScheduleRepository;
@@ -34,11 +33,8 @@ public class RepaymentService {
     private PayrollDeductionRepository payrollDeductionRepository;
     @Autowired
     private VouchersService vouchersService;
-    @Autowired
-    private ClientService clientService;
 
     public void createRepaymentSchedule(RepaymentScheduleRequest request) throws PaykeshoError {
-        BigDecimal amountDue = request.getAmountDue();
         // Date dueDate = request.getDueDate();
 
         RepaymentSchedule schedule = new RepaymentSchedule();

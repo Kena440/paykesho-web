@@ -6,7 +6,6 @@ import org.commons.entity.organization.OrganizationAdmin;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.organizations.dto.GPSDataItem;
 import org.paykesho.organizationportal.organizations.repository.OrganizationRepository;
-import org.paykesho.organizationportal.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +24,7 @@ public class OrganizationService {
     protected DateFormat dateFormat;
     @Autowired
     private OrganizationRepository organizationRepository;
-    @Autowired
-    private SettingService settingService;
+
 
     public Organization save(Organization organization) {
         if (organization == null) {

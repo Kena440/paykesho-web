@@ -11,9 +11,14 @@
     <div class="main">
         <nav th:replace="fragments/fragments :: topbar"></nav>
         <main class="content">
-            <input id="longitude" th:value="${merchant.longitude}" type="hidden"/>
-            <input id="latitude" th:value="${merchant.latitude}" type="hidden"/>
+            <input id="longitude" th:value="${merchant?.longitude ?: 0}" type="hidden"/>
+            <input id="latitude" th:value="${merchant?.latitude ?: 0}" type="hidden"/>
             <div class="container-fluid p-0">
+
+                <!-- Exception Handling Alert Container -->
+                <div class="mb-3" id="exceptionAlertContainer" style="display: none;">
+                    <!-- Dynamic exception alerts will be inserted here -->
+                </div>
 
                 <div class="row mb-2 mb-xl-3">
                     <div class="col-auto d-none d-sm-block">
@@ -38,96 +43,403 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-primary shadow-sm">
-                            <i class="align-middle" data-lucide="filter">&nbsp;</i>
-                        </button>
-                        <button class="btn btn-primary shadow-sm">
+                        <button class="btn btn-primary shadow-sm" id="refreshDashboardBtn">
                             <i class="align-middle" data-lucide="refresh-cw">&nbsp;</i>
                         </button>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-6 col-xl-5 d-flex">
-                        <div class="w-100">
-
-                            <div class="row">
-                                <div class="col-sm-12 col-lg-12 col-xxl-12 d-flex">
-                                    <div class="card illustration flex-fill">
-                                        <div class="card-body p-0 d-flex flex-fill">
-                                            <div class="row g-0 w-100">
-                                                <div class="col-6">
-                                                    <div class="illustration-text p-3 m-1">
-                                                        <h4 class="illustration-text">Welcome Back,
-                                                            [[${merchantAdmin.name}]]!</h4>
-                                                        <p class="mb-0">Merchant Dashboard - [[${merchant}]]</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-4 align-self-end text-end">
-
-
-                                                    <div class="img-fluid mb-2"><img
-                                                            alt="loading..."
-                                                            class="img-fluid illustration-img"
-                                                            style="max-width: 8.5rem;"
-                                                            th:src="@{${qrCodeContent}}">
-                                                    </div>
-                                                </div>
+                <!-- Welcome Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card illustration">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h2 class="mb-2">Welcome Back,
+                                            <span class="text-primary"
+                                                  th:text="${merchantAdmin?.name ?: 'User'}">User</span>!
+                                        </h2>
+                                        <p class="text-muted mb-0">Merchant Dashboard - <span
+                                                class="fw-bold"
+                                                th:text="${merchant?.name ?: 'Merchant'}">Merchant</span></p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <div class="img-fluid mb-2">
+                                            <img alt="QR Code"
+                                                 class="img-fluid"
+                                                 style="max-width: 120px;"
+                                                 th:if="${qrCodeContent != null and !#strings.isEmpty(qrCodeContent)}"
+                                                 th:src="@{${qrCodeContent}}">
+                                            <div class="text-muted text-center"
+                                                 style="max-width: 120px;"
+                                                 th:unless="${qrCodeContent != null and !#strings.isEmpty(qrCodeContent)}">
+                                                <i class="fas fa-qrcode fa-3x"></i>
+                                                <p class="small mt-2">QR Code not available</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row d-lg-none d-xxl-flex">
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Merchant Code</h5>
-                                                </div>
+                        </div>
+                    </div>
+                </div>
 
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="clock"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="h1 d-inline-block mt-1 mb-4">                                <a
-                                                    class="badge badge-subtle-primary me-1 my-1" href="#">[[${merchant.code}]]</a></span>
-                                        </div>
+                <!-- Key Performance Indicators (KPIs) - Primary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-primary">
+                            <i class="align-middle me-2" data-lucide="trending-up"></i>
+                            Key Performance Indicators
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Total Revenue - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-primary h-100" id="revenueCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-primary">
+                                        <i class="align-middle" data-lucide="dollar-sign"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshRevenueData()">Refresh</a></li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                                    <div class="card flex-fill">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col mt-0">
-                                                    <h5 class="card-title">Transactions</h5>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <div class="stat stat-sm">
-                                                        <i class="align-middle" data-lucide="users"></i>
-                                                    </div>
+                                <h3 class="text-primary mb-2"
+                                    th:text="${#numbers.formatDecimal(totalRevenue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW'">
+                                    0.00 ZMW</h3>
+                                <h6 class="text-muted mb-3">Total Revenue</h6>
+                                <div id="revenueContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${revenuePercentageChange ?: '0.00'} + '%'">0.00%</span>
+                                    <span class="text-muted small">vs last month</span>
+                                </div>
+                                <div class="text-danger small" id="revenueError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load revenue data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Transactions - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-success h-100" id="transactionsCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="credit-card"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-success" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshTransactionData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h3 class="text-success mb-2" th:text="${totalTransactions ?: 0}">0</h3>
+                                <h6 class="text-muted mb-3">Total Transactions</h6>
+                                <div id="transactionsContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${txnPercentageChange ?: '0.00'} + '%'">0.00%</span>
+                                    <span class="text-muted small">vs last month</span>
+                                </div>
+                                <div class="text-danger small" id="transactionsError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load transaction data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Merchant Code - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-info h-100" id="merchantCodeCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="hash"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshMerchantCode()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h3 class="text-info mb-2" th:text="${merchant?.code ?: 'N/A'}">N/A</h3>
+                                <h6 class="text-muted mb-3">Merchant Code</h6>
+                                <div id="merchantCodeContent">
+                                    <span class="badge badge-subtle-info me-2">Active</span>
+                                    <span class="text-muted small">Your unique identifier</span>
+                                </div>
+                                <div class="text-danger small" id="merchantCodeError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load merchant code</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Overview - Secondary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="bar-chart-3"></i>
+                            Performance Overview
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+
+                    <!-- Enhanced Merchant Analytics Cards -->
+                    <div class="col-12">
+                        <div class="row">
+                            <!-- Today's Performance Card -->
+                            <div class="col-sm-6 col-lg-3 d-flex">
+                                <div class="card flex-fill" id="todayPerformanceCard">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Today's Performance</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="stat stat-sm">
+                                                    <i class="align-middle" data-lucide="trending-up"></i>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div id="todayPerformanceContent">
                                             <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${totalTransactions}">0</span>
+                                                  th:text="${todayTransactions ?: 0}">0</span>
                                             <div class="mb-0">
-                                                <span class="badge badge-subtle-danger me-2"
-                                                      th:text="${txnPercentageChange + '%'}">0.00%</span>
-                                                <span class="text-muted">Since last week</span>
+                                                <span class="badge badge-subtle-success me-2"
+                                                      th:text="${#numbers.formatDecimal(todayRevenue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW'">0 ZMW</span>
+                                                <span class="text-muted">Today's revenue</span>
                                             </div>
+                                        </div>
+                                        <div class="text-danger" id="todayPerformanceError" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span class="error-message">Failed to load today's performance data</span>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
 
+                            <!-- Success Rate Card -->
+                            <div class="col-sm-6 col-lg-3 d-flex">
+                                <div class="card flex-fill" id="successRateCard">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Success Rate</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="stat stat-sm">
+                                                    <i class="align-middle" data-lucide="check-circle"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="successRateContent">
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-success me-2"
+                                                      th:text="${successfulTransactions ?: 0} + ' successful'">0 successful</span>
+                                                <span class="text-muted">Out of ${totalTransactions ?: 0} total</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger" id="successRateError" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span class="error-message">Failed to load success rate data</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Unique Customers Card -->
+                            <div class="col-sm-6 col-lg-3 d-flex">
+                                <div class="card flex-fill" id="uniqueCustomersCard">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Unique Customers</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="stat stat-sm">
+                                                    <i class="align-middle" data-lucide="users"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="uniqueCustomersContent">
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${uniqueCustomers ?: 0}">0</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-info me-2"
+                                                      th:text="${#numbers.formatDecimal(averageTransactionValue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW avg'">0 ZMW avg</span>
+                                                <span class="text-muted">Average transaction value</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger" id="uniqueCustomersError" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span class="error-message">Failed to load customer data</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Weekly Growth Card -->
+                            <div class="col-sm-6 col-lg-3 d-flex">
+                                <div class="card flex-fill" id="weeklyGrowthCard">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Weekly Growth</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="stat stat-sm">
+                                                    <i class="align-middle" data-lucide="trending-up"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="weeklyGrowthContent">
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${weeklyTransactions ?: 0}">0</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-success me-2"
+                                                      th:text="${#numbers.formatDecimal(weeklyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                                <span class="text-muted">vs last week</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger" id="weeklyGrowthError" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span class="error-message">Failed to load growth data</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue and Performance Cards -->
+                    <div class="col-12">
+                        <div class="row">
+                            <!-- Monthly Revenue Card -->
+                            <div class="col-sm-6 col-lg-4 d-flex">
+                                <div class="card flex-fill" id="monthlyRevenueCard">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Monthly Revenue</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="stat stat-sm">
+                                                    <i class="align-middle" data-lucide="dollar-sign"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="monthlyRevenueContent">
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${#numbers.formatDecimal(monthlyRevenue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-success me-2"
+                                                      th:text="${#numbers.formatDecimal(monthlyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                                <span class="text-muted">vs last month</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger" id="monthlyRevenueError" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span class="error-message">Failed to load revenue data</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Yesterday Comparison Card -->
+                            <div class="col-sm-6 col-lg-4 d-flex">
+                                <div class="card flex-fill" id="yesterdayComparisonCard">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Yesterday</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="stat stat-sm">
+                                                    <i class="align-middle" data-lucide="calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="yesterdayComparisonContent">
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${yesterdayTransactions ?: 0}">0</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-info me-2"
+                                                      th:text="${#numbers.formatDecimal(yesterdayRevenue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW'">0 ZMW</span>
+                                                <span class="text-muted">Yesterday's revenue</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger" id="yesterdayComparisonError" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span class="error-message">Failed to load yesterday's data</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Value Card -->
+                            <div class="col-sm-6 col-lg-4 d-flex">
+                                <div class="card flex-fill" id="totalValueCard">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col mt-0">
+                                                <h5 class="card-title">Total Value</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="stat stat-sm">
+                                                    <i class="align-middle" data-lucide="credit-card"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="totalValueContent">
+                                            <span class="h1 d-inline-block mt-1 mb-4"
+                                                  th:text="${#numbers.formatDecimal(totalTransactionValue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</span>
+                                            <div class="mb-0">
+                                                <span class="badge badge-subtle-primary me-2"
+                                                      th:text="${totalTransactions ?: 0} + ' transactions'">0 transactions</span>
+                                                <span class="text-muted">All time</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-danger" id="totalValueError" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span class="error-message">Failed to load total value data</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="col-lg-6 col-xl-7">
-                        <div class="card flex-fill w-100">
+                        <div class="card flex-fill w-100" id="mapCard">
                             <div class="card-header">
                                 <div class="card-actions float-end">
                                     <div class="dropdown position-relative">
@@ -146,6 +458,91 @@
                             </div>
                             <div class="card-body p-2">
                                 <div id="map" style='width: 100%; height: 279px'></div>
+                                <div class="text-center p-4" id="mapError" style="display: none;">
+                                    <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">Map Loading Failed</h6>
+                                    <p class="text-muted small">Unable to load map data. Please check your
+                                        connection.</p>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="retryLoadMap()">
+                                        <i class="fas fa-redo me-1"></i>Retry
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Merchant Analytics Charts -->
+                <div class="row">
+                    <!-- Revenue Trend Chart -->
+                    <div class="col-12 col-lg-8 d-flex">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#"
+                                               onclick="refreshRevenueChart()">Refresh</a>
+                                            <a class="dropdown-item" href="#" onclick="exportRevenueChart()">Export</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h5 class="card-title mb-0">Revenue Trend (Last 30 Days)</h5>
+                            </div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="merchantRevenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Status Chart -->
+                    <div class="col-12 col-lg-4 d-flex">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <div class="card-actions float-end">
+                                    <div class="dropdown position-relative">
+                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#" onclick="refreshStatusChart()">Refresh</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h5 class="card-title mb-0">Transaction Status</h5>
+                            </div>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="merchantStatusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics Charts -->
+                <div class="row">
+                    <!-- Daily Performance Chart -->
+                    <div class="col-12 col-lg-6 d-flex">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Daily Performance (Last 7 Days)</h5>
+                            </div>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="merchantDailyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Customers Chart -->
+                    <div class="col-12 col-lg-6 d-flex">
+                        <div class="card flex-fill w-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Top Customers</h5>
+                            </div>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="merchantCustomersChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -159,32 +556,668 @@
 </div>
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
+
+<!-- Exception Handling Styles -->
+<style>
+    .exception-alert {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .error-state {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+</style>
+
 <script>
-    // Initialize the Leaflet map
-    var map = L.map('map').setView([$("#latitude").val(), $("#longitude").val()], 15);
+    // Global exception handling configuration
+    const ExceptionHandler = {
+        // Configuration
+        config: {
+            autoRetry: true,
+            maxRetries: 3,
+            retryDelay: 2000,
+            showNotifications: true,
+            logErrors: true
+        },
 
-    // Add OpenStreetMap tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+        // Track retry attempts
+        retryCounts: {},
 
-    // Add a marker at the given coordinates
-    var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
+        // Initialize exception handling
+        init: function () {
+            this.setupGlobalErrorHandlers();
+            this.setupNetworkMonitoring();
+            this.initializeComponents();
+        },
 
-    // Optionally, if you need geocoding similar to MapboxGeocoder, you can integrate a Leaflet geocoder plugin.
-    // Here is an example of using leaflet-control-geocoder:
-    L.Control.geocoder({
-        defaultMarkGeocode: false
-    }).on('markgeocode', function (e) {
-        var bbox = e.geocode.bbox;
-        var poly = L.polygon([
-            bbox.getSouthEast(),
-            bbox.getNorthEast(),
-            bbox.getNorthWest(),
-            bbox.getSouthWest()
-        ]).addTo(map);
-        map.fitBounds(poly.getBounds());
-    }).addTo(map);
+        // Setup global error handlers
+        setupGlobalErrorHandlers: function () {
+            // Handle unhandled promise rejections
+            window.addEventListener('unhandledrejection', (event) => {
+                this.handleError('Network Error', event.reason, 'PROMISE_REJECTION');
+            });
+
+            // Handle JavaScript errors
+            window.addEventListener('error', (event) => {
+                this.handleError('JavaScript Error', event.error, 'JS_ERROR');
+            });
+        },
+
+        // Setup network monitoring
+        setupNetworkMonitoring: function () {
+            // Monitor online/offline status
+            window.addEventListener('online', () => {
+                this.showNotification('Connection restored', 'success');
+                this.retryFailedOperations();
+            });
+
+            window.addEventListener('offline', () => {
+                this.showNotification('Connection lost', 'warning');
+            });
+        },
+
+        // Initialize dashboard components
+        initializeComponents: function () {
+            this.initializeMap();
+            this.initializeDataLoading();
+            this.setupRefreshButton();
+        },
+
+        // Initialize map with error handling
+        initializeMap: function () {
+            try {
+                const lat = parseFloat($("#latitude").val()) || -14.432750819377832;
+                const lng = parseFloat($("#longitude").val()) || 28.446846724905615;
+
+                const map = L.map('map').setView([lat, lng], 15);
+
+                // Add tile layer with error handling
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    errorTileUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmOWZhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk1hcCBVbmF2YWlsYWJsZTwvdGV4dD48L3N2Zz4='
+                }).addTo(map);
+
+                // Add marker
+                L.marker([lat, lng]).addTo(map);
+
+                // Add geocoder with error handling
+                try {
+                    L.Control.geocoder({
+                        defaultMarkGeocode: false
+                    }).on('markgeocode', function (e) {
+                        try {
+                            var bbox = e.geocode.bbox;
+                            var poly = L.polygon([
+                                bbox.getSouthEast(),
+                                bbox.getNorthEast(),
+                                bbox.getNorthWest(),
+                                bbox.getSouthWest()
+                            ]).addTo(map);
+                            map.fitBounds(poly.getBounds());
+                        } catch (error) {
+                            ExceptionHandler.handleError('Map Geocoding Error', error, 'MAP_GEOCODING');
+                        }
+                    }).addTo(map);
+                } catch (error) {
+                    console.warn('Geocoder not available:', error);
+                }
+
+                // Store map reference
+                this.map = map;
+
+            } catch (error) {
+                this.handleError('Map Initialization Error', error, 'MAP_INIT');
+                this.showMapError();
+            }
+        },
+
+        // Initialize data loading with error handling
+        initializeDataLoading: function () {
+            this.loadTransactionData();
+            this.loadMerchantData();
+        },
+
+        // Load transaction data with error handling
+        loadTransactionData: function () {
+            // Simulate API call - replace with actual endpoint
+            fetch('/api/transactions/summary')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.updateTransactionDisplay(data);
+                })
+                .catch(error => {
+                    this.handleError('Transaction Data Loading Error', error, 'TRANSACTION_DATA');
+                    this.showTransactionError();
+                });
+        },
+
+        // Load merchant data with error handling
+        loadMerchantData: function () {
+            // Simulate API call - replace with actual endpoint
+            fetch('/api/merchant/info')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.updateMerchantDisplay(data);
+                })
+                .catch(error => {
+                    this.handleError('Merchant Data Loading Error', error, 'MERCHANT_DATA');
+                    this.showMerchantError();
+                });
+        },
+
+        // Update transaction display
+        updateTransactionDisplay: function (data) {
+            const content = document.getElementById('transactionsContent');
+            const error = document.getElementById('transactionsError');
+
+            if (content && error) {
+                content.style.display = 'block';
+                error.style.display = 'none';
+
+                // Update transaction count
+                const countElement = content.querySelector('.h1');
+                if (countElement) {
+                    countElement.textContent = data.totalTransactions || '0';
+                }
+
+                // Update percentage change
+                const percentageElement = content.querySelector('.badge');
+                if (percentageElement) {
+                    percentageElement.textContent = `${data.percentageChange || 0}%`;
+                }
+            }
+        },
+
+        // Update merchant display
+        updateMerchantDisplay: function (data) {
+            const content = document.getElementById('merchantCodeContent');
+            const error = document.getElementById('merchantCodeError');
+
+            if (content && error) {
+                content.style.display = 'block';
+                error.style.display = 'none';
+
+                // Update merchant code
+                const codeElement = content.querySelector('.badge');
+                if (codeElement) {
+                    codeElement.textContent = data.code || 'N/A';
+                }
+            }
+        },
+
+        // Show transaction error
+        showTransactionError: function () {
+            const content = document.getElementById('transactionsContent');
+            const error = document.getElementById('transactionsError');
+
+            if (content && error) {
+                content.style.display = 'none';
+                error.style.display = 'block';
+            }
+        },
+
+        // Show merchant error
+        showMerchantError: function () {
+            const content = document.getElementById('merchantCodeContent');
+            const error = document.getElementById('merchantCodeError');
+
+            if (content && error) {
+                content.style.display = 'none';
+                error.style.display = 'block';
+            }
+        },
+
+        // Show map error
+        showMapError: function () {
+            const map = document.getElementById('map');
+            const error = document.getElementById('mapError');
+
+            if (map && error) {
+                map.style.display = 'none';
+                error.style.display = 'block';
+            }
+        },
+
+        // Setup refresh button
+        setupRefreshButton: function () {
+            const refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    this.refreshDashboard();
+                });
+            }
+        },
+
+        // Refresh dashboard
+        refreshDashboard: function () {
+            const refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) {
+                const icon = refreshBtn.querySelector('i');
+                if (icon) {
+                    icon.className = 'loading-spinner';
+                }
+                refreshBtn.disabled = true;
+            }
+
+            // Clear previous errors
+            this.clearAllErrors();
+
+            // Reload all data
+            this.initializeDataLoading();
+
+            // Reset button after delay
+            setTimeout(() => {
+                if (refreshBtn) {
+                    const icon = refreshBtn.querySelector('i');
+                    if (icon) {
+                        icon.className = 'align-middle';
+                        icon.setAttribute('data-lucide', 'refresh-cw');
+                    }
+                    refreshBtn.disabled = false;
+                }
+            }, 2000);
+        },
+
+        // Clear all errors
+        clearAllErrors: function () {
+            const errorElements = document.querySelectorAll('[id$="Error"]');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+
+            const contentElements = document.querySelectorAll('[id$="Content"]');
+            contentElements.forEach(element => {
+                element.style.display = 'block';
+            });
+        },
+
+        // Handle errors
+        handleError: function (title, error, type) {
+            if (this.config.logErrors) {
+                console.error(`[${type}] ${title}:`, error);
+            }
+
+            if (this.config.showNotifications) {
+                this.showNotification(`${title}: ${error.message || error}`, 'danger');
+            }
+
+            // Show alert if critical
+            if (this.isCriticalError(type)) {
+                this.showExceptionAlert(title, error, type);
+            }
+        },
+
+        // Check if error is critical
+        isCriticalError: function (type) {
+            const criticalTypes = ['NETWORK_ERROR', 'AUTH_ERROR', 'PERMISSION_ERROR'];
+            return criticalTypes.includes(type);
+        },
+
+        // Show exception alert
+        showExceptionAlert: function (title, error, type) {
+            const container = document.getElementById('exceptionAlertContainer');
+            if (!container) return;
+
+            const alertId = `alert-${Date.now()}`;
+            const alertHtml = `
+                <div id="${alertId}" class="alert alert-danger alert-dismissible exception-alert" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3"></i>
+                        <div class="flex-grow-1">
+                            <strong>${title}</strong><br>
+                            <small>${error.message || error}</small>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', alertHtml);
+            container.style.display = 'block';
+
+            // Auto-dismiss after 10 seconds
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) {
+                    alert.remove();
+                    if (container.children.length === 0) {
+                        container.style.display = 'none';
+                    }
+                }
+            }, 10000);
+        },
+
+        // Show notification
+        showNotification: function (message, type) {
+            // Create toast notification
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+            // Add to toast container (create if doesn't exist)
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+            // Initialize and show toast
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        },
+
+        // Retry failed operations
+        retryFailedOperations: function () {
+            // Retry transaction data
+            if (document.getElementById('transactionsError').style.display !== 'none') {
+                this.loadTransactionData();
+            }
+
+            // Retry merchant data
+            if (document.getElementById('merchantCodeError').style.display !== 'none') {
+                this.loadMerchantData();
+            }
+
+            // Retry map
+            if (document.getElementById('mapError').style.display !== 'none') {
+                this.initializeMap();
+            }
+        }
+    };
+
+    // Retry functions for inline onclick handlers
+    function retryLoadTransactions() {
+        ExceptionHandler.loadTransactionData();
+    }
+
+    function retryLoadMap() {
+        ExceptionHandler.initializeMap();
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        ExceptionHandler.init();
+        // Initialize merchant dashboard charts
+        initializeMerchantCharts();
+    });
+
+    // Merchant Dashboard Charts
+    function initializeMerchantCharts() {
+        initializeMerchantRevenueChart();
+        initializeMerchantStatusChart();
+        initializeMerchantDailyChart();
+        initializeMerchantCustomersChart();
+    }
+
+    // Revenue Trend Chart
+    function initializeMerchantRevenueChart() {
+        const ctx = document.getElementById('merchantRevenueChart');
+        if (!ctx) return;
+
+        // Sample data - in real implementation, this would come from the backend
+        const revenueData = {
+            labels: generateLast30DaysLabels(),
+            datasets: [{
+                label: 'Daily Revenue',
+                data: generateSampleRevenueData(),
+                borderColor: window.cssVariables.primary || '#007bff',
+                backgroundColor: (window.cssVariables.primary || '#007bff') + '20',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: revenueData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'ZMW ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    }
+
+    // Transaction Status Chart
+    function initializeMerchantStatusChart() {
+        const ctx = document.getElementById('merchantStatusChart');
+        if (!ctx) return;
+
+        const statusData = {
+            labels: ['Successful', 'Failed'],
+            datasets: [{
+                data: [
+                    /*[[${successfulTransactions}]]*/ 85,
+                    /*[[${failedTransactions}]]*/ 15
+                ],
+                backgroundColor: [
+                    window.cssVariables.success || '#28a745',
+                    window.cssVariables.danger || '#dc3545'
+                ],
+                borderWidth: 0
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: statusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // Daily Performance Chart
+    function initializeMerchantDailyChart() {
+        const ctx = document.getElementById('merchantDailyChart');
+        if (!ctx) return;
+
+        const dailyData = {
+            labels: generateLast7DaysLabels(),
+            datasets: [{
+                label: 'Transactions',
+                data: generateSampleDailyData(),
+                backgroundColor: window.cssVariables.primary || '#007bff',
+                borderColor: window.cssVariables.primary || '#007bff',
+                borderWidth: 1
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: dailyData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Top Customers Chart
+    function initializeMerchantCustomersChart() {
+        const ctx = document.getElementById('merchantCustomersChart');
+        if (!ctx) return;
+
+        const customersData = {
+            labels: ['Customer A', 'Customer B', 'Customer C', 'Customer D', 'Customer E'],
+            datasets: [{
+                data: [45, 30, 15, 7, 3],
+                backgroundColor: [
+                    window.cssVariables.primary || '#007bff',
+                    window.cssVariables.success || '#28a745',
+                    window.cssVariables.warning || '#ffc107',
+                    window.cssVariables.info || '#17a2b8',
+                    window.cssVariables.secondary || '#6c757d'
+                ],
+                borderWidth: 0
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: customersData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Helper functions
+    function generateLast30DaysLabels() {
+        const labels = [];
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            labels.push(date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}));
+        }
+        return labels;
+    }
+
+    function generateLast7DaysLabels() {
+        const labels = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            labels.push(date.toLocaleDateString('en-US', {weekday: 'short'}));
+        }
+        return labels;
+    }
+
+    function generateSampleRevenueData() {
+        const data = [];
+        for (let i = 0; i < 30; i++) {
+            data.push(Math.floor(Math.random() * 10000) + 1000);
+        }
+        return data;
+    }
+
+    function generateSampleDailyData() {
+        const data = [];
+        for (let i = 0; i < 7; i++) {
+            data.push(Math.floor(Math.random() * 50) + 5);
+        }
+        return data;
+    }
+
+    // Chart refresh functions
+    function refreshRevenueChart() {
+        console.log('Refreshing revenue chart...');
+        // In real implementation, this would fetch new data from the backend
+    }
+
+    function refreshStatusChart() {
+        console.log('Refreshing status chart...');
+        // In real implementation, this would fetch new data from the backend
+    }
+
+    function exportRevenueChart() {
+        console.log('Exporting revenue chart...');
+        // In real implementation, this would export the chart data
+    }
 </script>
 
 </body>

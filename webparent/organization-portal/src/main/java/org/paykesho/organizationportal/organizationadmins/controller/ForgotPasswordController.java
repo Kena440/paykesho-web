@@ -6,7 +6,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.config.Utility;
 import org.paykesho.organizationportal.notification.general.NotificationClient;
 import org.paykesho.organizationportal.organizationadmins.service.OrganizationAdminService;
-import org.paykesho.organizationportal.settings.service.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.paykesho.organizationportal.settings.email.EmailSettingBag;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,8 +24,7 @@ public class ForgotPasswordController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgotPasswordController.class);
     @Autowired
     private OrganizationAdminService organizationAdminService;
-    @Autowired
-    private SettingService settingService;
+
     @Autowired
     private NotificationClient notificationClient;
 
@@ -106,12 +102,13 @@ public class ForgotPasswordController {
 
     private void sendTokenEmail(String verifyURL, String email) throws javax.mail.MessagingException, java.io.UnsupportedEncodingException {
         String toAddress = email;
-        String subject = "Password Reset";
+
         String content = "<p>Hello,</p>"
                 + "<p>You requested a password reset. Click the link below to change your password:</p>"
                 + "<p><a href=\"" + verifyURL + "\">Change Password</a></p>"
                 + "<p>If you did not request this, please ignore the email.</p>";
 
+        LOGGER.info("Attempting to send password reset email to: {} with URL: {}", toAddress, verifyURL);
         boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
         if (emailNotificationSent) {
             LOGGER.info("Notification sent successfully for {}", toAddress);

@@ -7,7 +7,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
 import org.paykesho.merchantportal.merchants.service.MerchantService;
 import org.paykesho.merchantportal.security.MerchantAdminUserDetails;
-import org.paykesho.merchantportal.settings.service.SettingService;
 import org.paykesho.merchantportal.transactions.service.TransactionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,8 +25,7 @@ public class TransactionController {
     private MerchantService merchantService;
     @Autowired
     private MerchantAdminService merchantAdminService;
-    @Autowired
-    private SettingService settingService;
+
     @Autowired
     private TransactionsService transactionsService;
 
@@ -35,6 +33,14 @@ public class TransactionController {
     public String showMerchantTransactions(@AuthenticationPrincipal MerchantAdminUserDetails loggedInUser, Model model) throws PaykeshoError {
         MerchantAdmin merchantAdmin = merchantAdminService.getMerchantAdminByEmail(loggedInUser.getMerchantAdmin().getEmail());
         Merchant merchant = merchantService.getMerchantByContactPerson(merchantAdmin);
+
+        if (merchant == null) {
+            // Handle case where merchant is not found
+            model.addAttribute("transactionList", List.of());
+            model.addAttribute("pageTitle", "Transactions");
+            return "transactions/transactions";
+        }
+
         List<Transaction> transactionList = transactionsService.getMerchantTransactions(merchant);
         model.addAttribute("transactionList", transactionList);
         model.addAttribute("pageTitle", merchant.getName() + " Transactions");

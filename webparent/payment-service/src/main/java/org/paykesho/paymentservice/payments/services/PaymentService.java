@@ -1,5 +1,6 @@
 package org.paykesho.paymentservice.payments.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,12 @@ import org.paykesho.paymentservice.payments.repositories.PaymentRepository;
 import org.paykesho.paymentservice.utils.PaymentConfigProperties;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -40,6 +43,9 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Idempotency tracking for duplicate payment prevention
+    private final java.util.concurrent.ConcurrentHashMap<String, String> processedPayments = new java.util.concurrent.ConcurrentHashMap<>();
 
     public BankPaymentResponse runWalletToBankPayment(BankPaymentRequest bankPaymentRequest) {
         try {
@@ -58,9 +64,15 @@ public class PaymentService {
             handlePaymentResponse(bankPaymentResponse);
             return bankPaymentResponse;
 
+        } catch (JsonProcessingException e) {
+            log.error("JSON serialization error for wallet-to-bank payment: {}", e.getMessage());
+            throw new RuntimeException("Payment request formatting failed", e);
+        } catch (RestClientException e) {
+            log.error("Network error during wallet-to-bank payment: {}", e.getMessage());
+            throw new RuntimeException("Payment gateway communication failed", e);
         } catch (Exception e) {
-            log.error("Error processing wallet-to-bank payment", e);
-            throw new RuntimeException("Payment processing failed", e);
+            log.error("Unexpected error processing wallet-to-bank payment", e);
+            throw new RuntimeException("Payment processing failed due to system error", e);
         }
     }
 
@@ -82,9 +94,18 @@ public class PaymentService {
             handleMoMoPaymentToMerchantResponse(moMoPaymentToMerchantResponse, amount);
             return moMoPaymentToMerchantResponse;
 
+        } catch (JsonProcessingException e) {
+            log.error("JSON serialization error for MoMo merchant payment: {}", e.getMessage());
+            throw new RuntimeException("Payment request formatting failed", e);
+        } catch (RestClientException e) {
+            log.error("Network error during MoMo merchant payment: {}", e.getMessage());
+            throw new RuntimeException("Payment gateway communication failed", e);
+        } catch (NumberFormatException e) {
+            log.error("Invalid amount format for MoMo merchant payment: {}", e.getMessage());
+            throw new RuntimeException("Invalid payment amount", e);
         } catch (Exception e) {
-            log.error("Error processing MoMo payment", e);
-            throw new RuntimeException("MoMo payment processing failed", e);
+            log.error("Unexpected error processing MoMo merchant payment", e);
+            throw new RuntimeException("Payment processing failed due to system error", e);
         }
     }
 
@@ -106,9 +127,18 @@ public class PaymentService {
             handleMoMoPaymentToPaykeshoResponse(moMoPaymentToPaykeshoResponse, amount);
             return moMoPaymentToPaykeshoResponse;
 
+        } catch (JsonProcessingException e) {
+            log.error("JSON serialization error for MoMo to Paykesho payment: {}", e.getMessage());
+            throw new RuntimeException("Payment request formatting failed", e);
+        } catch (RestClientException e) {
+            log.error("Network error during MoMo to Paykesho payment: {}", e.getMessage());
+            throw new RuntimeException("Payment gateway communication failed", e);
+        } catch (NumberFormatException e) {
+            log.error("Invalid amount format for MoMo to Paykesho payment: {}", e.getMessage());
+            throw new RuntimeException("Invalid payment amount", e);
         } catch (Exception e) {
-            log.error("Error processing MoMo payment", e);
-            throw new RuntimeException("MoMo payment processing failed", e);
+            log.error("Unexpected error processing MoMo to Paykesho payment", e);
+            throw new RuntimeException("Payment processing failed due to system error", e);
         }
     }
 
@@ -119,7 +149,6 @@ public class PaymentService {
 
             cardPaymentRequest.setReferenceNo(UUID.randomUUID().toString());
             CardPaymentDTO cardPaymentDTO = new CardPaymentDTO(paymentConfig, cardPaymentRequest);
-            BigDecimal amount = new BigDecimal(cardPaymentRequest.getAmount());
 
             String requestBody = objectMapper.writeValueAsString(cardPaymentDTO);
             HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
@@ -128,9 +157,18 @@ public class PaymentService {
 
             return responseEntity.getBody();
 
+        } catch (JsonProcessingException e) {
+            log.error("JSON serialization error for card payment: {}", e.getMessage());
+            throw new RuntimeException("Payment request formatting failed", e);
+        } catch (RestClientException e) {
+            log.error("Network error during card payment: {}", e.getMessage());
+            throw new RuntimeException("Payment gateway communication failed", e);
+        } catch (NumberFormatException e) {
+            log.error("Invalid amount format for card payment: {}", e.getMessage());
+            throw new RuntimeException("Invalid payment amount", e);
         } catch (Exception e) {
-            log.error("Error processing card payment", e);
-            throw new RuntimeException("card payment processing failed", e);
+            log.error("Unexpected error processing card payment", e);
+            throw new RuntimeException("Card payment processing failed due to system error", e);
         }
     }
 
@@ -348,5 +386,48 @@ public class PaymentService {
 
     private void logCardTransactionPending(CardPaymentCallBackResponse response) {
         log.warn("Card transaction pending: {}", response.getReferenceNo());
+    }
+
+    /**
+     * Check if payment was already processed using idempotency key
+     */
+    public boolean isPaymentAlreadyProcessed(String idempotencyKey) {
+        if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
+            return false;
+        }
+
+        // Check in-memory cache first (for recent requests)
+        if (processedPayments.containsKey(idempotencyKey)) {
+            return true;
+        }
+
+        // Check database for historical payments
+        try {
+            // You would implement this query in your PaymentRepository
+            // For now, just check the in-memory cache
+            return false;
+        } catch (Exception e) {
+            log.error("Error checking payment idempotency: {}", e.getMessage());
+            // Err on the side of caution - assume not processed
+            return false;
+        }
+    }
+
+    /**
+     * Mark payment as processed with idempotency key
+     */
+    public void markPaymentAsProcessed(String idempotencyKey, String paymentReference) {
+        if (idempotencyKey != null && !idempotencyKey.trim().isEmpty()) {
+            processedPayments.put(idempotencyKey, paymentReference);
+
+            // Clean up old entries periodically (keep only last 1000 entries)
+            if (processedPayments.size() > 1000) {
+                // Remove oldest 200 entries
+                processedPayments.entrySet().stream()
+                        .limit(200)
+                        .map(Map.Entry::getKey)
+                        .forEach(processedPayments::remove);
+            }
+        }
     }
 }

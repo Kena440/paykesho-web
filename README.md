@@ -114,7 +114,8 @@ mvn clean package -DskipTests
 
 # Create deployment directory
 
-mkdir -p deploy/{backoffice,client-portal, /organization-portal,merchant-portal,payment-service,notification-service,file-service}
+mkdir -p deploy/{backoffice,client-portal,
+/organization-portal,merchant-portal,payment-service,notification-service,file-service}
 
 # Copy JAR files to deployment directories
 

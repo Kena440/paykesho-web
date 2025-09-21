@@ -1,15 +1,19 @@
 package org.commons.entity.organization;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.commons.entity.IdBasedEntity;
 import org.commons.enums.OrganizationType;
 
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "organizations")
 public class Organization extends IdBasedEntity {

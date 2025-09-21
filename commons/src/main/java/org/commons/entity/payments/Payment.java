@@ -1,7 +1,9 @@
 package org.commons.entity.payments;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.commons.entity.IdBasedEntity;
 import org.commons.enums.PaymentMethod;
 import org.commons.enums.PaymentStatus;
@@ -12,7 +14,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @Entity
 @Table(name = "payments")

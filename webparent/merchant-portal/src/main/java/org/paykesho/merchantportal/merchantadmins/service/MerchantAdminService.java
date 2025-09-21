@@ -11,7 +11,6 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.merchantportal.config.Utility;
 import org.paykesho.merchantportal.merchantadmins.repository.MerchantAdminRepository;
 import org.paykesho.merchantportal.settings.repository.CountryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,23 +32,46 @@ public class MerchantAdminService {
     private final MerchantAdminRepository merchantAdminRepository;
 
     public List<Country> countryList() {
-        return countryRepository.findAllByOrderByNameDesc();
+        try {
+            log.debug("Retrieving country list");
+            List<Country> countries = countryRepository.findAllByOrderByNameDesc();
+            log.debug("Successfully retrieved {} countries", countries.size());
+            return countries;
+        } catch (Exception ex) {
+            log.error("Error retrieving country list: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve country list", ex);
+        }
     }
 
     public boolean isEmailUnique(String email) {
-        MerchantAdmin merchantAdmin = merchantAdminRepository.findByEmail(email);
-        return merchantAdmin == null;
+        try {
+            log.debug("Checking email uniqueness for: {}", email);
+            MerchantAdmin merchantAdmin = merchantAdminRepository.findByEmail(email);
+            boolean isUnique = merchantAdmin == null;
+            log.debug("Email {} is unique: {}", email, isUnique);
+            return isUnique;
+        } catch (Exception ex) {
+            log.error("Error checking email uniqueness for {}: {}", email, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to check email uniqueness", ex);
+        }
     }
 
     public void registerMerchantAdmin(MerchantAdmin merchantAdmin) {
-        encodePassword(merchantAdmin);
-        merchantAdmin.setEnabled(false);
-        merchantAdmin.setCreatedTime(new Date());
-        merchantAdmin.setAuthenticationType(AuthenticationType.DATABASE);
+        try {
+            log.debug("Registering new merchant admin with email: {}", merchantAdmin.getEmail());
+            encodePassword(merchantAdmin);
+            merchantAdmin.setEnabled(false);
+            merchantAdmin.setCreatedTime(new Date());
+            merchantAdmin.setAuthenticationType(AuthenticationType.DATABASE);
 
-        String randomCode = RandomString.make(64);
-        merchantAdmin.setVerificationCode(randomCode);
-        merchantAdminRepository.save(merchantAdmin);
+            String randomCode = RandomString.make(64);
+            merchantAdmin.setVerificationCode(randomCode);
+            merchantAdminRepository.save(merchantAdmin);
+            log.debug("Successfully registered merchant admin with ID: {}", merchantAdmin.getId());
+        } catch (Exception ex) {
+            log.error("Error registering merchant admin with email {}: {}", merchantAdmin.getEmail(), ex.getMessage(), ex);
+            throw new RuntimeException("Failed to register merchant admin", ex);
+        }
     }
 
     private void encodePassword(MerchantAdmin merchantAdmin) {
@@ -75,7 +97,19 @@ public class MerchantAdminService {
     }
 
     public MerchantAdmin getMerchantAdminByEmail(String email) {
-        return merchantAdminRepository.findByEmail(email);
+        try {
+            log.debug("Retrieving merchant admin by email: {}", email);
+            MerchantAdmin merchantAdmin = merchantAdminRepository.findByEmail(email);
+            if (merchantAdmin != null) {
+                log.debug("Found merchant admin with ID: {}", merchantAdmin.getId());
+            } else {
+                log.debug("No merchant admin found with email: {}", email);
+            }
+            return merchantAdmin;
+        } catch (Exception ex) {
+            log.error("Error retrieving merchant admin by email {}: {}", email, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve merchant admin by email", ex);
+        }
     }
 
     public MerchantAdmin getMerchantAdminByResetToken(String token) {

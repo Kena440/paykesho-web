@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.organization.Organization;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.organizations.repository.OrganizationRepository;
-import org.paykesho.clientportal.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +21,30 @@ public class OrganizationService {
     protected DateFormat dateFormat;
     @Autowired
     private OrganizationRepository organizationRepository;
-    @Autowired
-    private SettingService settingService;
+    // @Autowired
+    // private SettingService settingService; // Unused field
 
     public Organization getOrganizationById(Integer id) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("Null parameter id");
-        }
-
         try {
-            return organizationRepository.findById(id).get();
-        } catch (NoSuchElementException exception) {
-            throw new PaykeshoError("Could not find any member");
+            log.debug("Retrieving organization by ID: {}", id);
+            if (id == null) {
+                throw new PaykeshoError("Null parameter id");
+            }
+
+            try {
+                Organization organization = organizationRepository.findById(id).get();
+                log.debug("Found organization with ID: {}", id);
+                return organization;
+            } catch (NoSuchElementException exception) {
+                log.warn("Organization not found with ID: {}", id);
+                throw new PaykeshoError("Could not find any member");
+            }
+        } catch (PaykeshoError ex) {
+            log.warn("PaykeshoError retrieving organization by ID {}: {}", id, ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Error retrieving organization by ID {}: {}", id, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve organization by ID", ex);
         }
     }
 
@@ -46,6 +57,14 @@ public class OrganizationService {
     }
 
     public List<Organization> organizationListEnabled() {
-        return organizationRepository.findOrganizationEnabled(true);
+        try {
+            log.debug("Retrieving enabled organizations");
+            List<Organization> organizations = organizationRepository.findOrganizationEnabled(true);
+            log.debug("Successfully retrieved {} enabled organizations", organizations.size());
+            return organizations;
+        } catch (Exception ex) {
+            log.error("Error retrieving enabled organizations: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve enabled organizations", ex);
+        }
     }
 }

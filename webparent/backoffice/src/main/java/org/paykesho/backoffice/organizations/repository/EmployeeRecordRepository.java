@@ -1,6 +1,7 @@
 package org.paykesho.backoffice.organizations.repository;
 
 import org.commons.entity.client.EmployeeRecord;
+import org.commons.entity.organization.Organization;
 import org.paykesho.backoffice.paging.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,5 +23,7 @@ public interface EmployeeRecordRepository extends SearchRepository<EmployeeRecor
 
     @Query("select m from EmployeeRecord m where concat(m.name, ' ', m.nrc, ' ', m.tpin, ' ', m.manNumber) like %?1%")
     public Page<EmployeeRecord> findAll(String keyword, Pageable pageable);
+
+    EmployeeRecord findByNrcAndOrganization(String nrc, Organization organization);
 
 }

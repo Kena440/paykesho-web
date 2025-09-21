@@ -7,7 +7,6 @@ import org.commons.enums.PaymentStatus;
 import org.paykesho.backoffice.repayments.dto.RepaymentScheduleRequest;
 import org.paykesho.backoffice.repayments.repository.PayrollDeductionRepository;
 import org.paykesho.backoffice.repayments.repository.RepaymentScheduleRepository;
-import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +21,7 @@ public class RepaymentService {
     private RepaymentScheduleRepository repaymentScheduleRepository;
     @Autowired
     private PayrollDeductionRepository payrollDeductionRepository;
-    @Autowired
-    private PaykeshoReferenceService paykeshoReferenceService;
+
 
     public List<RepaymentSchedule> getRepaymentSchedules() {
         return repaymentScheduleRepository.findAll();

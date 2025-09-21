@@ -1,14 +1,13 @@
 package org.paykesho.merchantportal.security;
 
 
+import org.commons.entity.merchant.MerchantAdmin;
+import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.paykesho.merchantportal.merchantadmins.service.MerchantAdminService;
-import org.commons.entity.merchant.MerchantAdmin;
-import org.springframework.security.authentication.LockedException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +19,6 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
 
     private MerchantAdminService merchantAdminService;
 
-    @Autowired
     public CustomLoginFailureHandler(@Lazy MerchantAdminService merchantAdminService) {
         this.merchantAdminService = merchantAdminService;
     }

@@ -1,6 +1,7 @@
 package org.commons.entity.client;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.commons.entity.IdBasedEntity;
 
@@ -9,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Entity
 @Table(name = "employee_payslip_information")

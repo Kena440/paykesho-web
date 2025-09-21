@@ -67,7 +67,8 @@
                                     <li class="nav-item">
                                         <a class="nav-link text-nowrap active" href="#!">
                                             Total <span
-                                                class="badge rounded-pill bg-secondary-soft">[[${totalItems}]]</span>
+                                                class="badge rounded-pill bg-secondary-soft"
+                                                th:text="${totalItems ?: 0}">0</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -149,28 +150,41 @@
                                     </tr>
                                     </thead>
                                     <tbody class="list fs-base">
-                                    <tr th:each="announcement, eventStat : ${eventList}">
-                                        <td class="hideable-column">[[${eventStat.count}]]</td>
+                                    <tr th:each="announcement, eventStat : ${eventList ?: {}}"
+                                        th:if="${eventList != null and !eventList.isEmpty()}">
+                                        <td class="hideable-column"><span th:text="${eventStat?.count ?: ''}">-</span>
+                                        </td>
                                         <td class="avatar avatar-xxl">
                                             <span class="fas fa-portrait fa-3x"
-                                                  th:if="${announcement.photos == null}"></span>
-                                            <img alt=""
+                                                  th:if="${announcement?.photos == null}"></span>
+                                            <img alt="Event Photo"
                                                  class="avatar-img rounded img-fluid"
-                                                 th:if="${announcement.photos != null}"
+                                                 th:if="${announcement?.photos != null and announcement?.photosImagePath != null}"
                                                  th:src="@{${announcement.photosImagePath}}">
                                         </td>
-                                        <td class="hideable-column">[[${announcement.name}]]</td>
-                                        <td>[[${announcement.details}]]</td>
+                                        <td class="hideable-column"><span
+                                                th:text="${announcement?.name ?: 'N/A'}">N/A</span></td>
+                                        <td><span th:text="${announcement?.details ?: 'N/A'}">N/A</span></td>
                                         <td>
-                                            <time datetime="2018-04-23"
+                                            <time th:if="${announcement?.eventDate != null}"
                                                   th:replace="fragments/fragments :: format_date(${announcement.eventDate})"></time>
+                                            <span class="text-muted"
+                                                  th:unless="${announcement?.eventDate != null}">N/A</span>
                                         </td>
                                         <td>
                                             <a class="fe fe-file"
                                                th:href="@{'/events/view/'+${announcement.id}}"
+                                               th:if="${announcement?.id != null}"
                                                title="Event View">
                                                 View
                                             </a>
+                                            <span class="text-muted" th:unless="${announcement?.id != null}">N/A</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${eventList == null or eventList.isEmpty()}">
+                                        <td class="text-center text-muted py-4" colspan="6">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No events found or data could not be loaded.
                                         </td>
                                     </tr>
                                     </tbody>

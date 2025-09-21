@@ -24,10 +24,21 @@ public class VouchersService {
     private VouchersRepository vouchersRepository;
 
     public List<Voucher> getOrganizationVouchers(Organization organization) throws PaykeshoError {
-        if (organization == null) {
-            throw new PaykeshoError("no organization id");
-        } else {
-            return vouchersRepository.getVouchersByOrganization(organization);
+        try {
+            log.debug("Retrieving vouchers for organization ID: {}", organization != null ? organization.getId() : "null");
+            if (organization == null) {
+                throw new PaykeshoError("no organization id");
+            } else {
+                List<Voucher> vouchers = vouchersRepository.getVouchersByOrganization(organization);
+                log.debug("Successfully retrieved {} vouchers for organization ID: {}", vouchers.size(), organization.getId());
+                return vouchers;
+            }
+        } catch (PaykeshoError ex) {
+            log.warn("PaykeshoError retrieving organization vouchers: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Error retrieving vouchers for organization ID {}: {}", organization != null ? organization.getId() : "null", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve organization vouchers", ex);
         }
     }
 
@@ -40,19 +51,33 @@ public class VouchersService {
     }
 
     public Map<String, Object> getVoucherStats() {
+        try {
+            log.debug("Calculating voucher statistics");
+            LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
+            Date oneWeekAgoDate = Date.from(oneWeekAgo.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
-        Date oneWeekAgoDate = Date.from(oneWeekAgo.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            long totalVouchers = vouchersRepository.count();
+            long vouchersLastWeek = vouchersRepository.countByRequestDateAfter(oneWeekAgoDate);
 
-        long totalVouchers = vouchersRepository.count();
-        long vouchersLastWeek = vouchersRepository.countByRequestDateAfter(oneWeekAgoDate);
+            double percentageChange = 0.0;
+            if (totalVouchers > vouchersLastWeek) {
+                percentageChange = ((double) vouchersLastWeek / (totalVouchers - vouchersLastWeek)) * 100;
+            }
 
-        double percentageChange = ((double) vouchersLastWeek / (totalVouchers - vouchersLastWeek)) * 100;
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("totalVouchers", totalVouchers);
+            stats.put("voucherPercentageChange", String.format("%.2f", percentageChange));
 
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("totalVouchers", totalVouchers);
-        stats.put("voucherPercentageChange", String.format("%.2f", percentageChange));
-
-        return stats;
+            log.debug("Voucher stats - Total: {}, Last week: {}, Percentage change: {}",
+                    totalVouchers, vouchersLastWeek, percentageChange);
+            return stats;
+        } catch (Exception ex) {
+            log.error("Error calculating voucher statistics: {}", ex.getMessage(), ex);
+            // Return default stats on error
+            Map<String, Object> defaultStats = new HashMap<>();
+            defaultStats.put("totalVouchers", 0L);
+            defaultStats.put("voucherPercentageChange", "0.00");
+            return defaultStats;
+        }
     }
 }

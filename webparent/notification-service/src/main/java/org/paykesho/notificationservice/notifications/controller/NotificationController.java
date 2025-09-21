@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.paykesho.notificationservice.notifications.service.NotificationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -22,30 +25,46 @@ public class NotificationController {
             String recipient = request.get("recipient");
             String message = request.get("message");
             String notificationType = request.get("notificationType");
-            
+
+            // Validate request parameters
+            if (recipient == null || message == null || notificationType == null) {
+                log.error("Missing required parameters in notification request");
+                return ResponseEntity.badRequest().body(false);
+            }
+
             boolean result = notificationService.sendNotification(recipient, message, notificationType);
-            return ResponseEntity.ok(result);
+
+            if (result) {
+                return ResponseEntity.ok(true);
+            } else {
+                // Return 422 for business logic failures (invalid input, etc.)
+                return ResponseEntity.unprocessableEntity().body(false);
+            }
         } catch (Exception e) {
-            log.error("Error sending notification: {}", e.getMessage());
-            return ResponseEntity.ok(false);
+            log.error("Unexpected error sending notification: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(false);
         }
     }
 
     @PostMapping("/send-merchant-admin-welcome")
     public ResponseEntity<Boolean> sendMerchantAdminWelcomeEmail(@RequestBody Map<String, String> request) {
         try {
+            log.info("Received merchant admin welcome email request: {}", request);
             String adminName = request.get("adminName");
             String adminEmail = request.get("adminEmail");
             String merchantName = request.get("merchantName");
             String portalUrl = request.get("portalUrl");
             String temporaryPassword = request.get("temporaryPassword");
-            
+
+            log.info("Processing merchant admin welcome email for: {} ({}) from merchant: {}", adminName, adminEmail, merchantName);
+
             boolean result = notificationService.sendMerchantAdminWelcomeEmail(
-                adminName, adminEmail, merchantName, portalUrl, temporaryPassword
+                    adminName, adminEmail, merchantName, portalUrl, temporaryPassword
             );
+            log.info("Merchant admin welcome email result: {}", result);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            log.error("Error sending merchant admin welcome email: {}", e.getMessage());
+            log.error("Error sending merchant admin welcome email: {}", e.getMessage(), e);
             return ResponseEntity.ok(false);
         }
     }
@@ -53,18 +72,22 @@ public class NotificationController {
     @PostMapping("/send-organization-admin-welcome")
     public ResponseEntity<Boolean> sendOrganizationAdminWelcomeEmail(@RequestBody Map<String, String> request) {
         try {
+            log.info("Received organization admin welcome email request: {}", request);
             String adminName = request.get("adminName");
             String adminEmail = request.get("adminEmail");
             String organizationName = request.get("organizationName");
             String portalUrl = request.get("portalUrl");
             String temporaryPassword = request.get("temporaryPassword");
-            
+
+            log.info("Processing organization admin welcome email for: {} ({}) from organization: {}", adminName, adminEmail, organizationName);
+
             boolean result = notificationService.sendOrganizationAdminWelcomeEmail(
-                adminName, adminEmail, organizationName, portalUrl, temporaryPassword
+                    adminName, adminEmail, organizationName, portalUrl, temporaryPassword
             );
+            log.info("Organization admin welcome email result: {}", result);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            log.error("Error sending organization admin welcome email: {}", e.getMessage());
+            log.error("Error sending organization admin welcome email: {}", e.getMessage(), e);
             return ResponseEntity.ok(false);
         }
     }
@@ -75,7 +98,7 @@ public class NotificationController {
             String userName = request.get("userName");
             String userEmail = request.get("userEmail");
             String resetUrl = request.get("resetUrl");
-            
+
             boolean result = notificationService.sendPasswordResetEmail(userName, userEmail, resetUrl);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -89,14 +112,31 @@ public class NotificationController {
         try {
             String userName = request.get("userName");
             String userEmail = request.get("userEmail");
-            String lockTime = request.get("lockTime");
-            String unlockTime = request.get("unlockTime");
-            
+            String lockTimeStr = request.get("lockTime");
+            String unlockTimeStr = request.get("unlockTime");
+
             // Parse the datetime strings (you might want to use a proper date format)
             // For now, using current time as fallback
             java.time.LocalDateTime lockDateTime = java.time.LocalDateTime.now();
             java.time.LocalDateTime unlockDateTime = lockDateTime.plusMinutes(30);
-            
+
+            // Use the time strings if provided
+            if (lockTimeStr != null && !lockTimeStr.isEmpty()) {
+                try {
+                    lockDateTime = java.time.LocalDateTime.parse(lockTimeStr);
+                } catch (Exception e) {
+                    log.warn("Invalid lock time format: {}", lockTimeStr);
+                }
+            }
+
+            if (unlockTimeStr != null && !unlockTimeStr.isEmpty()) {
+                try {
+                    unlockDateTime = java.time.LocalDateTime.parse(unlockTimeStr);
+                } catch (Exception e) {
+                    log.warn("Invalid unlock time format: {}", unlockTimeStr);
+                }
+            }
+
             boolean result = notificationService.sendAccountLockedEmail(userName, userEmail, lockDateTime, unlockDateTime);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -118,10 +158,10 @@ public class NotificationController {
             String warningContent = request.get("warningContent");
             String actionUrl = request.get("actionUrl");
             String actionText = request.get("actionText");
-            
+
             boolean result = notificationService.sendCustomTemplatedEmail(
-                recipient, subject, greeting, content, highlightTitle, highlightContent,
-                warningTitle, warningContent, actionUrl, actionText
+                    recipient, subject, greeting, content, highlightTitle, highlightContent,
+                    warningTitle, warningContent, actionUrl, actionText
             );
             return ResponseEntity.ok(result);
         } catch (Exception e) {

@@ -37,6 +37,15 @@ public class SettlementController {
     public String showSettlements(Model model, HttpServletRequest request, @AuthenticationPrincipal MerchantAdminUserDetails loggedInUser) throws PaykeshoError {
         MerchantAdmin merchantAdmin = merchantAdminService.getMerchantAdminByEmail(loggedInUser.getMerchantAdmin().getEmail());
         Merchant merchant = merchantService.getMerchantByContactPerson(merchantAdmin);
+
+        if (merchant == null) {
+            // Handle case where merchant is not found
+            model.addAttribute("settlementList", List.of());
+            model.addAttribute("pageTitle", "All Settlements");
+            loadCurrencySetting(request);
+            return "settlements/settlements";
+        }
+
         List<Settlement> settlementList = settlementService.listAllByMerchant(merchant);
         loadCurrencySetting(request);
         model.addAttribute("settlementList", settlementList);

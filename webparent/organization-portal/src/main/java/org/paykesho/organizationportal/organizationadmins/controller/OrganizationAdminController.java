@@ -6,7 +6,8 @@ import org.paykesho.organizationportal.config.Utility;
 import org.paykesho.organizationportal.organizationadmins.service.OrganizationAdminService;
 import org.paykesho.organizationportal.security.OrganizationAdminUserDetails;
 import org.paykesho.organizationportal.security.oauth.OrganizationAdminOAuth2User;
-import org.paykesho.organizationportal.settings.service.SettingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
@@ -23,10 +24,12 @@ import java.util.List;
 
 @Controller
 public class OrganizationAdminController {
+
+    private static final Logger log = LoggerFactory.getLogger(OrganizationAdminController.class);
+
     @Autowired
     private OrganizationAdminService organizationAdminService;
-    @Autowired
-    private SettingService settingService;
+
 
     @GetMapping("/sign-up-customer")
     public String showSignUpForm(Model model) {
@@ -45,11 +48,22 @@ public class OrganizationAdminController {
                                           RedirectAttributes redirectAttributes,
                                           Model model,
                                           HttpServletRequest request) {
-        organizationAdminService.registerOrganizationAdmin(assessor);
-        //sendVerificationEmail(request, assessor);
+        try {
+            log.debug("Processing organization admin signup for email: {}", assessor.getEmail());
 
-        model.addAttribute("pageTitle", "Registration Successful");
-        return "register/register_success";
+            organizationAdminService.registerOrganizationAdmin(assessor);
+            //sendVerificationEmail(request, assessor);
+
+            model.addAttribute("pageTitle", "Registration Successful");
+            log.debug("Successfully registered organization admin");
+            return "register/register_success";
+
+        } catch (Exception ex) {
+            log.error("Error during organization admin signup: {}", ex.getMessage(), ex);
+            model.addAttribute("errorMessage", "Registration failed. Please try again later.");
+            model.addAttribute("pageTitle", "Registration Failed");
+            return "error/500";
+        }
     }
 
     @PostMapping(value = "/organization-admins/update-account")

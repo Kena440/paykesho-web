@@ -1,11 +1,13 @@
 package org.commons.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @MappedSuperclass
 public abstract class AbstractAddress extends IdBasedEntity {
     @Column(length = 45, nullable = false, name = "first_name")

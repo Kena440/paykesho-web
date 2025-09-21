@@ -3,7 +3,6 @@ package org.paykesho.backoffice.client.service;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.CreditScore;
-import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.client.repository.CreditScoreRepository;
 import org.paykesho.backoffice.voucher.repository.VouchersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,7 @@ import java.util.Date;
 @Service
 public class CreditScoreService {
 
-    @Autowired
-    private ClientRepository clientRepository;
+
     @Autowired
     private CreditScoreRepository creditScoreRepository;
 

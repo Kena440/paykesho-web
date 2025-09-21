@@ -175,18 +175,6 @@ public class MerchantController {
         }
     }
 
-    private String getRedirectURLtoAffectedMerchant(Merchant merchant) throws PaykeshoError {
-        if (merchant == null) {
-            throw new PaykeshoError("no member provided");
-        }
-        String code = merchant.getCode();
-
-        if (merchant.getEmail() == null) {
-            return Constants.REDIRECT_MERCHANTS_VIEW + merchant.getId();
-        } else {
-            return Constants.REDIRECT_TO_MERCHANTS_KEYWORD + code;
-        }
-    }
 
     @GetMapping("/{id}/enabled/{status}")
     public String updateMerchantEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {

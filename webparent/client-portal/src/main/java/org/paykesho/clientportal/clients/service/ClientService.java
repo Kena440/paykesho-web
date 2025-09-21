@@ -46,25 +46,48 @@ public class ClientService {
     private ClientBalanceRepository clientBalanceRepository;
 
     public List<Country> countryList() {
-        return countryRepository.findAllByOrderByNameDesc();
+        try {
+            log.debug("Retrieving country list");
+            List<Country> countries = countryRepository.findAllByOrderByNameDesc();
+            log.debug("Successfully retrieved {} countries", countries.size());
+            return countries;
+        } catch (Exception ex) {
+            log.error("Error retrieving country list: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve country list", ex);
+        }
     }
 
     public boolean isEmailUnique(String email) {
-        Client client = clientRepository.findByEmail(email);
-        return client == null;
+        try {
+            log.debug("Checking email uniqueness for: {}", email);
+            Client client = clientRepository.findByEmail(email);
+            boolean isUnique = client == null;
+            log.debug("Email {} is unique: {}", email, isUnique);
+            return isUnique;
+        } catch (Exception ex) {
+            log.error("Error checking email uniqueness for {}: {}", email, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to check email uniqueness", ex);
+        }
     }
 
     public void registerClient(Client client) {
-        encodePassword(client);
-        client.setEnabled(true);
-        client.setAccountNonLocked(true);
-        client.setCreatedTime(new Date());
-        client.setAuthenticationType(AuthenticationType.DATABASE);
+        try {
+            log.debug("Registering new client with email: {}", client.getEmail());
+            encodePassword(client);
+            client.setEnabled(true);
+            client.setAccountNonLocked(true);
+            client.setCreatedTime(new Date());
+            client.setAuthenticationType(AuthenticationType.DATABASE);
 
-        String randomCode = RandomString.make(64);
-        client.setVerificationCode(randomCode);
-        Client savedClient = clientRepository.save(client);
-        createClientBalance(savedClient);
+            String randomCode = RandomString.make(64);
+            client.setVerificationCode(randomCode);
+            Client savedClient = clientRepository.save(client);
+            createClientBalance(savedClient);
+            log.debug("Successfully registered client with ID: {}", savedClient.getId());
+        } catch (Exception ex) {
+            log.error("Error registering client with email {}: {}", client.getEmail(), ex.getMessage(), ex);
+            throw new RuntimeException("Failed to register client", ex);
+        }
     }
 
     private void createClientBalance(Client client) {
@@ -108,11 +131,35 @@ public class ClientService {
     }
 
     public Client getClientByEmail(String email) {
-        return clientRepository.findByEmail(email);
+        try {
+            log.debug("Retrieving client by email: {}", email);
+            Client client = clientRepository.findByEmail(email);
+            if (client != null) {
+                log.debug("Found client with ID: {}", client.getId());
+            } else {
+                log.debug("No client found with email: {}", email);
+            }
+            return client;
+        } catch (Exception ex) {
+            log.error("Error retrieving client by email {}: {}", email, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve client by email", ex);
+        }
     }
 
     public Client getClientByCode(String code) {
-        return clientRepository.findByCode(code);
+        try {
+            log.debug("Retrieving client by code: {}", code);
+            Client client = clientRepository.findByCode(code);
+            if (client != null) {
+                log.debug("Found client with ID: {}", client.getId());
+            } else {
+                log.debug("No client found with code: {}", code);
+            }
+            return client;
+        } catch (Exception ex) {
+            log.error("Error retrieving client by code {}: {}", code, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve client by code", ex);
+        }
     }
 
     public Client getClientByResetToken(String token) {
@@ -147,26 +194,33 @@ public class ClientService {
     }
 
     public void updateClient(Client clientInForm) {
-        Client clientInDB = clientRepository.findById(clientInForm.getId()).get();
+        try {
+            log.debug("Updating client with ID: {}", clientInForm.getId());
+            Client clientInDB = clientRepository.findById(clientInForm.getId()).get();
 
-        if (clientInDB.getAuthenticationType().equals(AuthenticationType.DATABASE)) {
-            if (!clientInForm.getPassword().isEmpty()) {
-                String encodedPassword = passwordEncoder.encode(clientInForm.getPassword());
-                clientInForm.setPassword(encodedPassword);
+            if (clientInDB.getAuthenticationType().equals(AuthenticationType.DATABASE)) {
+                if (!clientInForm.getPassword().isEmpty()) {
+                    String encodedPassword = passwordEncoder.encode(clientInForm.getPassword());
+                    clientInForm.setPassword(encodedPassword);
+                } else {
+                    clientInForm.setPassword(clientInDB.getPassword());
+                }
             } else {
                 clientInForm.setPassword(clientInDB.getPassword());
             }
-        } else {
-            clientInForm.setPassword(clientInDB.getPassword());
-        }
 
-        clientInForm.setSalutation(clientInDB.getSalutation());
-        clientInForm.setEnabled(clientInDB.isEnabled());
-        clientInForm.setCreatedTime(clientInDB.getCreatedTime());
-        clientInForm.setVerificationCode(clientInDB.getVerificationCode());
-        clientInForm.setAuthenticationType(clientInDB.getAuthenticationType());
-        clientInForm.setResetPasswordToken(clientInDB.getResetPasswordToken());
-        clientRepository.save(clientInForm);
+            clientInForm.setSalutation(clientInDB.getSalutation());
+            clientInForm.setEnabled(clientInDB.isEnabled());
+            clientInForm.setCreatedTime(clientInDB.getCreatedTime());
+            clientInForm.setVerificationCode(clientInDB.getVerificationCode());
+            clientInForm.setAuthenticationType(clientInDB.getAuthenticationType());
+            clientInForm.setResetPasswordToken(clientInDB.getResetPasswordToken());
+            clientRepository.save(clientInForm);
+            log.debug("Successfully updated client with ID: {}", clientInForm.getId());
+        } catch (Exception ex) {
+            log.error("Error updating client with ID {}: {}", clientInForm.getId(), ex.getMessage(), ex);
+            throw new RuntimeException("Failed to update client", ex);
+        }
     }
 
     public String updateClientResetToken(String email) throws PaykeshoError {
@@ -234,22 +288,30 @@ public class ClientService {
     }
 
     public String checkClientStatus(String name, String nrc, String tpin, String manNumber, Organization organization) {
-        String resp = "";
+        try {
+            log.debug("Checking client status for name: {}, nrc: {}, organization: {}", name, nrc, organization.getId());
+            String resp = "";
 
-        boolean clientExists = clientRepository.existsByNrcAndTpinAndManNumberAndOrganization(nrc, tpin, manNumber, organization);
-        if (clientExists) {
-            resp = "Duplicated";
+            boolean clientExists = clientRepository.existsByNrcAndTpinAndManNumberAndOrganization(nrc, tpin, manNumber, organization);
+            if (clientExists) {
+                resp = "Duplicated";
+                log.debug("Client status: Duplicated");
+                return resp;
+            }
+
+            boolean employeeExists = employeeRecordRepository.existsByNameAndNrcAndTpinAndManNumberAndOrganization(name, nrc, tpin, manNumber, organization);
+            if (!employeeExists) {
+                resp = "Not Found";
+            } else {
+                resp = "OK";
+            }
+
+            log.debug("Client status: {}", resp);
             return resp;
+        } catch (Exception ex) {
+            log.error("Error checking client status for name: {}, nrc: {}: {}", name, nrc, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to check client status", ex);
         }
-
-        boolean employeeExists = employeeRecordRepository.existsByNameAndNrcAndTpinAndManNumberAndOrganization(name, nrc, tpin, manNumber, organization);
-        if (!employeeExists) {
-            resp = "Not Found";
-        } else {
-            resp = "OK";
-        }
-
-        return resp;
     }
 
     public ClientBalance saveClientBalance(ClientBalance clientBalance) {
@@ -258,9 +320,16 @@ public class ClientService {
 
     public ClientBalance getClientBalance(Client client) {
         try {
+            log.debug("Retrieving client balance for client ID: {}", client.getId());
             ClientBalance balance = clientBalanceRepository.getClientBalanceByClientId(client.getId());
+            if (balance != null) {
+                log.debug("Found client balance for client ID: {}", client.getId());
+            } else {
+                log.warn("No ClientBalance found for client id: {}. Returning null.", client.getId());
+            }
             return balance;
         } catch (Exception ex) {
+            log.error("Error retrieving client balance for client ID {}: {}", client.getId(), ex.getMessage(), ex);
             log.warn("No ClientBalance found for client id: {}. Returning null.", client.getId());
             return null;
         }

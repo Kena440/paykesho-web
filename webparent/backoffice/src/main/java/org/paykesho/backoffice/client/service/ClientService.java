@@ -10,7 +10,6 @@ import org.paykesho.backoffice.client.repository.ClientBalanceRepository;
 import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.paging.PagingAndSortingHelper;
 import org.paykesho.backoffice.settings.repository.CountryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,34 +35,84 @@ public class ClientService {
     private final CreditScoreService creditScoreService;
 
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
-        helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);
+        try {
+            log.debug("Listing clients by page: {}", pageNum);
+            helper.listEntities(pageNum, CUSTOMERS_PER_PAGE, clientRepository);
+            log.debug("Successfully listed clients for page: {}", pageNum);
+        } catch (PaykeshoError ex) {
+            log.warn("PaykeshoError listing clients by page {}: {}", pageNum, ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Error listing clients by page {}: {}", pageNum, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to list clients by page", ex);
+        }
     }
 
     public List<Client> listAll() {
-        List<Client> clientList = (List<Client>) clientRepository.findAll(Sort.by("code").ascending());
-        for (Client c : clientList) {
-            ClientBalance clientBalance = clientBalanceRepository.getClientBalanceByClientId(c.getId());
-            c.setClientBalance(clientBalance);
-            c.setCreditScore(creditScoreService.calculateCreditScore(c));
-        }
+        try {
+            log.debug("Retrieving all clients");
+            List<Client> clientList = (List<Client>) clientRepository.findAll(Sort.by("code").ascending());
+            log.debug("Found {} clients, enriching with balance and credit score data", clientList.size());
 
-        return clientList;
+            for (Client c : clientList) {
+                try {
+                    ClientBalance clientBalance = clientBalanceRepository.getClientBalanceByClientId(c.getId());
+                    c.setClientBalance(clientBalance);
+                } catch (Exception ex) {
+                    log.warn("Failed to get balance for client ID {}: {}", c.getId(), ex.getMessage());
+                    c.setClientBalance(null);
+                }
+
+                try {
+                    int creditScore = creditScoreService.calculateCreditScore(c);
+                    c.setCreditScore(creditScore);
+                } catch (Exception ex) {
+                    log.warn("Failed to calculate credit score for client ID {}: {}", c.getId(), ex.getMessage());
+                    c.setCreditScore(0);
+                }
+            }
+
+            log.debug("Successfully retrieved and enriched {} clients", clientList.size());
+            return clientList;
+        } catch (Exception ex) {
+            log.error("Error retrieving all clients: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve all clients", ex);
+        }
     }
 
     public void updateCustomerEnabledStatus(Integer id, boolean enabled) {
-        clientRepository.updateEnabledStatus(id, enabled);
+        try {
+            log.debug("Updating customer enabled status for ID: {} to: {}", id, enabled);
+            clientRepository.updateEnabledStatus(id, enabled);
+            log.debug("Successfully updated customer enabled status for ID: {}", id);
+        } catch (Exception ex) {
+            log.error("Error updating customer enabled status for ID {}: {}", id, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to update customer enabled status", ex);
+        }
     }
 
     public Client get(Integer id) throws PaykeshoError {
         try {
-            return clientRepository.findById(id).get();
+            log.debug("Retrieving client by ID: {}", id);
+            Client client = clientRepository.findById(id).get();
+            log.debug("Found client with ID: {}", id);
+            return client;
         } catch (Exception exception) {
+            log.warn("Client not found with ID: {}", id);
             throw new PaykeshoError("no customer found " + exception);
         }
     }
 
     public List<Country> countryList() {
-        return countryRepository.findAllByOrderByNameDesc();
+        try {
+            log.debug("Retrieving country list");
+            List<Country> countries = countryRepository.findAllByOrderByNameDesc();
+            log.debug("Successfully retrieved {} countries", countries.size());
+            return countries;
+        } catch (Exception ex) {
+            log.error("Error retrieving country list: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve country list", ex);
+        }
     }
 
     public boolean isEmailUnique(Integer id, String email) {

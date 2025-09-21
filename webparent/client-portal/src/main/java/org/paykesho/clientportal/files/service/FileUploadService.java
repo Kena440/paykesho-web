@@ -10,7 +10,6 @@ import org.paykesho.clientportal.files.dto.FileUploadResponse;
 import org.paykesho.clientportal.files.repository.FileUploadRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,6 @@ public class FileUploadService {
     private final RestTemplate restTemplate;
     private final FileUploadRepository fileUploadRepository;
 
-    @Autowired
     public FileUploadService(RestTemplate restTemplate, FileUploadRepository fileUploadRepository) {
         this.restTemplate = restTemplate;
         this.fileUploadRepository = fileUploadRepository;
