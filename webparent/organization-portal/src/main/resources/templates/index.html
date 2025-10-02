@@ -55,10 +55,11 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-8">
                                         <h2 class="mb-2">Welcome Back,
-                                            <span class="text-primary" th:text="${organizationAdmin?.name ?: 'User'}">User</span>!
+                                            <span class="text-primary" th:text="${#strings.isEmpty(organizationAdmin?.name) ? 'Organization Admin' : organizationAdmin.name}">Organization Admin</span>!
                                         </h2>
-                                        <p class="text-muted mb-0">Organization Dashboard - <span
-                                                class="fw-bold" th:text="${organization?.name ?: 'Organization'}">Organization</span>
+                                        <p class="text-muted mb-0">Organization Dashboard - Manage your client portfolio and voucher operations</p>
+                                        <p class="text-muted small mb-0">Organization: <span
+                                                class="fw-bold" th:text="${organization?.name ?: 'Your Organization'}">Your Organization</span>
                                         </p>
                                     </div>
                                     <div class="col-md-4 text-end">
@@ -165,160 +166,197 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-lg-12 col-xxl-6 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col mt-0">
-                                        <h5 class="card-title">Real-Time</h5>
+
+                    <!-- Total Revenue - Primary KPI -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card border-info h-100" id="revenueCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="dollar-sign"></i>
                                     </div>
-
-                                    <div class="col-auto">
-                                        <div class="stat stat-sm">
-                                            <i class="align-middle" data-lucide="clock"></i>
-                                        </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="refreshRevenueData()">Refresh</a></li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <span class="h1 d-inline-block mt-1 mb-4">1.856</span>
-                                <div class="mb-0">
-                                    <span class="badge badge-subtle-success me-2"> +2.25% </span>
-                                    <span class="text-muted">Since last week</span>
+                                <h3 class="text-info mb-2"
+                                    th:text="${totalRevenue != null ? #numbers.formatCurrency(totalRevenue) : '0.00'}">
+                                    0.00</h3>
+                                <h6 class="text-muted mb-3">Total Revenue</h6>
+                                <div id="revenueContent" th:if="${revenuePercentageChange != null}">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${#numbers.formatDecimal(revenuePercentageChange, 1, 'POINT', 2, 'POINT')} + '%'">0.00%</span>
+                                    <span class="text-muted small">vs last month</span>
+                                </div>
+                                <div class="text-muted small" th:unless="${revenuePercentageChange != null}">
+                                    <span>Revenue data loading...</span>
+                                </div>
+                                <div class="text-danger small" id="revenueError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load revenue data</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-    </div>
 
-    <!-- Enhanced Organization Analytics Cards -->
-    <div class="col-12">
-        <div class="row">
-            <!-- Total Clients Card -->
-            <div class="col-sm-6 col-lg-3 d-flex">
-                <div class="card flex-fill" id="totalClientsCard">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">Total Clients</h5>
-                            </div>
-                            <div class="col-auto">
-                                <div class="stat stat-sm">
-                                    <i class="align-middle" data-lucide="users"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="totalClientsContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${totalClients ?: 0}">0</span>
-                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"
-                                                      th:text="${activeClients ?: 0} + ' active'">0 active</span>
-                                <span class="text-muted">Total clients</span>
-                            </div>
-                        </div>
-                        <div class="text-danger" id="totalClientsError" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span class="error-message">Failed to load client data</span>
-                        </div>
+                <!-- Client Portfolio Overview - Secondary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="bar-chart-3"></i>
+                            Client Portfolio Overview
+                        </h4>
                     </div>
                 </div>
-            </div>
 
-            <!-- Voucher Approval Rate Card -->
-            <div class="col-sm-6 col-lg-3 d-flex">
-                <div class="card flex-fill" id="voucherApprovalCard">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">Voucher Approval</h5>
-                            </div>
-                            <div class="col-auto">
-                                <div class="stat stat-sm">
-                                    <i class="align-middle" data-lucide="check-circle"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="voucherApprovalContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${#numbers.formatDecimal(voucherApprovalRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
-                            <div class="mb-0">
-                                                <span class="badge badge-subtle-info me-2"
-                                                      th:text="${approvedVouchers ?: 0} + ' approved'">0 approved</span>
-                                <span class="text-muted">Out of ${totalVouchers ?: 0} total</span>
-                            </div>
-                        </div>
-                        <div class="text-danger" id="voucherApprovalError" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span class="error-message">Failed to load voucher approval data</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <div class="row mb-4">
 
-            <!-- Monthly Revenue Card -->
-            <div class="col-sm-6 col-lg-3 d-flex">
-                <div class="card flex-fill" id="monthlyRevenueCard">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">Monthly Revenue</h5>
-                            </div>
-                            <div class="col-auto">
-                                <div class="stat stat-sm">
-                                    <i class="align-middle" data-lucide="dollar-sign"></i>
+                    <!-- Active Clients Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="activeClientsCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="user-check"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshActiveClientsData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-success mb-2" th:text="${activeClients ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Active Clients</h6>
+                                <div id="activeClientsContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${totalClients ?: 0} + ' total'">0 total</span>
+                                    <span class="text-muted small">Under your organization</span>
+                                </div>
+                                <div class="text-danger small" id="activeClientsError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load client data</span>
                                 </div>
                             </div>
                         </div>
-                        <div id="monthlyRevenueContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${#numbers.formatDecimal(monthlyRevenue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</span>
-                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"
-                                                      th:text="${monthlyTransactions ?: 0} + ' transactions'">0 transactions</span>
-                                <span class="text-muted">This month</span>
-                            </div>
-                        </div>
-                        <div class="text-danger" id="monthlyRevenueError" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span class="error-message">Failed to load revenue data</span>
-                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Client Growth Card -->
-            <div class="col-sm-6 col-lg-3 d-flex">
-                <div class="card flex-fill" id="clientGrowthCard">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">Client Growth</h5>
-                            </div>
-                            <div class="col-auto">
-                                <div class="stat stat-sm">
-                                    <i class="align-middle" data-lucide="trending-up"></i>
+                    <!-- Voucher Approval Rate Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="voucherApprovalCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="thumbs-up"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshVoucherApprovalData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-info mb-2"
+                                    th:text="${#numbers.formatDecimal(voucherApprovalRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</h4>
+                                <h6 class="text-muted mb-3">Voucher Approval Rate</h6>
+                                <div id="voucherApprovalContent">
+                                    <span class="badge badge-subtle-info me-2"
+                                          th:text="${approvedVouchers ?: 0} + ' approved'">0 approved</span>
+                                    <span class="text-muted small">Out of ${totalVouchers ?: 0} total</span>
+                                </div>
+                                <div class="text-danger small" id="voucherApprovalError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load voucher approval data</span>
                                 </div>
                             </div>
                         </div>
-                        <div id="clientGrowthContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${newClientsThisMonth ?: 0}">0</span>
-                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"
-                                                      th:text="${#numbers.formatDecimal(clientGrowthRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
-                                <span class="text-muted">vs last month</span>
+                    </div>
+
+                    <!-- Monthly Growth Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="monthlyGrowthCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-warning">
+                                        <i class="align-middle" data-lucide="trending-up"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshMonthlyGrowthData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-warning mb-2" th:text="${newClientsThisMonth ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">New Clients This Month</h6>
+                                <div id="monthlyGrowthContent">
+                                    <span class="badge badge-subtle-warning me-2"
+                                          th:text="${#numbers.formatDecimal(clientGrowthRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                    <span class="text-muted small">vs last month</span>
+                                </div>
+                                <div class="text-danger small" id="monthlyGrowthError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load growth data</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-danger" id="clientGrowthError" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span class="error-message">Failed to load growth data</span>
+                    </div>
+
+                    <!-- Portfolio Value Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="portfolioValueCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-danger">
+                                        <i class="align-middle" data-lucide="dollar-sign"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshPortfolioValueData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-danger mb-2"
+                                    th:text="${#numbers.formatDecimal(totalTransactionValue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</h4>
+                                <h6 class="text-muted mb-3">Portfolio Value (ZMW)</h6>
+                                <div id="portfolioValueContent">
+                                    <span class="badge badge-subtle-danger me-2"
+                                          th:text="${monthlyTransactions ?: 0} + ' transactions'">0 transactions</span>
+                                    <span class="text-muted small">This month</span>
+                                </div>
+                                <div class="text-danger small" id="portfolioValueError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load portfolio value data</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Performance and Activity Cards -->
     <div class="col-12">
@@ -763,86 +801,136 @@
     </div>
 </div>
 
-<!-- Organization Analytics Charts -->
-<div class="row">
-    <!-- Client Growth Trend Chart -->
-    <div class="col-12 col-lg-8 d-flex">
-        <div class="card flex-fill w-100">
-            <div class="card-header">
-                <div class="card-actions float-end">
-                    <div class="dropdown position-relative">
-                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
-                            <i class="align-middle" data-lucide="more-horizontal"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="#" onclick="refreshClientGrowthChart()">Refresh</a>
-                            <a class="dropdown-item" href="#" onclick="exportClientGrowthChart()">Export</a>
+                <!-- Charts and Analytics Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="bar-chart-2"></i>
+                            Analytics & Trends
+                        </h4>
+                    </div>
+                </div>
+
+                <!-- Primary Charts Row -->
+                <div class="row mb-4">
+                    <!-- Client Growth Trend Chart - Primary Chart -->
+                    <div class="col-lg-8 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="trending-up"></i>
+                                        Client Growth Trend (Last 12 Months)
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshClientGrowthChart()">Refresh</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#" onclick="exportClientGrowthChart()">Export</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="organizationClientGrowthChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voucher Status Distribution -->
+                    <div class="col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="pie-chart"></i>
+                                        Voucher Status Distribution
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshVoucherStatusChart()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" style="height: 250px;">
+                                <canvas id="organizationVoucherStatusChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <h5 class="card-title mb-0">Client Growth Trend (Last 12 Months)</h5>
-            </div>
-            <div class="card-body" style="height: 200px;">
-                <canvas id="organizationClientGrowthChart"></canvas>
-            </div>
-        </div>
-    </div>
 
-    <!-- Voucher Status Chart -->
-    <div class="col-12 col-lg-4 d-flex">
-        <div class="card flex-fill w-100">
-            <div class="card-header">
-                <div class="card-actions float-end">
-                    <div class="dropdown position-relative">
-                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
-                            <i class="align-middle" data-lucide="more-horizontal"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="#" onclick="refreshVoucherStatusChart()">Refresh</a>
+                <!-- Secondary Charts Row -->
+                <div class="row mb-4">
+                    <!-- Transaction Trend Chart -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-info text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="bar-chart"></i>
+                                        Transaction Trend (Last 30 Days)
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshTransactionTrendChart()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="organizationTransactionTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Clients Chart -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-warning text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="users"></i>
+                                        Top Clients by Activity
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshTopClientsChart()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" style="height: 200px;">
+                                <canvas id="organizationTopClientsChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <h5 class="card-title mb-0">Voucher Status</h5>
+
             </div>
-            <div class="card-body" style="height: 200px;">
-                <canvas id="organizationVoucherStatusChart"></canvas>
-            </div>
-        </div>
+        </main>
+
+        <footer th:replace="fragments/fragments :: footer()"></footer>
     </div>
-</div>
-
-<!-- Performance Metrics Charts -->
-<div class="row">
-    <!-- Transaction Trend Chart -->
-    <div class="col-12 col-lg-6 d-flex">
-        <div class="card flex-fill w-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Transaction Trend (Last 30 Days)</h5>
-            </div>
-            <div class="card-body" style="height: 200px;">
-                <canvas id="organizationTransactionTrendChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Top Clients Chart -->
-    <div class="col-12 col-lg-6 d-flex">
-        <div class="card flex-fill w-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Top Clients by Activity</h5>
-            </div>
-            <div class="card-body" style="height: 200px;">
-                <canvas id="organizationTopClientsChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
-</div>
-</main>
-
-<footer th:replace="fragments/fragments :: footer()"></footer>
-</div>
 </div>
 
 <footer th:replace="fragments/fragments :: js_code"></footer>
@@ -885,6 +973,19 @@
 </style>
 
 <script>
+    // Global error handler to prevent dashboard breaking
+    window.addEventListener('error', function(e) {
+        console.error('Global error caught:', e.error);
+        // Prevent the error from breaking the page
+        return true;
+    });
+
+    window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+        // Prevent the error from breaking the page
+        e.preventDefault();
+    });
+
     // Organization Portal Exception Handler
     const ExceptionHandler = {
         init: function () {
@@ -922,6 +1023,13 @@
 
         initializeMap: function () {
             try {
+                // Check if map is already initialized
+                const mapElement = document.getElementById('map');
+                if (mapElement && mapElement._leaflet_id) {
+                    console.log('Map already initialized, skipping...');
+                    return;
+                }
+
                 const lat = parseFloat($("#latitude").val()) || -14.432750819377832;
                 const lng = parseFloat($("#longitude").val()) || 28.446846724905615;
 
@@ -946,7 +1054,7 @@
         },
 
         loadVoucherData: function () {
-            fetch('/api/vouchers/summary')
+            fetch('/api/dashboard/vouchers')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1156,10 +1264,110 @@
 
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', function () {
-        ExceptionHandler.init();
-        // Initialize organization dashboard charts
-        initializeOrganizationCharts();
+        try {
+            console.log('Starting dashboard initialization...');
+            
+            // Step 1: Initialize error handling
+            ExceptionHandler.init();
+            
+            // Step 2: Initialize organization dashboard charts
+            initializeOrganizationCharts();
+            
+            // Step 3: Initialize radar chart
+            initializeRadarChart();
+            
+            // Step 4: Initialize DataTable
+            initializeDataTable();
+            
+            console.log('Dashboard initialization completed successfully');
+        } catch (error) {
+            console.error('Dashboard initialization error:', error);
+            // Show user-friendly error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-warning m-3';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Dashboard initialization failed. Some features may not work properly.';
+            document.body.insertBefore(errorDiv, document.body.firstChild);
+        }
     });
+
+    // Radar chart initialization function
+    function initializeRadarChart() {
+        try {
+            const radarCanvas = document.getElementById("chartjs-dashboard-radar");
+            if (!radarCanvas) {
+                console.warn('Radar chart canvas not found');
+                return;
+            }
+
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js library not loaded, radar chart will not be displayed');
+                showChartPlaceholder('chartjs-dashboard-radar', 'Radar chart not available');
+                return;
+            }
+
+            new Chart(radarCanvas, {
+                type: "radar",
+                data: {
+                    labels: ["Technology", "Sports", "Media", "Gaming", "Arts"],
+                    datasets: [{
+                        label: "Interests",
+                        backgroundColor: "rgba(0, 123, 255, 0.2)",
+                        borderColor: window.cssVariables?.primary || "#007bff",
+                        borderWidth: 2,
+                        pointBackgroundColor: window.cssVariables?.primary || "#007bff",
+                        pointBorderColor: "#fff",
+                        pointHoverBackgroundColor: "#fff",
+                        pointHoverBorderColor: window.cssVariables?.primary || "#007bff",
+                        data: [65, 59, 90, 81, 56]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            console.log('Radar chart initialized successfully');
+        } catch (error) {
+            console.error('Radar chart initialization failed:', error);
+            showChartPlaceholder('chartjs-dashboard-radar', 'Radar chart failed to load');
+        }
+    }
+
+    // DataTable initialization function
+    function initializeDataTable() {
+        try {
+            // Check if DataTable is available
+            if (typeof $.fn.DataTable === 'undefined') {
+                console.warn('DataTables library not loaded');
+                return;
+            }
+            
+            $("#datatables-dashboard-traffic").DataTable({
+                destroy: true,
+                pageLength: 8,
+                lengthChange: false,
+                bFilter: false,
+                autoWidth: false,
+                order: [
+                    [1, "desc"]
+                ]
+            });
+            console.log('DataTable initialized successfully');
+        } catch (error) {
+            console.error('DataTable initialization failed:', error);
+        }
+    }
 
     // Organization Dashboard Charts with Error Handling
     function initializeOrganizationCharts() {
@@ -1328,10 +1536,14 @@
                     cutout: '60%'
                 }
             });
+            } catch (error) {
+                console.error('Voucher status chart initialization failed:', error);
+            }
         }
 
         // Transaction Trend Chart
         function initializeOrganizationTransactionTrendChart() {
+            try {
             const ctx = document.getElementById('organizationTransactionTrendChart');
             if (!ctx) return;
 
@@ -1364,10 +1576,14 @@
                     }
                 }
             });
+            } catch (error) {
+                console.error('Transaction trend chart initialization failed:', error);
+            }
         }
 
         // Top Clients Chart
         function initializeOrganizationTopClientsChart() {
+            try {
             const ctx = document.getElementById('organizationTopClientsChart');
             if (!ctx) return;
 
@@ -1403,6 +1619,9 @@
                     }
                 }
             });
+            } catch (error) {
+                console.error('Top clients chart initialization failed:', error);
+            }
         }
 
         // Helper functions
@@ -1530,130 +1749,38 @@
                 showErrorAlert('Export failed. Please try again.');
             }
         }
-</script>
-<script>
-    // Initialize the Leaflet map
-    var map = L.map('map').setView([$("#latitude").val(), $("#longitude").val()], 15);
 
-    // Add OpenStreetMap tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+        // Additional refresh functions for organization dashboard
+        function refreshActiveClientsData() {
+            refreshClientData();
+        }
 
-    // Add a marker at the given coordinates
-    var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
+        function refreshVoucherApprovalData() {
+            refreshVoucherData();
+        }
 
-    // Optionally, if you need geocoding similar to MapboxGeocoder, you can integrate a Leaflet geocoder plugin.
-    // Here is an example of using leaflet-control-geocoder:
-    L.Control.geocoder({
-        defaultMarkGeocode: false
-    }).on('markgeocode', function (e) {
-        var bbox = e.geocode.bbox;
-        var poly = L.polygon([
-            bbox.getSouthEast(),
-            bbox.getNorthEast(),
-            bbox.getNorthWest(),
-            bbox.getSouthWest()
-        ]).addTo(map);
-        map.fitBounds(poly.getBounds());
-    }).addTo(map);
-</script>
+        function refreshMonthlyGrowthData() {
+            refreshClientData();
+        }
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Pie chart
-        new Chart(document.getElementById("chartjs-dashboard-pie"), {
-            type: "pie",
-            data: {
-                labels: ["Direct", "Affiliate", "E-mail", "Other"],
-                datasets: [{
-                    data: [2602, 1253, 541, 1465],
-                    backgroundColor: [
-                        window.cssVariables.primary,
-                        window.cssVariables.warning,
-                        window.cssVariables.danger,
-                        "#E8EAED"
-                    ],
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutoutPercentage: 70,
-                legend: {
-                    display: false
-                },
-                elements: {
-                    arc: {
-                        borderWidth: 5,
-                        borderColor: window.cssVariables.secondaryBg
-                    }
-                },
-                layout: {
-                    padding: {
-                        top: 10,
-                        bottom: 10
-                    }
-                }
-            }
-        });
-    });
+        function refreshPortfolioValueData() {
+            refreshVoucherData();
+        }
+
+        function refreshTransactionTrendChart() {
+            initializeOrganizationTransactionTrendChart();
+        }
+
+        function refreshTopClientsChart() {
+            initializeOrganizationTopClientsChart();
+        }
+
+        function refreshRevenueData() {
+            // In real implementation, this would fetch revenue data
+            console.log('Refreshing revenue data...');
+        }
 </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Radar chart
-        new Chart(document.getElementById("chartjs-dashboard-radar"), {
-            type: "radar",
-            data: {
-                labels: ["Technology", "Sports", "Media", "Gaming", "Arts"],
-                datasets: [{
-                    label: "Interests",
-                    backgroundColor: "rgba(0, 123, 255, 0.2)",
-                    borderColor: window.cssVariables.primary,
-                    pointBackgroundColor: window.cssVariables.primary,
-                    pointBorderColor: "#fff",
-                    pointHoverBackgroundColor: "#fff",
-                    pointHoverBorderColor: window.cssVariables.primary,
-                    data: [70, 53, 82, 60, 33]
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                legend: {
-                    display: false,
-                },
-                scale: {
-                    gridLines: {
-                        color: window.cssVariables.quaternaryColor
-                    },
-                    ticks: {
-                        backdropColor: window.cssVariables.secondaryBg,
-                        fontColor: window.cssVariables.bodyColor
-                    },
-                    angleLines: {
-                        color: window.cssVariables.quaternaryColor
-                    },
-                    pointLabels: {
-                        fontColor: window.cssVariables.bodyColor
-                    }
-                }
-            }
-        });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        $("#datatables-dashboard-traffic").DataTable({
-            destroy: true,
-            pageLength: 8,
-            lengthChange: false,
-            bFilter: false,
-            autoWidth: false,
-            order: [
-                [1, "desc"]
-            ]
-        });
-    });
-</script>
+<!-- Map initialization is handled by ExceptionHandler.initializeMap() -->
+
 </body>
 </html>

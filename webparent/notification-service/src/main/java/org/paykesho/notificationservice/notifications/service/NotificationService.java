@@ -3,12 +3,17 @@ package org.paykesho.notificationservice.notifications.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Notification;
+import org.commons.entity.NotificationQueue;
+import org.commons.enums.NotificationStatus;
 import org.commons.enums.NotificationType;
+import org.commons.utils.NotificationTypeUtils;
 import org.paykesho.notificationservice.notifications.repository.NotificationsRepository;
+import org.paykesho.notificationservice.repository.NotificationQueueRepository;
 import org.paykesho.notificationservice.utils.EmailTemplateService;
 import org.paykesho.notificationservice.utils.general.ApplicationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,6 +24,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -35,12 +44,29 @@ public class NotificationService {
     private final NotificationsRepository notificationRepository;
     private final ApplicationProperties applicationProperties;
     private final EmailTemplateService emailTemplateService;
+    
+    @Autowired
+    private NotificationQueueRepository notificationQueueRepository;
 
     public static String trimString(String input) {
         if (input != null && input.length() > MAX_MESSAGE_LENGTH) {
             return input.substring(0, MAX_MESSAGE_LENGTH) + "...";
         }
         return input;
+    }
+
+    /**
+     * Sanitize input to prevent XSS and other security issues
+     */
+    private String sanitizeInput(String input) {
+        if (input == null) {
+            return "";
+        }
+        
+        // Remove potentially dangerous characters
+        return input.replaceAll("[<>\"'&]", "")
+                   .replaceAll("\\s+", " ")
+                   .trim();
     }
 
     @Transactional
@@ -54,13 +80,7 @@ public class NotificationService {
             return false;
         }
 
-        // Validate notification type
-        try {
-            NotificationType.valueOf(notificationType.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            logger.error("Invalid notification type: {}", notificationType);
-            return false;
-        }
+        // Note: NotificationTypeUtils.parseNotificationType() handles validation and defaults to email
 
         // Validate recipient format
         if (recipient.trim().isEmpty()) {
@@ -79,7 +99,7 @@ public class NotificationService {
             notification.setReference(UUID.randomUUID().toString());
             notification.setRecipient(recipient);
             notification.setMessage(trimString(message));
-            notification.setNotificationType(NotificationType.valueOf(notificationType));
+            notification.setNotificationType(NotificationTypeUtils.parseNotificationType(notificationType));
             notification.setStatus("pending");
             saved = notificationRepository.save(notification);
         } catch (Exception e) {
@@ -230,11 +250,27 @@ public class NotificationService {
 
     public boolean sendEmail(String recipient, String subject, String message) {
         try {
-            logger.info("Sending email to: {} with subject: {}", recipient, subject);
-            logger.info("Email message length: {} characters", message != null ? message.length() : 0);
+            // Input sanitization
+            if (recipient == null || recipient.trim().isEmpty()) {
+                logger.error("Recipient email cannot be null or empty");
+                return false;
+            }
+            
+            // Basic email validation
+            if (!recipient.contains("@") || !recipient.contains(".")) {
+                logger.error("Invalid email format: {}", recipient);
+                return false;
+            }
+            
+            // Sanitize subject and message
+            String sanitizedSubject = sanitizeInput(subject);
+            String sanitizedMessage = sanitizeInput(message);
+            
+            logger.info("Sending email to: {} with subject: {}", recipient, sanitizedSubject);
+            logger.info("Email message length: {} characters", sanitizedMessage != null ? sanitizedMessage.length() : 0);
 
-            // Don't trim email content as it needs to be much longer than 200 characters
-            String emailContent = message; // Use full message for emails
+            // Use sanitized content
+            String emailContent = sanitizedMessage;
             logger.info("Email content length: {} characters", emailContent != null ? emailContent.length() : 0);
 
             Properties props = new Properties();
@@ -243,6 +279,11 @@ public class NotificationService {
             props.put("mail.smtp.host", applicationProperties.getSmtpServer());
             props.put("mail.smtp.port", String.valueOf(applicationProperties.getSmtpPort()));
             props.put("mail.smtp.ssl.trust", applicationProperties.getSmtpServer());
+            
+            // Add timeout configurations
+            props.put("mail.smtp.connectiontimeout", "10000"); // 10 seconds
+            props.put("mail.smtp.timeout", "10000"); // 10 seconds
+            props.put("mail.smtp.writetimeout", "10000"); // 10 seconds
 
             logger.info("SMTP Configuration - Host: {}, Port: {}, User: {}",
                     applicationProperties.getSmtpServer(),
@@ -265,7 +306,7 @@ public class NotificationService {
                     applicationProperties.getFromName()
             ));
             mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
-            mimeMessage.setSubject(subject);
+            mimeMessage.setSubject(sanitizedSubject);
             mimeMessage.setContent(emailContent, "text/html; charset=utf-8");
 
             logger.info("About to send email via SMTP...");
@@ -276,5 +317,344 @@ public class NotificationService {
             logger.error("Email could not be sent to {}. Error: {}", recipient, e.getMessage(), e);
             return false;
         }
+    }
+
+    // ==================== QUEUE FUNCTIONALITY ====================
+
+    /**
+     * Send notification using queue system (recommended approach)
+     */
+    public NotificationQueue sendNotificationQueued(String recipient, String message, String notificationType) {
+        try {
+            NotificationType type = NotificationTypeUtils.parseNotificationType(notificationType);
+            return addNotificationToQueue(type, recipient, "Notification", message);
+        } catch (Exception e) {
+            logger.error("Error creating notification queue: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Send notification using queue system with subject
+     */
+    public NotificationQueue sendNotificationQueued(String recipient, String subject, String message, String notificationType) {
+        try {
+            NotificationType type = NotificationTypeUtils.parseNotificationType(notificationType);
+            return addNotificationToQueue(type, recipient, subject, message);
+        } catch (Exception e) {
+            logger.error("Error creating notification queue: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Send high priority notification using queue system
+     */
+    public NotificationQueue sendHighPriorityNotification(String recipient, String subject, String message, String notificationType) {
+        try {
+            NotificationType type = NotificationTypeUtils.parseNotificationType(notificationType);
+            NotificationQueue notification = new NotificationQueue(type, recipient, subject, message);
+            notification.setPriority(1); // Highest priority
+            notification = notificationQueueRepository.save(notification);
+            createLegacyNotification(notification);
+            return notification;
+        } catch (Exception e) {
+            logger.error("Error creating high priority notification: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Send scheduled notification using queue system
+     */
+    public NotificationQueue sendScheduledNotification(String recipient, String subject, String message, 
+                                                      String notificationType, Date scheduledFor) {
+        try {
+            NotificationType type = NotificationTypeUtils.parseNotificationType(notificationType);
+            NotificationQueue notification = new NotificationQueue(type, recipient, subject, message);
+            notification.setScheduledFor(scheduledFor);
+            notification = notificationQueueRepository.save(notification);
+            createLegacyNotification(notification);
+            return notification;
+        } catch (Exception e) {
+            logger.error("Error creating scheduled notification: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Send notification with metadata using queue system
+     */
+    public NotificationQueue sendNotificationWithMetadata(String recipient, String subject, String message, 
+                                                         String notificationType, String metadata, 
+                                                         String entityReference, String entityType) {
+        try {
+            NotificationType type = NotificationTypeUtils.parseNotificationType(notificationType);
+            NotificationQueue notification = new NotificationQueue(type, recipient, subject, message);
+            notification.setMetadata(metadata);
+            notification.setEntityReference(entityReference);
+            notification.setEntityType(entityType);
+            notification = notificationQueueRepository.save(notification);
+            createLegacyNotification(notification);
+            return notification;
+        } catch (Exception e) {
+            logger.error("Error creating notification with metadata: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Add notification to queue (internal method)
+     */
+    private NotificationQueue addNotificationToQueue(NotificationType type, String recipient, String subject, String message) {
+        NotificationQueue notification = new NotificationQueue(type, recipient, subject, message);
+        notification = notificationQueueRepository.save(notification);
+        createLegacyNotification(notification);
+        return notification;
+    }
+
+    /**
+     * Create legacy notification for backward compatibility
+     */
+    private void createLegacyNotification(NotificationQueue queueNotification) {
+        try {
+            Notification legacyNotification = new Notification();
+            legacyNotification.setReference(UUID.randomUUID().toString());
+            legacyNotification.setRecipient(queueNotification.getRecipientEmail());
+            legacyNotification.setMessage(queueNotification.getContent());
+            legacyNotification.setNotificationType(queueNotification.getNotificationType());
+            legacyNotification.setStatus("pending");
+            legacyNotification.setCreatedAt(new Date());
+            notificationRepository.save(legacyNotification);
+        } catch (Exception e) {
+            logger.error("Error creating legacy notification: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Update legacy notification status
+     */
+    private void updateLegacyNotificationStatus(NotificationQueue queueNotification) {
+        try {
+            // Find legacy notification by recipient and message
+            List<Notification> legacyNotifications = notificationRepository.findAll();
+            for (Notification legacy : legacyNotifications) {
+                if (legacy.getRecipient() != null && legacy.getRecipient().equals(queueNotification.getRecipientEmail()) &&
+                    legacy.getMessage() != null && legacy.getMessage().equals(queueNotification.getContent())) {
+                    
+                    // Map queue status to legacy status
+                    String legacyStatus = mapQueueStatusToLegacyStatus(queueNotification.getStatus());
+                    legacy.setStatus(legacyStatus);
+                    notificationRepository.save(legacy);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error updating legacy notification status: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Map queue status to legacy status
+     */
+    private String mapQueueStatusToLegacyStatus(NotificationStatus queueStatus) {
+        switch (queueStatus) {
+            case PENDING:
+                return "pending";
+            case PROCESSING:
+                return "processing";
+            case SENT:
+                return "sent";
+            case FAILED:
+            case FAILED_PERMANENTLY:
+                return "failed";
+            case CANCELLED:
+                return "cancelled";
+            default:
+                return "pending";
+        }
+    }
+
+    // ==================== QUEUE MANAGEMENT ====================
+
+    /**
+     * Get pending notifications ready to be processed
+     */
+    @Transactional
+    public List<NotificationQueue> getPendingNotifications() {
+        return notificationQueueRepository.findPendingNotifications(NotificationStatus.PENDING, new Date());
+    }
+
+    /**
+     * Get failed notifications that can be retried
+     */
+    @Transactional
+    public List<NotificationQueue> getRetryableNotifications() {
+        return notificationQueueRepository.findRetryableNotifications(NotificationStatus.FAILED, new Date());
+    }
+
+    /**
+     * Get notifications by status
+     */
+    @Transactional
+    public List<NotificationQueue> getNotificationsByStatus(NotificationStatus status) {
+        return notificationQueueRepository.findByStatus(status);
+    }
+
+    /**
+     * Get notifications by recipient
+     */
+    @Transactional
+    public List<NotificationQueue> getNotificationsByRecipient(String recipientEmail) {
+        return notificationQueueRepository.findByRecipientEmail(recipientEmail);
+    }
+
+    /**
+     * Get notification by ID
+     */
+    @Transactional
+    public Optional<NotificationQueue> getNotificationById(Integer id) {
+        return notificationQueueRepository.findById(id);
+    }
+
+    /**
+     * Update notification status
+     */
+    public NotificationQueue updateNotificationStatus(Integer id, NotificationStatus status) {
+        Optional<NotificationQueue> optional = notificationQueueRepository.findById(id);
+        if (optional.isPresent()) {
+            NotificationQueue notification = optional.get();
+            notification.setStatus(status);
+            
+            if (status == NotificationStatus.PROCESSING) {
+                notification.markAsProcessing();
+            } else if (status == NotificationStatus.SENT) {
+                notification.markAsSent();
+            }
+            
+            // Update legacy notification status
+            updateLegacyNotificationStatus(notification);
+            
+            return notificationQueueRepository.save(notification);
+        }
+        return null;
+    }
+
+    /**
+     * Mark notification as failed
+     */
+    public NotificationQueue markNotificationAsFailed(Integer id, String errorMessage) {
+        Optional<NotificationQueue> optional = notificationQueueRepository.findById(id);
+        if (optional.isPresent()) {
+            NotificationQueue notification = optional.get();
+            notification.markAsFailed(errorMessage);
+            
+            // Update legacy notification status
+            updateLegacyNotificationStatus(notification);
+            
+            return notificationQueueRepository.save(notification);
+        }
+        return null;
+    }
+
+    /**
+     * Retry a failed notification
+     */
+    public NotificationQueue retryNotification(Integer id) {
+        Optional<NotificationQueue> optional = notificationQueueRepository.findById(id);
+        if (optional.isPresent()) {
+            NotificationQueue notification = optional.get();
+            
+            if (!notification.canRetry()) {
+                throw new RuntimeException("Notification cannot be retried - max retries exceeded");
+            }
+            
+            notification.incrementRetry();
+            
+            // Update legacy notification status
+            updateLegacyNotificationStatus(notification);
+            
+            return notificationQueueRepository.save(notification);
+        }
+        return null;
+    }
+
+    /**
+     * Cancel a notification
+     */
+    public NotificationQueue cancelNotification(Integer id) {
+        Optional<NotificationQueue> optional = notificationQueueRepository.findById(id);
+        if (optional.isPresent()) {
+            NotificationQueue notification = optional.get();
+            
+            if (notification.getStatus() == NotificationStatus.SENT) {
+                throw new RuntimeException("Cannot cancel notification that has already been sent");
+            }
+            
+            notification.cancel();
+            
+            // Update legacy notification status
+            updateLegacyNotificationStatus(notification);
+            
+            return notificationQueueRepository.save(notification);
+        }
+        return null;
+    }
+
+    /**
+     * Get queue statistics
+     */
+    @Transactional
+    public Map<String, Long> getQueueStatistics() {
+        List<Object[]> results = notificationQueueRepository.getNotificationStatistics();
+        return results.stream().collect(
+            java.util.stream.Collectors.toMap(
+                row -> ((NotificationStatus) row[0]).toString(),
+                row -> (Long) row[1]
+            )
+        );
+    }
+
+    /**
+     * Get queue health status
+     */
+    public String getQueueHealthStatus() {
+        try {
+            long pendingCount = notificationQueueRepository.countByStatus(NotificationStatus.PENDING);
+            long processingCount = notificationQueueRepository.countByStatus(NotificationStatus.PROCESSING);
+            long failedCount = notificationQueueRepository.countByStatus(NotificationStatus.FAILED);
+            long sentCount = notificationQueueRepository.countByStatus(NotificationStatus.SENT);
+            
+            return String.format("Queue Health - Pending: %d, Processing: %d, Failed: %d, Sent: %d", 
+                               pendingCount, processingCount, failedCount, sentCount);
+        } catch (Exception e) {
+            logger.error("Error getting queue health status: {}", e.getMessage());
+            return "Error retrieving queue health: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Reset stale processing notifications
+     */
+    public int resetStaleProcessingNotifications(int staleMinutes) {
+        Date cutoffTime = new Date(System.currentTimeMillis() - (staleMinutes * 60 * 1000));
+        return notificationQueueRepository.resetStaleProcessingNotifications(
+            NotificationStatus.PROCESSING, 
+            NotificationStatus.PENDING, 
+            cutoffTime
+        );
+    }
+
+    /**
+     * Clean up old notifications
+     */
+    public int cleanupOldNotifications(int daysToKeep) {
+        Date cutoffDate = new Date(System.currentTimeMillis() - (daysToKeep * 24 * 60 * 60 * 1000));
+        List<NotificationStatus> completedStatuses = List.of(
+            NotificationStatus.SENT, 
+            NotificationStatus.FAILED_PERMANENTLY, 
+            NotificationStatus.CANCELLED
+        );
+        return notificationQueueRepository.deleteOldNotifications(completedStatuses, cutoffDate);
     }
 }

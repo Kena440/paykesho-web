@@ -57,11 +57,12 @@
                                     <div class="col-md-8">
                                         <h2 class="mb-2">Welcome Back,
                                             <span class="text-primary"
-                                                  th:text="${merchantAdmin?.name ?: 'User'}">User</span>!
+                                                  th:text="${merchantAdmin?.name ?: 'Merchant'}">Merchant</span>!
                                         </h2>
-                                        <p class="text-muted mb-0">Merchant Dashboard - <span
+                                        <p class="text-muted mb-0">Merchant Dashboard - Monitor your business performance and transactions</p>
+                                        <p class="text-muted small mb-0">Business: <span
                                                 class="fw-bold"
-                                                th:text="${merchant?.name ?: 'Merchant'}">Merchant</span></p>
+                                                th:text="${merchant?.name ?: 'Your Business'}">Your Business</span></p>
                                     </div>
                                     <div class="col-md-4 text-end">
                                         <div class="img-fluid mb-2">
@@ -165,16 +166,62 @@
                         </div>
                     </div>
 
-                    <!-- Merchant Code - Primary KPI -->
+                    <!-- Active Customers - Primary KPI -->
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <div class="card border-info h-100" id="merchantCodeCard">
+                        <div class="card border-info h-100" id="customersCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="users"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshCustomerData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h3 class="text-info mb-2" th:text="${uniqueCustomers ?: 0}">0</h3>
+                                <h6 class="text-muted mb-3">Active Customers</h6>
+                                <div id="customersContent">
+                                    <span class="badge badge-subtle-info me-2"
+                                          th:text="${#numbers.formatDecimal(customerGrowthRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                    <span class="text-muted small">vs last month</span>
+                                </div>
+                                <div class="text-danger small" id="customersError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load customer data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Overview - Secondary Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="bar-chart-3"></i>
+                            Business Overview
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Merchant Code Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="merchantCodeCard">
                             <div class="card-body text-center">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div class="stat stat-lg text-info">
                                         <i class="align-middle" data-lucide="hash"></i>
                                     </div>
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="dropdown"
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
                                                 type="button">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
                                         </button>
@@ -184,7 +231,7 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <h3 class="text-info mb-2" th:text="${merchant?.code ?: 'N/A'}">N/A</h3>
+                                <h4 class="text-info mb-2" th:text="${merchant?.code ?: 'N/A'}">N/A</h4>
                                 <h6 class="text-muted mb-3">Merchant Code</h6>
                                 <div id="merchantCodeContent">
                                     <span class="badge badge-subtle-info me-2">Active</span>
@@ -197,246 +244,227 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Today's Performance Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="todayPerformanceCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="trending-up"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshTodayData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-success mb-2" th:text="${todayTransactions ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Today's Transactions</h6>
+                                <div id="todayPerformanceContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${#numbers.formatDecimal(todayRevenue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW'">0 ZMW</span>
+                                    <span class="text-muted small">Today's revenue</span>
+                                </div>
+                                <div class="text-danger small" id="todayPerformanceError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load today's data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Success Rate Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="successRateCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-warning">
+                                        <i class="align-middle" data-lucide="check-circle"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshSuccessRateData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-warning mb-2"
+                                    th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</h4>
+                                <h6 class="text-muted mb-3">Success Rate</h6>
+                                <div id="successRateContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${successfulTransactions ?: 0} + ' successful'">0 successful</span>
+                                    <span class="text-muted small">Out of ${totalTransactions ?: 0} total</span>
+                                </div>
+                                <div class="text-danger small" id="successRateError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load success rate data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Average Order Value Card -->
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100" id="averageOrderCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-danger">
+                                        <i class="align-middle" data-lucide="dollar-sign"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshAverageOrderData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-danger mb-2"
+                                    th:text="${#numbers.formatDecimal(averageTransactionValue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</h4>
+                                <h6 class="text-muted mb-3">Avg Order Value (ZMW)</h6>
+                                <div id="averageOrderContent">
+                                    <span class="badge badge-subtle-danger me-2"
+                                          th:text="${uniqueCustomers ?: 0} + ' customers'">0 customers</span>
+                                    <span class="text-muted small">Unique customers</span>
+                                </div>
+                                <div class="text-danger small" id="averageOrderError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load order value data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Performance Overview - Secondary Metrics -->
+                <!-- Performance Metrics - Tertiary Metrics -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <h4 class="mb-3 text-secondary">
-                            <i class="align-middle me-2" data-lucide="bar-chart-3"></i>
-                            Performance Overview
+                            <i class="align-middle me-2" data-lucide="activity"></i>
+                            Performance Metrics
                         </h4>
                     </div>
                 </div>
 
                 <div class="row mb-4">
-
-                    <!-- Enhanced Merchant Analytics Cards -->
-                    <div class="col-12">
-                        <div class="row">
-                            <!-- Today's Performance Card -->
-                            <div class="col-sm-6 col-lg-3 d-flex">
-                                <div class="card flex-fill" id="todayPerformanceCard">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col mt-0">
-                                                <h5 class="card-title">Today's Performance</h5>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="stat stat-sm">
-                                                    <i class="align-middle" data-lucide="trending-up"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="todayPerformanceContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${todayTransactions ?: 0}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"
-                                                      th:text="${#numbers.formatDecimal(todayRevenue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW'">0 ZMW</span>
-                                                <span class="text-muted">Today's revenue</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-danger" id="todayPerformanceError" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <span class="error-message">Failed to load today's performance data</span>
-                                        </div>
+                    <!-- Weekly Growth Card -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100" id="weeklyGrowthCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-success">
+                                        <i class="align-middle" data-lucide="trending-up"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshWeeklyGrowthData()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Success Rate Card -->
-                            <div class="col-sm-6 col-lg-3 d-flex">
-                                <div class="card flex-fill" id="successRateCard">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col mt-0">
-                                                <h5 class="card-title">Success Rate</h5>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="stat stat-sm">
-                                                    <i class="align-middle" data-lucide="check-circle"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="successRateContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"
-                                                      th:text="${successfulTransactions ?: 0} + ' successful'">0 successful</span>
-                                                <span class="text-muted">Out of ${totalTransactions ?: 0} total</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-danger" id="successRateError" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <span class="error-message">Failed to load success rate data</span>
-                                        </div>
-                                    </div>
+                                <h4 class="text-success mb-2" th:text="${weeklyTransactions ?: 0}">0</h4>
+                                <h6 class="text-muted mb-3">Weekly Transactions</h6>
+                                <div id="weeklyGrowthContent">
+                                    <span class="badge badge-subtle-success me-2"
+                                          th:text="${#numbers.formatDecimal(weeklyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                    <span class="text-muted small">vs last week</span>
                                 </div>
-                            </div>
-
-                            <!-- Unique Customers Card -->
-                            <div class="col-sm-6 col-lg-3 d-flex">
-                                <div class="card flex-fill" id="uniqueCustomersCard">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col mt-0">
-                                                <h5 class="card-title">Unique Customers</h5>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="stat stat-sm">
-                                                    <i class="align-middle" data-lucide="users"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="uniqueCustomersContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${uniqueCustomers ?: 0}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-info me-2"
-                                                      th:text="${#numbers.formatDecimal(averageTransactionValue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW avg'">0 ZMW avg</span>
-                                                <span class="text-muted">Average transaction value</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-danger" id="uniqueCustomersError" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <span class="error-message">Failed to load customer data</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Weekly Growth Card -->
-                            <div class="col-sm-6 col-lg-3 d-flex">
-                                <div class="card flex-fill" id="weeklyGrowthCard">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col mt-0">
-                                                <h5 class="card-title">Weekly Growth</h5>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="stat stat-sm">
-                                                    <i class="align-middle" data-lucide="trending-up"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="weeklyGrowthContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${weeklyTransactions ?: 0}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"
-                                                      th:text="${#numbers.formatDecimal(weeklyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
-                                                <span class="text-muted">vs last week</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-danger" id="weeklyGrowthError" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <span class="error-message">Failed to load growth data</span>
-                                        </div>
-                                    </div>
+                                <div class="text-danger small" id="weeklyGrowthError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load weekly growth data</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Revenue and Performance Cards -->
-                    <div class="col-12">
-                        <div class="row">
-                            <!-- Monthly Revenue Card -->
-                            <div class="col-sm-6 col-lg-4 d-flex">
-                                <div class="card flex-fill" id="monthlyRevenueCard">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col mt-0">
-                                                <h5 class="card-title">Monthly Revenue</h5>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="stat stat-sm">
-                                                    <i class="align-middle" data-lucide="dollar-sign"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="monthlyRevenueContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${#numbers.formatDecimal(monthlyRevenue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-success me-2"
-                                                      th:text="${#numbers.formatDecimal(monthlyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
-                                                <span class="text-muted">vs last month</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-danger" id="monthlyRevenueError" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <span class="error-message">Failed to load revenue data</span>
-                                        </div>
+                    <!-- Monthly Performance Card -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100" id="monthlyPerformanceCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-info">
+                                        <i class="align-middle" data-lucide="calendar"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshMonthlyPerformanceData()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Yesterday Comparison Card -->
-                            <div class="col-sm-6 col-lg-4 d-flex">
-                                <div class="card flex-fill" id="yesterdayComparisonCard">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col mt-0">
-                                                <h5 class="card-title">Yesterday</h5>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="stat stat-sm">
-                                                    <i class="align-middle" data-lucide="calendar"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="yesterdayComparisonContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${yesterdayTransactions ?: 0}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-info me-2"
-                                                      th:text="${#numbers.formatDecimal(yesterdayRevenue ?: 0, 0, 'COMMA', 2, 'POINT')} + ' ZMW'">0 ZMW</span>
-                                                <span class="text-muted">Yesterday's revenue</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-danger" id="yesterdayComparisonError" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <span class="error-message">Failed to load yesterday's data</span>
-                                        </div>
-                                    </div>
+                                <h4 class="text-info mb-2"
+                                    th:text="${#numbers.formatDecimal(monthlyRevenue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</h4>
+                                <h6 class="text-muted mb-3">Monthly Revenue (ZMW)</h6>
+                                <div id="monthlyPerformanceContent">
+                                    <span class="badge badge-subtle-info me-2"
+                                          th:text="${#numbers.formatDecimal(monthlyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                    <span class="text-muted small">vs last month</span>
                                 </div>
-                            </div>
-
-                            <!-- Total Value Card -->
-                            <div class="col-sm-6 col-lg-4 d-flex">
-                                <div class="card flex-fill" id="totalValueCard">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col mt-0">
-                                                <h5 class="card-title">Total Value</h5>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="stat stat-sm">
-                                                    <i class="align-middle" data-lucide="credit-card"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="totalValueContent">
-                                            <span class="h1 d-inline-block mt-1 mb-4"
-                                                  th:text="${#numbers.formatDecimal(totalTransactionValue ?: 0, 0, 'COMMA', 2, 'POINT')}">0</span>
-                                            <div class="mb-0">
-                                                <span class="badge badge-subtle-primary me-2"
-                                                      th:text="${totalTransactions ?: 0} + ' transactions'">0 transactions</span>
-                                                <span class="text-muted">All time</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-danger" id="totalValueError" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <span class="error-message">Failed to load total value data</span>
-                                        </div>
-                                    </div>
+                                <div class="text-danger small" id="monthlyPerformanceError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load monthly performance data</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Customer Retention Rate Card -->
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100" id="retentionRateCard">
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat stat-lg text-warning">
+                                        <i class="align-middle" data-lucide="user-check"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshRetentionRateData()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <h4 class="text-warning mb-2"
+                                    th:text="${#numbers.formatDecimal(customerRetentionRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</h4>
+                                <h6 class="text-muted mb-3">Customer Retention</h6>
+                                <div id="retentionRateContent">
+                                    <span class="badge badge-subtle-warning me-2"
+                                          th:text="${returningCustomers ?: 0} + ' returning'">0 returning</span>
+                                    <span class="text-muted small">Out of ${uniqueCustomers ?: 0} total</span>
+                                </div>
+                                <div class="text-danger small" id="retentionRateError" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    <span class="error-message">Failed to load retention rate data</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                     <div class="col-lg-6 col-xl-7">
                         <div class="card flex-fill w-100" id="mapCard">
@@ -472,25 +500,39 @@
                     </div>
                 </div>
 
-                <!-- Merchant Analytics Charts -->
-                <div class="row">
-                    <!-- Revenue Trend Chart -->
-                    <div class="col-12 col-lg-8 d-flex">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                <!-- Charts and Analytics Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3 text-secondary">
+                            <i class="align-middle me-2" data-lucide="bar-chart-2"></i>
+                            Analytics & Trends
+                        </h4>
+                    </div>
+                </div>
+
+                <!-- Primary Charts Row -->
+                <div class="row mb-4">
+                    <!-- Revenue Trend Chart - Primary Chart -->
+                    <div class="col-lg-8 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="trending-up"></i>
+                                        Revenue Trend (Last 30 Days)
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#"
-                                               onclick="refreshRevenueChart()">Refresh</a>
-                                            <a class="dropdown-item" href="#" onclick="exportRevenueChart()">Export</a>
-                                        </div>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshRevenueChart()">Refresh</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#" onclick="exportRevenueChart()">Export</a></li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <h5 class="card-title mb-0">Revenue Trend (Last 30 Days)</h5>
                             </div>
                             <div class="card-body" style="height: 300px;">
                                 <canvas id="merchantRevenueChart"></canvas>
@@ -498,36 +540,56 @@
                         </div>
                     </div>
 
-                    <!-- Transaction Status Chart -->
-                    <div class="col-12 col-lg-4 d-flex">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <div class="card-actions float-end">
-                                    <div class="dropdown position-relative">
-                                        <a data-bs-display="static" data-bs-toggle="dropdown" href="#">
+                    <!-- Transaction Status Distribution -->
+                    <div class="col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="pie-chart"></i>
+                                        Transaction Status
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
                                             <i class="align-middle" data-lucide="more-horizontal"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#" onclick="refreshStatusChart()">Refresh</a>
-                                        </div>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshStatusChart()">Refresh</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <h5 class="card-title mb-0">Transaction Status</h5>
                             </div>
-                            <div class="card-body" style="height: 200px;">
+                            <div class="card-body" style="height: 250px;">
                                 <canvas id="merchantStatusChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Performance Metrics Charts -->
-                <div class="row">
+                <!-- Secondary Charts Row -->
+                <div class="row mb-4">
                     <!-- Daily Performance Chart -->
-                    <div class="col-12 col-lg-6 d-flex">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Daily Performance (Last 7 Days)</h5>
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-info text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="bar-chart"></i>
+                                        Daily Performance (Last 7 Days)
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshDailyChart()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body" style="height: 200px;">
                                 <canvas id="merchantDailyChart"></canvas>
@@ -536,16 +598,33 @@
                     </div>
 
                     <!-- Top Customers Chart -->
-                    <div class="col-12 col-lg-6 d-flex">
-                        <div class="card flex-fill w-100">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Top Customers</h5>
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-warning text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="align-middle me-2" data-lucide="users"></i>
+                                        Top Customers by Volume
+                                    </h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown"
+                                                type="button">
+                                            <i class="align-middle" data-lucide="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="refreshCustomersChart()">Refresh</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body" style="height: 200px;">
                                 <canvas id="merchantCustomersChart"></canvas>
                             </div>
                         </div>
                     </div>
+                </div>
+
                 </div>
 
             </div>
@@ -601,6 +680,19 @@
 
 <script>
     // Global exception handling configuration
+    // Global error handler to prevent dashboard breaking
+    window.addEventListener('error', function(e) {
+        console.error('Global error caught:', e.error);
+        // Prevent the error from breaking the page
+        return true;
+    });
+
+    window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+        // Prevent the error from breaking the page
+        e.preventDefault();
+    });
+
     const ExceptionHandler = {
         // Configuration
         config: {
@@ -671,26 +763,30 @@
                 // Add marker
                 L.marker([lat, lng]).addTo(map);
 
-                // Add geocoder with error handling
-                try {
-                    L.Control.geocoder({
-                        defaultMarkGeocode: false
-                    }).on('markgeocode', function (e) {
-                        try {
-                            var bbox = e.geocode.bbox;
-                            var poly = L.polygon([
-                                bbox.getSouthEast(),
-                                bbox.getNorthEast(),
-                                bbox.getNorthWest(),
-                                bbox.getSouthWest()
-                            ]).addTo(map);
-                            map.fitBounds(poly.getBounds());
-                        } catch (error) {
-                            ExceptionHandler.handleError('Map Geocoding Error', error, 'MAP_GEOCODING');
-                        }
-                    }).addTo(map);
-                } catch (error) {
-                    console.warn('Geocoder not available:', error);
+                // Add geocoder with proper availability check
+                if (typeof L.Control !== 'undefined' && typeof L.Control.geocoder === 'function') {
+                    try {
+                        L.Control.geocoder({
+                            defaultMarkGeocode: false
+                        }).on('markgeocode', function (e) {
+                            try {
+                                var bbox = e.geocode.bbox;
+                                var poly = L.polygon([
+                                    bbox.getSouthEast(),
+                                    bbox.getNorthEast(),
+                                    bbox.getNorthWest(),
+                                    bbox.getSouthWest()
+                                ]).addTo(map);
+                                map.fitBounds(poly.getBounds());
+                            } catch (error) {
+                                ExceptionHandler.handleError('Map Geocoding Error', error, 'MAP_GEOCODING');
+                            }
+                        }).addTo(map);
+                    } catch (error) {
+                        console.warn('Geocoder initialization failed:', error);
+                    }
+                } else {
+                    console.info('Geocoder plugin not available - geocoding functionality disabled');
                 }
 
                 // Store map reference
@@ -988,39 +1084,75 @@
 
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', function () {
-        ExceptionHandler.init();
-        // Initialize merchant dashboard charts
-        initializeMerchantCharts();
+        try {
+            ExceptionHandler.init();
+            // Initialize merchant dashboard charts
+            initializeMerchantCharts();
+        } catch (error) {
+            console.error('Dashboard initialization error:', error);
+            // Show user-friendly error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-warning m-3';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Dashboard initialization failed. Some features may not work properly.';
+            document.body.insertBefore(errorDiv, document.body.firstChild);
+        }
     });
 
     // Merchant Dashboard Charts
     function initializeMerchantCharts() {
-        initializeMerchantRevenueChart();
-        initializeMerchantStatusChart();
-        initializeMerchantDailyChart();
-        initializeMerchantCustomersChart();
+        try {
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js library not loaded, charts will not be displayed');
+                showChartPlaceholders();
+                return;
+            }
+            
+            initializeMerchantRevenueChart();
+            initializeMerchantStatusChart();
+            initializeMerchantDailyChart();
+            initializeMerchantCustomersChart();
+        } catch (error) {
+            console.error('Chart initialization failed:', error);
+            showChartPlaceholders();
+        }
+    }
+    
+    function showChartPlaceholders() {
+        const chartIds = ['merchantRevenueChart', 'merchantStatusChart', 'merchantDailyChart', 'merchantCustomersChart'];
+        chartIds.forEach(chartId => {
+            const element = document.getElementById(chartId);
+            if (element && element.tagName === 'CANVAS') {
+                element.style.display = 'none';
+                const placeholder = document.createElement('div');
+                placeholder.className = 'text-center text-muted p-4';
+                placeholder.innerHTML = '<i class="fas fa-chart-bar fa-2x mb-2"></i><br>Chart unavailable';
+                element.parentNode.insertBefore(placeholder, element);
+            }
+        });
     }
 
     // Revenue Trend Chart
     function initializeMerchantRevenueChart() {
-        const ctx = document.getElementById('merchantRevenueChart');
-        if (!ctx) return;
+        try {
+            const ctx = document.getElementById('merchantRevenueChart');
+            if (!ctx) return;
 
-        // Sample data - in real implementation, this would come from the backend
-        const revenueData = {
-            labels: generateLast30DaysLabels(),
-            datasets: [{
-                label: 'Daily Revenue',
-                data: generateSampleRevenueData(),
-                borderColor: window.cssVariables.primary || '#007bff',
-                backgroundColor: (window.cssVariables.primary || '#007bff') + '20',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
-        };
+            // Sample data - in real implementation, this would come from the backend
+            const revenueData = {
+                labels: generateLast30DaysLabels(),
+                datasets: [{
+                    label: 'Daily Revenue',
+                    data: generateSampleRevenueData(),
+                    borderColor: window.cssVariables.primary || '#007bff',
+                    backgroundColor: (window.cssVariables.primary || '#007bff') + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            };
 
-        new Chart(ctx, {
+            new Chart(ctx, {
             type: 'line',
             data: revenueData,
             options: {
@@ -1049,10 +1181,14 @@
                 }
             }
         });
+        } catch (error) {
+            console.error('Revenue chart initialization failed:', error);
+        }
     }
 
     // Transaction Status Chart
     function initializeMerchantStatusChart() {
+        try {
         const ctx = document.getElementById('merchantStatusChart');
         if (!ctx) return;
 
@@ -1089,10 +1225,14 @@
                 cutout: '60%'
             }
         });
+        } catch (error) {
+            console.error('Status chart initialization failed:', error);
+        }
     }
 
     // Daily Performance Chart
     function initializeMerchantDailyChart() {
+        try {
         const ctx = document.getElementById('merchantDailyChart');
         if (!ctx) return;
 
@@ -1125,10 +1265,14 @@
                 }
             }
         });
+        } catch (error) {
+            console.error('Daily chart initialization failed:', error);
+        }
     }
 
     // Top Customers Chart
     function initializeMerchantCustomersChart() {
+        try {
         const ctx = document.getElementById('merchantCustomersChart');
         if (!ctx) return;
 
@@ -1164,6 +1308,9 @@
                 }
             }
         });
+        } catch (error) {
+            console.error('Customers chart initialization failed:', error);
+        }
     }
 
     // Helper functions
@@ -1206,17 +1353,60 @@
     // Chart refresh functions
     function refreshRevenueChart() {
         console.log('Refreshing revenue chart...');
-        // In real implementation, this would fetch new data from the backend
+        initializeMerchantRevenueChart();
     }
 
     function refreshStatusChart() {
         console.log('Refreshing status chart...');
-        // In real implementation, this would fetch new data from the backend
+        initializeMerchantStatusChart();
+    }
+
+    function refreshDailyChart() {
+        console.log('Refreshing daily chart...');
+        initializeMerchantDailyChart();
+    }
+
+    function refreshCustomersChart() {
+        console.log('Refreshing customers chart...');
+        initializeMerchantCustomersChart();
     }
 
     function exportRevenueChart() {
         console.log('Exporting revenue chart...');
         // In real implementation, this would export the chart data
+    }
+
+    // Data refresh functions
+    function refreshCustomerData() {
+        ExceptionHandler.loadMerchantData();
+    }
+
+    function refreshMerchantCode() {
+        ExceptionHandler.loadMerchantData();
+    }
+
+    function refreshTodayData() {
+        ExceptionHandler.loadTransactionData();
+    }
+
+    function refreshSuccessRateData() {
+        ExceptionHandler.loadTransactionData();
+    }
+
+    function refreshAverageOrderData() {
+        ExceptionHandler.loadTransactionData();
+    }
+
+    function refreshWeeklyGrowthData() {
+        ExceptionHandler.loadTransactionData();
+    }
+
+    function refreshMonthlyPerformanceData() {
+        ExceptionHandler.loadTransactionData();
+    }
+
+    function refreshRetentionRateData() {
+        ExceptionHandler.loadMerchantData();
     }
 </script>
 

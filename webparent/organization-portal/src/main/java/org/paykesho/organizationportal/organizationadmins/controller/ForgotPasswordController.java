@@ -1,7 +1,6 @@
 package org.paykesho.organizationportal.organizationadmins.controller;
 
 import org.commons.entity.organization.OrganizationAdmin;
-import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.config.Utility;
 import org.paykesho.organizationportal.notification.general.NotificationClient;
@@ -109,7 +108,7 @@ public class ForgotPasswordController {
                 + "<p>If you did not request this, please ignore the email.</p>";
 
         LOGGER.info("Attempting to send password reset email to: {} with URL: {}", toAddress, verifyURL);
-        boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
+        boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, "email");
         if (emailNotificationSent) {
             LOGGER.info("Notification sent successfully for {}", toAddress);
         } else {

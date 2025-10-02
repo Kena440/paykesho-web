@@ -142,10 +142,20 @@ public class OrganizationController {
             model.addAttribute("pageTitle", pageTitle);
             model.addAttribute("organizationAdmin", organizationAdmin);
 
-            if (employeeRecords != null) model.addAttribute("employeeRecords", employeeRecords);
-            if (employeeRecords != null) model.addAttribute("employeeRecordsSize", employeeRecords.size());
-            if (clientRecordsSize != null) model.addAttribute("clientRecords", clientRecordsSize);
-            if (clientRecordsSize != null) model.addAttribute("clientRecordsSize", clientRecordsSize.size());
+            if (employeeRecords != null) {
+                model.addAttribute("employeeRecords", employeeRecords);
+                model.addAttribute("employeeRecordsSize", employeeRecords.size());
+            } else {
+                model.addAttribute("employeeRecords", new ArrayList<>());
+                model.addAttribute("employeeRecordsSize", 0);
+            }
+            if (clientRecordsSize != null) {
+                model.addAttribute("clientRecords", clientRecordsSize);
+                model.addAttribute("clientRecordsSize", clientRecordsSize.size());
+            } else {
+                model.addAttribute("clientRecords", new ArrayList<>());
+                model.addAttribute("clientRecordsSize", 0);
+            }
 
             return "organizations/organization_view";
         } catch (PaykeshoError paykeshoError) {

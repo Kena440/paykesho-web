@@ -412,6 +412,149 @@
     <script th:src="@{/assets/js/jquery.number.min.js}" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Client Portal Error Handling -->
+    <script>
+        // Initialize client portal error handling
+        window.addEventListener('DOMContentLoaded', function () {
+            console.log('Client Portal Error Handling initialized');
+
+            // Comprehensive library availability checks
+            const missingLibraries = [];
+            
+            // Check jQuery
+            if (typeof $ === 'undefined') {
+                missingLibraries.push('jQuery');
+            }
+            
+            // Check Bootstrap
+            if (typeof bootstrap === 'undefined') {
+                console.warn('Bootstrap not loaded - some UI components may not work');
+            }
+            
+            // Check SweetAlert2
+            if (typeof Swal === 'undefined') {
+                console.warn('SweetAlert2 not loaded - using fallback alerts');
+                // Implement fallback alert function
+                window.Swal = {
+                    fire: function(options) {
+                        const title = options.title || 'Alert';
+                        const text = options.text || options.html || '';
+                        const type = options.icon || 'info';
+                        alert(`${title}\n\n${text}`);
+                    }
+                };
+            }
+            
+            // Check HTML5-QRCode
+            if (typeof Html5Qrcode === 'undefined') {
+                console.warn('HTML5-QRCode not loaded - QR scanning will not be available');
+            }
+            
+            // If critical libraries are missing, show error
+            if (missingLibraries.length > 0) {
+                console.error('Critical libraries not loaded:', missingLibraries);
+                document.body.innerHTML = `
+                    <div class="alert alert-danger m-3">
+                        <h4>Required Libraries Failed to Load</h4>
+                        <p>The following libraries are required but not loaded: ${missingLibraries.join(', ')}</p>
+                        <p>Please refresh the page or contact support if the problem persists.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh Page</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Initialize global AJAX error handling
+            $(document).ajaxError(function (event, xhr, settings, error) {
+                console.error('Global AJAX Error:', {
+                    url: settings.url,
+                    status: xhr.status,
+                    error: error,
+                    response: xhr.responseText
+                });
+
+                let message = 'Network request failed.';
+                if (xhr.status === 0) {
+                    message = 'Network connection lost. Please check your internet connection.';
+                } else if (xhr.status === 404) {
+                    message = 'Requested resource not found.';
+                } else if (xhr.status === 500) {
+                    message = 'Server error occurred. Please try again later.';
+                } else if (xhr.status === 403) {
+                    message = 'Access denied. Please check your permissions.';
+                }
+
+                // Use SweetAlert2 if available, otherwise fallback
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Network Error',
+                        text: message
+                    });
+                } else {
+                    alert('Error: ' + message);
+                }
+            });
+            
+            // Initialize network monitoring
+            initializeNetworkMonitoring();
+        });
+        
+        // Network monitoring functionality
+        function initializeNetworkMonitoring() {
+            // Monitor online/offline status
+            window.addEventListener('online', function() {
+                console.log('Network connection restored');
+                showNetworkNotification('Connection restored', 'success');
+            });
+
+            window.addEventListener('offline', function() {
+                console.log('Network connection lost');
+                showNetworkNotification('Connection lost - some features may be unavailable', 'warning');
+            });
+            
+            // Check initial connection status
+            if (!navigator.onLine) {
+                showNetworkNotification('You are currently offline', 'warning');
+            }
+        }
+        
+        // Show network status notifications
+        function showNetworkNotification(message, type) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: type === 'success' ? 'success' : 'warning',
+                    title: 'Network Status',
+                    text: message,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            } else {
+                // Fallback notification
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-warning';
+                const alertHtml = `
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                         style="top: 20px; right: 20px; z-index: 9999;" role="alert">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', alertHtml);
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    const alerts = document.querySelectorAll('.alert');
+                    alerts.forEach(alert => {
+                        if (alert.textContent.includes(message)) {
+                            alert.remove();
+                        }
+                    });
+                }, 5000);
+            }
+        }
+    </script>
 </th:block>
 
 <!-- Toast Container -->

@@ -68,7 +68,7 @@ public class Client extends IdBasedEntity {
 
     @Column(name = "lock_time")
     private Date lockTime;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
     @Column(name = "remote_file_id")

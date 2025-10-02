@@ -3,7 +3,6 @@ package org.paykesho.clientportal.clients.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
-import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.paykesho.clientportal.config.Utility;
@@ -125,7 +124,7 @@ public class ForgotPasswordController {
 
         ////mailSender.send(mimeMessage);
 
-        boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, NotificationType.email.defaultDescription());
+        boolean emailNotificationSent = notificationClient.sendNotification(toAddress, content, "email");
 
         if (emailNotificationSent) {
             log.info("Notification sent successfully for {}", toAddress);

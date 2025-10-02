@@ -23,7 +23,7 @@ public class EmployeeRecord {
     private String tpin;
     @Column(name = "man_number", length = 128, nullable = false, unique = true)
     private String manNumber;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organization_id")
     private Organization organization;
     private Date registrationDate;
