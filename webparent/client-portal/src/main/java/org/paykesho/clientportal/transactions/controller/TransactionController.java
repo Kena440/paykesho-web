@@ -7,7 +7,6 @@ import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
 import org.commons.entity.merchant.Merchant;
-import org.commons.enums.NotificationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.MerchantDto;
 import org.paykesho.clientportal.api.dto.PaymentDto;
@@ -165,21 +164,44 @@ public class TransactionController {
             return;
         }
 
-        String emailMessage = generateEmailMessage(transaction, "PAYMENT");
-        String smsMessage = generateSmsMessage(transaction, "PAYMENT");
+        try {
+            // Use NotificationClient (which uses database-driven approach internally)
+            String emailMessage = generateEmailMessage(transaction, "PAYMENT");
+            String smsMessage = generateSmsMessage(transaction, "PAYMENT");
 
-        boolean emailSent = notificationClient.sendNotification(transaction.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
-        if (emailSent) {
-            log.info("Email sent successfully to " + transaction.getClient().getEmail());
-        } else {
-            log.error("Failed to send email to " + transaction.getClient().getEmail());
-        }
+            // Send email notification via NotificationClient
+            boolean emailSent = notificationClient.sendNotification(
+                transaction.getClient().getEmail(), 
+                emailMessage, 
+                "email"
+            );
+            
+            if (emailSent) {
+                log.info("Transaction email notification request created for: {}", transaction.getClient().getEmail());
+            } else {
+                log.error("Failed to create email notification request for: {}", transaction.getClient().getEmail());
+            }
 
-        boolean smsSent = notificationClient.sendNotification(transaction.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
-        if (smsSent) {
-            log.info("SMS sent successfully to " + transaction.getClient().getPhoneNumber());
-        } else {
-            log.error("Failed to send SMS to " + transaction.getClient().getPhoneNumber());
+            // Send SMS notification via NotificationClient
+            if (transaction.getClient().getPhoneNumber() != null && !transaction.getClient().getPhoneNumber().trim().isEmpty()) {
+                boolean smsSent = notificationClient.sendNotification(
+                    transaction.getClient().getPhoneNumber(), 
+                    smsMessage, 
+                    "sms"
+                );
+                
+                if (smsSent) {
+                    log.info("Transaction SMS notification request created for: {}", transaction.getClient().getPhoneNumber());
+                } else {
+                    log.error("Failed to create SMS notification request for: {}", transaction.getClient().getPhoneNumber());
+                }
+            } else {
+                log.warn("No phone number available for SMS notification to client: {}", transaction.getClient().getEmail());
+            }
+            
+        } catch (Exception e) {
+            log.error("Error creating notification requests for transaction {}: {}", 
+                     transaction.getReference(), e.getMessage());
         }
     }
 

@@ -178,6 +178,15 @@
                                                                 <i class="align-middle" data-lucide="key"></i> Reset
                                                                 Password
                                                             </button>
+                                                            <button class="btn btn-sm toggle-admin-status"
+                                                                    th:classappend="${organizationAdmin?.enabled} ? 'btn-danger' : 'btn-success'"
+                                                                    th:data-admin-id="${organizationAdmin?.id}"
+                                                                    th:data-current-status="${organizationAdmin?.enabled}"
+                                                                    th:if="${organizationAdmin?.id != null}"
+                                                                    type="button">
+                                                                <i class="align-middle" th:data-lucide="${organizationAdmin?.enabled} ? 'user-x' : 'user-check'"></i>
+                                                                <span th:text="${organizationAdmin?.enabled} ? 'Disable' : 'Enable'">Toggle</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <div th:if="${organizationAdmin?.id == null}">
@@ -337,49 +346,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr th:each="client, iterStat : ${clientRecords}"
-                                                    th:if="${clientRecords != null and !#lists.isEmpty(clientRecords)}">
-                                                    <td th:text="${iterStat.count}">1</td>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="avatar avatar-sm bg-success text-white rounded-circle me-2">
-                                                                <span th:text="${#strings.substring(client.name ?: 'N', 0, 1)}">N</span>
-                                                            </div>
-                                                            <span th:text="${client.name ?: 'N/A'}">N/A</span>
-                                                        </div>
-                                                    </td>
-                                                    <td th:text="${client.nrc ?: 'N/A'}">N/A</td>
-                                                    <td th:text="${client.phoneNumber ?: 'N/A'}">N/A</td>
-                                                    <td th:text="${client.email ?: 'N/A'}">N/A</td>
-                                                    <td>
-                                                        <div class="btn-group btn-group-sm" role="group">
-                                                            <button class="btn btn-outline-primary edit-client-btn"
-                                                                    th:data-email="${client.email ?: ''}"
-                                                                    th:data-id="${client.id}"
-                                                                    th:data-name="${client.name ?: ''}"
-                                                                    th:data-nrc="${client.nrc ?: ''}"
-                                                                    th:data-phone="${client.phoneNumber ?: ''}"
-                                                                    title="Edit"
-                                                                    type="button">
-                                                                <i class="fas fa-edit"></i>
-                                                            </button>
-                                                            <button class="btn btn-outline-danger delete-client-btn"
-                                                                    th:data-id="${client.id}"
-                                                                    th:data-name="${client.name ?: ''}"
-                                                                    title="Delete"
-                                                                    type="button">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr th:if="${clientRecords == null or #lists.isEmpty(clientRecords)}">
-                                                    <td class="text-center text-muted py-4" colspan="6">
-                                                        <i class="fas fa-user-friends fa-2x mb-2"></i>
-                                                        <p class="mb-0">No client records found</p>
-                                                        <small>Click "Add Client" to get started</small>
-                                                    </td>
-                                                </tr>
+                                                <!-- Client records will be loaded dynamically via JavaScript -->
                                                 </tbody>
                                             </table>
                                         </div>
@@ -998,6 +965,20 @@
         min-height: 400px;
     }
 
+    /* Force client records table to be visible */
+    #clientRecordsMainTable {
+        display: table !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Force table wrapper to be visible */
+    .table-responsive {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
     .text-muted {
         color: #6c757d !important;
     }
@@ -1013,7 +994,14 @@
 <script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
 <script>
     moduleURL = "[[@{/organizations}]]";
+    var organizationId = /*[[${organization.id}]]*/ 1;
+    console.log('Organization ID from template:', organizationId);
+    
     $(document).ready(function () {
+        // Initialize client records on page load
+        console.log('Page loaded, initializing client records...');
+        loadClientRecordsTab();
+        
         $(".link-delete").on("click", function (e) {
             e.preventDefault();
             showDeleteConfirmModal($(this), 'organization');
@@ -1057,17 +1045,21 @@
             loadClientRecords();
         });
 
-        // Tab change handling
-        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        // Tab change handling - only refresh when user clicks on tab, not on page load
+        $('button[data-bs-toggle="tab"]').on('click', function (e) {
             const target = $(e.target).data('bs-target');
+            console.log('Tab clicked:', target);
+            
             if (target === '#employees') {
-                // Refresh employee records when tab is shown
+                // Refresh employee records when tab is clicked
                 setTimeout(function () {
+                    console.log('Loading employee records tab...');
                     loadEmployeeRecordsTab();
                 }, 100);
             } else if (target === '#clients') {
-                // Refresh client records when tab is shown
+                // Refresh client records when tab is clicked
                 setTimeout(function () {
+                    console.log('Loading client records tab...');
                     loadClientRecordsTab();
                 }, 100);
             }
@@ -1107,138 +1099,304 @@
             $('#modal-edit-client-record').modal('show');
         });
 
-        // Handle delete employee record
+        // Handle delete employee record with enhanced error handling
         $(document).on('click', '.delete-employee-btn', function () {
             const employeeId = $(this).data('id');
             const employeeName = $(this).data('name');
+            const button = $(this);
 
-            if (confirm('Are you sure you want to delete employee record for ' + employeeName + '?')) {
-                $.post('/organizations/employee-record/delete', {id: employeeId}, function (response) {
-                    if (response.success) {
-                        loadEmployeeRecords(); // Reload the modal table
-                        loadEmployeeRecordsTab(); // Reload the tab table
-                        showAlert('success', 'Employee record deleted successfully');
-                    } else {
-                        showAlert('error', 'Failed to delete employee record');
+            if (!employeeId) {
+                showAlert('error', 'Invalid employee record ID');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete employee record for ' + (employeeName || 'Unknown') + '?')) {
+                // Disable button to prevent double-clicks
+                button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                
+                $.ajax({
+                    url: '/organizations/employee-record/delete',
+                    method: 'POST',
+                    data: {id: employeeId},
+                    timeout: 10000,
+                    dataType: 'json',
+                    success: function (response) {
+                        try {
+                            if (response && response.success) {
+                                loadEmployeeRecords(); // Reload the modal table
+                                loadEmployeeRecordsTab(); // Reload the tab table
+                                showAlert('success', 'Employee record deleted successfully');
+                            } else {
+                                showAlert('error', response.message || 'Failed to delete employee record');
+                            }
+                        } catch (error) {
+                            console.error('Error processing delete response:', error);
+                            showAlert('error', 'Error processing delete response');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Delete employee AJAX error:', {xhr, status, error});
+                        
+                        let errorMessage = 'Error occurred while deleting employee record';
+                        if (xhr.status === 0) {
+                            errorMessage = 'Network connection lost';
+                        } else if (xhr.status === 404) {
+                            errorMessage = 'Employee record not found';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Server error occurred';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'Access denied';
+                        } else if (status === 'timeout') {
+                            errorMessage = 'Request timed out';
+                        }
+                        
+                        showAlert('error', errorMessage);
+                    },
+                    complete: function () {
+                        // Re-enable button
+                        button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
                     }
-                }).fail(function () {
-                    showAlert('error', 'Error occurred while deleting employee record');
                 });
             }
         });
 
-        // Handle delete client record
+        // Handle delete client record with enhanced error handling
         $(document).on('click', '.delete-client-btn', function () {
             const clientId = $(this).data('id');
             const clientName = $(this).data('name');
+            const button = $(this);
 
-            if (confirm('Are you sure you want to delete client record for ' + clientName + '?')) {
-                $.post('/organizations/client-record/delete', {id: clientId}, function (response) {
-                    if (response.success) {
-                        loadClientRecords(); // Reload the modal table
-                        loadClientRecordsTab(); // Reload the tab table
-                        showAlert('success', 'Client record deleted successfully');
-                    } else {
-                        showAlert('error', 'Failed to delete client record');
+            if (!clientId) {
+                showAlert('error', 'Invalid client record ID');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete client record for ' + (clientName || 'Unknown') + '?')) {
+                // Disable button to prevent double-clicks
+                button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                
+                $.ajax({
+                    url: '/organizations/client-record/delete',
+                    method: 'POST',
+                    data: {id: clientId},
+                    timeout: 10000,
+                    dataType: 'json',
+                    success: function (response) {
+                        try {
+                            if (response && response.success) {
+                                loadClientRecords(); // Reload the modal table
+                                loadClientRecordsTab(); // Reload the tab table
+                                showAlert('success', 'Client record deleted successfully');
+                            } else {
+                                showAlert('error', response.message || 'Failed to delete client record');
+                            }
+                        } catch (error) {
+                            console.error('Error processing delete response:', error);
+                            showAlert('error', 'Error processing delete response');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Delete client AJAX error:', {xhr, status, error});
+                        
+                        let errorMessage = 'Error occurred while deleting client record';
+                        if (xhr.status === 0) {
+                            errorMessage = 'Network connection lost';
+                        } else if (xhr.status === 404) {
+                            errorMessage = 'Client record not found';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Server error occurred';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'Access denied';
+                        } else if (status === 'timeout') {
+                            errorMessage = 'Request timed out';
+                        }
+                        
+                        showAlert('error', errorMessage);
+                    },
+                    complete: function () {
+                        // Re-enable button
+                        button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
                     }
-                }).fail(function () {
-                    showAlert('error', 'Error occurred while deleting client record');
                 });
             }
         });
     });
 
-    // Function to load employee records
+    // Function to load employee records with comprehensive error handling
     function loadEmployeeRecords() {
-        const organizationId = /*[[${organization.id}]]*/ 0;
         const tbody = $('#employeeRecordsTable tbody');
-        tbody.html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
+        if (!tbody.length) {
+            console.error('Employee records table body not found');
+            return;
+        }
+        
+        tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>');
 
-        $.get('/organizations/' + organizationId + '/employee-records', function (data) {
-            tbody.empty();
-            if (data && data.length > 0) {
-                data.forEach(function (employee) {
-                    const row = `
-                        <tr>
-                            <td>${employee.name || 'N/A'}</td>
-                            <td>${employee.nrc || 'N/A'}</td>
-                            <td>${employee.tpin || 'N/A'}</td>
-                            <td>${employee.manNumber || 'N/A'}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-outline-primary edit-employee-btn" 
-                                            data-id="${employee.id}"
-                                            data-name="${employee.name || ''}"
-                                            data-nrc="${employee.nrc || ''}"
-                                            data-tpin="${employee.tpin || ''}"
-                                            data-man-number="${employee.manNumber || ''}"
-                                            title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-danger delete-employee-btn"
-                                            data-id="${employee.id}"
-                                            data-name="${employee.name || ''}"
-                                            title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.append(row);
-                });
-            } else {
-                tbody.html('<tr><td colspan="5" class="text-center text-muted">No employee records found</td></tr>');
+        $.ajax({
+            url: '/organizations/' + organizationId + '/employee-records',
+            method: 'GET',
+            timeout: 10000,
+            dataType: 'json',
+            success: function (data) {
+                try {
+                    tbody.empty();
+                    if (data && Array.isArray(data) && data.length > 0) {
+                        data.forEach(function (employee) {
+                            // Validate employee data
+                            if (!employee || typeof employee !== 'object') {
+                                console.warn('Invalid employee data:', employee);
+                                return;
+                            }
+                            
+                            const row = `
+                                <tr>
+                                    <td>${employee.name || 'N/A'}</td>
+                                    <td>${employee.nrc || 'N/A'}</td>
+                                    <td>${employee.tpin || 'N/A'}</td>
+                                    <td>${employee.manNumber || 'N/A'}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-primary edit-employee-btn" 
+                                                    data-id="${employee.id || ''}"
+                                                    data-name="${employee.name || ''}"
+                                                    data-nrc="${employee.nrc || ''}"
+                                                    data-tpin="${employee.tpin || ''}"
+                                                    data-man-number="${employee.manNumber || ''}"
+                                                    title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger delete-employee-btn"
+                                                    data-id="${employee.id || ''}"
+                                                    data-name="${employee.name || ''}"
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.html('<tr><td colspan="5" class="text-center text-muted"><i class="fas fa-info-circle me-2"></i>No employee records found</td></tr>');
+                    }
+                } catch (error) {
+                    console.error('Error processing employee data:', error);
+                    tbody.html('<tr><td colspan="5" class="text-center text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error processing data</td></tr>');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Employee records AJAX error:', {xhr, status, error});
+                
+                let errorMessage = 'Error loading employee records';
+                if (xhr.status === 0) {
+                    errorMessage = 'Network connection lost';
+                } else if (xhr.status === 404) {
+                    errorMessage = 'Employee records not found';
+                } else if (xhr.status === 500) {
+                    errorMessage = 'Server error occurred';
+                } else if (xhr.status === 403) {
+                    errorMessage = 'Access denied';
+                } else if (status === 'timeout') {
+                    errorMessage = 'Request timed out';
+                }
+                
+                tbody.html(`<tr><td colspan="5" class="text-center text-danger"><i class="fas fa-exclamation-triangle me-2"></i>${errorMessage}</td></tr>`);
+                
+                // Show user-friendly notification
+                if (typeof showAlert === 'function') {
+                    showAlert('error', errorMessage);
+                }
             }
-        }).fail(function () {
-            tbody.html('<tr><td colspan="5" class="text-center text-danger">Error loading employee records</td></tr>');
         });
     }
 
-    // Function to load client records
+    // Function to load client records with comprehensive error handling
     function loadClientRecords() {
-        const organizationId = /*[[${organization.id}]]*/ 0;
         const tbody = $('#clientRecordsTable tbody');
-        tbody.html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
+        if (!tbody.length) {
+            console.error('Client records table body not found');
+            return;
+        }
+        
+        tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>');
 
-        $.get('/organizations/' + organizationId + '/client-records', function (data) {
-            tbody.empty();
-            if (data && data.length > 0) {
-                data.forEach(function (client) {
-                    const row = `
-                        <tr>
-                            <td>${client.name || 'N/A'}</td>
-                            <td>${client.nrc || 'N/A'}</td>
-                            <td>${client.phoneNumber || 'N/A'}</td>
-                            <td>${client.email || 'N/A'}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-outline-primary edit-client-btn" 
-                                            data-id="${client.id}"
-                                            data-name="${client.name || ''}"
-                                            data-nrc="${client.nrc || ''}"
-                                            data-phone="${client.phoneNumber || ''}"
-                                            data-email="${client.email || ''}"
-                                            title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-danger delete-client-btn"
-                                            data-id="${client.id}"
-                                            data-name="${client.name || ''}"
-                                            title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.append(row);
-                });
-            } else {
-                tbody.html('<tr><td colspan="5" class="text-center text-muted">No client records found</td></tr>');
+        $.ajax({
+            url: '/organizations/' + organizationId + '/client-records',
+            method: 'GET',
+            timeout: 10000,
+            dataType: 'json',
+            success: function (data) {
+                try {
+                    tbody.empty();
+                    if (data && Array.isArray(data) && data.length > 0) {
+                        data.forEach(function (client) {
+                            // Validate client data
+                            if (!client || typeof client !== 'object') {
+                                console.warn('Invalid client data:', client);
+                                return;
+                            }
+                            
+                            const row = `
+                                <tr>
+                                    <td>${client.name || 'N/A'}</td>
+                                    <td>${client.nrc || 'N/A'}</td>
+                                    <td>${client.phoneNumber || 'N/A'}</td>
+                                    <td>${client.email || 'N/A'}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-primary edit-client-btn" 
+                                                    data-id="${client.id || ''}"
+                                                    data-name="${client.name || ''}"
+                                                    data-nrc="${client.nrc || ''}"
+                                                    data-phone="${client.phoneNumber || ''}"
+                                                    data-email="${client.email || ''}"
+                                                    title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger delete-client-btn"
+                                                    data-id="${client.id || ''}"
+                                                    data-name="${client.name || ''}"
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.html('<tr><td colspan="5" class="text-center text-muted"><i class="fas fa-info-circle me-2"></i>No client records found</td></tr>');
+                    }
+                } catch (error) {
+                    console.error('Error processing client data:', error);
+                    tbody.html('<tr><td colspan="5" class="text-center text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error processing data</td></tr>');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Client records AJAX error:', {xhr, status, error});
+                
+                let errorMessage = 'Error loading client records';
+                if (xhr.status === 0) {
+                    errorMessage = 'Network connection lost';
+                } else if (xhr.status === 404) {
+                    errorMessage = 'Client records not found';
+                } else if (xhr.status === 500) {
+                    errorMessage = 'Server error occurred';
+                } else if (xhr.status === 403) {
+                    errorMessage = 'Access denied';
+                } else if (status === 'timeout') {
+                    errorMessage = 'Request timed out';
+                }
+                
+                tbody.html(`<tr><td colspan="5" class="text-center text-danger"><i class="fas fa-exclamation-triangle me-2"></i>${errorMessage}</td></tr>`);
+                
+                // Show user-friendly notification
+                if (typeof showAlert === 'function') {
+                    showAlert('error', errorMessage);
+                }
             }
-        }).fail(function () {
-            tbody.html('<tr><td colspan="5" class="text-center text-danger">Error loading client records</td></tr>');
         });
     }
 
@@ -1261,7 +1419,7 @@
 
     // Function to load employee records in the main tab
     function loadEmployeeRecordsTab() {
-        const organizationId = /*[[${organization.id}]]*/ 0;
+        console.log('Loading employee records for organization ID:', organizationId);
         const tbody = $('#employeeRecordsMainTable tbody');
 
         // Show loading state
@@ -1331,14 +1489,18 @@
 
     // Function to load client records in the main tab
     function loadClientRecordsTab() {
-        const organizationId = /*[[${organization.id}]]*/ 0;
+        console.log('Loading client records for organization ID:', organizationId);
         const tbody = $('#clientRecordsMainTable tbody');
-
+        console.log('Found tbody element:', tbody.length);
+        
         // Show loading state
         tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading client records...</td></tr>');
 
         $.get('/organizations/' + organizationId + '/client-records', function (data) {
+            console.log('Client records API response:', data);
+            console.log('About to clear tbody and populate with', data.length, 'records');
             tbody.empty();
+            console.log('Tbody cleared, current content:', tbody.html());
             if (data && data.length > 0) {
                 data.forEach(function (client, index) {
                     const avatar = client.name ? client.name.charAt(0).toUpperCase() : 'N';
@@ -1382,6 +1544,34 @@
 
                 // Update badge count
                 $('#clients-tab .badge').text(data.length);
+                
+                // Force table visibility with multiple approaches
+                $('#clientRecordsMainTable').show();
+                $('#clientRecordsMainTable').css('display', 'table');
+                $('#clientRecordsMainTable').css('visibility', 'visible');
+                $('#clientRecordsMainTable').removeClass('d-none');
+                $('#clientRecordsMainTable').addClass('d-block');
+                
+                // Force table wrapper visibility
+                $('#clientRecordsMainTable').parent().show();
+                $('#clientRecordsMainTable').parent().css('display', 'block');
+                $('#clientRecordsMainTable').parent().css('visibility', 'visible');
+                $('#clientRecordsMainTable').parent().removeClass('d-none');
+                $('#clientRecordsMainTable').parent().addClass('d-block');
+                
+                console.log('Successfully loaded', data.length, 'client records');
+                console.log('Final tbody content:', tbody.html());
+                console.log('Table visibility check:', $('#clientRecordsMainTable').is(':visible'));
+                console.log('Table display style:', $('#clientRecordsMainTable').css('display'));
+                console.log('Table visibility style:', $('#clientRecordsMainTable').css('visibility'));
+                console.log('Table wrapper visibility after fix:', $('#clientRecordsMainTable').parent().is(':visible'));
+                console.log('Table wrapper display style after fix:', $('#clientRecordsMainTable').parent().css('display'));
+                console.log('Table wrapper classes:', $('#clientRecordsMainTable').parent().attr('class'));
+                console.log('Clients tab visibility check:', $('#clients').is(':visible'));
+                console.log('Clients tab classes:', $('#clients').attr('class'));
+                
+                // Add a temporary visible indicator to test if content is being added
+                tbody.prepend('<tr style="background-color: yellow !important;"><td colspan="6" style="color: red; font-weight: bold;">DEBUG: Client records loaded successfully!</td></tr>');
             } else {
                 tbody.html(`
                     <tr>
@@ -1393,8 +1583,10 @@
                     </tr>
                 `);
                 $('#clients-tab .badge').text('0');
+                console.log('No client records found');
             }
-        }).fail(function () {
+        }).fail(function (xhr, status, error) {
+            console.error('Error loading client records:', status, error);
             tbody.html('<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>Error loading client records</td></tr>');
         });
     }
@@ -1408,23 +1600,93 @@
 
     var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
 
-    L.Control.geocoder({
-        defaultMarkGeocode: false
-    }).on('markgeocode', function (e) {
-        var bbox = e.geocode.bbox;
-        var poly = L.polygon([
-            bbox.getSouthEast(),
-            bbox.getNorthEast(),
-            bbox.getNorthWest(),
-            bbox.getSouthWest()
-        ]).addTo(map);
-        map.fitBounds(poly.getBounds());
-    }).addTo(map);
+    // Geocoder functionality removed to prevent JavaScript errors
+    // If needed, include the Leaflet Control Geocoder plugin separately
 
 </script>
 <script>
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Handle organization admin enable/disable toggle
+        $('.toggle-admin-status').on('click', function() {
+            var button = $(this);
+            var adminId = button.data('admin-id');
+            var currentStatus = button.data('current-status');
+            var newStatus = !currentStatus;
+            var actionText = newStatus ? 'enable' : 'disable';
+            
+            if (!confirm('Are you sure you want to ' + actionText + ' this organization admin?')) {
+                return;
+            }
+            
+            // Disable button during request
+            button.prop('disabled', true);
+            
+            $.ajax({
+                url: '/organization-admin/toggle-status',
+                type: 'POST',
+                data: {
+                    adminId: adminId,
+                    enabled: newStatus
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Update button appearance
+                        button.removeClass('btn-success btn-danger');
+                        button.addClass(newStatus ? 'btn-danger' : 'btn-success');
+                        
+                        // Update button text and icon
+                        button.find('span').text(newStatus ? 'Disable' : 'Enable');
+                        button.find('i').attr('data-lucide', newStatus ? 'user-x' : 'user-check');
+                        
+                        // Update data attribute
+                        button.data('current-status', newStatus);
+                        
+                        // Refresh lucide icons
+                        lucide.createIcons();
+                        
+                        // Show success message
+                        showAlert('success', response.message);
+                        
+                        // Optionally reload the page to refresh all data
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                        
+                    } else {
+                        showAlert('error', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error toggling admin status:', error);
+                    showAlert('error', 'Failed to update organization admin status. Please try again.');
+                },
+                complete: function() {
+                    // Re-enable button
+                    button.prop('disabled', false);
+                }
+            });
+        });
+        
+        // Helper function to show alerts
+        function showAlert(type, message) {
+            var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            var alertHtml = '<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert">' +
+                           message +
+                           '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                           '</div>';
+            
+            // Remove existing alerts
+            $('.alert').remove();
+            
+            // Add new alert at the top of the content
+            $('.content .container-fluid').prepend(alertHtml);
+        }
     });
 </script>
 

@@ -689,10 +689,49 @@
         window.addEventListener('DOMContentLoaded', function () {
             console.log('Paykesho UI Error Handling initialized');
 
-            // Check for required libraries
+            // Comprehensive library availability checks
+            const missingLibraries = [];
+            
+            // Check jQuery
             if (typeof $ === 'undefined') {
-                console.error('jQuery is not loaded');
-                document.body.innerHTML = '<div class="alert alert-danger m-3">Required libraries failed to load. Please refresh the page.</div>';
+                missingLibraries.push('jQuery');
+            }
+            
+            // Check Bootstrap
+            if (typeof bootstrap === 'undefined') {
+                console.warn('Bootstrap not loaded - some UI components may not work');
+            }
+            
+            // Check SweetAlert2
+            if (typeof Swal === 'undefined') {
+                console.warn('SweetAlert2 not loaded - using fallback alerts');
+                // Implement fallback alert function
+                window.Swal = {
+                    fire: function(options) {
+                        const title = options.title || 'Alert';
+                        const text = options.text || options.html || '';
+                        const type = options.icon || 'info';
+                        alert(`${title}\n\n${text}`);
+                    }
+                };
+            }
+            
+            // Check Leaflet
+            if (typeof L === 'undefined') {
+                console.warn('Leaflet not loaded - maps will not be available');
+            }
+            
+            // If critical libraries are missing, show error
+            if (missingLibraries.length > 0) {
+                console.error('Critical libraries not loaded:', missingLibraries);
+                document.body.innerHTML = `
+                    <div class="alert alert-danger m-3">
+                        <h4>Required Libraries Failed to Load</h4>
+                        <p>The following libraries are required but not loaded: ${missingLibraries.join(', ')}</p>
+                        <p>Please refresh the page or contact support if the problem persists.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh Page</button>
+                    </div>
+                `;
                 return;
             }
 
@@ -731,7 +770,66 @@
 
                 return safeFormSubmit(this);
             });
+            
+            // Initialize network monitoring
+            initializeNetworkMonitoring();
         });
+        
+        // Network monitoring functionality
+        function initializeNetworkMonitoring() {
+            // Monitor online/offline status
+            window.addEventListener('online', function() {
+                console.log('Network connection restored');
+                showNetworkNotification('Connection restored', 'success');
+                // Retry any failed operations
+                retryFailedOperations();
+            });
+
+            window.addEventListener('offline', function() {
+                console.log('Network connection lost');
+                showNetworkNotification('Connection lost - some features may be unavailable', 'warning');
+            });
+            
+            // Check initial connection status
+            if (!navigator.onLine) {
+                showNetworkNotification('You are currently offline', 'warning');
+            }
+        }
+        
+        // Show network status notifications
+        function showNetworkNotification(message, type) {
+            if (typeof showErrorAlert === 'function') {
+                showErrorAlert(message, type);
+            } else {
+                // Fallback notification
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-warning';
+                const alertHtml = `
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                         style="top: 20px; right: 20px; z-index: 9999;" role="alert">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', alertHtml);
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    const alerts = document.querySelectorAll('.alert');
+                    alerts.forEach(alert => {
+                        if (alert.textContent.includes(message)) {
+                            alert.remove();
+                        }
+                    });
+                }, 5000);
+            }
+        }
+        
+        // Retry failed operations when connection is restored
+        function retryFailedOperations() {
+            // This could be expanded to track and retry specific failed operations
+            console.log('Retrying failed operations...');
+        }
     </script>
 </th:block>
 </body>

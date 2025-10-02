@@ -19,7 +19,8 @@ public interface EmployeeRecordRepository extends SearchRepository<EmployeeRecor
 
     public Long countById(Integer id);
 
-    public List<EmployeeRecord> getEmployeeRecordsByOrganizationId(Integer id);
+    @Query("SELECT e FROM EmployeeRecord e WHERE e.organization.id = :organizationId")
+    public List<EmployeeRecord> getEmployeeRecordsByOrganizationId(@Param("organizationId") Integer id);
 
     @Query("select m from EmployeeRecord m where concat(m.name, ' ', m.nrc, ' ', m.tpin, ' ', m.manNumber) like %?1%")
     public Page<EmployeeRecord> findAll(String keyword, Pageable pageable);

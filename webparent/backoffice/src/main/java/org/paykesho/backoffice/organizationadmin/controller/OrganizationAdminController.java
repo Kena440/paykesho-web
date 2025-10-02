@@ -117,6 +117,34 @@ public class OrganizationAdminController {
         }
     }
 
+    @PostMapping("/toggle-status")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> toggleOrganizationAdminStatus(@RequestParam Integer adminId, @RequestParam boolean enabled) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            log.debug("Toggling organization admin status for ID: {} to: {}", adminId, enabled);
+            organizationAdminService.updateCustomerEnabledStatus(adminId, enabled);
+            
+            OrganizationAdmin admin = organizationAdminService.get(adminId);
+            String status = enabled ? "enabled" : "disabled";
+            String message = String.format("Organization admin '%s' has been %s successfully.", admin.getFullName(), status);
+            
+            response.put("success", true);
+            response.put("message", message);
+            response.put("enabled", enabled);
+            
+            log.info("Successfully {} organization admin: {} (ID: {})", status, admin.getEmail(), adminId);
+            
+        } catch (Exception e) {
+            log.error("Error toggling organization admin status for ID {}: {}", adminId, e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "Failed to update organization admin status: " + e.getMessage());
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam Integer adminId, @RequestParam Integer organizationId,
                                 RedirectAttributes redirectAttributes) {

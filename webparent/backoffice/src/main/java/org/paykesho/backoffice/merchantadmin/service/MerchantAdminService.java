@@ -368,6 +368,7 @@ public class MerchantAdminService {
     private void sendPasswordResetNotification(MerchantAdmin merchantAdmin, String newPassword, Merchant merchant) {
         try {
             log.debug("Sending password reset notification to: {}", merchantAdmin.getEmail());
+            // Note: Password is not logged for security reasons
 
             // Send email notification
             String emailMessage = generatePasswordResetEmailMessage(merchantAdmin, newPassword, merchant);

@@ -6,7 +6,6 @@ import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Setting;
-import org.commons.enums.NotificationType;
 import org.commons.enums.VoucherStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.service.ClientService;
@@ -221,7 +220,7 @@ public class VoucherController {
         String emailMessage = generateEmailMessage(voucher, actionType, voucherAmount, message);
         String smsMessage = generateSmsMessage(voucher, actionType, message);
 
-        boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, "email");
 
         if (emailSent) {
             log.info("Email sent successfully to {}", voucher.getClient().getEmail());
@@ -229,7 +228,7 @@ public class VoucherController {
             log.error("Failed to send email to " + voucher.getClient().getEmail());
         }
 
-        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, "sms");
 
         if (smsSent) {
             log.info("SMS sent successfully to {}", voucher.getClient().getPhoneNumber());

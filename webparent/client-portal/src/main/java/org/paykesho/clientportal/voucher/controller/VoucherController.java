@@ -6,7 +6,6 @@ import org.commons.entity.Voucher;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.RepaymentSchedule;
 import org.commons.enums.FileType;
-import org.commons.enums.NotificationType;
 import org.commons.enums.VoucherStatus;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.api.dto.VoucherRequestDto;
@@ -178,7 +177,7 @@ public class VoucherController {
         String smsMessage = generateSmsMessage(voucher, "REQUEST");
 
         // Send email notification
-        boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, NotificationType.email.defaultDescription());
+        boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, "email");
         if (emailSent) {
             log.info("Email sent successfully to {}", voucher.getClient().getEmail());
         } else {
@@ -186,7 +185,7 @@ public class VoucherController {
         }
 
         // Send SMS notification
-        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, NotificationType.sms.defaultDescription());
+        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, "sms");
         if (smsSent) {
             log.info("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
         } else {

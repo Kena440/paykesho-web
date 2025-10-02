@@ -300,9 +300,14 @@
         });
     }
 
-    // Initialize QR Scanner with WebView support
+    // Initialize QR Scanner with WebView support and enhanced error handling
     async function initQRScanner() {
         try {
+            // Check if Html5Qrcode is available
+            if (typeof Html5Qrcode === 'undefined') {
+                throw new Error('HTML5-QRCode library not loaded');
+            }
+
             if (html5QrCode) {
                 await html5QrCode.clear();
             }
@@ -316,22 +321,41 @@
 
             // Always use back camera on mobile devices
             if (isMobile) {
-                const devices = await Html5Qrcode.getCameras();
-                if (devices && devices.length > 0) {
-                    // Prefer back/rear camera
-                    const backCamera = devices.find(device =>
-                        device.label.toLowerCase().includes('back') ||
-                        device.label.toLowerCase().includes('rear')
-                    );
-                    const cameraId = backCamera ? backCamera.id : devices[0].id;
-                    await html5QrCode.start(
-                        {deviceId: cameraId},
-                        config,
-                        onScanSuccess,
-                        onScanFailure
-                    );
-                } else {
-                    throw new Error('No cameras found');
+                try {
+                    const devices = await Html5Qrcode.getCameras();
+                    if (devices && devices.length > 0) {
+                        // Prefer back/rear camera
+                        const backCamera = devices.find(device =>
+                            device.label.toLowerCase().includes('back') ||
+                            device.label.toLowerCase().includes('rear')
+                        );
+                        const cameraId = backCamera ? backCamera.id : devices[0].id;
+                        await html5QrCode.start(
+                            {deviceId: cameraId},
+                            config,
+                            onScanSuccess,
+                            onScanFailure
+                        );
+                    } else {
+                        throw new Error('No cameras found');
+                    }
+                } catch (cameraError) {
+                    console.error('Camera access error:', cameraError);
+                    
+                    // Provide more specific error messages
+                    let errorMessage = 'Unable to access camera. Please check your permissions and try again.';
+                    if (cameraError.name === 'NotAllowedError') {
+                        errorMessage = 'Camera access denied. Please allow camera permissions in your browser settings.';
+                    } else if (cameraError.name === 'NotFoundError') {
+                        errorMessage = 'No camera found on this device.';
+                    } else if (cameraError.name === 'NotReadableError') {
+                        errorMessage = 'Camera is already in use by another application.';
+                    } else if (cameraError.name === 'OverconstrainedError') {
+                        errorMessage = 'Camera does not support the required constraints.';
+                    }
+                    
+                    showNotification('Error', errorMessage, 'error');
+                    throw cameraError;
                 }
             } else {
                 // For regular web browsers
@@ -345,8 +369,20 @@
             }
         } catch (err) {
             console.error('QR Scanner initialization error:', err);
-            showNotification('Error', 'Unable to access camera. Please check your permissions and try again.', 'error');
+            
+            // Handle different types of errors
+            let errorMessage = 'Unable to access camera. Please check your permissions and try again.';
+            if (err.message === 'HTML5-QRCode library not loaded') {
+                errorMessage = 'QR scanning library not loaded. Please refresh the page.';
+            } else if (err.name === 'NotAllowedError') {
+                errorMessage = 'Camera access denied. Please allow camera permissions.';
+            } else if (err.name === 'NotFoundError') {
+                errorMessage = 'No camera found on this device.';
+            }
+            
+            showNotification('Error', errorMessage, 'error');
             qrScannerContainer.style.display = 'none';
+            throw err;
         }
     }
 
@@ -445,6 +481,12 @@
     });
 
     scanQrButton.addEventListener('click', async () => {
+        // Check if HTML5-QRCode library is loaded
+        if (typeof Html5Qrcode === 'undefined') {
+            showNotification('Error', 'QR scanning library not loaded. Please refresh the page.', 'error');
+            return;
+        }
+
         if (!isMobile) {
             showNotification('Warning', 'QR scanning is only available on mobile devices.', 'warning');
             return;
