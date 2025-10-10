@@ -68,4 +68,19 @@ public class NotificationClient {
             return false;
         }
     }
+
+    public boolean sendAdminPasswordResetEmail(String adminName, String adminEmail, String portalUrl, 
+                                             String temporaryPassword, String entityName) {
+        try {
+            log.info("Creating admin password reset notification request for {} from backoffice module", adminEmail);
+            databaseNotificationService.createAdminPasswordResetNotificationRequest(
+                adminEmail, adminName, portalUrl, temporaryPassword, entityName
+            );
+            log.info("Created admin password reset notification request for {} via database", adminEmail);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to create admin password reset notification request: {}", e.getMessage());
+            return false;
+        }
+    }
 }

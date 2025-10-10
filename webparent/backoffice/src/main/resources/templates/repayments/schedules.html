@@ -44,7 +44,7 @@
                                 <h6 class="card-subtitle text-muted">A list of repayment schedules.</h6>
                             </div>
                             <div class="card-body">
-                                <table class="table table-striped w-100" id="datatables-reponsive">
+                                <table class="table table-striped w-100" id="datatables-responsive">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -103,9 +103,13 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Datatables Responsive
-        $("#datatables-reponsive").DataTable({
+        $("#datatables-responsive").DataTable({
             destroy: true,
-            responsive: true
+            responsive: true,
+            error: function (xhr, error, thrown) {
+                console.error('DataTable error:', error, thrown);
+                showErrorAlert('Failed to load data table. Please refresh the page.');
+            }
         });
     });
 </script>

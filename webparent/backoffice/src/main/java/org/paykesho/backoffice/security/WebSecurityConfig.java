@@ -62,7 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests(authz -> authz
                         .antMatchers("/events/registration/**", "/events/generateQRCode", "/assessments/registration/**",
-                                "/assessments/generateQRCode", "/actuator/health", "/test/**", "/debug/**").permitAll()
+                                "/assessments/generateQRCode", "/actuator/health", "/test/**", "/debug/**",
+                                "/forgot-password", "/forgot-password/captcha", "/reset-password").permitAll()
                         .antMatchers("/actuator/**").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
                         .antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
                         .anyRequest().authenticated()

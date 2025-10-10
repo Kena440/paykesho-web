@@ -321,6 +321,7 @@ public class MerchantAdminService {
             merchantAdmin.setPassword(encodedPassword);
             merchantAdmin.setAccountNonLocked(true);
             merchantAdmin.setFailedAttempt(0);
+            merchantAdmin.setEnabled(true); // Enable account after password reset
 
             // Save updated admin
             merchantAdminRepository.save(merchantAdmin);
@@ -360,7 +361,7 @@ public class MerchantAdminService {
             char temp = passwordArray[i];
             passwordArray[i] = passwordArray[j];
             passwordArray[j] = temp;
-        }
+        } 
 
         return new String(passwordArray);
     }
@@ -370,9 +371,14 @@ public class MerchantAdminService {
             log.debug("Sending password reset notification to: {}", merchantAdmin.getEmail());
             // Note: Password is not logged for security reasons
 
-            // Send email notification
-            String emailMessage = generatePasswordResetEmailMessage(merchantAdmin, newPassword, merchant);
-            boolean emailSent = notificationClient.sendNotification(merchantAdmin.getEmail(), emailMessage, "email");
+            // Send email notification using professional template with new password
+            boolean emailSent = notificationClient.sendAdminPasswordResetEmail(
+                merchantAdmin.getFullName(),
+                merchantAdmin.getEmail(),
+                "https://merchant.paykesho.com/",
+                newPassword,
+                merchant.getName()
+            );
 
             if (emailSent) {
                 log.info("Password reset email sent successfully to {}", merchantAdmin.getEmail());
@@ -396,35 +402,6 @@ public class MerchantAdminService {
         }
     }
 
-    private String generatePasswordResetEmailMessage(MerchantAdmin merchantAdmin, String newPassword, Merchant merchant) {
-        StringBuilder message = new StringBuilder();
-        message.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
-        message.append("<div style='background-color: #f8f9fa; padding: 20px; border-radius: 8px;'>");
-        message.append("<h2 style='color: #ffc107; margin-bottom: 20px;'>Password Reset - Paykesho Merchant Portal</h2>");
-        message.append("<p>Hello <strong>").append(merchantAdmin.getFullName()).append("</strong>,</p>");
-        message.append("<p>Your password has been reset for your <strong>").append(merchant.getName()).append("</strong> merchant admin account.</p>");
-        message.append("<div style='background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;'>");
-        message.append("<h4 style='margin-top: 0; color: #856404;'>Your New Login Credentials:</h4>");
-        message.append("<p><strong>Login URL:</strong> <a href='https://merchant.paykesho.com/' style='color: #007bff;'>https://merchant.paykesho.com/</a></p>");
-        message.append("<p><strong>Email:</strong> ").append(merchantAdmin.getEmail()).append("</p>");
-        message.append("<p><strong>New Temporary Password:</strong> <code style='background-color: #fff; padding: 2px 6px; border-radius: 3px;'>").append(newPassword).append("</code></p>");
-        message.append("</div>");
-        message.append("<div style='background-color: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #dc3545;'>");
-        message.append("<h4 style='margin-top: 0; color: #721c24;'>Important Security Notice:</h4>");
-        message.append("<ul style='color: #721c24;'>");
-        message.append("<li><strong>You must change this password immediately</strong> after your first login</li>");
-        message.append("<li>This temporary password will expire in 24 hours</li>");
-        message.append("<li>Use a strong, unique password with at least 8 characters</li>");
-        message.append("<li>Include uppercase, lowercase, numbers, and special characters</li>");
-        message.append("<li>If you did not request this password reset, contact support immediately</li>");
-        message.append("</ul>");
-        message.append("</div>");
-        message.append("<p>If you have any questions or need assistance, please contact our support team.</p>");
-        message.append("<p>Best regards,<br><strong>Paykesho Team</strong></p>");
-        message.append("</div>");
-        message.append("</div>");
-        return message.toString();
-    }
 
     private String generatePasswordResetSmsMessage(MerchantAdmin merchantAdmin, String newPassword, Merchant merchant) {
         return String.format("Paykesho Password Reset: Your password has been reset for %s. New password: %s. Login: https://merchant.paykesho.com/ Change password immediately after login. Contact support if you didn't request this.",

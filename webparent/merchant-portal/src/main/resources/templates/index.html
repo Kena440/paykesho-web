@@ -189,7 +189,7 @@
                                 <h6 class="text-muted mb-3">Active Customers</h6>
                                 <div id="customersContent">
                                     <span class="badge badge-subtle-info me-2"
-                                          th:text="${#numbers.formatDecimal(customerGrowthRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                          th:text="${#numbers.formatDecimal(customerGrowthRate ?: 0, 1, 1)} + '%'">0%</span>
                                     <span class="text-muted small">vs last month</span>
                                 </div>
                                 <div class="text-danger small" id="customersError" style="display: none;">
@@ -299,7 +299,7 @@
                                     </div>
                                 </div>
                                 <h4 class="text-warning mb-2"
-                                    th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</h4>
+                                    th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 1)} + '%'">0%</h4>
                                 <h6 class="text-muted mb-3">Success Rate</h6>
                                 <div id="successRateContent">
                                     <span class="badge badge-subtle-success me-2"
@@ -384,7 +384,7 @@
                                 <h6 class="text-muted mb-3">Weekly Transactions</h6>
                                 <div id="weeklyGrowthContent">
                                     <span class="badge badge-subtle-success me-2"
-                                          th:text="${#numbers.formatDecimal(weeklyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                          th:text="${#numbers.formatDecimal(weeklyGrowth ?: 0, 1, 1)} + '%'">0%</span>
                                     <span class="text-muted small">vs last week</span>
                                 </div>
                                 <div class="text-danger small" id="weeklyGrowthError" style="display: none;">
@@ -419,7 +419,7 @@
                                 <h6 class="text-muted mb-3">Monthly Revenue (ZMW)</h6>
                                 <div id="monthlyPerformanceContent">
                                     <span class="badge badge-subtle-info me-2"
-                                          th:text="${#numbers.formatDecimal(monthlyGrowth ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                          th:text="${#numbers.formatDecimal(monthlyGrowth ?: 0, 1, 1)} + '%'">0%</span>
                                     <span class="text-muted small">vs last month</span>
                                 </div>
                                 <div class="text-danger small" id="monthlyPerformanceError" style="display: none;">
@@ -450,7 +450,7 @@
                                     </div>
                                 </div>
                                 <h4 class="text-warning mb-2"
-                                    th:text="${#numbers.formatDecimal(customerRetentionRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</h4>
+                                    th:text="${#numbers.formatDecimal(customerRetentionRate ?: 0, 1, 1)} + '%'">0%</h4>
                                 <h6 class="text-muted mb-3">Customer Retention</h6>
                                 <div id="retentionRateContent">
                                     <span class="badge badge-subtle-warning me-2"

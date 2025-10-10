@@ -150,7 +150,7 @@
                     <hr>
 
                     <!-- Email -->
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label class="sr-only" for="modalPasswordResetEmail">
                             Email Address *
                         </label>
@@ -158,10 +158,40 @@
                                name="modalPasswordResetEmail" placeholder="Email Address *"
                                required type="email">
                     </div>
+
+                    <!-- CAPTCHA Challenge -->
+                    <div class="form-group mb-3" id="captchaSection" style="display: none;">
+                        <label for="captchaChallenge" class="form-label">
+                            <i class="fas fa-shield-alt text-primary"></i> Security Verification *
+                        </label>
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="captcha-challenge bg-light p-3 rounded border">
+                                    <div class="d-flex align-items-center">
+                                        <span class="captcha-question fw-bold text-primary fs-5 me-3"></span>
+                                        <span class="text-muted">= ?</span>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="captchaChallengeId" name="captchaChallengeId">
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-outline-secondary btn-sm w-100" id="refreshCaptcha">
+                                    <i class="fas fa-sync-alt"></i> New
+                                </button>
+                            </div>
+                        </div>
+                        <input class="form-control mt-2" id="captchaAnswer" name="captchaAnswer" 
+                               placeholder="Enter your answer" type="number" min="0" max="100">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i> Please solve the math problem above
+                        </small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
-                    <button class="btn btn-primary" type="submit">Reset</button>
+                    <button class="btn btn-primary" type="submit" id="submitResetBtn">
+                        <i class="fas fa-paper-plane"></i> Send Reset Link
+                    </button>
                 </div>
             </form>
         </div>
@@ -255,8 +285,12 @@ document.addEventListener('DOMContentLoaded', function() {
             bsAlert.close();
         }, 5000);
     });
+
 });
 </script>
+
+<!-- Password Reset CAPTCHA Script -->
+<th:block th:replace="fragments/password_reset_script :: password_reset_captcha_script"></th:block>
 
 </body>
 

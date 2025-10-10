@@ -15,6 +15,8 @@ import org.paykesho.backoffice.repayments.service.RepaymentService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.utils.PaykeshoReferenceService;
 import org.paykesho.backoffice.voucher.service.VoucherService;
+import org.paykesho.backoffice.idempotency.service.IdempotencyService;
+import org.commons.entity.IdempotencyRecord;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +33,7 @@ import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -50,6 +53,8 @@ public class VoucherController {
     private final SettingService settingService;
 
     private final RepaymentService repaymentService;
+
+    private final IdempotencyService idempotencyService;
 
     @GetMapping("")
     public String listAllVouchersByPage(Model model, HttpServletRequest request) throws PaykeshoError {
@@ -73,9 +78,46 @@ public class VoucherController {
 
     @GetMapping("/approve/{id}")
     public String approveVoucherRequest(@PathVariable("id") Integer voucherId, HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
-        Voucher approvedVoucher = runVoucherApprovalProcess(voucherId, request);
-        redirectAttributes.addFlashAttribute("message", "Voucher has been approved #" + approvedVoucher.getReference());
-        return "redirect:/vouchers";
+        // IDEMPOTENCY: Generate key for this approval operation
+        String idempotencyKey = "VOUCHER_APPROVAL_" + voucherId;
+        
+        // Check if already approved
+        Optional<IdempotencyRecord> existing = idempotencyService.checkIdempotency(idempotencyKey);
+        if (existing.isPresent() && existing.get().isCompleted()) {
+            log.warn("Voucher {} already approved. Skipping duplicate approval.", voucherId);
+            redirectAttributes.addFlashAttribute("message", "Voucher was already approved");
+            return "redirect:/vouchers";
+        }
+        
+        // Create idempotency record
+        try {
+            idempotencyService.createIdempotencyRecord(
+                idempotencyKey,
+                "/vouchers/approve/" + voucherId,
+                "GET",
+                String.valueOf(voucherId),
+                "backoffice-admin"
+            );
+        } catch (Exception e) {
+            log.error("Error creating idempotency record: {}", e.getMessage());
+        }
+        
+        try {
+            Voucher approvedVoucher = runVoucherApprovalProcess(voucherId, request);
+            
+            // Mark as completed
+            idempotencyService.markAsCompleted(
+                idempotencyKey, 200,
+                "{\"voucherRef\":\"" + approvedVoucher.getReference() + "\"}", null
+            );
+            
+            redirectAttributes.addFlashAttribute("message", "Voucher has been approved #" + approvedVoucher.getReference());
+            return "redirect:/vouchers";
+        } catch (Exception e) {
+            log.error("Error approving voucher: {}", e.getMessage());
+            idempotencyService.markAsFailed(idempotencyKey, e.getMessage(), 500);
+            throw e;
+        }
     }
 
     @GetMapping("/adjust")

@@ -54,6 +54,15 @@ public class ClientBalance extends IdBasedEntity {
 
     private Date lastUpdate;
 
+    /**
+     * Version field for optimistic locking to prevent concurrent balance update conflicts
+     * This will automatically increment on each update and throw OptimisticLockException
+     * if another transaction has modified the balance in the meantime
+     */
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     @Override
     public String toString() {
         return availableBalance + " [" + lastUpdate + "]";

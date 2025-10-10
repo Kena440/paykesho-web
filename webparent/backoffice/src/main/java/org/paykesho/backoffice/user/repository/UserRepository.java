@@ -24,4 +24,7 @@ public interface UserRepository extends SearchRepository<User, Integer> {
     @Query("UPDATE User u SET u.failedAttempt = ?1 WHERE u.email = ?2")
     @Modifying
     public void updateFailedAttempts(int failAttempts, String email);
+    
+    @Query("SELECT u FROM User u WHERE u.resetPasswordToken = ?1")
+    public User findByResetPasswordToken(String token);
 }

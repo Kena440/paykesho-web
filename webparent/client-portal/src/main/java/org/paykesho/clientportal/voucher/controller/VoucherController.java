@@ -172,12 +172,16 @@ public class VoucherController {
 
     // Private method to handle sending notifications
     private void sendNotification(Voucher voucher) {
-        // Generate messages
-        String emailMessage = generateEmailMessage(voucher, "REQUEST");
-        String smsMessage = generateSmsMessage(voucher, "REQUEST");
-
-        // Send email notification
-        boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, "email");
+        // Send email notification using professional template
+        boolean emailSent = notificationClient.sendVoucherNotificationEmail(
+            voucher.getClient().getFullName(),
+            voucher.getClient().getEmail(),
+            voucher.getReference(),
+            "REQUEST",
+            "Please allow some time for processing",
+            voucher.getAmount()
+        );
+        
         if (emailSent) {
             log.info("Email sent successfully to {}", voucher.getClient().getEmail());
         } else {
@@ -185,6 +189,7 @@ public class VoucherController {
         }
 
         // Send SMS notification
+        String smsMessage = generateSmsMessage(voucher, "REQUEST");
         boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, "sms");
         if (smsSent) {
             log.info("SMS sent successfully to " + voucher.getClient().getPhoneNumber());

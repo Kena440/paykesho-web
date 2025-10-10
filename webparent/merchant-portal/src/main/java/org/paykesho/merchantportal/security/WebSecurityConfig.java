@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests(authz -> authz
-                        .antMatchers("/forgot-password", "/reset-password", "/reset-password-action").permitAll()
+                        .antMatchers("/forgot-password", "/forgot-password/captcha", "/reset-password", "/reset-password-action").permitAll()
                         .antMatchers("/", "/account", "/assessors/update-account").authenticated()
                         .anyRequest().authenticated()
                 )

@@ -36,6 +36,9 @@ public class NotificationProcessorService {
     
     @Autowired
     private DatabaseNotificationService databaseNotificationService;
+    
+    @Autowired
+    private org.paykesho.notificationservice.utils.EmailTemplateService emailTemplateService;
 
     // Hardcoded configuration values
     private static final int RATE_LIMIT_DELAY_MS = 100;
@@ -266,16 +269,23 @@ public class NotificationProcessorService {
             
             try {
                 if (request.getNotificationType() == NotificationType.email) {
+                    // Generate proper HTML email content using templates
+                    String emailContent = generateEmailContent(request);
+                    
                     success = legacyNotificationService.sendEmail(
                         request.getRecipientEmail(), 
                         request.getSubject(), 
-                        request.getContent()
+                        emailContent
                     );
                 } else if (request.getNotificationType() == NotificationType.sms) {
                     success = legacyNotificationService.sendSms(
                         request.getRecipientPhone() != null ? request.getRecipientPhone() : request.getRecipientEmail(), 
                         request.getContent()
                     );
+                    // Set error message if SMS failed
+                    if (!success && errorMessage == null) {
+                        errorMessage = "SMS API returned failed status";
+                    }
                 } else {
                     LOGGER.warn("Unsupported notification type: {}", request.getNotificationType());
                     errorMessage = "Unsupported notification type: " + request.getNotificationType();
@@ -299,6 +309,144 @@ public class NotificationProcessorService {
         } catch (Exception e) {
             LOGGER.error("Error processing database notification request {}: {}", request.getId(), e.getMessage());
             databaseNotificationService.markNotificationAsFailed(request.getId(), e.getMessage());
+        }
+    }
+    
+    /**
+     * Generate email content using templates based on entity type
+     * This ensures all emails use uniform professional designs
+     */
+    private String generateEmailContent(NotificationRequest request) {
+        try {
+            // Extract metadata if available
+            String metadata = request.getMetadata();
+            String entityType = request.getEntityType();
+            String content = request.getContent();
+            
+            // If content is marked as template-generated, force template usage
+            boolean forceTemplate = "TEMPLATE_GENERATED".equals(content);
+            
+            // Use professional templates based on entity type
+            if ("PASSWORD_RESET".equals(entityType) || 
+                "MERCHANT_PASSWORD_RESET".equals(entityType) || 
+                "ORGANIZATION_PASSWORD_RESET".equals(entityType) || 
+                "CLIENT_PASSWORD_RESET".equals(entityType)) {
+                // Extract userName and resetUrl from metadata
+                String userName = extractFromMetadata(metadata, "userName");
+                String resetUrl = extractFromMetadata(metadata, "resetUrl");
+                
+                if (userName != null && resetUrl != null) {
+                    LOGGER.info("Generating password reset email using HTML template for {}", request.getRecipientEmail());
+                    return emailTemplateService.generatePasswordResetEmail(userName, request.getRecipientEmail(), resetUrl);
+                } else {
+                    LOGGER.warn("Missing userName or resetUrl for password reset email {}: userName={}, resetUrl={}", 
+                               request.getId(), userName, resetUrl);
+                }
+            } else if ("VOUCHER".equals(entityType)) {
+                // Extract voucher details from metadata
+                String clientName = extractFromMetadata(metadata, "clientName");
+                String voucherReference = request.getEntityReference();
+                String actionType = extractFromMetadata(metadata, "actionType");
+                String message = extractFromMetadata(metadata, "message");
+                String amountStr = extractFromMetadata(metadata, "amount");
+                
+                if (clientName != null && voucherReference != null && actionType != null && amountStr != null) {
+                    LOGGER.info("Generating voucher notification email using HTML template for {}", request.getRecipientEmail());
+                    java.math.BigDecimal amount = new java.math.BigDecimal(amountStr);
+                    return emailTemplateService.generateVoucherNotificationEmail(
+                        clientName, request.getRecipientEmail(), voucherReference, actionType, message, amount
+                    );
+                }
+            } else if ("TRANSACTION".equals(entityType)) {
+                // Extract transaction details from metadata
+                String transactionReference = request.getEntityReference();
+                String merchantName = extractFromMetadata(metadata, "merchantName");
+                String clientName = extractFromMetadata(metadata, "clientName");
+                String amountStr = extractFromMetadata(metadata, "amount");
+                
+                if (transactionReference != null && merchantName != null && clientName != null && amountStr != null) {
+                    LOGGER.info("Generating transaction notification email using HTML template for {}", request.getRecipientEmail());
+                    java.math.BigDecimal amount = new java.math.BigDecimal(amountStr);
+                    return emailTemplateService.generateTransactionNotificationEmail(
+                        clientName, request.getRecipientEmail(), transactionReference, merchantName, amount
+                    );
+                }
+            }
+            
+            // Fall back to original content if template generation fails or unsupported type
+            if (forceTemplate) {
+                LOGGER.error("Template generation failed for notification {} (entity type: {}) - cannot use fallback", 
+                           request.getId(), entityType);
+                // Generate a basic HTML email instead of plain text
+                return generateBasicHtmlEmail(request);
+            } else {
+                LOGGER.info("Using original content for notification {} (entity type: {})", request.getId(), entityType);
+                return content;
+            }
+            
+        } catch (Exception e) {
+            LOGGER.error("Error generating email content from template: {}", e.getMessage());
+            // Generate a basic HTML email instead of plain text fallback
+            return generateBasicHtmlEmail(request);
+        }
+    }
+    
+    /**
+     * Generate a basic HTML email when template generation fails
+     * This ensures emails are never sent as plain text
+     */
+    private String generateBasicHtmlEmail(NotificationRequest request) {
+        try {
+            String htmlContent = String.format(
+                "<!DOCTYPE html>" +
+                "<html>" +
+                "<head><meta charset='UTF-8'><title>%s</title></head>" +
+                "<body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>" +
+                "<div style='max-width: 600px; margin: 0 auto; padding: 20px;'>" +
+                "<h2 style='color: #007bff;'>%s</h2>" +
+                "<div style='white-space: pre-line;'>%s</div>" +
+                "<hr style='margin: 20px 0; border: none; border-top: 1px solid #eee;'>" +
+                "<p style='color: #666; font-size: 12px;'>Best regards,<br>Paykesho Team</p>" +
+                "</div></body></html>",
+                request.getSubject(),
+                request.getSubject(),
+                request.getContent().replace("<", "&lt;").replace(">", "&gt;")
+            );
+            LOGGER.info("Generated basic HTML email for notification {}", request.getId());
+            return htmlContent;
+        } catch (Exception e) {
+            LOGGER.error("Error generating basic HTML email: {}", e.getMessage());
+            // Last resort - return original content
+            return request.getContent();
+        }
+    }
+    
+    /**
+     * Extract value from JSON-like metadata string
+     */
+    private String extractFromMetadata(String metadata, String key) {
+        if (metadata == null || key == null) {
+            return null;
+        }
+        
+        try {
+            // Simple JSON parsing for metadata like: {"userName":"John","resetUrl":"http://..."}
+            String searchKey = "\"" + key + "\":\"";
+            int startIndex = metadata.indexOf(searchKey);
+            if (startIndex == -1) {
+                return null;
+            }
+            
+            startIndex += searchKey.length();
+            int endIndex = metadata.indexOf("\"", startIndex);
+            if (endIndex == -1) {
+                return null;
+            }
+            
+            return metadata.substring(startIndex, endIndex);
+        } catch (Exception e) {
+            LOGGER.error("Error extracting {} from metadata: {}", key, e.getMessage());
+            return null;
         }
     }
 
@@ -332,6 +480,10 @@ public class NotificationProcessorService {
                         notification.getRecipientEmail(), 
                         notification.getContent()
                     );
+                    // Set error message if SMS failed
+                    if (!success && errorMessage == null) {
+                        errorMessage = "SMS API returned failed status";
+                    }
                 } else {
                     LOGGER.warn("Unsupported notification type: {}", notification.getNotificationType());
                     errorMessage = "Unsupported notification type: " + notification.getNotificationType();

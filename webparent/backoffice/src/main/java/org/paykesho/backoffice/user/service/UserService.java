@@ -18,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import net.bytebuddy.utility.RandomString;
 
 @Slf4j
 @Service
@@ -263,6 +264,51 @@ public class UserService {
         }
 
         return false;
+    }
+    
+    /**
+     * Generate and update reset password token for user
+     * @param email User email
+     * @return Generated token
+     * @throws PaykeshoError if user not found
+     */
+    public String updateUserResetToken(String email) throws PaykeshoError {
+        User user = userRepository.getUserByEmail(email);
+        
+        if (user != null) {
+            String token = RandomString.make(30);
+            user.setResetPasswordToken(token);
+            userRepository.save(user);
+            
+            log.info("Reset password token generated for user: {}", email);
+            return token;
+        } else {
+            throw new PaykeshoError("User not found");
+        }
+    }
+    
+    /**
+     * Get user by reset password token
+     * @param token Reset password token
+     * @return User if found, null otherwise
+     */
+    public User getUserByResetToken(String token) {
+        return userRepository.findByResetPasswordToken(token);
+    }
+    
+    /**
+     * Update user password
+     * @param user User to update
+     * @param newPassword New password (will be encoded)
+     */
+    public void updateUserPassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        user.setAccountNonLocked(true);
+        user.setFailedAttempt(0);
+        userRepository.save(user);
+        
+        log.info("Password updated for user: {}", user.getEmail());
     }
 
 }

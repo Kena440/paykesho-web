@@ -384,6 +384,7 @@ public class OrganizationAdminService {
             organizationAdmin.setAccountNonLocked(true);
             organizationAdmin.setFailedAttempt(0);
             organizationAdmin.setLockTime(null); // Clear any existing lock time
+            organizationAdmin.setEnabled(true); // Enable account after password reset
 
             // CRASH POINT #5 FIX: Database save with enhanced error handling
             try {
@@ -464,30 +465,24 @@ public class OrganizationAdminService {
         try {
             log.debug("Sending password reset notification to: {}", organizationAdmin.getEmail());
 
-            // CRASH POINT #8 FIX: Email message generation with error handling
+            // CRASH POINT #7 FIX: Notification service with timeout and retry
             try {
-                String emailMessage = generatePasswordResetEmailMessage(organizationAdmin, newPassword, organization);
-                if (emailMessage == null || emailMessage.trim().isEmpty()) {
-                    log.error("Generated email message is empty for {}", organizationAdmin.getEmail());
-                    errorMessages.append("Email message generation failed. ");
+                emailSent = notificationClient.sendAdminPasswordResetEmail(
+                    organizationAdmin.getFullName(),
+                    organizationAdmin.getEmail(),
+                    "https://organization.paykesho.com/",
+                    newPassword,
+                    organization.getName()
+                );
+                if (emailSent) {
+                    log.info("Password reset email sent successfully to {}", organizationAdmin.getEmail());
                 } else {
-                    // CRASH POINT #7 FIX: Notification service with timeout and retry
-                    try {
-                        emailSent = notificationClient.sendNotification(organizationAdmin.getEmail(), emailMessage, "email");
-                        if (emailSent) {
-                            log.info("Password reset email sent successfully to {}", organizationAdmin.getEmail());
-                        } else {
-                            log.error("Failed to send password reset email to {}", organizationAdmin.getEmail());
-                            errorMessages.append("Email delivery failed. ");
-                        }
-                    } catch (Exception e) {
-                        log.error("Exception during email notification to {}: {}", organizationAdmin.getEmail(), e.getMessage());
-                        errorMessages.append("Email service error: ").append(e.getMessage()).append(". ");
-                    }
+                    log.error("Failed to send password reset email to {}", organizationAdmin.getEmail());
+                    errorMessages.append("Email delivery failed. ");
                 }
             } catch (Exception e) {
-                log.error("Error generating email message for {}: {}", organizationAdmin.getEmail(), e.getMessage());
-                errorMessages.append("Email message generation error: ").append(e.getMessage()).append(". ");
+                log.error("Exception during email notification to {}: {}", organizationAdmin.getEmail(), e.getMessage());
+                errorMessages.append("Email service error: ").append(e.getMessage()).append(". ");
             }
 
             // Send SMS notification if phone number is available
@@ -543,35 +538,6 @@ public class OrganizationAdminService {
         }
     }
 
-    private String generatePasswordResetEmailMessage(OrganizationAdmin organizationAdmin, String newPassword, Organization organization) {
-        StringBuilder message = new StringBuilder();
-        message.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
-        message.append("<div style='background-color: #f8f9fa; padding: 20px; border-radius: 8px;'>");
-        message.append("<h2 style='color: #ffc107; margin-bottom: 20px;'>Password Reset - Paykesho Organization Portal</h2>");
-        message.append("<p>Hello <strong>").append(organizationAdmin.getFullName()).append("</strong>,</p>");
-        message.append("<p>Your password has been reset for your <strong>").append(organization.getName()).append("</strong> organization admin account.</p>");
-        message.append("<div style='background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;'>");
-        message.append("<h4 style='margin-top: 0; color: #856404;'>Your New Login Credentials:</h4>");
-        message.append("<p><strong>Login URL:</strong> <a href='https://organization.paykesho.com/' style='color: #007bff;'>https://organization.paykesho.com/</a></p>");
-        message.append("<p><strong>Email:</strong> ").append(organizationAdmin.getEmail()).append("</p>");
-        message.append("<p><strong>New Temporary Password:</strong> <code style='background-color: #fff; padding: 2px 6px; border-radius: 3px;'>").append(newPassword).append("</code></p>");
-        message.append("</div>");
-        message.append("<div style='background-color: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #dc3545;'>");
-        message.append("<h4 style='margin-top: 0; color: #721c24;'>Important Security Notice:</h4>");
-        message.append("<ul style='color: #721c24;'>");
-        message.append("<li><strong>You must change this password immediately</strong> after your first login</li>");
-        message.append("<li>This temporary password will expire in 24 hours</li>");
-        message.append("<li>Use a strong, unique password with at least 8 characters</li>");
-        message.append("<li>Include uppercase, lowercase, numbers, and special characters</li>");
-        message.append("<li>If you did not request this password reset, contact support immediately</li>");
-        message.append("</ul>");
-        message.append("</div>");
-        message.append("<p>If you have any questions or need assistance, please contact our support team.</p>");
-        message.append("<p>Best regards,<br><strong>Paykesho Team</strong></p>");
-        message.append("</div>");
-        message.append("</div>");
-        return message.toString();
-    }
 
     private String generatePasswordResetSmsMessage(OrganizationAdmin organizationAdmin, String newPassword, Organization organization) {
         return String.format("Paykesho Password Reset: Your password has been reset for %s. Email: %s New password: %s. Login: https://organization.paykesho.com/ Change password immediately after login. Contact support if you didn't request this.",

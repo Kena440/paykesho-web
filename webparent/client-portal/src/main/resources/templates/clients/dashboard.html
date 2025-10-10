@@ -356,7 +356,7 @@
                                         </div>
                                     </div>
                                     <h4 class="text-danger mb-2"
-                                        th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">
+                                        th:text="${#numbers.formatDecimal(successRate ?: 0, 1, 1)} + '%'">
                                         0%</h4>
                                     <h6 class="text-muted mb-3">Transaction Success Rate</h6>
                                     <div id="transactionSuccessContent">
@@ -441,7 +441,7 @@
                                         </div>
                                     </div>
                                     <h4 class="text-info mb-2"
-                                        th:text="${#numbers.formatDecimal(voucherUsageRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">
+                                        th:text="${#numbers.formatDecimal(voucherUsageRate ?: 0, 1, 1)} + '%'">
                                         0%</h4>
                                     <h6 class="text-muted mb-3">Voucher Usage Rate</h6>
                                     <div id="voucherUsageContent">
@@ -481,7 +481,7 @@
                                     <h6 class="text-muted mb-3">Unique Merchants</h6>
                                     <div id="merchantDiversityContent">
                                         <span class="badge badge-subtle-warning me-2"
-                                            th:text="${#numbers.formatDecimal(merchantDiversityScore ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">0%</span>
+                                            th:text="${#numbers.formatDecimal(merchantDiversityScore ?: 0, 1, 1)} + '%'">0%</span>
                                         <span class="text-muted small">Diversity score</span>
                                     </div>
                                     <div class="text-danger small" id="merchantDiversityError" style="display: none;">
@@ -614,7 +614,7 @@
                                             th:text="${lastTransactionDate ?: 'No transactions'}">No transactions</span>
                                         <div class="mb-0">
                                             <span class="badge badge-subtle-secondary me-2"
-                                                th:text="${#numbers.formatDecimal(transactionFrequency ?: 0, 1, 'POINT')} + ' days avg'">0
+                                                th:text="${#numbers.formatDecimal(transactionFrequency ?: 0, 1, 1)} + ' days avg'">0
                                                 days avg</span>
                                             <span class="text-muted">Between transactions</span>
                                         </div>

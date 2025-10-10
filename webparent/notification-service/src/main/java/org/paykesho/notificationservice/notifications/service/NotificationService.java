@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Notification;
 import org.commons.entity.NotificationQueue;
+import org.commons.entity.IdempotencyRecord;
 import org.commons.enums.NotificationStatus;
 import org.commons.enums.NotificationType;
 import org.commons.utils.NotificationTypeUtils;
 import org.paykesho.notificationservice.notifications.repository.NotificationsRepository;
 import org.paykesho.notificationservice.repository.NotificationQueueRepository;
+import org.paykesho.notificationservice.idempotency.service.IdempotencyService;
 import org.paykesho.notificationservice.utils.EmailTemplateService;
 import org.paykesho.notificationservice.utils.general.ApplicationProperties;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.Message;
+import java.math.BigDecimal;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -44,6 +47,7 @@ public class NotificationService {
     private final NotificationsRepository notificationRepository;
     private final ApplicationProperties applicationProperties;
     private final EmailTemplateService emailTemplateService;
+    private final IdempotencyService idempotencyService;
     
     @Autowired
     private NotificationQueueRepository notificationQueueRepository;
@@ -53,6 +57,31 @@ public class NotificationService {
             return input.substring(0, MAX_MESSAGE_LENGTH) + "...";
         }
         return input;
+    }
+
+    /**
+     * Compute SHA-256 hash of notification content for idempotency checking
+     */
+    private String computeContentHash(String content) {
+        if (content == null || content.isEmpty()) {
+            return "";
+        }
+        
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(content.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            logger.error("Error computing content hash: {}", e.getMessage());
+            return content.hashCode() + ""; // Fallback to simple hashCode
+        }
     }
 
     /**
@@ -92,6 +121,39 @@ public class NotificationService {
             logger.error("Message cannot be empty");
             return false;
         }
+
+        // IDEMPOTENCY: Create content hash to detect duplicate notifications
+        String contentHash = computeContentHash(recipient + "|" + trimString(message) + "|" + notificationType);
+        String idempotencyKey = "NOTIFICATION_" + contentHash;
+
+        // Check if this notification was sent recently (within 1 hour)
+        try {
+            Optional<IdempotencyRecord> existing = idempotencyService.checkIdempotency(idempotencyKey);
+            if (existing.isPresent() && existing.get().isCompleted()) {
+                long timeSinceCreation = System.currentTimeMillis() - existing.get().getCreatedAt().getTime();
+                if (timeSinceCreation < 60 * 60 * 1000) { // 1 hour
+                    logger.info("Duplicate notification detected within 1 hour. Skipping. Recipient: {}", recipient);
+                    return true; // Return true as it was already sent
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error checking notification idempotency: {}", e.getMessage());
+            // Continue with sending if idempotency check fails
+        }
+
+        // Create idempotency record
+        try {
+            idempotencyService.createIdempotencyRecord(
+                idempotencyKey,
+                "/notifications/send",
+                "POST",
+                contentHash,
+                recipient
+            );
+        } catch (Exception e) {
+            logger.error("Error creating idempotency record: {}", e.getMessage());
+        }
+
         Notification saved = null;
         // Save notification to DB before sending
         try {
@@ -104,6 +166,7 @@ public class NotificationService {
             saved = notificationRepository.save(notification);
         } catch (Exception e) {
             logger.error("Error saving notification to database: {}", e.getMessage());
+            idempotencyService.markAsFailed(idempotencyKey, "DB save failed: " + e.getMessage(), 500);
         }
         boolean result;
         if (notificationType.equalsIgnoreCase("sms")) {
@@ -126,6 +189,18 @@ public class NotificationService {
         } catch (Exception e) {
             logger.error("Error updating notification status: {}", e.getMessage());
         }
+
+        // Mark idempotency as completed or failed
+        try {
+            if (result) {
+                idempotencyService.markAsCompleted(idempotencyKey, 200, "Notification sent", null);
+            } else {
+                idempotencyService.markAsFailed(idempotencyKey, "Notification send failed", 500);
+            }
+        } catch (Exception e) {
+            logger.error("Error marking idempotency: {}", e.getMessage());
+        }
+
         return result;
     }
 
@@ -223,6 +298,72 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Send voucher notification email using template
+     */
+    public boolean sendVoucherNotificationEmail(String clientName, String clientEmail, String voucherReference, 
+                                               String actionType, String message, BigDecimal amount) {
+        try {
+            if (clientName == null || clientEmail == null || voucherReference == null || actionType == null || amount == null) {
+                logger.error("Invalid parameters for voucher notification email: clientName={}, clientEmail={}, voucherReference={}, actionType={}, amount={}", 
+                           clientName, clientEmail, voucherReference, actionType, amount);
+                return false;
+            }
+            
+            String emailContent = emailTemplateService.generateVoucherNotificationEmail(
+                clientName, clientEmail, voucherReference, actionType, message, amount
+            );
+            return sendEmail(clientEmail, "Voucher Update - Paykesho", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending voucher notification email: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send transaction notification email using template
+     */
+    public boolean sendTransactionNotificationEmail(String clientName, String clientEmail, String transactionReference, 
+                                                   String merchantName, BigDecimal amount) {
+        try {
+            if (clientName == null || clientEmail == null || transactionReference == null || merchantName == null || amount == null) {
+                logger.error("Invalid parameters for transaction notification email: clientName={}, clientEmail={}, transactionReference={}, merchantName={}, amount={}", 
+                           clientName, clientEmail, transactionReference, merchantName, amount);
+                return false;
+            }
+            
+            String emailContent = emailTemplateService.generateTransactionNotificationEmail(
+                clientName, clientEmail, transactionReference, merchantName, amount
+            );
+            return sendEmail(clientEmail, "Payment Confirmation - Paykesho", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending transaction notification email: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send admin password reset email using template (for when admin resets user's password)
+     */
+    public boolean sendAdminPasswordResetEmail(String adminName, String adminEmail, String portalUrl, 
+                                             String temporaryPassword, String entityName) {
+        try {
+            if (adminName == null || adminEmail == null || portalUrl == null || temporaryPassword == null || entityName == null) {
+                logger.error("Invalid parameters for admin password reset email: adminName={}, adminEmail={}, portalUrl={}, temporaryPassword={}, entityName={}", 
+                           adminName, adminEmail, portalUrl, temporaryPassword != null ? "[PROVIDED]" : null, entityName);
+                return false;
+            }
+            
+            String emailContent = emailTemplateService.generateAdminPasswordResetEmail(
+                adminName, adminEmail, portalUrl, temporaryPassword, entityName
+            );
+            return sendEmail(adminEmail, "Password Reset - Paykesho Admin", emailContent);
+        } catch (Exception e) {
+            logger.error("Error sending admin password reset email: {}", e.getMessage());
+            return false;
+        }
+    }
+
     public boolean sendSms(String phoneNumber, String message) {
         try {
             String trimmedMessage = trimString(message);
@@ -262,15 +403,14 @@ public class NotificationService {
                 return false;
             }
             
-            // Sanitize subject and message
+            // Only sanitize subject - message content is trusted (comes from templates or database)
             String sanitizedSubject = sanitizeInput(subject);
-            String sanitizedMessage = sanitizeInput(message);
             
             logger.info("Sending email to: {} with subject: {}", recipient, sanitizedSubject);
-            logger.info("Email message length: {} characters", sanitizedMessage != null ? sanitizedMessage.length() : 0);
+            logger.info("Email message length: {} characters", message != null ? message.length() : 0);
 
-            // Use sanitized content
-            String emailContent = sanitizedMessage;
+            // Use original message content - don't sanitize HTML emails
+            String emailContent = message;
             logger.info("Email content length: {} characters", emailContent != null ? emailContent.length() : 0);
 
             Properties props = new Properties();

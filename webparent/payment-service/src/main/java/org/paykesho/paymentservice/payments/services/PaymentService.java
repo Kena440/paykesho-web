@@ -22,6 +22,8 @@ import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToMerchantRespon
 import org.paykesho.paymentservice.payments.dto.momo.MoMoPaymentToPaykeshoDTO;
 import org.paykesho.paymentservice.payments.repositories.PaymentRepository;
 import org.paykesho.paymentservice.utils.PaymentConfigProperties;
+import org.paykesho.paymentservice.idempotency.service.IdempotencyService;
+import org.commons.entity.IdempotencyRecord;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -31,6 +33,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -39,13 +42,10 @@ import java.util.UUID;
 public class PaymentService {
 
     private final PaymentConfigProperties paymentConfig;
-
     private final PaymentRepository paymentRepository;
+    private final IdempotencyService idempotencyService;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    // Idempotency tracking for duplicate payment prevention
-    private final java.util.concurrent.ConcurrentHashMap<String, String> processedPayments = new java.util.concurrent.ConcurrentHashMap<>();
 
     public BankPaymentResponse runWalletToBankPayment(BankPaymentRequest bankPaymentRequest) {
         try {
@@ -340,23 +340,62 @@ public class PaymentService {
             throw new RuntimeException("Invalid callback response from ZynlePay");
         }
 
-        switch (callbackResponse.getResponseCode()) {
-            case "100":
-                saveSuccessfulCardPayment(callbackResponse);
-                break;
-            case "990":
-                logCardTransactionPending(callbackResponse);
-                break;
-            case "995":
-                saveFailedCardPayment(callbackResponse, "Transaction failed");
-                break;
-            default:
-                saveFailedCardPayment(callbackResponse, "Unknown response code");
-                break;
+        // IDEMPOTENCY: Check if this callback was already processed
+        String idempotencyKey = "WEBHOOK_ZYNLEPAY_" + callbackResponse.getReferenceNo();
+        Optional<IdempotencyRecord> existingRecord = idempotencyService.checkIdempotency(idempotencyKey);
+        
+        if (existingRecord.isPresent() && existingRecord.get().isCompleted()) {
+            log.info("Webhook already processed for reference: {}. Skipping duplicate.", callbackResponse.getReferenceNo());
+            return; // Idempotent - already processed
+        }
+
+        // Create idempotency record before processing
+        try {
+            idempotencyService.createIdempotencyRecord(
+                idempotencyKey,
+                "/callback/zynlepay",
+                "POST",
+                objectMapper.writeValueAsString(callbackResponse),
+                "zynlepay"
+            );
+        } catch (Exception e) {
+            log.error("Error creating idempotency record for webhook: {}", e.getMessage());
+        }
+
+        try {
+            switch (callbackResponse.getResponseCode()) {
+                case "100":
+                    saveSuccessfulCardPayment(callbackResponse);
+                    break;
+                case "990":
+                    logCardTransactionPending(callbackResponse);
+                    break;
+                case "995":
+                    saveFailedCardPayment(callbackResponse, "Transaction failed");
+                    break;
+                default:
+                    saveFailedCardPayment(callbackResponse, "Unknown response code");
+                    break;
+            }
+            
+            // Mark as completed after successful processing
+            idempotencyService.markAsCompleted(idempotencyKey, 200, "Webhook processed", null);
+            
+        } catch (Exception e) {
+            log.error("Error processing webhook: {}", e.getMessage());
+            idempotencyService.markAsFailed(idempotencyKey, e.getMessage(), 500);
+            throw e;
         }
     }
 
     private void saveSuccessfulCardPayment(CardPaymentCallBackResponse response) {
+        // Check if payment already exists
+        Optional<Payment> existingPayment = paymentRepository.findByPaymentReference(response.getReferenceNo());
+        if (existingPayment.isPresent()) {
+            log.info("Payment already exists for reference: {}. Skipping duplicate.", response.getReferenceNo());
+            return;
+        }
+
         Payment payment = new Payment();
         payment.setPaymentReference(response.getReferenceNo());
         payment.setPaymentStatus(PaymentStatus.COMPLETED);
@@ -390,21 +429,31 @@ public class PaymentService {
 
     /**
      * Check if payment was already processed using idempotency key
+     * Now uses database-backed idempotency service instead of in-memory cache
      */
     public boolean isPaymentAlreadyProcessed(String idempotencyKey) {
         if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
             return false;
         }
 
-        // Check in-memory cache first (for recent requests)
-        if (processedPayments.containsKey(idempotencyKey)) {
-            return true;
-        }
-
-        // Check database for historical payments
         try {
-            // You would implement this query in your PaymentRepository
-            // For now, just check the in-memory cache
+            Optional<IdempotencyRecord> existingRecord = idempotencyService.checkIdempotency(idempotencyKey);
+            if (existingRecord.isPresent()) {
+                IdempotencyRecord record = existingRecord.get();
+                // If completed, it was definitely processed
+                if (record.isCompleted()) {
+                    log.info("Payment idempotency check: Already processed with key {}", idempotencyKey);
+                    return true;
+                }
+                // If still processing and created less than 5 minutes ago, consider it in progress
+                if (record.isProcessing()) {
+                    long processingTime = System.currentTimeMillis() - record.getCreatedAt().getTime();
+                    if (processingTime < 5 * 60 * 1000) { // 5 minutes
+                        log.warn("Payment idempotency check: Currently processing with key {}", idempotencyKey);
+                        return true; // Prevent duplicate while in progress
+                    }
+                }
+            }
             return false;
         } catch (Exception e) {
             log.error("Error checking payment idempotency: {}", e.getMessage());
@@ -415,18 +464,17 @@ public class PaymentService {
 
     /**
      * Mark payment as processed with idempotency key
+     * Now uses database-backed idempotency service
      */
     public void markPaymentAsProcessed(String idempotencyKey, String paymentReference) {
         if (idempotencyKey != null && !idempotencyKey.trim().isEmpty()) {
-            processedPayments.put(idempotencyKey, paymentReference);
-
-            // Clean up old entries periodically (keep only last 1000 entries)
-            if (processedPayments.size() > 1000) {
-                // Remove oldest 200 entries
-                processedPayments.entrySet().stream()
-                        .limit(200)
-                        .map(Map.Entry::getKey)
-                        .forEach(processedPayments::remove);
+            try {
+                // Store payment reference in metadata
+                String metadata = String.format("{\"paymentReference\":\"%s\"}", paymentReference);
+                idempotencyService.markAsCompleted(idempotencyKey, 200, metadata, null);
+                log.info("Marked payment as processed: idempotency key={}, reference={}", idempotencyKey, paymentReference);
+            } catch (Exception e) {
+                log.error("Error marking payment as processed: {}", e.getMessage());
             }
         }
     }

@@ -188,6 +188,7 @@ public class OrganizationAdminService {
 
         organizationAdmin.setPassword(newPassword);
         organizationAdmin.setResetPasswordToken(null);
+        organizationAdmin.setEnabled(true); // Enable account after successful password reset
         encodePassword(organizationAdmin);
         organizationAdminRepository.save(organizationAdmin);
     }

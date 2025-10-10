@@ -188,6 +188,7 @@ public class MerchantAdminService {
 
         merchantAdmin.setPassword(newPassword);
         merchantAdmin.setResetPasswordToken(null);
+        merchantAdmin.setEnabled(true); // Enable account after successful password reset
         encodePassword(merchantAdmin);
         merchantAdminRepository.save(merchantAdmin);
     }
