@@ -245,6 +245,7 @@ public class ClientService {
 
         client.setPassword(newPassword);
         client.setResetPasswordToken(null);
+        client.setEnabled(true); // Enable account after successful password reset
         encodePassword(client);
         clientRepository.save(client);
     }

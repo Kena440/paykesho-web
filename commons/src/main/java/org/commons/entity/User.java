@@ -40,6 +40,8 @@ public class User extends IdBasedEntity {
     @Column(name = "lock_time")
     private Date lockTime;
     private String photoPath;
+    @Column(name = "reset_password_token", length = 64)
+    private String resetPasswordToken;
 
 
     @ManyToMany(fetch = FetchType.EAGER)

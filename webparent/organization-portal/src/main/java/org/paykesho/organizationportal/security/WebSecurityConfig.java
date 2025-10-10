@@ -45,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .ignoringAntMatchers("/api/dashboard/**", "/debug/**") // Only specific API endpoints
                 )
                 .authorizeRequests(authz -> authz
-                        .antMatchers("/forgot-password", "/reset-password", "/reset-password-action").permitAll()
+                        .antMatchers("/forgot-password", "/forgot-password/captcha", "/reset-password", "/reset-password-action").permitAll()
                         .antMatchers("/", "/account", "/assessors/update-account").authenticated()
                         .anyRequest().authenticated()
                 )

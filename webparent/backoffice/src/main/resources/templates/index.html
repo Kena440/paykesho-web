@@ -107,7 +107,7 @@
                                 <h6 class="text-muted mb-3">Total Revenue</h6>
                                 <div id="revenueContent" th:if="${revenuePercentageChange != null}">
                                     <span class="badge badge-subtle-success me-2"
-                                          th:text="${#numbers.formatDecimal(revenuePercentageChange, 1, 'POINT', 2, 'POINT')} + '%'">0.00%</span>
+                                          th:text="${#numbers.formatDecimal(revenuePercentageChange, 1, 2)} + '%'">0.00%</span>
                                     <span class="text-muted small">vs last month</span>
                                 </div>
                                 <div class="text-muted small" th:unless="${revenuePercentageChange != null}">
@@ -369,7 +369,7 @@
                                     </div>
                                 </div>
                                 <h4 class="text-success mb-2"
-                                    th:text="${#numbers.formatDecimal(transactionSuccessRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">
+                                    th:text="${#numbers.formatDecimal(transactionSuccessRate ?: 0, 1, 1)} + '%'">
                                     0%</h4>
                                 <h6 class="text-muted mb-3">Transaction Success Rate</h6>
                                 <div id="successRateContent">
@@ -405,7 +405,7 @@
                                     </div>
                                 </div>
                                 <h4 class="text-info mb-2"
-                                    th:text="${#numbers.formatDecimal(voucherApprovalRate ?: 0, 1, 'POINT', 1, 'POINT')} + '%'">
+                                    th:text="${#numbers.formatDecimal(voucherApprovalRate ?: 0, 1, 1)} + '%'">
                                     0%</h4>
                                 <h6 class="text-muted mb-3">Voucher Approval Rate</h6>
                                 <div id="voucherApprovalContent">

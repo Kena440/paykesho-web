@@ -43,7 +43,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .authorizeRequests(authz -> authz
                         .antMatchers(HttpMethod.GET, "/clients/register", "/clients/save-client", "/clients/verify",
-                                "/business", "/how-it-works", "/faq", "/contact").permitAll()
+                                "/business", "/how-it-works", "/faq", "/contact", "/reset-password", "/forgot-password/captcha").permitAll()
+                        .antMatchers(HttpMethod.POST, "/forgot-password", "/reset-password-action").permitAll()
                         .antMatchers("/clients/dashboard", "/vouchers/**", "/transactions/**").authenticated()
                         .anyRequest().authenticated()
                 )

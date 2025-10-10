@@ -152,6 +152,46 @@ public class DatabaseNotificationService {
     }
 
     /**
+     * Create voucher notification request
+     */
+    @Transactional
+    public NotificationRequest createVoucherNotificationRequest(String recipientEmail, String clientName, 
+                                                              String voucherReference, String actionType, 
+                                                              String message, java.math.BigDecimal amount) {
+        try {
+            String subject = "Voucher Update - Paykesho";
+            String content = String.format(
+                "Dear %s,\n\n" +
+                "We have an update regarding your voucher request.\n" +
+                "- Action: %s\n" +
+                "- Reference: %s\n" +
+                "- Amount: %s\n" +
+                "- Message: %s\n\n" +
+                "Thank you for using Paykesho!\n\n" +
+                "Best regards,\nPaykesho Team",
+                clientName, actionType, voucherReference, amount, message
+            );
+            
+            NotificationRequest request = new NotificationRequest(
+                NotificationType.email, recipientEmail, subject, content, "client-portal"
+            );
+            request.setEntityType("VOUCHER");
+            request.setEntityReference(voucherReference);
+            request.setMetadata(String.format("{\"clientName\":\"%s\",\"actionType\":\"%s\",\"amount\":\"%s\",\"message\":\"%s\"}", 
+                clientName, actionType, amount, message));
+            
+            NotificationRequest saved = notificationRequestRepository.save(request);
+            log.info("Created voucher notification request {} for {} from client-portal module", 
+                    saved.getId(), recipientEmail);
+            
+            return saved;
+        } catch (Exception e) {
+            log.error("Error creating voucher notification request: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to create voucher notification request", e);
+        }
+    }
+
+    /**
      * Create SMS notification request
      */
     @Transactional

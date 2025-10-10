@@ -2,12 +2,17 @@ package org.paykesho.notificationservice.utils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -17,9 +22,32 @@ public class EmailTemplateService {
     private final TemplateEngine templateEngine;
 
     /**
+     * Convert image file to base64 data URI
+     */
+    private String getLogoAsBase64() {
+        try {
+            ClassPathResource resource = new ClassPathResource("static/images/paykeshologo.png");
+            try (InputStream inputStream = resource.getInputStream()) {
+                byte[] imageBytes = inputStream.readAllBytes();
+                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                return "data:image/png;base64," + base64Image;
+            }
+        } catch (IOException e) {
+            log.error("Failed to load logo image for email template", e);
+            return ""; // Return empty string if image can't be loaded
+        }
+    }
+
+    /**
      * Generate welcome email for new admin users
      */
     public String generateWelcomeAdminEmail(String adminName, String adminEmail, String portalUrl, String temporaryPassword) {
+        if (adminName == null || adminEmail == null || portalUrl == null || temporaryPassword == null) {
+            log.error("Null parameters detected in generateWelcomeAdminEmail: adminName={}, adminEmail={}, portalUrl={}, temporaryPassword={}", 
+                     adminName, adminEmail, portalUrl, temporaryPassword != null ? "[PROVIDED]" : null);
+            throw new IllegalArgumentException("All parameters must be non-null for welcome admin email generation");
+        }
+        
         Context context = new Context();
         context.setVariable("subject", "Welcome to Paykesho - Admin Account Created");
         context.setVariable("greeting", "Hello " + adminName + ",");
@@ -35,13 +63,54 @@ public class EmailTemplateService {
      * Generate password reset email
      */
     public String generatePasswordResetEmail(String userName, String userEmail, String resetUrl) {
+        if (userName == null || userEmail == null || resetUrl == null) {
+            log.error("Null parameters detected in generatePasswordResetEmail: userName={}, userEmail={}, resetUrl={}", 
+                     userName, userEmail, resetUrl);
+            throw new IllegalArgumentException("All parameters must be non-null for password reset email generation");
+        }
+        
+        log.info("Generating password reset email for user: {} ({}) with reset URL: {}", userName, userEmail, resetUrl);
+        
         Context context = new Context();
         context.setVariable("subject", "Password Reset Request - Paykesho");
         context.setVariable("greeting", "Hello " + userName + ",");
         context.setVariable("recipientEmail", userEmail);
-        context.setVariable("resetUrl", resetUrl);
+        
+        // Main content for the email
+        String content = "<p>We received a request to reset your password for your Paykesho account.</p>" +
+                        "<p>If you didn't make this request, you can safely ignore this email. Your password will remain unchanged.</p>";
+        
+        // Highlight box content with reset button
+        String highlightContent = "<h3>Reset Your Password</h3>" +
+                                 "<p>Click the button below to reset your password. This link will expire in 24 hours for security reasons.</p>" +
+                                 "<div style=\"text-align: center; margin: 20px 0;\">" +
+                                 "<a href=\"" + resetUrl + "\" style=\"display: inline-block; background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;\">Reset Password</a>" +
+                                 "</div>";
+        
+        // Warning content
+        String warningContent = "<h4>Security Notice</h4>" +
+                               "<ul>" +
+                               "<li>This link will expire in 24 hours</li>" +
+                               "<li>Never share this link with anyone</li>" +
+                               "<li>If you didn't request this reset, please contact support immediately</li>" +
+                               "<li>Use a strong, unique password when setting your new password</li>" +
+                               "</ul>" +
+                               "<p>If the button above doesn't work, you can copy and paste this link into your browser:</p>" +
+                               "<p style=\"word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px;\">" + resetUrl + "</p>" +
+                               "<p>Best regards,<br><strong>The Paykesho Security Team</strong></p>";
+        
+        context.setVariable("content", content);
+        context.setVariable("highlightContent", highlightContent);
+        context.setVariable("warningContent", warningContent);
+        // Set logo as base64 data URI for embedded image
+        context.setVariable("logoUrl", getLogoAsBase64());
+        log.info("Password reset email context variables set - content length: {}, highlight length: {}, warning length: {}", 
+                content.length(), highlightContent.length(), warningContent.length());
 
-        return templateEngine.process("email/password-reset", context);
+        String result = templateEngine.process("email/base", context);
+        log.info("Successfully generated password reset email template, length: {}", result != null ? result.length() : 0);
+        
+        return result;
     }
 
     /**
@@ -86,6 +155,131 @@ public class EmailTemplateService {
      */
     public String generateSimpleEmail(String subject, String greeting, String content, String recipientEmail) {
         return generateCustomEmail(subject, greeting, content, recipientEmail, null, null, null, null, null, null);
+    }
+
+    /**
+     * Generate voucher notification email
+     */
+    public String generateVoucherNotificationEmail(String clientName, String clientEmail, String voucherReference, 
+                                                   String actionType, String message, BigDecimal amount) {
+        if (clientName == null || clientEmail == null || voucherReference == null || actionType == null || amount == null) {
+            log.error("Null parameters detected in generateVoucherNotificationEmail: clientName={}, clientEmail={}, voucherReference={}, actionType={}, amount={}", 
+                     clientName, clientEmail, voucherReference, actionType, amount);
+            throw new IllegalArgumentException("All required parameters must be non-null for voucher notification email generation");
+        }
+        
+        Context context = new Context();
+        context.setVariable("subject", "Voucher Update - Paykesho");
+        context.setVariable("greeting", "Hello " + clientName + ",");
+        context.setVariable("recipientEmail", clientEmail);
+        
+        String content = "<p>We have an update regarding your voucher request.</p>";
+        
+        String highlightContent = "";
+        String warningContent = "";
+        
+        switch (actionType) {
+            case "REQUEST":
+                content = "<p>Your voucher request has been submitted successfully.</p>";
+                highlightContent = "<p><strong>Voucher Reference:</strong> " + voucherReference + "</p>" +
+                                 "<p>Please allow some time for processing.</p>";
+                break;
+            case "APPROVAL":
+                content = "<p>Great news! Your voucher request has been approved.</p>";
+                highlightContent = "<p><strong>Voucher Reference:</strong> " + voucherReference + "</p>" +
+                                 "<p><strong>Approved Amount:</strong> K" + amount + "</p>" +
+                                 "<p>You will receive further instructions shortly.</p>";
+                break;
+            case "REJECTION":
+                content = "<p>Your voucher request has been reviewed.</p>";
+                warningContent = "<p><strong>Status:</strong> Rejected</p>" +
+                               "<p><strong>Reason:</strong> " + message + "</p>" +
+                               "<p>Please contact our support team if you have any questions.</p>";
+                break;
+            case "ADJUSTMENT":
+                content = "<p>Your voucher request has been adjusted.</p>";
+                highlightContent = "<p><strong>New Amount:</strong> K" + amount + "</p>" +
+                                 "<p><strong>Voucher Reference:</strong> " + voucherReference + "</p>";
+                break;
+            default:
+                content = "<p>We have an update regarding your voucher request.</p>";
+                break;
+        }
+        
+        context.setVariable("content", content);
+        context.setVariable("highlightContent", highlightContent);
+        context.setVariable("warningContent", warningContent);
+        
+        return templateEngine.process("email/base", context);
+    }
+
+    /**
+     * Generate transaction notification email
+     */
+    public String generateTransactionNotificationEmail(String clientName, String clientEmail, String transactionReference, 
+                                                       String merchantName, BigDecimal amount) {
+        if (clientName == null || clientEmail == null || transactionReference == null || merchantName == null || amount == null) {
+            log.error("Null parameters detected in generateTransactionNotificationEmail: clientName={}, clientEmail={}, transactionReference={}, merchantName={}, amount={}", 
+                     clientName, clientEmail, transactionReference, merchantName, amount);
+            throw new IllegalArgumentException("All required parameters must be non-null for transaction notification email generation");
+        }
+        
+        Context context = new Context();
+        context.setVariable("subject", "Payment Confirmation - Paykesho");
+        context.setVariable("greeting", "Hello " + clientName + ",");
+        context.setVariable("recipientEmail", clientEmail);
+        
+        String content = "<p>Your payment has been processed successfully.</p>";
+        
+        String highlightContent = "<p><strong>Transaction Details:</strong></p>" +
+                                "<p><strong>Amount:</strong> K" + amount + "</p>" +
+                                "<p><strong>Merchant:</strong> " + merchantName + "</p>" +
+                                "<p><strong>Reference:</strong> " + transactionReference + "</p>" +
+                                "<p>Thank you for using Paykesho for your payment.</p>";
+        
+        context.setVariable("content", content);
+        context.setVariable("highlightContent", highlightContent);
+        
+        return templateEngine.process("email/base", context);
+    }
+
+    /**
+     * Generate admin password reset email (for when admin resets user's password)
+     */
+    public String generateAdminPasswordResetEmail(String adminName, String adminEmail, String portalUrl, 
+                                                 String temporaryPassword, String entityName) {
+        if (adminName == null || adminEmail == null || portalUrl == null || temporaryPassword == null || entityName == null) {
+            log.error("Null parameters detected in generateAdminPasswordResetEmail: adminName={}, adminEmail={}, portalUrl={}, temporaryPassword={}, entityName={}", 
+                     adminName, adminEmail, portalUrl, temporaryPassword != null ? "[PROVIDED]" : null, entityName);
+            throw new IllegalArgumentException("All required parameters must be non-null for admin password reset email generation");
+        }
+        
+        Context context = new Context();
+        context.setVariable("subject", "Password Reset - Paykesho Admin");
+        context.setVariable("greeting", "Hello " + adminName + ",");
+        context.setVariable("recipientEmail", adminEmail);
+        
+        String content = "<p>Your password has been reset for your <strong>" + entityName + "</strong> admin account.</p>" +
+                        "<p>For security reasons, a new temporary password has been generated for your account.</p>";
+        
+        String highlightContent = "<p><strong>Portal URL:</strong> <a href=\"" + portalUrl + "\">" + portalUrl + "</a></p>" +
+                                "<p><strong>Email:</strong> " + adminEmail + "</p>" +
+                                "<p><strong>New Temporary Password:</strong> <code style=\"background-color: #fff; padding: 2px 6px; border-radius: 3px; font-family: monospace;\">" + temporaryPassword + "</code></p>";
+        
+        String warningContent = "<ul>" +
+                              "<li><strong>You must change this password immediately</strong> after your first login</li>" +
+                              "<li>This temporary password will expire in 24 hours</li>" +
+                              "<li>Use a strong, unique password with at least 8 characters</li>" +
+                              "<li>Include uppercase, lowercase, numbers, and special characters</li>" +
+                              "<li>Never share your credentials with others</li>" +
+                              "<li>If you did not request this password reset, contact support immediately</li>" +
+                              "</ul>";
+        
+        context.setVariable("content", content);
+        context.setVariable("highlightContent", highlightContent);
+        context.setVariable("warningContent", warningContent);
+        
+        return templateEngine.process("email/base", context);
     }
 
     /**

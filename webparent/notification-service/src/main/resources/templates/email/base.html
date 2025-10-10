@@ -34,9 +34,18 @@
         }
 
         .logo {
-            width: 120px;
+            width: 150px;
             height: auto;
             margin-bottom: 15px;
+            max-width: 100%;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
         }
 
         .company-name {
@@ -179,13 +188,7 @@
 </head>
 <body>
 <div class="email-container">
-    <!-- Header with Logo -->
-    <div class="header">
-        <img alt="Paykesho Logo" class="logo" src="https://paykesho.com/assets/images/logo-white.png"
-             th:src="${logoUrl} ?: 'https://paykesho.com/assets/images/logo-white.png'">
-        <div class="company-name">Paykesho</div>
-        <div class="tagline">Secure Digital Payments & Financial Solutions</div>
-    </div>
+
 
     <!-- Main Content -->
     <div class="content">

@@ -17,6 +17,8 @@ import org.paykesho.clientportal.security.ClientUserDetails;
 import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
+import org.paykesho.clientportal.idempotency.service.IdempotencyService;
+import org.commons.entity.IdempotencyRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +29,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -52,6 +56,8 @@ public class TransactionController {
     private TransactionsService transactionsService;
     @Autowired
     private NotificationClient notificationClient;
+    @Autowired
+    private IdempotencyService idempotencyService;
 
     @GetMapping("")
     public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
@@ -76,7 +82,23 @@ public class TransactionController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<?> saveSubmittedPayment(@AuthenticationPrincipal ClientUserDetails loggedInUser, @RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> saveSubmittedPayment(
+            @AuthenticationPrincipal ClientUserDetails loggedInUser, 
+            @RequestBody Map<String, String> requestBody,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+
+        // Generate idempotency key if not provided (for backwards compatibility)
+        if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
+            idempotencyKey = idempotencyService.generateIdempotencyKey();
+            log.info("Generated idempotency key for transaction: {}", idempotencyKey);
+        }
+
+        // IDEMPOTENCY CHECK: Check if this transaction was already processed
+        Optional<IdempotencyRecord> existingRecord = idempotencyService.checkIdempotency(idempotencyKey);
+        if (existingRecord.isPresent() && existingRecord.get().isCompleted()) {
+            log.warn("Duplicate transaction attempt detected with idempotency key: {}", idempotencyKey);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Transaction already processed. Please check your transaction history."));
+        }
 
         String merchantCode = requestBody.get("merchantCode");
         BigDecimal amount;
@@ -86,32 +108,56 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format. Please enter a valid number."));
         }
 
+        // Create idempotency record at START of processing
+        String finalIdempotencyKey = idempotencyKey;
+        try {
+            idempotencyService.createIdempotencyRecord(
+                finalIdempotencyKey,
+                "/transactions/confirm",
+                "POST",
+                merchantCode + ":" + amount,
+                loggedInUser.getClient().getEmail()
+            );
+        } catch (Exception e) {
+            log.error("Error creating idempotency record: {}", e.getMessage());
+        }
+
         try {
             Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
 
             MerchantDto merchant = merchantService.getMerchantByCode(merchantCode);
             if (merchant == null) {
+                idempotencyService.markAsFailed(finalIdempotencyKey, "Invalid merchant code", 400);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
             }
 
             BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
 
             if (availableBalance.compareTo(amount) < 0) {
+                idempotencyService.markAsFailed(finalIdempotencyKey, "Insufficient balance", 400);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Insufficient balance."));
             }
 
             Transaction trx = runPaymentSubmission(client, merchant, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
-                return updateClientBalance(amount, client, clientService.getClientBalance(client).getCurrentBalance());
+                ResponseEntity<?> response = updateClientBalance(amount, client, clientService.getClientBalance(client).getCurrentBalance());
+                
+                // Mark as completed after successful transaction
+                idempotencyService.markAsCompleted(finalIdempotencyKey, 200, "{\"transactionRef\":\"" + trx.getReference() + "\"}", null);
+                
+                return response;
             } else {
+                idempotencyService.markAsFailed(finalIdempotencyKey, "Failed to create transaction reference", 500);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment failed. Could not create transaction reference."));
             }
         } catch (PaykeshoError e) {
             log.error("Paykesho Error during payment submission: " + e.getMessage());
+            idempotencyService.markAsFailed(finalIdempotencyKey, e.getMessage(), 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Payment processing failed: " + e.getMessage()));
         } catch (Exception e) {
             log.error("An unexpected error occurred during payment submission:", e);
+            idempotencyService.markAsFailed(finalIdempotencyKey, e.getMessage(), 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "An unexpected error occurred while processing your payment."));
         }
     }
@@ -165,16 +211,17 @@ public class TransactionController {
         }
 
         try {
-            // Use NotificationClient (which uses database-driven approach internally)
-            String emailMessage = generateEmailMessage(transaction, "PAYMENT");
-            String smsMessage = generateSmsMessage(transaction, "PAYMENT");
-
-            // Send email notification via NotificationClient
-            boolean emailSent = notificationClient.sendNotification(
-                transaction.getClient().getEmail(), 
-                emailMessage, 
-                "email"
+            // Send email notification using professional template
+            boolean emailSent = notificationClient.sendTransactionNotificationEmail(
+                transaction.getClient().getFullName(),
+                transaction.getClient().getEmail(),
+                transaction.getReference(),
+                transaction.getMerchant().getName(),
+                transaction.getAmount()
             );
+            
+            // Generate SMS message
+            String smsMessage = generateSmsMessage(transaction, "PAYMENT");
             
             if (emailSent) {
                 log.info("Transaction email notification request created for: {}", transaction.getClient().getEmail());

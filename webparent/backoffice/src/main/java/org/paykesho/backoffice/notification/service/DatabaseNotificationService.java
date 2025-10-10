@@ -224,4 +224,49 @@ public class DatabaseNotificationService {
             return Map.of("error", e.getMessage());
         }
     }
+
+    /**
+     * Create admin password reset notification request
+     */
+    @Transactional
+    public NotificationRequest createAdminPasswordResetNotificationRequest(String adminEmail, String adminName, 
+                                                                         String portalUrl, String temporaryPassword, 
+                                                                         String entityName) {
+        try {
+            String subject = "Password Reset - Paykesho Admin";
+            String content = String.format(
+                "Dear %s,\n\n" +
+                "Your password has been reset for your %s admin account.\n\n" +
+                "New Login Credentials:\n" +
+                "- Portal URL: %s\n" +
+                "- Email: %s\n" +
+                "- New Temporary Password: %s\n\n" +
+                "Important Security Notice:\n" +
+                "- You must change this password immediately after your first login\n" +
+                "- This temporary password will expire in 24 hours\n" +
+                "- Use a strong, unique password with at least 8 characters\n" +
+                "- Include uppercase, lowercase, numbers, and special characters\n" +
+                "- Never share your credentials with others\n" +
+                "- If you did not request this password reset, contact support immediately\n\n" +
+                "Best regards,\nPaykesho Team",
+                adminName, entityName, portalUrl, adminEmail, temporaryPassword
+            );
+            
+            NotificationRequest request = new NotificationRequest(
+                NotificationType.email, adminEmail, subject, content, "backoffice"
+            );
+            request.setEntityType("ADMIN_PASSWORD_RESET");
+            request.setMetadata(String.format("{\"adminName\":\"%s\",\"portalUrl\":\"%s\",\"entityName\":\"%s\"}", 
+                             adminName, portalUrl, entityName));
+            
+            NotificationRequest saved = notificationRequestRepository.save(request);
+            log.info("Created admin password reset notification request {} for {} from backoffice module", 
+                    saved.getId(), adminEmail);
+            
+            return saved;
+        } catch (Exception e) {
+            log.error("Error creating admin password reset notification request: {}", e.getMessage());
+            throw new RuntimeException("Failed to create admin password reset notification request", e);
+        }
+    }
 }

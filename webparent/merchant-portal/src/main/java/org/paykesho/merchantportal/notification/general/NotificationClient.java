@@ -32,4 +32,18 @@ public class NotificationClient {
             return false;
         }
     }
+
+    public boolean sendPasswordResetEmail(String userName, String userEmail, String resetUrl) {
+        try {
+            log.info("Creating password reset notification request for {} from merchant-portal module", userEmail);
+            databaseNotificationService.createPasswordResetNotificationRequest(
+                userEmail, userName, resetUrl
+            );
+            log.info("Created password reset notification request for {} via database", userEmail);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to create password reset notification request: {}", e.getMessage());
+            return false;
+        }
+    }
 }
