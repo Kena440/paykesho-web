@@ -82,6 +82,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.paykesho</groupId>
@@ -108,11 +109,7 @@
             <artifactId>javase</artifactId>
             <version>3.4.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.openpnp</groupId>
-            <artifactId>opencv</artifactId>
-            <version>4.5.3-1</version>
-        </dependency>
+        <!-- OpenCV removed from parent - only needed in specific modules if at all -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-json</artifactId>

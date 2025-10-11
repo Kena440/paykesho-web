@@ -134,15 +134,15 @@ public class UserController {
         return Constants.REDIRECT_TO_USERS;
     }
 
-    @GetMapping("/edit/{id}")
-    public String editUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
-        if (id == null) {
+    @GetMapping("/edit/{uuid}")
+    public String editUser(@PathVariable(name = "uuid") String uuid, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
             return Constants.REDIRECT_TO_USERS;
         }
         String pageTitle = "Edit User";
 
         try {
-            User user = userService.getUserById(id);
+            User user = userService.getUserByUuid(uuid);
             List<Role> roleList = userService.listRoles();
 
             model.addAttribute("user", user);
@@ -157,16 +157,16 @@ public class UserController {
 
     }
 
-    @GetMapping("/{id}/enabled/{status}")
-    public String updateUserEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+    @GetMapping("/{uuid}/enabled/{status}")
+    public String updateUserEnabledStatus(@PathVariable(name = "uuid") String uuid, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
 
-        if (id == null) {
-            throw new PaykeshoError("no parameter id");
+        if (uuid == null || uuid.trim().isEmpty()) {
+            throw new PaykeshoError("Invalid UUID parameter");
         }
 
         try {
-            User user = userService.getUserById(id);
-            userService.updateUserStatus(id, enabled);
+            User user = userService.getUserByUuid(uuid);
+            userService.updateUserStatusByUuid(uuid, enabled);
             String status = enabled ? "enabled" : "has been disabled";
             String operationMSG = user.getFirstName() + " has been " + status;
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
@@ -177,10 +177,10 @@ public class UserController {
 
     }
 
-    @GetMapping("/details/{id}")
-    public String viewUserDetails(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
+    @GetMapping("/details/{uuid}")
+    public String viewUserDetails(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
 
-        User user = userService.getUserById(id);
+        User user = userService.getUserByUuid(uuid);
         model.addAttribute("user", user);
         return "users/user_details_modal";
 

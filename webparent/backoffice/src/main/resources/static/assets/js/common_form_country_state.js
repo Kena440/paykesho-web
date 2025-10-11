@@ -16,8 +16,11 @@ $(document).ready(function () {
 function loadStates4Country() {
     selectedCountry = $("#country option:selected");
     countryId = selectedCountry.val();
+    countryUuid = selectedCountry.data('uuid') || selectedCountry.attr('data-uuid');
 
-    url = contextPath + "states/list-by-country/" + countryId;
+    // Use UUID if available, otherwise fall back to ID
+    var identifier = countryUuid || countryId;
+    url = contextPath + "states/list-by-country/" + identifier;
 
     $.get(url, function (responseJson) {
         dropdownStates.empty();

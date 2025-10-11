@@ -54,6 +54,15 @@ public class MerchantAdminService {
         }
     }
 
+    public MerchantAdmin getByUuid(String uuid) throws PaykeshoError {
+        try {
+            return merchantAdminRepository.findByUuid(uuid)
+                    .orElseThrow(() -> new PaykeshoError("Merchant admin not found with UUID: " + uuid));
+        } catch (Exception exception) {
+            throw new PaykeshoError("Merchant admin not found: " + exception.getMessage());
+        }
+    }
+
     public MerchantAdmin getByEmail(String email) {
         return merchantAdminRepository.findByEmail(email);
     }

@@ -10,6 +10,7 @@ import org.paykesho.clientportal.files.dto.FileUploadResponse;
 import org.paykesho.clientportal.files.repository.FileUploadRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,9 @@ public class FileUploadService {
     private static final Logger logger = LoggerFactory.getLogger(FileUploadService.class);
     private final RestTemplate restTemplate;
     private final FileUploadRepository fileUploadRepository;
+    
+    @Value("${file.service.url:http://localhost:8086}")
+    private String fileServiceUrl;
 
     public FileUploadService(RestTemplate restTemplate, FileUploadRepository fileUploadRepository) {
         this.restTemplate = restTemplate;
@@ -60,7 +64,7 @@ public class FileUploadService {
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange("https://files.paykesho.com/uploads-api", HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(fileServiceUrl + "/uploads-api", HttpMethod.POST, requestEntity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -72,8 +76,9 @@ public class FileUploadService {
                 uploadedFile.setFileName(file.getOriginalFilename());
                 uploadedFile.setFileType(fileType);
                 uploadedFile.setFilePath(tempFile.getAbsolutePath());
-                uploadedFile.setCreatedAt(new Date());
+                uploadedFile.setCreatedAt(LocalDateTime.now());
                 uploadedFile.setRemoteFileId(fileId);
+                uploadedFile.setUserId(userId);
                 fileUploadRepository.save(uploadedFile);
 
                 fileUploadResponse.setMessage(message);
@@ -103,7 +108,7 @@ public class FileUploadService {
     @Transactional
     public FileAccessResponse getFileAccessDetails(int fileId) {
         String apiKey = "F39E25A3B2A446F98E87A95723AE4";
-        String url = "https://files.paykesho.com/access-api";
+        String url = fileServiceUrl + "/access-api";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("API-Key", apiKey);
@@ -139,11 +144,52 @@ public class FileUploadService {
             return fileAccessResponse;
         }
     }
+    
+    /**
+     * Get file access details with fallback to placeholder
+     */
+    @Transactional
+    public FileAccessResponse getFileAccessDetailsWithFallback(int fileId, FileType fileType) {
+        FileAccessResponse response = getFileAccessDetails(fileId);
+        
+        if (response == null || !response.isStatus()) {
+            // Return placeholder URL based on file type
+            response = new FileAccessResponse();
+            response.setFileName("placeholder");
+            response.setFileUrl(getPlaceholderUrl(fileType));
+            response.setStatus(true);
+            logger.info("Returning placeholder for file ID {} of type {}", fileId, fileType);
+        }
+        
+        return response;
+    }
+    
+    /**
+     * Get placeholder URL for missing files
+     */
+    public String getPlaceholderUrl(FileType fileType) {
+        if (fileType == null) {
+            return fileServiceUrl + "/placeholders/file";
+        }
+        return fileServiceUrl + "/placeholders/" + fileType.name().toLowerCase();
+    }
 
     private File convertMultipartToFile(MultipartFile file) {
         try {
-            File tempFile = File.createTempFile("upload_", file.getOriginalFilename());
+            // Generate UUID-based filename to avoid conflicts and improve security
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = "";
+            
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            
+            // Create temp file with UUID prefix and original extension
+            String uuidFilename = java.util.UUID.randomUUID().toString() + fileExtension;
+            File tempFile = File.createTempFile("upload_", "_" + uuidFilename);
             file.transferTo(tempFile);
+            
+            logger.info("File saved locally with UUID name: {} (original: {})", tempFile.getName(), originalFilename);
             return tempFile;
         } catch (IOException e) {
             logger.error("Failed to convert MultipartFile to File: {}", e.getMessage());

@@ -23,15 +23,15 @@ public class ClientRestController {
     private OrganizationService organizationService;
 
     @PostMapping("/rest/check-client")
-    public String checkClientStatus(@RequestParam("name") String name, @RequestParam("nrc") String nrc, @RequestParam("tpin") String tpin, @RequestParam("manNumber") String manNumber, @RequestParam("organization") Integer organizationId) {
+    public String checkClientStatus(@RequestParam("name") String name, @RequestParam("nrc") String nrc, @RequestParam("tpin") String tpin, @RequestParam("manNumber") String manNumber, @RequestParam("organizationUuid") String organizationUuid) {
         try {
-            log.debug("Checking client status for name: {}, nrc: {}, organization: {}", name, nrc, organizationId);
+            log.debug("Checking client status for name: {}, nrc: {}, organizationUuid: {}", name, nrc, organizationUuid);
 
             Organization organization = null;
             try {
-                organization = organizationService.getOrganizationById(organizationId);
+                organization = organizationService.getOrganizationByUuid(organizationUuid);
                 if (organization == null) {
-                    log.warn("Organization not found for ID: {}", organizationId);
+                    log.warn("Organization not found for UUID: {}", organizationUuid);
                     return "Organization not found";
                 }
             } catch (Exception ex) {

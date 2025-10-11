@@ -1,0 +1,20 @@
+# Placeholders Directory
+
+This directory is for custom placeholder images (optional).
+
+## Add Custom Images (Optional)
+
+Place these files here to use custom placeholders instead of auto-generated SVG:
+- default-logo.png
+- default-avatar.png  
+- default-document.png
+- default-file.png
+
+## Documentation
+
+See documentation/PLACEHOLDERS_README.md for detailed instructions.
+See documentation/PLACEHOLDERS_SETUP.md for quick setup guide.
+
+## Default Behavior
+
+If no custom images are present, the system automatically generates SVG placeholders.

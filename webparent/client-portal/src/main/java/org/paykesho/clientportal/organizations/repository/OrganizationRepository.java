@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrganizationRepository extends CrudRepository<Organization, Integer> {
     @Query("select m from Organization m where m.email = :email")
@@ -29,5 +30,7 @@ public interface OrganizationRepository extends CrudRepository<Organization, Int
 
     @Query("select m " + "from Organization m " + "where m.enabled = ?1 ")
     List<Organization> findOrganizationTypesEnabled(boolean enabled);
+
+    Optional<Organization> findByUuid(String uuid);
 
 }

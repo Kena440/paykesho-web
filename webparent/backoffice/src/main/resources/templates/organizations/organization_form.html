@@ -40,6 +40,7 @@
                                       th:action="@{/organizations/save}"
                                       th:object="${organization}">
                                     <input id="id" th:field="*{id}" type="hidden"/>
+                                    <input id="uuid" th:field="*{uuid}" type="hidden"/>
                                     <input id="longitude" th:field="*{longitude}" type="hidden"/>
                                     <input id="latitude" th:field="*{latitude}" type="hidden"/>
                                     <div class="row">
@@ -85,12 +86,21 @@
                                         <div class="col-md-6">
 
                                             <div class="mb-3">
-                                                <img
-                                                        alt="loading..."
-                                                        class="rounded"
-                                                        id="thumbnail"
-                                                        style="height: 100px; width: 100px"
-                                                        th:src="@{${organization.photoPath}}">
+                                                <div style="height: 100px; width: 100px; position: relative;">
+                                                    <img
+                                                            alt="Organization Photo"
+                                                            class="rounded"
+                                                            id="thumbnail"
+                                                            th:src="${organization.photoPath != null} ? @{${organization.photoPath}} : ''"
+                                                            th:style="${organization.photos != null and organization.photoPath != null} ? 'height: 100px; width: 100px; display: block;' : 'height: 100px; width: 100px; display: none;'"
+                                                            style="height: 100px; width: 100px; object-fit: cover;">
+                                                    <div class="d-flex align-items-center justify-content-center bg-light rounded"
+                                                         id="thumbnail-placeholder"
+                                                         style="height: 100px; width: 100px; min-height: 100px; min-width: 100px; position: absolute; top: 0; left: 0; display: flex;"
+                                                         th:style="${organization.photos == null or organization.photoPath == null} ? 'height: 100px; width: 100px; min-height: 100px; min-width: 100px; display: flex; position: absolute; top: 0; left: 0;' : 'height: 100px; width: 100px; min-height: 100px; min-width: 100px; display: none; position: absolute; top: 0; left: 0;'">
+                                                        <i class="fas fa-building fa-2x text-muted"></i>
+                                                    </div>
+                                                </div>
                                                 <hr>
                                                 <label class="form-label">File input</label>
                                                 <input accept="image/png, image/jpeg"
@@ -98,7 +108,7 @@
                                                        class="form-control"
                                                        id="fileImage"
                                                        name="image"
-                                                       required type="file">
+                                                       required type="file"
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-check m-0">
@@ -142,11 +152,11 @@
         url = "[[@{/organizations/rest/check-organization}]]";
         organizationName = $("#name").val();
         organizationType = $("#organizationType").val();
-        organizationId = $("#id").val();
+        organizationUuid = $("#uuid").val();
         csrfValue = $("input[name='_csrf']").val();
 
         params = {
-            id: organizationId,
+            uuid: organizationUuid,
             organizationName: organizationName,
             organizationType: organizationType,
             _csrf: csrfValue
@@ -218,6 +228,44 @@
         ]).addTo(map);
         map.fitBounds(poly.getBounds());
     }).addTo(map);
+    
+    // Image preview functionality
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            // Check file size (500KB limit)
+            const file = input.files[0];
+            const MAX_FILE_SIZE = 502400; // 500KB
+            if (file.size > MAX_FILE_SIZE) {
+                alert('File size exceeds 500KB limit. Please choose a smaller image.');
+                input.value = '';
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file (PNG or JPEG).');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const thumbnail = document.getElementById('thumbnail');
+                const placeholder = document.getElementById('thumbnail-placeholder');
+                
+                if (thumbnail) {
+                    thumbnail.src = ''; // Clear src to force re-render
+                    thumbnail.src = e.target.result;
+                    thumbnail.style.display = 'block';
+                }
+                
+                if (placeholder) {
+                    placeholder.style.setProperty('display', 'none', 'important');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 </script>
 
 </body>

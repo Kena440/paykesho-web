@@ -1,7 +1,9 @@
 package org.commons.entity.client;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.commons.entity.IdBasedEntity;
 import org.commons.entity.organization.Organization;
 
 import javax.persistence.*;
@@ -9,12 +11,10 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "employee_records")
-public class EmployeeRecord {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class EmployeeRecord extends IdBasedEntity {
     @Column(name = "name", length = 128, nullable = false)
     private String name;
     @Column(name = "nrc", length = 128, nullable = false, unique = true)

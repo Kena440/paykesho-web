@@ -1,7 +1,9 @@
 package org.commons.entity.merchant;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.commons.entity.IdBasedEntity;
 import org.commons.enums.PaymentMethod;
 
 import javax.persistence.*;
@@ -9,12 +11,10 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "merchant_money_account_details")
-public class MerchantMoneyAccountDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class MerchantMoneyAccountDetail extends IdBasedEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;

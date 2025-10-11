@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -109,7 +110,17 @@ public class MerchantService {
         }
 
         try {
-            return merchantRepository.findById(id).get();
+            Merchant merchant = merchantRepository.findById(id).get();
+            
+            // Process photoPath the same way as in listAll()
+            if (merchant.getPhotoPath() != null && merchant.getRemoteFileId() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
+                if (fileAccessResponse != null && fileAccessResponse.getFileUrl() != null) {
+                    merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
+            }
+            
+            return merchant;
         } catch (NoSuchElementException exception) {
             throw new PaykeshoError("Could not find any member");
         }
@@ -158,6 +169,29 @@ public class MerchantService {
         }
     }
 
+    public boolean isMerchantUniqueByUuid(String uuid, String merchantName, String merchantType) {
+        if (merchantName == null || merchantType == null) {
+            return false;
+        }
+
+        // If creating new (no UUID), just check if name exists
+        if (uuid == null || uuid.trim().isEmpty()) {
+            Merchant existingMerchant = merchantRepository.getMerchantByName(merchantName);
+            return existingMerchant == null;
+        }
+
+        // If editing, get the current merchant and exclude it from the check
+        try {
+            Merchant currentMerchant = merchantRepository.findByUuid(uuid)
+                    .orElseThrow(() -> new RuntimeException("Merchant not found"));
+            return isMerchantUnique(currentMerchant.getId(), merchantName, merchantType);
+        } catch (Exception e) {
+            // If merchant not found, treat as new
+            Merchant existingMerchant = merchantRepository.getMerchantByName(merchantName);
+            return existingMerchant == null;
+        }
+    }
+
     public Long countInstitutions() {
         return merchantRepository.count();
     }
@@ -172,6 +206,80 @@ public class MerchantService {
             return merchantRepository.findAll(keyword, pageable);
         }
         return merchantRepository.findAll(pageable);
+    }
+
+    // ============================================================================
+    // UUID-based methods for secure URL access
+    // ============================================================================
+
+    /**
+     * Get merchant by UUID (for public/URL access)
+     * This method should be used for all public-facing endpoints
+     * 
+     * @param uuid The merchant's UUID
+     * @return Merchant entity
+     * @throws PaykeshoError if UUID is invalid or merchant not found
+     */
+    public Merchant getMerchantByUuid(String uuid) throws PaykeshoError {
+        // Validate UUID parameter
+        if (uuid == null || uuid.trim().isEmpty()) {
+            log.error("getMerchantByUuid called with null or empty UUID");
+            throw new PaykeshoError("Invalid UUID parameter");
+        }
+
+        // Validate UUID format to prevent injection attacks
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            log.error("getMerchantByUuid called with invalid UUID format: {}", uuid);
+            throw new PaykeshoError("Invalid UUID format");
+        }
+
+        // Fetch merchant by UUID
+        Merchant merchant = merchantRepository.findByUuid(uuid)
+                .orElseThrow(() -> {
+                    log.error("Merchant not found with UUID: {}", uuid);
+                    return new PaykeshoError("Could not find merchant with UUID: " + uuid);
+                });
+
+        // Process photo path
+        processPhotoPath(merchant);
+
+        log.debug("Successfully retrieved merchant with UUID: {}", uuid);
+        return merchant;
+    }
+
+    /**
+     * Update merchant enabled status by UUID
+     * 
+     * @param uuid The merchant's UUID
+     * @param enabled The new enabled status
+     * @throws PaykeshoError if UUID is invalid or merchant not found
+     */
+    @Transactional(rollbackOn = {Exception.class})
+    public void updateMerchantStatusByUuid(String uuid, boolean enabled) throws PaykeshoError {
+        // Get merchant by UUID (includes validation)
+        Merchant merchant = getMerchantByUuid(uuid);
+        
+        // Update status using internal ID
+        updateMerchantStatus(merchant.getId(), enabled);
+        
+        log.info("Updated merchant status for UUID: {} to enabled: {}", uuid, enabled);
+    }
+
+    /**
+     * Helper method to process merchant photo path
+     * Extracted to avoid code duplication
+     * 
+     * @param merchant The merchant entity
+     */
+    private void processPhotoPath(Merchant merchant) {
+        if (merchant != null && merchant.getPhotoPath() != null && merchant.getRemoteFileId() != null) {
+            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
+            if (fileAccessResponse != null && fileAccessResponse.getFileUrl() != null) {
+                merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+            }
+        }
     }
 
 

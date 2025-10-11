@@ -7,7 +7,12 @@ $(document).ready(function () {
         if (!checkFileSize(this)) {
             return;
         } else {
-            showImageThumbnail(this);
+            // Use the new previewImage function if it exists, otherwise fall back to showImageThumbnail
+            if (typeof previewImage === 'function') {
+                previewImage(this);
+            } else {
+                showImageThumbnail(this);
+            }
         }
     })
 });
@@ -25,9 +30,9 @@ function showImageThumbnail(fileInput) {
 function checkFileSize(fileInput) {
     fileSize = fileInput.files[0].size;
     if (fileSize > MAX_FILE_SIZE) {
-        fileInput.setCustomValidity("Image size greater than 100KB!");
+        fileInput.setCustomValidity("Image size greater than 500KB!");
         //this.reportValidity();
-        showModalDialog("Upload Error", "Kindly upload an image less than 100KB")
+        showModalDialog("Upload Error", "Kindly upload an image less than 500KB")
         return false
     } else {
         fileInput.setCustomValidity("");

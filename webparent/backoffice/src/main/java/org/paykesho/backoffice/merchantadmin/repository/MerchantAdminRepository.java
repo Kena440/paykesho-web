@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface MerchantAdminRepository extends SearchRepository<MerchantAdmin, Integer> {
 
     @Query("select c from MerchantAdmin c where concat(c.email, ' ', c.name, ' ', c.title) like %?1%")
@@ -21,6 +23,8 @@ public interface MerchantAdminRepository extends SearchRepository<MerchantAdmin,
     public MerchantAdmin findByEmail(String email);
 
     public Long countById(Integer id);
+
+    Optional<MerchantAdmin> findByUuid(String uuid);
 
 }
 

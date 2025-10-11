@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeRecordRepository extends SearchRepository<EmployeeRecord, Integer> {
     @Query("select m from EmployeeRecord m where m.manNumber = :manNumber")
@@ -26,5 +27,7 @@ public interface EmployeeRecordRepository extends SearchRepository<EmployeeRecor
     public Page<EmployeeRecord> findAll(String keyword, Pageable pageable);
 
     EmployeeRecord findByNrcAndOrganization(String nrc, Organization organization);
+
+    Optional<EmployeeRecord> findByUuid(String uuid);
 
 }

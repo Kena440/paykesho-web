@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface OrganizationAdminRepository extends SearchRepository<OrganizationAdmin, Integer> {
 
     @Query("select c from OrganizationAdmin c where concat(c.email, ' ', c.name, ' ', c.title) like %?1%")
@@ -21,6 +23,12 @@ public interface OrganizationAdminRepository extends SearchRepository<Organizati
     public OrganizationAdmin findByEmail(String email);
 
     public Long countById(Integer id);
+
+    Optional<OrganizationAdmin> findByUuid(String uuid);
+
+    @Query("update OrganizationAdmin c set c.enabled = ?2 where c.uuid = ?1")
+    @Modifying
+    void updateEnabledStatusByUuid(String uuid, boolean enabled);
 
 }
 

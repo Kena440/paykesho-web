@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EventsRepository extends SearchRepository<Announcement, Integer> {
     @Query("select e from Announcement e where e.enabled = true order by e.name desc")
@@ -21,5 +22,11 @@ public interface EventsRepository extends SearchRepository<Announcement, Integer
 
     @Query("SELECT e FROM Announcement e WHERE e.eventDate > CURRENT_DATE AND DATEDIFF(e.eventDate, CURRENT_DATE) <= :days")
     public List<Announcement> findUpcomingEvents(@Param("days") int days);
+
+    // UUID-based methods
+    Optional<Announcement> findByUuid(String uuid);
+    
+    @Query("SELECT COUNT(a) > 0 FROM Announcement a WHERE a.uuid = ?1")
+    boolean existsByUuid(String uuid);
 
 }

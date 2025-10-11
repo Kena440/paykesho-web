@@ -25,20 +25,20 @@ public class ClientRestController {
     private VouchersService vouchersService;
 
     @PostMapping("/check-client")
-    public String checkClientEmail(Integer id, String email) {
-        return clientService.isEmailUnique(id, email) ? "OK" : "Duplicated";
+    public String checkClientEmail(String uuid, String email) {
+        return clientService.isEmailUniqueByUuid(uuid, email) ? "OK" : "Duplicated";
     }
 
     @PostMapping("/balance")
-    public ResponseEntity<ClientBalance> checkClientBalance(@RequestParam Integer clientId) throws PaykeshoError {
-        Client client = clientService.get(clientId);
+    public ResponseEntity<ClientBalance> checkClientBalance(@RequestParam String clientUuid) throws PaykeshoError {
+        Client client = clientService.getByUuid(clientUuid);
         ClientBalance balance = clientService.getClientBalance(client);
         return new ResponseEntity<>(balance, HttpStatus.OK);
     }
 
     @PostMapping("/voucher-totals")
-    public ResponseEntity<BigDecimal> checkClientVoucherTotals(@RequestParam Integer clientId) throws PaykeshoError {
-        Client client = clientService.get(clientId);
+    public ResponseEntity<BigDecimal> checkClientVoucherTotals(@RequestParam String clientUuid) throws PaykeshoError {
+        Client client = clientService.getByUuid(clientUuid);
         BigDecimal totals = vouchersService.getApprovedAndValidClientVouchers(client).stream()
                 .map(Voucher::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -38,14 +38,14 @@ public class ClientController {
         return "clients/clients";
     }
 
-    @GetMapping("/{id}/enabled/{status}")
-    public String updateCustomerEnabledStatus(@PathVariable(name = "id") Integer id,
+    @GetMapping("/{uuid}/enabled/{status}")
+    public String updateCustomerEnabledStatus(@PathVariable(name = "uuid") String uuid,
                                               @PathVariable(name = "status") boolean enabled,
                                               RedirectAttributes redirectAttributes,
                                               Model model) throws PaykeshoError {
 
-        Client client = clientService.get(id);
-        clientService.updateCustomerEnabledStatus(id, enabled);
+        Client client = clientService.getByUuid(uuid);
+        clientService.updateCustomerEnabledStatusByUuid(uuid, enabled);
         String status = enabled ? "enabled" : "has been disabled";
         String operationMSG = client.getFullName() + " has been " + status;
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
@@ -53,12 +53,12 @@ public class ClientController {
 
     }
 
-    @GetMapping("/details/{id}")
-    public String viewCustomer(@PathVariable("id") Integer id,
+    @GetMapping("/details/{uuid}")
+    public String viewCustomer(@PathVariable("uuid") String uuid,
                                Model model,
                                RedirectAttributes redirectAttributes) throws PaykeshoError {
         try {
-            Client client = clientService.get(id);
+            Client client = clientService.getByUuid(uuid);
             model.addAttribute("customer", client);
             return "clients/client_details_modal";
         } catch (PaykeshoError paykeshoError) {
@@ -67,17 +67,17 @@ public class ClientController {
         }
     }
 
-    @GetMapping("/edit/{id}")
-    public String editCustomer(@PathVariable(name = "id") Integer id,
+    @GetMapping("/edit/{uuid}")
+    public String editCustomer(@PathVariable(name = "uuid") String uuid,
                                RedirectAttributes redirectAttributes,
                                Model model) throws PaykeshoError {
-        if (id == null) {
+        if (uuid == null || uuid.trim().isEmpty()) {
             return Constants.REDIRECT_CUSTOMERS;
         }
         String pageTitle = "Edit Client";
 
         try {
-            Client client = clientService.get(id);
+            Client client = clientService.getByUuid(uuid);
             List<Country> countryList = clientService.countryList();
 
             model.addAttribute("client", client);

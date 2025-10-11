@@ -24,6 +24,8 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -334,5 +336,30 @@ public class ClientService {
             log.warn("No ClientBalance found for client id: {}. Returning null.", client.getId());
             return null;
         }
+    }
+
+    // UUID-based methods for API endpoints
+    public Optional<Client> getClientById(Integer id) {
+        try {
+            return clientRepository.findById(id);
+        } catch (Exception ex) {
+            log.error("Error retrieving client by ID: {}", ex.getMessage(), ex);
+            return Optional.empty();
+        }
+    }
+
+    public Client getClientByUuid(String uuid) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            throw new PaykeshoError("Invalid UUID parameter");
+        }
+
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            throw new PaykeshoError("Invalid UUID format");
+        }
+
+        return clientRepository.findByUuid(uuid)
+                .orElseThrow(() -> new PaykeshoError("Could not find client with UUID: " + uuid));
     }
 }

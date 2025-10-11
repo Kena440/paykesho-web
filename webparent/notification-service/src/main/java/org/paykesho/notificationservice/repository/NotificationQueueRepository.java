@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for NotificationQueue entity
@@ -161,4 +162,10 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
      */
     @Query("SELECT n.notificationType, n.status, COUNT(n) FROM NotificationQueue n GROUP BY n.notificationType, n.status")
     List<Object[]> getNotificationStatisticsByType();
+
+    // UUID-based methods for secure URL access
+    Optional<NotificationQueue> findByUuid(String uuid);
+    
+    @Query("SELECT COUNT(n) > 0 FROM NotificationQueue n WHERE n.uuid = ?1")
+    boolean existsByUuid(String uuid);
 }

@@ -186,6 +186,25 @@ public class NotificationQueueService {
     }
 
     /**
+     * Get notification by UUID (for public/URL access)
+     */
+    @Transactional(readOnly = true)
+    public NotificationQueue getNotificationByUuid(String uuid) {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            throw new ValidationException("Invalid UUID parameter");
+        }
+
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Invalid UUID format");
+        }
+
+        return notificationQueueRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with UUID: " + uuid));
+    }
+
+    /**
      * Update notification status
      */
     public NotificationQueue updateNotificationStatus(Integer id, NotificationStatus status) {

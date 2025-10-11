@@ -118,21 +118,21 @@ public class MerchantAdminController {
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam Integer adminId, @RequestParam Integer merchantId,
+    public String resetPassword(@RequestParam String adminUuid, @RequestParam String merchantUuid,
                                 RedirectAttributes redirectAttributes) {
         try {
-            log.debug("Resetting password for merchant admin ID: {}", adminId);
+            log.debug("Resetting password for merchant admin UUID: {}", adminUuid);
 
-            MerchantAdmin admin = memberAdminService.get(adminId);
+            MerchantAdmin admin = memberAdminService.getByUuid(adminUuid);
             if (admin == null) {
                 redirectAttributes.addFlashAttribute("error", "Merchant admin not found");
-                return "redirect:/merchants/view/" + merchantId;
+                return "redirect:/merchants/view/" + merchantUuid;
             }
 
-            Merchant merchant = merchantService.getMerchantById(merchantId);
+            Merchant merchant = merchantService.getMerchantByUuid(merchantUuid);
             if (merchant == null) {
                 redirectAttributes.addFlashAttribute("error", "Merchant not found");
-                return "redirect:/merchants/view/" + merchantId;
+                return "redirect:/merchants/view/" + merchantUuid;
             }
 
             // Generate new temporary password and send email
@@ -143,11 +143,11 @@ public class MerchantAdminController {
                     "Password reset successful! A new temporary password has been sent to " + admin.getEmail());
 
         } catch (Exception e) {
-            log.error("Error resetting password for merchant admin ID {}: {}", adminId, e.getMessage(), e);
+            log.error("Error resetting password for merchant admin UUID {}: {}", adminUuid, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Failed to reset password: " + e.getMessage());
         }
 
-        return "redirect:/merchants/view/" + merchantId;
+        return "redirect:/merchants/view/" + merchantUuid;
     }
 
 }

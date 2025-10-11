@@ -13,7 +13,7 @@ public class ClientRestController {
     private ClientService clientService;
 
     @PostMapping("/check-email")
-    public String checkCustomerEmail(Integer id, String email) {
-        return clientService.isEmailUnique(id, email) ? "OK" : "Duplicated";
+    public String checkCustomerEmail(String uuid, String email) {
+        return clientService.isEmailUniqueByUuid(uuid, email) ? "OK" : "Duplicated";
     }
 }

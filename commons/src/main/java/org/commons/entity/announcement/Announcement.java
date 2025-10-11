@@ -27,6 +27,7 @@ public class Announcement extends IdBasedEntity {
     @Column(length = 255, nullable = false)
     private String details;
 
+    @Column(length = 512)
     private String photos;
     private Date eventDate;
 

@@ -1,7 +1,9 @@
 package org.commons.entity.client;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.commons.entity.IdBasedEntity;
 import org.commons.entity.Voucher;
 import org.commons.enums.PaymentStatus;
 
@@ -11,12 +13,10 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "repayment_schedules")
-public class RepaymentSchedule {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class RepaymentSchedule extends IdBasedEntity {
     @Column(name = "reference", length = 128, nullable = false, unique = true)
     private String reference;
     @ManyToOne

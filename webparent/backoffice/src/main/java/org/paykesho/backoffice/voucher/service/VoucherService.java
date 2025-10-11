@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -119,6 +120,50 @@ public class VoucherService {
             throw new PaykeshoError("Null parameter id");
         }
         return vouchersRepository.save(voucher);
+    }
+
+    // UUID-based methods for secure URL access
+    public Voucher getVoucherByUuid(String uuid) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            log.error("getVoucherByUuid called with null or empty UUID");
+            throw new PaykeshoError("Invalid UUID parameter");
+        }
+
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            log.error("getVoucherByUuid called with invalid UUID format: {}", uuid);
+            throw new PaykeshoError("Invalid UUID format");
+        }
+
+        Voucher voucher = vouchersRepository.findByUuid(uuid)
+                .orElseThrow(() -> {
+                    log.error("Voucher not found with UUID: {}", uuid);
+                    return new PaykeshoError("Could not find voucher with UUID: " + uuid);
+                });
+
+        processPayslipPath(voucher);
+        log.debug("Successfully retrieved voucher with UUID: {}", uuid);
+        return voucher;
+    }
+
+    public void approveVoucherByUuid(String uuid) throws PaykeshoError {
+        Voucher voucher = getVoucherByUuid(uuid);
+        vouchersRepository.updateApprovedStatus(voucher.getId(), true);
+        log.info("Approved voucher with UUID: {}", uuid);
+    }
+
+    private void processPayslipPath(Voucher voucher) {
+        if (voucher != null && voucher.getPayslip() != null) {
+            try {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(voucher.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    voucher.setPayslipPath(fileAccessResponse.getFileUrl());
+                }
+            } catch (Exception ex) {
+                log.warn("Failed to get file access details for voucher: {}", ex.getMessage());
+            }
+        }
     }
 
     public List<Voucher> getApprovedAndValidClientVouchers(Client client) throws PaykeshoError {

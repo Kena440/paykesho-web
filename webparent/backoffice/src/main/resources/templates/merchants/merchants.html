@@ -55,11 +55,16 @@
                                                      style="max-height: 100px; max-width: 100px"
                                                      th:if="${merchant.photos != null}"
                                                      th:src="@{${merchant.photoPath}}">
+                                                <div class="d-flex align-items-center justify-content-center bg-light rounded"
+                                                     style="height: 100px; width: 100px; min-height: 100px; min-width: 100px;"
+                                                     th:unless="${merchant.photos != null}">
+                                                    <i class="fas fa-store fa-2x text-muted"></i>
+                                                </div>
                                             </a>
                                         </td>
                                         <td>
                                             <span class="font-weight-normal">
-                                                <a th:href="@{'/merchants/view/'+${merchant.id}}"
+                                                <a th:href="@{'/merchants/view/'+${merchant.uuid}}"
                                                    title="Assessment View">
                                                     <span class="font-weight-normal"> [[${merchant.name}]]</span>
                                                 </a>
@@ -68,15 +73,15 @@
                                         <td><span class="font-weight-normal">[[${merchant.code}]]</span></td>
                                         <td><span class="font-weight-normal">[[${merchant.merchantType}]]</span></td>
                                         <td>
-                                            <div th:replace="fragments/fragments :: status(${merchant.enabled}, 'merchant', '/merchants/' + ${merchant.id})"></div>
+                                            <div th:replace="fragments/fragments :: status(${merchant.enabled}, 'merchant', '/merchants/' + ${merchant.uuid})"></div>
                                         </td>
                                         <td>
                                             <a class="dropdown-item" href="#">
-                                                <div th:replace="fragments/fragments :: edit('merchant', '/merchants/edit/' + ${merchant.id})"></div>
+                                                <div th:replace="fragments/fragments :: edit('merchant', '/merchants/edit/' + ${merchant.uuid})"></div>
                                             </a>
                                             &nbsp;
                                             <a class="dropdown-item text-danger" href="#">
-                                                <div th:replace="fragments/fragments :: delete(${merchant.id}, 'merchant', '/merchants/delete/' + ${merchant.id}, true)"></div>
+                                                <div th:replace="fragments/fragments :: delete(${merchant.uuid}, 'merchant', '/merchants/delete/' + ${merchant.uuid}, true)"></div>
                                             </a>
                                         </td>
                                     </tr>

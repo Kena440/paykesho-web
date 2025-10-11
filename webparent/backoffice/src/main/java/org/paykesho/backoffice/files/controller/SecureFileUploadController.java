@@ -49,7 +49,7 @@ public class SecureFileUploadController {
     public ResponseEntity<Map<String, Object>> handleSecureFileUpload(
             @RequestParam("file") MultipartFile file,
             @RequestParam("fileType") String fileTypeStr,
-            @RequestParam("userId") int userId,
+            @RequestParam("userUuid") String userUuid,
             @RequestParam("description") String description) {
 
         Map<String, Object> response = new HashMap<>();
@@ -125,10 +125,10 @@ public class SecureFileUploadController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // SECURITY CHECK #9: Validate user ID
-            if (userId <= 0) {
+            // SECURITY CHECK #9: Validate user UUID
+            if (userUuid == null || userUuid.trim().isEmpty()) {
                 response.put("success", false);
-                response.put("error", "Invalid user ID");
+                response.put("error", "Invalid user UUID");
                 return ResponseEntity.badRequest().body(response);
             }
 
@@ -139,8 +139,8 @@ public class SecureFileUploadController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // Process the upload
-            FileUploadResponse uploadResponse = fileUploadService.uploadFile(file, fileType, userId, description);
+            // Process the upload using UUID
+            FileUploadResponse uploadResponse = fileUploadService.uploadFileByUuid(file, fileType, userUuid, description);
 
             if (uploadResponse != null && uploadResponse.isStatus()) {
                 response.put("success", true);
@@ -148,7 +148,7 @@ public class SecureFileUploadController {
                 response.put("filePath", uploadResponse.getFilePath());
                 response.put("message", "File uploaded successfully");
 
-                log.info("File uploaded successfully: {} by user {}", sanitizedFilename, userId);
+                log.info("File uploaded successfully: {} by user UUID: {}", sanitizedFilename, userUuid);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("success", false);

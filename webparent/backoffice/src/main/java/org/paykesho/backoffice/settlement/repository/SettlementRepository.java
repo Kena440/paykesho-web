@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SettlementRepository extends JpaRepository<Settlement, Integer> {
 
@@ -17,4 +18,10 @@ public interface SettlementRepository extends JpaRepository<Settlement, Integer>
 
     @Query("select count(t.id) as total from Settlement t order by t.settlementDate desc")
     Long countAllSettlements();
+
+    // UUID-based methods for secure URL access
+    Optional<Settlement> findByUuid(String uuid);
+    
+    @Query("SELECT COUNT(s) > 0 FROM Settlement s WHERE s.uuid = ?1")
+    boolean existsByUuid(String uuid);
 }

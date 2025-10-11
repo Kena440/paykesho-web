@@ -54,10 +54,15 @@
                                                      style="max-height: 100px; max-width: 100px"
                                                      th:if="${organization.photos != null}"
                                                      th:src="@{${organization.photoPath}}">
+                                                <div class="d-flex align-items-center justify-content-center bg-light rounded"
+                                                     style="height: 100px; width: 100px; min-height: 100px; min-width: 100px;"
+                                                     th:unless="${organization.photos != null}">
+                                                    <i class="fas fa-building fa-2x text-muted"></i>
+                                                </div>
                                             </a>
                                         </td>
                                         <td>
-                                            <a th:href="@{'/organizations/view/'+${organization.id}}"
+                                            <a th:href="@{'/organizations/view/'+${organization.uuid}}"
                                                title="Assessment View">
                                                 <span class="font-weight-normal">[[${organization.name}]]</span>
                                             </a>
@@ -65,15 +70,15 @@
                                         <td><span class="font-weight-normal">[[${organization.organizationType}]]</span>
                                         </td>
                                         <td>
-                                            <div th:replace="fragments/fragments :: status(${organization.enabled}, 'organization', '/organizations/' + ${organization.id})"></div>
+                                            <div th:replace="fragments/fragments :: status(${organization.enabled}, 'organization', '/organizations/' + ${organization.uuid})"></div>
                                         </td>
                                         <td>
                                             <a class="dropdown-item" href="#">
-                                                <div th:replace="fragments/fragments :: edit('organization', '/organizations/edit/' + ${organization.id})"></div>
+                                                <div th:replace="fragments/fragments :: edit('organization', '/organizations/edit/' + ${organization.uuid})"></div>
                                             </a>
                                             &nbsp;
                                             <a class="dropdown-item text-danger" href="#">
-                                                <div th:replace="fragments/fragments :: delete(${organization.id}, 'organization', '/organizations/delete/' + ${organization.id}, true)"></div>
+                                                <div th:replace="fragments/fragments :: delete(${organization.uuid}, 'organization', '/organizations/delete/' + ${organization.uuid}, true)"></div>
                                             </a>
                                         </td>
                                     </tr>

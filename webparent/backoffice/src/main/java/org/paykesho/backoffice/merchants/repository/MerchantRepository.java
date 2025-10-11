@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MerchantRepository extends SearchRepository<Merchant, Integer> {
     @Query("select m from Merchant m where m.email = :email")
@@ -42,5 +43,24 @@ public interface MerchantRepository extends SearchRepository<Merchant, Integer> 
     long countByEnabledFalse();
 
     long countByRegistrationDateAfter(java.util.Date date);
+
+    // ============================================================================
+    // UUID-based methods for secure URL access
+    // ============================================================================
+    
+    /**
+     * Find merchant by UUID for public/URL access
+     * @param uuid The merchant's UUID
+     * @return Optional containing the merchant if found
+     */
+    Optional<Merchant> findByUuid(String uuid);
+    
+    /**
+     * Check if a merchant exists with the given UUID
+     * @param uuid The merchant's UUID
+     * @return true if merchant exists, false otherwise
+     */
+    @Query("SELECT COUNT(m) > 0 FROM Merchant m WHERE m.uuid = ?1")
+    boolean existsByUuid(String uuid);
 
 }

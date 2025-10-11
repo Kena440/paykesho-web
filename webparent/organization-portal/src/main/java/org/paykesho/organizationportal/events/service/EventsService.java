@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -89,6 +90,22 @@ public class EventsService {
      * @return
      * @throws PaykeshoError
      */
+    // UUID-based method
+    public Announcement getEventByUuid(String uuid) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            throw new PaykeshoError("Invalid UUID parameter");
+        }
+
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            throw new PaykeshoError("Invalid UUID format");
+        }
+
+        return eventsRepository.findByUuid(uuid)
+                .orElseThrow(() -> new PaykeshoError("Could not find event with UUID: " + uuid));
+    }
+
     public Announcement getEventByName(String name) throws PaykeshoError {
         if (name == null) {
             throw new PaykeshoError("Null parameter storeName");

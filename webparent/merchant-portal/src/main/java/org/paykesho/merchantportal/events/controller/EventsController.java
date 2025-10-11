@@ -42,11 +42,11 @@ public class EventsController {
         return "events/events";
     }
 
-    @GetMapping("/view/{id}")
-    public String viewEvent(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+    @GetMapping("/view/{uuid}")
+    public String viewEvent(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
         try {
 
-            Announcement announcement = eventsService.getEventById(id);
+            Announcement announcement = eventsService.getEventByUuid(uuid);
 
             model.addAttribute("event", announcement);
             return "events/event_view";

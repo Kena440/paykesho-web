@@ -39,9 +39,23 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
         String idempotencyKey = getIdempotencyKey(request);
         Optional<IdempotencyRecord> existingRecord = idempotencyService.checkIdempotency(idempotencyKey);
         
-        if (existingRecord.isPresent() && existingRecord.get().isCompleted()) {
-            log.info("Returning cached response for idempotency key: {}", idempotencyKey);
-            return replayResponse(response, existingRecord.get());
+        if (existingRecord.isPresent()) {
+            IdempotencyRecord record = existingRecord.get();
+            // Only replay if it's truly completed successfully (not failed)
+            if (record.isCompleted() && record.getStatus() != null && 
+                !record.getStatus().toString().equals("FAILED")) {
+                log.info("Returning cached response for idempotency key: {}", idempotencyKey);
+                return replayResponse(response, record);
+            } else if (record.getStatus() != null && record.getStatus().toString().equals("FAILED")) {
+                // If it previously failed, allow retry by not replaying
+                log.info("Previous request failed, allowing retry for idempotency key: {}", idempotencyKey);
+                // Delete the failed record to allow retry
+                try {
+                    idempotencyService.deleteIdempotencyRecord(idempotencyKey);
+                } catch (Exception e) {
+                    log.error("Error deleting failed idempotency record: {}", e.getMessage());
+                }
+            }
         }
 
         try {
@@ -62,10 +76,23 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
         if (idempotencyKey == null) return;
 
         try {
-            if (ex != null) {
-                idempotencyService.markAsFailed(idempotencyKey, ex.getMessage(), response.getStatus());
+            String responseBody = getResponseBody(response);
+            
+            // Don't cache error pages (HTML responses with error indicators)
+            boolean isErrorPage = responseBody != null && (
+                responseBody.contains("<title>Paykesho | Back Office | Business Error</title>") ||
+                responseBody.contains("Business Logic Error") ||
+                responseBody.contains("class=\"alert alert-danger\"") ||
+                responseBody.contains("error/business-error")
+            );
+            
+            if (ex != null || isErrorPage) {
+                // Mark as failed and don't cache error responses
+                String errorMsg = ex != null ? ex.getMessage() : "Business error occurred";
+                idempotencyService.markAsFailed(idempotencyKey, errorMsg, response.getStatus());
             } else if (response.getStatus() >= 200 && response.getStatus() < 300) {
-                idempotencyService.markAsCompleted(idempotencyKey, response.getStatus(), getResponseBody(response), null);
+                // Only cache successful responses that are not HTML error pages
+                idempotencyService.markAsCompleted(idempotencyKey, response.getStatus(), responseBody, null);
             } else if (response.getStatus() >= 400) {
                 idempotencyService.markAsFailed(idempotencyKey, "HTTP " + response.getStatus(), response.getStatus());
             }
@@ -81,6 +108,13 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
 
     private boolean shouldSkipIdempotency(HttpServletRequest request) {
         String uri = request.getRequestURI();
+        String contentType = request.getContentType();
+        
+        // Skip idempotency for multipart form data (file uploads)
+        if (contentType != null && contentType.toLowerCase().contains("multipart/form-data")) {
+            return true;
+        }
+        
         return uri.contains("/actuator/") || uri.contains("/health") || 
                uri.contains("/login") || uri.contains("/logout") || uri.contains("/auth") ||
                uri.contains("/forgot-password") || uri.contains("/reset-password") ||

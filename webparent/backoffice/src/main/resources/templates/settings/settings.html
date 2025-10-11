@@ -111,6 +111,44 @@
     $(document).ready(function () {
         $("#MEMBER_ADMIN_CREATION_CONTENT").richText();
     })
+    
+    // Image preview functionality
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            // Check file size (500KB limit)
+            const file = input.files[0];
+            const MAX_FILE_SIZE = 502400; // 500KB
+            if (file.size > MAX_FILE_SIZE) {
+                alert('File size exceeds 500KB limit. Please choose a smaller image.');
+                input.value = '';
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file (PNG or JPEG).');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const thumbnail = document.getElementById('thumbnail');
+                const placeholder = document.getElementById('avatar-placeholder');
+                
+                if (thumbnail) {
+                    thumbnail.src = ''; // Clear src to force re-render
+                    thumbnail.src = e.target.result;
+                    thumbnail.style.display = 'block';
+                }
+                
+                if (placeholder) {
+                    placeholder.style.setProperty('display', 'none', 'important');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 </script>
 <script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
 <script th:src="@{/assets/js/country/country_setting.js}" type="text/javascript"></script>

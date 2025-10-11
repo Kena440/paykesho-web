@@ -64,27 +64,27 @@ public class VoucherController {
         return "vouchers/vouchers";
     }
 
-    @GetMapping("/voucher/{id}")
-    public String listAllVouchersByClient(@PathVariable("id") int id, Model model) {
+    @GetMapping("/voucher/{uuid}")
+    public String listAllVouchersByClient(@PathVariable("uuid") String uuid, Model model) {
         return "vouchers/vouchers";
     }
 
-    @GetMapping("/view/{id}")
-    public String showVoucherViewModal(@PathVariable("id") Integer id, Model model) {
-        Voucher voucher = voucherService.getVoucherById(id);
+    @GetMapping("/view/{uuid}")
+    public String showVoucherViewModal(@PathVariable("uuid") String uuid, Model model) throws PaykeshoError {
+        Voucher voucher = voucherService.getVoucherByUuid(uuid);
         model.addAttribute("voucher", voucher);
         return "vouchers/voucher_view_modal";
     }
 
-    @GetMapping("/approve/{id}")
-    public String approveVoucherRequest(@PathVariable("id") Integer voucherId, HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
+    @GetMapping("/approve/{uuid}")
+    public String approveVoucherRequest(@PathVariable("uuid") String voucherUuid, HttpServletRequest request, RedirectAttributes redirectAttributes) throws PaykeshoError, MessagingException, UnsupportedEncodingException {
         // IDEMPOTENCY: Generate key for this approval operation
-        String idempotencyKey = "VOUCHER_APPROVAL_" + voucherId;
+        String idempotencyKey = "VOUCHER_APPROVAL_" + voucherUuid;
         
         // Check if already approved
         Optional<IdempotencyRecord> existing = idempotencyService.checkIdempotency(idempotencyKey);
         if (existing.isPresent() && existing.get().isCompleted()) {
-            log.warn("Voucher {} already approved. Skipping duplicate approval.", voucherId);
+            log.warn("Voucher {} already approved. Skipping duplicate approval.", voucherUuid);
             redirectAttributes.addFlashAttribute("message", "Voucher was already approved");
             return "redirect:/vouchers";
         }
@@ -93,9 +93,9 @@ public class VoucherController {
         try {
             idempotencyService.createIdempotencyRecord(
                 idempotencyKey,
-                "/vouchers/approve/" + voucherId,
+                "/vouchers/approve/" + voucherUuid,
                 "GET",
-                String.valueOf(voucherId),
+                voucherUuid,
                 "backoffice-admin"
             );
         } catch (Exception e) {
@@ -103,7 +103,8 @@ public class VoucherController {
         }
         
         try {
-            Voucher approvedVoucher = runVoucherApprovalProcess(voucherId, request);
+            Voucher voucher = voucherService.getVoucherByUuid(voucherUuid);
+            Voucher approvedVoucher = runVoucherApprovalProcess(voucher.getId(), request);
             
             // Mark as completed
             idempotencyService.markAsCompleted(

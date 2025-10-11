@@ -104,13 +104,13 @@ public class APIController {
 
     }
 
-    @GetMapping("/vouchers/{id}")
-    public ResponseEntity<?> getClientVouchers(@PathVariable("id") Integer clientId) {
+    @GetMapping("/vouchers/{uuid}")
+    public ResponseEntity<?> getClientVouchers(@PathVariable("uuid") String clientUuid) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            if (clientId != null) {
-                Client client = clientService.getClientById(clientId).get();
+            if (clientUuid != null && !clientUuid.trim().isEmpty()) {
+                Client client = clientService.getClientByUuid(clientUuid);
 
                 List<VoucherDto> clientVoucherList = voucherService.getClientVouchersFlat(client);
                 response.put("error", false);
@@ -128,13 +128,13 @@ public class APIController {
 
     }
 
-    @GetMapping("/vouchers/{userId}/{merchantCode}")
-    public ResponseEntity<?> getClientVouchersByMerchant(@PathVariable("userId") Integer userId, @PathVariable("merchantCode") String merchantCode) {
+    @GetMapping("/vouchers/{userUuid}/{merchantCode}")
+    public ResponseEntity<?> getClientVouchersByMerchant(@PathVariable("userUuid") String userUuid, @PathVariable("merchantCode") String merchantCode) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            if (userId != null && !merchantCode.isEmpty()) {
-                Client client = clientService.getClientById(userId).get();
+            if (userUuid != null && !merchantCode.isEmpty()) {
+                Client client = clientService.getClientByUuid(userUuid);
                 MerchantDto merchant = merchantService.getMerchantByCode(merchantCode);
 
                 List<VoucherDto> clientVoucherList = voucherService.getClientVouchersByMerchantFlat(client, merchant);
@@ -176,13 +176,13 @@ public class APIController {
 
     }
 
-    @GetMapping("/transactions/{id}")
-    public ResponseEntity<?> getClientTransactions(@PathVariable("id") Integer clientId) {
+    @GetMapping("/transactions/{uuid}")
+    public ResponseEntity<?> getClientTransactions(@PathVariable("uuid") String clientUuid) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            if (clientId != null) {
-                Client client = clientService.getClientById(clientId).get();
+            if (clientUuid != null && !clientUuid.trim().isEmpty()) {
+                Client client = clientService.getClientByUuid(clientUuid);
 
                 List<TransactionDto> clientTransactionList = transactionsService.getClientTransactionsFlat(client);
                 response.put("error", false);

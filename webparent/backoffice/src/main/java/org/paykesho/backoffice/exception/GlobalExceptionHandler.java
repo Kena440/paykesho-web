@@ -3,6 +3,7 @@ package org.paykesho.backoffice.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.utils.PaykeshoError;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -37,9 +38,12 @@ public class GlobalExceptionHandler {
      * Handle PaykeshoError (Business Logic Errors) - Handle first for priority
      */
     @ExceptionHandler(PaykeshoError.class)
-    public ModelAndView handlePaykeshoError(PaykeshoError ex, HttpServletRequest request) {
+    public ModelAndView handlePaykeshoError(PaykeshoError ex, HttpServletRequest request, HttpServletResponse response) {
         log.error("Business logic error: {} at {}", ex.getMessage(), request.getRequestURI());
 
+        // Ensure proper Content-Type header
+        response.setContentType("text/html; charset=UTF-8");
+        
         ModelAndView modelAndView = new ModelAndView("error/business-error");
         modelAndView.addObject("errorMessage", ex.getMessage());
         modelAndView.addObject("errorCode", "BUSINESS_ERROR");
@@ -184,6 +188,28 @@ public class GlobalExceptionHandler {
     // }
 
     /**
+     * Handle data integrity violation exceptions (unique constraints, foreign keys, etc.)
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ModelAndView handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest request, HttpServletResponse response) {
+        log.error("Data integrity violation at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        // Ensure proper Content-Type header
+        response.setContentType("text/html; charset=UTF-8");
+        
+        // Extract meaningful error message from the exception
+        String errorMessage = extractConstraintViolationMessage(ex.getMessage());
+        
+        ModelAndView modelAndView = new ModelAndView("error/business-error");
+        modelAndView.addObject("errorMessage", errorMessage);
+        modelAndView.addObject("errorCode", "DATA_INTEGRITY_VIOLATION");
+        modelAndView.addObject("timestamp", LocalDateTime.now());
+        modelAndView.addObject("path", request.getRequestURI());
+
+        return modelAndView;
+    }
+
+    /**
      * Handle database access exceptions
      */
     @ExceptionHandler({DataAccessException.class, SQLException.class})
@@ -267,5 +293,36 @@ public class GlobalExceptionHandler {
         errorResponse.put("path", path);
 
         return errorResponse;
+    }
+
+    /**
+     * Extract meaningful error message from constraint violation exception
+     */
+    private String extractConstraintViolationMessage(String exceptionMessage) {
+        if (exceptionMessage == null) {
+            return "A data validation error occurred.";
+        }
+
+        // Check for common constraint violations
+        if (exceptionMessage.contains("Duplicate entry")) {
+            if (exceptionMessage.contains("name")) {
+                return "A merchant with this name already exists. Please choose a different name.";
+            } else if (exceptionMessage.contains("email")) {
+                return "A merchant with this email already exists. Please choose a different email.";
+            } else if (exceptionMessage.contains("code")) {
+                return "A merchant with this code already exists. Please try again.";
+            } else {
+                return "Duplicate data detected. Please ensure all fields are unique.";
+            }
+        } else if (exceptionMessage.contains("foreign key constraint")) {
+            return "Referenced data not found. Please check your selections.";
+        } else if (exceptionMessage.contains("cannot be null")) {
+            return "Required fields are missing. Please fill in all required information.";
+        } else if (exceptionMessage.contains("Data too long")) {
+            return "Some data is too long. Please shorten your input.";
+        }
+
+        // Default message for unknown constraint violations
+        return "Data validation failed. Please check your input and try again.";
     }
 }

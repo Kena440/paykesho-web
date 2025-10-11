@@ -56,6 +56,11 @@
                                                 <img alt="Avatar" class="user-avatar rounded-circle mr-3"
                                                      style="max-height: 100px; max-width: 100px"
                                                      th:if="${user.photos != null}" th:src="@{${user.photoPath}}">
+                                                <div class="d-flex align-items-center justify-content-center bg-light rounded-circle"
+                                                     style="height: 100px; width: 100px; min-height: 100px; min-width: 100px;"
+                                                     th:unless="${user.photos != null}">
+                                                    <i class="fas fa-user fa-2x text-muted"></i>
+                                                </div>
                                             </a>
                                         </td>
                                         <td><span class="font-weight-normal">[[${user.email}]]</span></td>
@@ -63,15 +68,15 @@
                                         <td><span class="font-weight-normal">[[${user.lastName}]]</span></td>
                                         <td><span class="font-weight-normal">[[${user.roles}]]</span></td>
                                         <td>
-                                            <div th:replace="fragments/fragments :: status(${user.enabled}, 'user', '/users/' + ${user.id})"></div>
+                                            <div th:replace="fragments/fragments :: status(${user.enabled}, 'user', '/users/' + ${user.uuid})"></div>
                                         </td>
                                         <td>
                                             <a class="dropdown-item" href="#">
-                                                <div th:replace="fragments/fragments :: edit('user', '/users/edit/' + ${user.id})"></div>
+                                                <div th:replace="fragments/fragments :: edit('user', '/users/edit/' + ${user.uuid})"></div>
                                             </a>
                                             &nbsp;
                                             <a class="dropdown-item text-danger" href="#">
-                                                <div th:replace="fragments/fragments :: delete(${user.id}, 'user', '/users/delete/' + ${user.id}, true)"></div>
+                                                <div th:replace="fragments/fragments :: delete(${user.uuid}, 'user', '/users/delete/' + ${user.uuid}, true)"></div>
                                             </a>
                                         </td>
                                     </tr>

@@ -45,8 +45,8 @@ public interface NotificationRequestRepository extends JpaRepository<Notificatio
     /**
      * Find retryable notifications (failed but not permanently failed)
      */
-    @Query("SELECT n FROM NotificationRequest n WHERE n.status = :status AND n.retryCount < n.maxRetries AND (n.nextRetryAt IS NULL OR n.nextRetryAt <= :now)")
-    List<NotificationRequest> findRetryableNotifications(@Param("status") NotificationStatus status, @Param("now") Date now);
+    @Query("SELECT n FROM NotificationRequest n WHERE n.status = :status AND n.attemptCount < n.maxAttempts")
+    List<NotificationRequest> findRetryableNotifications(@Param("status") NotificationStatus status);
     
     /**
      * Count notifications by source module
@@ -72,7 +72,7 @@ public interface NotificationRequestRepository extends JpaRepository<Notificatio
     /**
      * Reset stale processing notifications
      */
-    @Query("UPDATE NotificationRequest n SET n.status = :newStatus WHERE n.status = :oldStatus AND n.updatedAt < :cutoffTime")
+    @Query("UPDATE NotificationRequest n SET n.status = :newStatus WHERE n.status = :oldStatus AND n.lastProcessedAt < :cutoffTime")
     int resetStaleProcessingNotifications(@Param("oldStatus") NotificationStatus oldStatus, 
                                         @Param("newStatus") NotificationStatus newStatus, 
                                         @Param("cutoffTime") Date cutoffTime);

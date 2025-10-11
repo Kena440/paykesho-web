@@ -1,7 +1,9 @@
 package org.commons.entity.merchant;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.commons.entity.IdBasedEntity;
 import org.commons.enums.SettlementStatus;
 
 import javax.persistence.*;
@@ -10,12 +12,10 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "settlements")
-public class Settlement {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Settlement extends IdBasedEntity {
     @Column(name = "reference", length = 128, nullable = false, unique = true)
     private String reference;
     @OneToOne

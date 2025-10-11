@@ -20,9 +20,9 @@ public class StateRestController {
     @Autowired
     private StateRepository stateRepository;
 
-    @GetMapping("/list-states-by-country/{id}")
-    public List<StateDto> listStatesByCountry(@PathVariable("id") Integer countryId) {
-        List<State> stateList = stateRepository.findByCountryOrderByNameAsc(new Country(countryId));
+    @GetMapping("/list-states-by-country/{uuid}")
+    public List<StateDto> listStatesByCountry(@PathVariable("uuid") String countryUuid) {
+        List<State> stateList = stateRepository.findByCountryUuid(countryUuid);
         List<StateDto> result = new ArrayList<>();
 
         for (State state : stateList) {

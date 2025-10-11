@@ -1,8 +1,10 @@
 package org.paykesho.backoffice.transaction.controller;
 
 import org.commons.entity.Transaction;
+import org.commons.entity.merchant.Merchant;
 import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.merchants.service.MerchantService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.paykesho.backoffice.transaction.service.TransactionsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class TransactionController {
     @Autowired
     private TransactionsService transactionsService;
     @Autowired
+    private MerchantService merchantService;
+    @Autowired
     private SettingService settingService;
 
     @GetMapping("")
@@ -34,10 +38,11 @@ public class TransactionController {
         return "transactions/transactions";
     }
 
-    @GetMapping("/merchant/{id}")
-    public String listAllTransactionsByMerchant(@PathVariable("id") int id, Model model) throws PaykeshoError {
+    @GetMapping("/merchant/{uuid}")
+    public String listAllTransactionsByMerchant(@PathVariable("uuid") String uuid, Model model) throws PaykeshoError {
 
-        List<Transaction> transactionList = transactionsService.getMerchantTransactions(id);
+        Merchant merchant = merchantService.getMerchantByUuid(uuid);
+        List<Transaction> transactionList = transactionsService.getMerchantTransactions(merchant.getId());
         model.addAttribute("transactionList", transactionList);
         //todo
         model.addAttribute("totalItems", transactionList.size());

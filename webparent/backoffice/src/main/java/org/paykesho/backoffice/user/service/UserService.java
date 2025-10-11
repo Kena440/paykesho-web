@@ -18,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import net.bytebuddy.utility.RandomString;
 
 @Slf4j
@@ -145,6 +146,29 @@ public class UserService {
         return true;
     }
 
+    public boolean isEmailUniqueByUuid(String uuid, String email) {
+        if (email == null) {
+            return false;
+        }
+
+        // If creating new (no UUID), just check if email exists
+        if (uuid == null || uuid.trim().isEmpty()) {
+            User existingUser = userRepository.getUserByEmail(email);
+            return existingUser == null;
+        }
+
+        // If editing, get the current user and exclude it from the check
+        try {
+            User currentUser = userRepository.findByUuid(uuid)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            return isEmailUnique(currentUser.getId(), email);
+        } catch (Exception e) {
+            // If user not found, treat as new
+            User existingUser = userRepository.getUserByEmail(email);
+            return existingUser == null;
+        }
+    }
+
     /**
      * +
      * This method returns a user based on the ID
@@ -159,7 +183,17 @@ public class UserService {
         }
 
         try {
-            return userRepository.findById(id).get();
+            User user = userRepository.findById(id).get();
+            
+            // Process photoPath the same way as in listAll()
+            if (user.getPhotoPath() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(user.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    user.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
+            }
+            
+            return user;
         } catch (NoSuchElementException exception) {
             throw new PaykeshoError("Could not find any user");
         }
@@ -185,6 +219,79 @@ public class UserService {
         }
 
         userRepository.updateEnableStatus(id, enabled);
+    }
+
+    // ============================================================================
+    // UUID-based methods for secure URL access
+    // ============================================================================
+
+    /**
+     * Get user by UUID (for public/URL access)
+     * This method should be used for all public-facing endpoints
+     * 
+     * @param uuid The user's UUID
+     * @return User entity
+     * @throws PaykeshoError if UUID is invalid or user not found
+     */
+    public User getUserByUuid(String uuid) throws PaykeshoError {
+        // Validate UUID parameter
+        if (uuid == null || uuid.trim().isEmpty()) {
+            log.error("getUserByUuid called with null or empty UUID");
+            throw new PaykeshoError("Invalid UUID parameter");
+        }
+
+        // Validate UUID format to prevent injection attacks
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            log.error("getUserByUuid called with invalid UUID format: {}", uuid);
+            throw new PaykeshoError("Invalid UUID format");
+        }
+
+        // Fetch user by UUID
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(() -> {
+                    log.error("User not found with UUID: {}", uuid);
+                    return new PaykeshoError("Could not find user with UUID: " + uuid);
+                });
+
+        // Process photo path
+        processPhotoPath(user);
+
+        log.debug("Successfully retrieved user with UUID: {}", uuid);
+        return user;
+    }
+
+    /**
+     * Update user enabled status by UUID
+     * 
+     * @param uuid The user's UUID
+     * @param enabled The new enabled status
+     * @throws PaykeshoError if UUID is invalid or user not found
+     */
+    public void updateUserStatusByUuid(String uuid, boolean enabled) throws PaykeshoError {
+        // Get user by UUID (includes validation)
+        User user = getUserByUuid(uuid);
+        
+        // Update status using internal ID
+        updateUserStatus(user.getId(), enabled);
+        
+        log.info("Updated user status for UUID: {} to enabled: {}", uuid, enabled);
+    }
+
+    /**
+     * Helper method to process user photo path
+     * Extracted to avoid code duplication
+     * 
+     * @param user The user entity
+     */
+    private void processPhotoPath(User user) {
+        if (user != null && user.getPhotoPath() != null) {
+            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(user.getRemoteFileId());
+            if (fileAccessResponse != null) {
+                user.setPhotoPath(fileAccessResponse.getFileUrl());
+            }
+        }
     }
 
     /**

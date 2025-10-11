@@ -119,14 +119,14 @@ public class OrganizationAdminController {
 
     @PostMapping("/toggle-status")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> toggleOrganizationAdminStatus(@RequestParam Integer adminId, @RequestParam boolean enabled) {
+    public ResponseEntity<Map<String, Object>> toggleOrganizationAdminStatus(@RequestParam String adminUuid, @RequestParam boolean enabled) {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            log.debug("Toggling organization admin status for ID: {} to: {}", adminId, enabled);
-            organizationAdminService.updateCustomerEnabledStatus(adminId, enabled);
+            log.debug("Toggling organization admin status for UUID: {} to: {}", adminUuid, enabled);
+            organizationAdminService.updateCustomerEnabledStatusByUuid(adminUuid, enabled);
             
-            OrganizationAdmin admin = organizationAdminService.get(adminId);
+            OrganizationAdmin admin = organizationAdminService.getByUuid(adminUuid);
             String status = enabled ? "enabled" : "disabled";
             String message = String.format("Organization admin '%s' has been %s successfully.", admin.getFullName(), status);
             
@@ -134,10 +134,10 @@ public class OrganizationAdminController {
             response.put("message", message);
             response.put("enabled", enabled);
             
-            log.info("Successfully {} organization admin: {} (ID: {})", status, admin.getEmail(), adminId);
+            log.info("Successfully {} organization admin: {} (UUID: {})", status, admin.getEmail(), adminUuid);
             
         } catch (Exception e) {
-            log.error("Error toggling organization admin status for ID {}: {}", adminId, e.getMessage(), e);
+            log.error("Error toggling organization admin status for UUID {}: {}", adminUuid, e.getMessage(), e);
             response.put("success", false);
             response.put("message", "Failed to update organization admin status: " + e.getMessage());
         }
@@ -146,40 +146,40 @@ public class OrganizationAdminController {
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam Integer adminId, @RequestParam Integer organizationId,
+    public String resetPassword(@RequestParam String adminUuid, @RequestParam String organizationUuid,
                                 RedirectAttributes redirectAttributes) {
 
         // CRASH POINT #1 FIX: Validate parameters
-        if (adminId == null || organizationId == null) {
-            log.error("Invalid parameters: adminId={}, organizationId={}", adminId, organizationId);
+        if (adminUuid == null || adminUuid.isEmpty() || organizationUuid == null || organizationUuid.isEmpty()) {
+            log.error("Invalid parameters: adminUuid={}, organizationUuid={}", adminUuid, organizationUuid);
             redirectAttributes.addFlashAttribute("error", "Invalid request parameters");
-            return organizationId != null ? "redirect:/organizations/view/" + organizationId : "redirect:/organizations";
+            return organizationUuid != null ? "redirect:/organizations/view/" + organizationUuid : "redirect:/organizations";
         }
 
         try {
-            log.debug("Resetting password for organization admin ID: {}", adminId);
+            log.debug("Resetting password for organization admin UUID: {}", adminUuid);
 
             // CRASH POINT #2 FIX: Enhanced admin validation
-            OrganizationAdmin admin = organizationAdminService.get(adminId);
+            OrganizationAdmin admin = organizationAdminService.getByUuid(adminUuid);
             if (admin == null) {
-                log.warn("Organization admin not found for ID: {}", adminId);
+                log.warn("Organization admin not found for UUID: {}", adminUuid);
                 redirectAttributes.addFlashAttribute("error", "Organization admin not found");
-                return "redirect:/organizations/view/" + organizationId;
+                return "redirect:/organizations/view/" + organizationUuid;
             }
 
             // CRASH POINT #3 FIX: Enhanced organization validation
-            Organization organization = organizationService.getOrganizationById(organizationId);
+            Organization organization = organizationService.getOrganizationByUuid(organizationUuid);
             if (organization == null) {
-                log.warn("Organization not found for ID: {}", organizationId);
+                log.warn("Organization not found for UUID: {}", organizationUuid);
                 redirectAttributes.addFlashAttribute("error", "Organization not found");
-                return "redirect:/organizations/view/" + organizationId;
+                return "redirect:/organizations/view/" + organizationUuid;
             }
 
             // Additional validation for admin state
             if (admin.getEmail() == null || admin.getEmail().trim().isEmpty()) {
-                log.error("Organization admin {} has no email address", adminId);
+                log.error("Organization admin {} has no email address", adminUuid);
                 redirectAttributes.addFlashAttribute("error", "Organization admin has no email address configured");
-                return "redirect:/organizations/view/" + organizationId;
+                return "redirect:/organizations/view/" + organizationUuid;
             }
 
             // Generate new temporary password and send email
@@ -200,17 +200,17 @@ public class OrganizationAdminController {
                             ". Please wait a moment before attempting to login.");
 
         } catch (IllegalArgumentException e) {
-            log.error("Invalid argument during password reset for admin ID {}: {}", adminId, e.getMessage());
+            log.error("Invalid argument during password reset for admin UUID {}: {}", adminUuid, e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Invalid request: " + e.getMessage());
         } catch (PaykeshoError e) {
-            log.error("Business logic error during password reset for admin ID {}: {}", adminId, e.getMessage());
+            log.error("Business logic error during password reset for admin UUID {}: {}", adminUuid, e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Password reset failed: " + e.getMessage());
         } catch (Exception e) {
-            log.error("Unexpected error resetting password for organization admin ID {}: {}", adminId, e.getMessage(), e);
+            log.error("Unexpected error resetting password for organization admin UUID {}: {}", adminUuid, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "An unexpected error occurred. Please try again or contact support.");
         }
 
-        return "redirect:/organizations/view/" + organizationId;
+        return "redirect:/organizations/view/" + organizationUuid;
     }
 
 }
