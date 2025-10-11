@@ -251,6 +251,8 @@
                       th:action="@{/events/save-attendee}">
                     <input id="eventId" name="eventId" th:value="${announcement.id}"
                            type="hidden"/>
+                    <input id="eventUuid" name="eventUuid" th:value="${announcement.uuid}"
+                           type="hidden"/>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-12 col-md-6">
