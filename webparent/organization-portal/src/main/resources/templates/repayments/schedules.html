@@ -95,7 +95,8 @@
                         <select class="form-control" id="client-selector" placeholder="Client" required
                                 th:field="*{client}">
                             <option selected value="">Select</option>
-                            <option th:each="os : ${clientList}" th:text="${os}" th:value="${os.id}"></option>
+                            <option th:each="os : ${clientList}" th:text="${os}" th:value="${os.id}" 
+                                    th:data-uuid="${os.uuid}"></option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -156,9 +157,11 @@
 <script>
     document.getElementById('client-selector').addEventListener('change', function () {
         var clientId = this.value;
+        var selectedOption = this.options[this.selectedIndex];
+        var clientUuid = selectedOption.getAttribute('data-uuid');
 
-        if (clientId) {
-            fetch('/clients/rest/voucher-totals?clientId=' + clientId, {
+        if (clientUuid) {
+            fetch('/clients/rest/voucher-totals?clientUuid=' + clientUuid, {
                 method: 'POST'
             })
                 .then(response => response.json())

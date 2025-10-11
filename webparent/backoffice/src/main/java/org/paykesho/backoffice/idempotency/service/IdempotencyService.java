@@ -111,6 +111,15 @@ public class IdempotencyService {
         return deletedCount;
     }
 
+    @Transactional
+    public void deleteIdempotencyRecord(String idempotencyKey) {
+        Optional<IdempotencyRecord> recordOpt = idempotencyRecordRepository.findByIdempotencyKey(idempotencyKey);
+        if (recordOpt.isPresent()) {
+            idempotencyRecordRepository.delete(recordOpt.get());
+            log.info("Deleted idempotency record: {}", idempotencyKey);
+        }
+    }
+
     private String computeHash(String input) {
         if (input == null || input.isEmpty()) {
             return "";

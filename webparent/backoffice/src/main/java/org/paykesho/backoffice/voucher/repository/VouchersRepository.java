@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface VouchersRepository extends SearchRepository<Voucher, Integer> {
 
@@ -55,6 +56,12 @@ public interface VouchersRepository extends SearchRepository<Voucher, Integer> {
     long countByClientOrganizationIdAndApprovedTrue(Integer organizationId);
 
     long countByClientOrganizationIdAndApprovedFalse(Integer organizationId);
+
+    // UUID-based methods for secure URL access
+    Optional<Voucher> findByUuid(String uuid);
+    
+    @Query("SELECT COUNT(v) > 0 FROM Voucher v WHERE v.uuid = ?1")
+    boolean existsByUuid(String uuid);
 
 }
 

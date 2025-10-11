@@ -233,7 +233,9 @@
                   th:action="@{/merchant-admin/save}"
                   th:object="${merchantAdmin}">
                 <input id="merchantId" name="merchantId" th:value="${merchant.id}" type="hidden"/>
+                <input id="merchantUuid" name="merchantUuid" th:value="${merchant.uuid}" type="hidden"/>
                 <input id="id" th:field="*{id}" type="hidden"/>
+                <input id="uuid" th:field="*{uuid}" type="hidden"/>
 
                 <div class="modal-body">
                     <div class="row">
@@ -347,8 +349,8 @@
 
             <form id="passwordResetForm" method="post"
                   th:action="@{/merchant-admin/reset-password}">
-                <input id="adminId" name="adminId" th:value="${merchantAdmin?.id}" type="hidden"/>
-                <input id="merchantId" name="merchantId" th:value="${merchant?.id}" type="hidden"/>
+                <input id="adminUuid" name="adminUuid" th:value="${merchantAdmin?.uuid}" type="hidden"/>
+                <input id="merchantUuid" name="merchantUuid" th:value="${merchant?.uuid}" type="hidden"/>
 
                 <div class="modal-body">
                     <div class="text-center mb-3">

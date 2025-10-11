@@ -51,7 +51,7 @@
                                         </td>
                                         <td>
                                             <span class="font-weight-normal">
-                                                <a th:href="@{'/clients/view/'+${client.id}}"
+                                                <a th:href="@{'/clients/view/'+${client.uuid}}"
                                                    title="client View">
                                                     <span class="font-weight-normal"> [[${client.code}]]</span>
                                                 </a>
@@ -64,7 +64,7 @@
                                         <td><span class="font-weight-normal">[[${client.email}]] <small>([[${client.phoneNumber}]])</small></span>
                                         </td>
                                         <td>
-                                            <div th:replace="fragments/fragments :: status(${client.enabled}, 'client', '/clients/' + ${client.id})"></div>
+                                            <div th:replace="fragments/fragments :: status(${client.enabled}, 'client', '/clients/' + ${client.uuid})"></div>
                                         </td>
                                         <td><span class="font-weight-normal"
                                                   th:replace="fragments/fragments :: format_currency(${client.clientBalance.availableBalance})"></span>

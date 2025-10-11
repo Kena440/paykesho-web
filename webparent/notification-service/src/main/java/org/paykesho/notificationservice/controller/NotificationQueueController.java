@@ -154,19 +154,18 @@ public class NotificationQueueController {
     }
 
     /**
-     * Get notification by ID
+     * Get notification by UUID
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<NotificationQueueDto> getNotificationById(@PathVariable Integer id) {
+    @GetMapping("/{uuid}")
+    public ResponseEntity<NotificationQueueDto> getNotificationById(@PathVariable String uuid) {
         try {
-            Optional<NotificationQueue> notification = notificationQueueService.getNotificationById(id);
-            if (notification.isPresent()) {
-                return ResponseEntity.ok(new NotificationQueueDto(notification.get()));
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            NotificationQueue notification = notificationQueueService.getNotificationByUuid(uuid);
+            return ResponseEntity.ok(new NotificationQueueDto(notification));
+        } catch (RuntimeException e) {
+            logger.error("Notification not found with UUID: {}", uuid);
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            logger.error("Error getting notification by ID: {}", e.getMessage());
+            logger.error("Error getting notification by UUID: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
@@ -174,10 +173,11 @@ public class NotificationQueueController {
     /**
      * Cancel a notification
      */
-    @PostMapping("/{id}/cancel")
-    public ResponseEntity<String> cancelNotification(@PathVariable Integer id) {
+    @PostMapping("/{uuid}/cancel")
+    public ResponseEntity<String> cancelNotification(@PathVariable String uuid) {
         try {
-            notificationQueueService.cancelNotification(id);
+            NotificationQueue notification = notificationQueueService.getNotificationByUuid(uuid);
+            notificationQueueService.cancelNotification(notification.getId());
             return ResponseEntity.ok("Notification cancelled successfully");
         } catch (Exception e) {
             logger.error("Error cancelling notification: {}", e.getMessage());
@@ -188,10 +188,11 @@ public class NotificationQueueController {
     /**
      * Retry a failed notification
      */
-    @PostMapping("/{id}/retry")
-    public ResponseEntity<String> retryNotification(@PathVariable Integer id) {
+    @PostMapping("/{uuid}/retry")
+    public ResponseEntity<String> retryNotification(@PathVariable String uuid) {
         try {
-            notificationQueueService.retryNotification(id);
+            NotificationQueue notification = notificationQueueService.getNotificationByUuid(uuid);
+            notificationQueueService.retryNotification(notification.getId());
             return ResponseEntity.ok("Notification queued for retry");
         } catch (Exception e) {
             logger.error("Error retrying notification: {}", e.getMessage());
@@ -230,10 +231,11 @@ public class NotificationQueueController {
     /**
      * Process a notification immediately
      */
-    @PostMapping("/{id}/process")
-    public ResponseEntity<String> processNotificationImmediately(@PathVariable Integer id) {
+    @PostMapping("/{uuid}/process")
+    public ResponseEntity<String> processNotificationImmediately(@PathVariable String uuid) {
         try {
-            boolean success = notificationProcessorService.processNotificationImmediately(id);
+            NotificationQueue notification = notificationQueueService.getNotificationByUuid(uuid);
+            boolean success = notificationProcessorService.processNotificationImmediately(notification.getId());
             if (success) {
                 return ResponseEntity.ok("Notification processed successfully");
             } else {

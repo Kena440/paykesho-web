@@ -73,7 +73,9 @@ public class Client extends IdBasedEntity {
     private Organization organization;
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
+    @Column(length = 512)
     private String photoPath;
+    @Column(length = 512)
     private String photos;
     @Transient
     private ClientBalance clientBalance;

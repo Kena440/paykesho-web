@@ -49,8 +49,12 @@ $(document).ready(function () {
 
 function deleteState() {
     let stateId = dropdownStates.val();
+    let selectedState = $("#dropDownStates option:selected");
+    let stateUuid = selectedState.data('uuid') || selectedState.attr('data-uuid');
 
-    let url = moduleURL + "states/delete/" + stateId;
+    // Use UUID if available, otherwise fall back to ID
+    let identifier = stateUuid || stateId;
+    let url = moduleURL + "states/delete/" + identifier;
 
     $.ajax({
         type: 'DELETE',
@@ -187,7 +191,11 @@ function loadCountries4States() {
 function loadStates4Country() {
     let selectedCountry = $("#dropDownCountriesForStates option:selected");
     let countryId = selectedCountry.val();
-    let url = moduleURL + "states/list-by-country/" + countryId;
+    let countryUuid = selectedCountry.data('uuid') || selectedCountry.attr('data-uuid');
+
+    // Use UUID if available, otherwise fall back to ID
+    let identifier = countryUuid || countryId;
+    let url = moduleURL + "states/list-by-country/" + identifier;
 
     $.get(url, function (responseJSON) {
         dropdownStates.empty();

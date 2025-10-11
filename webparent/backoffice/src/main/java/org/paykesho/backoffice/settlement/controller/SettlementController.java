@@ -40,10 +40,10 @@ public class SettlementController {
         return "settlements/settlements";
     }
 
-    @GetMapping("/merchant/{id}")
-    public String listAllSettlementsByMerchant(@PathVariable("id") int id, Model model) throws PaykeshoError {
+    @GetMapping("/merchant/{uuid}")
+    public String listAllSettlementsByMerchant(@PathVariable("uuid") String uuid, Model model) throws PaykeshoError {
 
-        Merchant merchant = merchantService.getMerchantById(id);
+        Merchant merchant = merchantService.getMerchantByUuid(uuid);
 
         List<Settlement> settlementList = settlementService.listAllByMerchant(merchant);
         model.addAttribute("settlementList", settlementList);

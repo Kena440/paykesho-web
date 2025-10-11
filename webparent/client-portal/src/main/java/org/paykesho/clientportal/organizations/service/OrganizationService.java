@@ -48,6 +48,31 @@ public class OrganizationService {
         }
     }
 
+    public Organization getOrganizationByUuid(String uuid) throws PaykeshoError {
+        try {
+            log.debug("Retrieving organization by UUID: {}", uuid);
+            if (uuid == null || uuid.trim().isEmpty()) {
+                throw new PaykeshoError("Null or empty UUID parameter");
+            }
+
+            try {
+                Organization organization = organizationRepository.findByUuid(uuid)
+                        .orElseThrow(() -> new PaykeshoError("Could not find organization with UUID: " + uuid));
+                log.debug("Found organization with UUID: {}", uuid);
+                return organization;
+            } catch (PaykeshoError exception) {
+                log.warn("Organization not found with UUID: {}", uuid);
+                throw exception;
+            }
+        } catch (PaykeshoError ex) {
+            log.warn("PaykeshoError retrieving organization by UUID {}: {}", uuid, ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Error retrieving organization by UUID {}: {}", uuid, ex.getMessage(), ex);
+            throw new RuntimeException("Failed to retrieve organization by UUID", ex);
+        }
+    }
+
     public Organization getOrganizationByName(String name) {
         return organizationRepository.getOrganizationByName(name);
     }

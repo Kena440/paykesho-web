@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface UserRepository extends SearchRepository<User, Integer> {
     @Query("select u from User u where u.email = :email")
     public User getUserByEmail(@Param("email") String email);
@@ -27,4 +29,23 @@ public interface UserRepository extends SearchRepository<User, Integer> {
     
     @Query("SELECT u FROM User u WHERE u.resetPasswordToken = ?1")
     public User findByResetPasswordToken(String token);
+
+    // ============================================================================
+    // UUID-based methods for secure URL access
+    // ============================================================================
+    
+    /**
+     * Find user by UUID for public/URL access
+     * @param uuid The user's UUID
+     * @return Optional containing the user if found
+     */
+    Optional<User> findByUuid(String uuid);
+    
+    /**
+     * Check if a user exists with the given UUID
+     * @param uuid The user's UUID
+     * @return true if user exists, false otherwise
+     */
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.uuid = ?1")
+    boolean existsByUuid(String uuid);
 }

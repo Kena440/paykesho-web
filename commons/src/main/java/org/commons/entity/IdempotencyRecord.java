@@ -1,6 +1,7 @@
 package org.commons.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "idempotency_records", indexes = {
     @Index(name = "idx_idempotency_key", columnList = "idempotency_key", unique = true),

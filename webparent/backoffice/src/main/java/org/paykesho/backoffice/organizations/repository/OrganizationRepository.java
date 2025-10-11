@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrganizationRepository extends SearchRepository<Organization, Integer> {
     @Query("select m from Organization m where m.email = :email")
@@ -39,5 +40,24 @@ public interface OrganizationRepository extends SearchRepository<Organization, I
     long countByEnabledFalse();
 
     long countByRegistrationDateAfter(java.util.Date date);
+
+    // ============================================================================
+    // UUID-based methods for secure URL access
+    // ============================================================================
+    
+    /**
+     * Find organization by UUID for public/URL access
+     * @param uuid The organization's UUID
+     * @return Optional containing the organization if found
+     */
+    Optional<Organization> findByUuid(String uuid);
+    
+    /**
+     * Check if an organization exists with the given UUID
+     * @param uuid The organization's UUID
+     * @return true if organization exists, false otherwise
+     */
+    @Query("SELECT COUNT(o) > 0 FROM Organization o WHERE o.uuid = ?1")
+    boolean existsByUuid(String uuid);
 
 }

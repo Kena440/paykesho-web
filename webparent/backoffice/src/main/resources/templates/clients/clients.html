@@ -56,12 +56,12 @@
                                         </td>
                                         <td>
                                             <span class="font-weight-normal">
-                                                <a th:href="@{'/clients/view/'+${client.id}}"
-                                                   th:if="${client?.id != null}"
+                                                <a th:href="@{'/clients/view/'+${client.uuid}}"
+                                                   th:if="${client?.uuid != null}"
                                                    title="client View">
                                                     <span class="font-weight-normal" th:text="${client?.code ?: 'N/A'}">N/A</span>
                                                 </a>
-                                                <span class="text-muted" th:unless="${client?.id != null}">N/A</span>
+                                                <span class="text-muted" th:unless="${client?.uuid != null}">N/A</span>
                                             </span>
                                         </td>
                                         <td>
@@ -79,9 +79,9 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <div th:if="${client?.id != null}"
-                                                 th:replace="fragments/fragments :: status(${client?.enabled ?: false}, 'client', '/clients/' + ${client.id})"></div>
-                                            <span class="text-muted" th:unless="${client?.id != null}">N/A</span>
+                                            <div th:if="${client?.uuid != null}"
+                                                 th:replace="fragments/fragments :: status(${client?.enabled ?: false}, 'client', '/clients/' + ${client.uuid})"></div>
+                                            <span class="text-muted" th:unless="${client?.uuid != null}">N/A</span>
                                         </td>
                                         <td>
                                             <span class="font-weight-normal"

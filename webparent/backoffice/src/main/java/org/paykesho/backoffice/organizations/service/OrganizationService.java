@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -120,7 +121,17 @@ public class OrganizationService {
         }
 
         try {
-            return organizationRepository.findById(id).get();
+            Organization organization = organizationRepository.findById(id).get();
+            
+            // Process photoPath the same way as in listAll()
+            if (organization.getPhotoPath() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    organization.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
+            }
+            
+            return organization;
         } catch (NoSuchElementException exception) {
             throw new PaykeshoError("Could not find any member");
         }
@@ -158,6 +169,68 @@ public class OrganizationService {
         organizationRepository.updateEnableStatus(id, enabled);
     }
 
+    // ============================================================================
+    // UUID-based methods for secure URL access
+    // ============================================================================
+
+    /**
+     * Get organization by UUID (for public/URL access)
+     * 
+     * @param uuid The organization's UUID
+     * @return Organization entity
+     * @throws PaykeshoError if UUID is invalid or organization not found
+     */
+    public Organization getOrganizationByUuid(String uuid) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            log.error("getOrganizationByUuid called with null or empty UUID");
+            throw new PaykeshoError("Invalid UUID parameter");
+        }
+
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            log.error("getOrganizationByUuid called with invalid UUID format: {}", uuid);
+            throw new PaykeshoError("Invalid UUID format");
+        }
+
+        Organization organization = organizationRepository.findByUuid(uuid)
+                .orElseThrow(() -> {
+                    log.error("Organization not found with UUID: {}", uuid);
+                    return new PaykeshoError("Could not find organization with UUID: " + uuid);
+                });
+
+        processPhotoPath(organization);
+        log.debug("Successfully retrieved organization with UUID: {}", uuid);
+        return organization;
+    }
+
+    /**
+     * Update organization enabled status by UUID
+     * 
+     * @param uuid The organization's UUID
+     * @param enabled The new enabled status
+     * @throws PaykeshoError if UUID is invalid or organization not found
+     */
+    public void updateOrganizationStatusByUuid(String uuid, boolean enabled) throws PaykeshoError {
+        Organization organization = getOrganizationByUuid(uuid);
+        updateOrganizationStatus(organization.getId(), enabled);
+        log.info("Updated organization status for UUID: {} to enabled: {}", uuid, enabled);
+    }
+
+    /**
+     * Helper method to process organization photo path
+     * 
+     * @param organization The organization entity
+     */
+    private void processPhotoPath(Organization organization) {
+        if (organization != null && organization.getPhotoPath() != null) {
+            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
+            if (fileAccessResponse != null) {
+                organization.setPhotoPath(fileAccessResponse.getFileUrl());
+            }
+        }
+    }
+
     public Organization getOrganizationByEmail(String email) throws PaykeshoError {
         if (email == null) {
             throw new PaykeshoError("Null parameter email");
@@ -184,6 +257,29 @@ public class OrganizationService {
             return false;
         } else {
             return Objects.equals(organization.getId(), id);
+        }
+    }
+
+    public boolean isOrganizationUniqueByUuid(String uuid, String organizationName, String organizationType) {
+        if (organizationName == null || organizationType == null) {
+            return false;
+        }
+
+        // If creating new (no UUID), just check if name exists
+        if (uuid == null || uuid.trim().isEmpty()) {
+            Organization existingOrg = organizationRepository.getOrganizationByName(organizationName);
+            return existingOrg == null;
+        }
+
+        // If editing, get the current organization and exclude it from the check
+        try {
+            Organization currentOrg = organizationRepository.findByUuid(uuid)
+                    .orElseThrow(() -> new RuntimeException("Organization not found"));
+            return isOrganizationUnique(currentOrg.getId(), organizationName, organizationType);
+        } catch (Exception e) {
+            // If organization not found, treat as new
+            Organization existingOrg = organizationRepository.getOrganizationByName(organizationName);
+            return existingOrg == null;
         }
     }
 
@@ -288,6 +384,19 @@ public class OrganizationService {
         employeeRecordRepository.deleteById(id);
     }
 
+    public void deleteEmployeeRecordByUuid(String uuid) throws PaykeshoError {
+        if (uuid == null || uuid.isEmpty()) {
+            throw new PaykeshoError("Employee record UUID is required");
+        }
+
+        EmployeeRecord employeeRecord = employeeRecordRepository.findByUuid(uuid).orElse(null);
+        if (employeeRecord == null) {
+            throw new PaykeshoError("Employee record not found");
+        }
+
+        employeeRecordRepository.deleteById(employeeRecord.getId());
+    }
+
     @Transactional(rollbackOn = {Exception.class})
     public Client saveClientRecord(Client client) {
         if (client == null) {
@@ -316,6 +425,19 @@ public class OrganizationService {
         }
 
         clientRepository.deleteById(id);
+    }
+
+    public void deleteClientRecordByUuid(String uuid) throws PaykeshoError {
+        if (uuid == null || uuid.isEmpty()) {
+            throw new PaykeshoError("Client UUID is required");
+        }
+
+        Client client = clientRepository.findByUuid(uuid).orElse(null);
+        if (client == null) {
+            throw new PaykeshoError("Client record not found");
+        }
+
+        clientRepository.deleteById(client.getId());
     }
 
 /*    public List<GeneralStatsDto> getOrganizationsCountByLevelOfCare(Integer countryId, boolean enabled) {

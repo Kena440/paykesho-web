@@ -30,6 +30,7 @@ public class User extends IdBasedEntity {
     @Column(name = "last_name", length = 45, nullable = false)
     private String lastName;
 
+    @Column(length = 512)
     private String photos;
     private boolean enabled;
     private boolean deleted;

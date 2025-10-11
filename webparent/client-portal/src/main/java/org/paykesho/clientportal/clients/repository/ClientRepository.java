@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Optional;
+
 public interface ClientRepository extends CrudRepository<Client, Integer> {
 
     @Query("select c from Client c where c.email = ?1")
@@ -37,5 +39,11 @@ public interface ClientRepository extends CrudRepository<Client, Integer> {
     public Client findByCode(String code);
 
     boolean existsByNrcAndTpinAndManNumberAndOrganization(String nrc, String tpin, String manNumber, Organization organization);
+
+    // UUID-based methods
+    Optional<Client> findByUuid(String uuid);
+    
+    @Query("SELECT COUNT(c) > 0 FROM Client c WHERE c.uuid = ?1")
+    boolean existsByUuid(String uuid);
 
 }

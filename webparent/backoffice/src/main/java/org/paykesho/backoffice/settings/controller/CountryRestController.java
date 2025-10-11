@@ -24,8 +24,10 @@ public class CountryRestController {
         return String.valueOf(savedCountry.getId());
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable("id") Integer id) {
-        countryRepository.deleteById(id);
+    @DeleteMapping("/delete/{uuid}")
+    public void delete(@PathVariable("uuid") String uuid) {
+        Country country = countryRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("Country not found with UUID: " + uuid));
+        countryRepository.deleteById(country.getId());
     }
 }

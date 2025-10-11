@@ -35,12 +35,27 @@
                                 <h6 class="card-subtitle text-muted">Record merchants onto the system.</h6>
                             </div>
                             <div class="card-body">
+                                <!-- Success Alert -->
+                                <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <span th:text="${message}">Success message</span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                
+                                <!-- Error Alert -->
+                                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <span th:text="${error}">Error message</span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                
                                 <form enctype="multipart/form-data"
                                       method="post"
                                       onsubmit="return checkMerchantUnique(this)"
                                       th:action="@{/merchants/save}"
-                                      th:object="${merchant ?: new org.commons.entity.merchant.Merchant()}">
+                                      th:object="${merchant}">
                                     <input id="id" th:field="*{id}" type="hidden"/>
+                                    <input id="uuid" th:field="*{uuid}" type="hidden"/>
                                     <input id="longitude" th:field="*{longitude}" type="hidden"/>
                                     <input id="latitude" th:field="*{latitude}" type="hidden"/>
                                     <input id="code" th:field="*{code}" type="hidden"/>
@@ -102,12 +117,21 @@
                                         <div class="col-md-6">
 
                                             <div class="mb-3">
-                                                <img
-                                                        alt="loading..."
-                                                        class="rounded"
-                                                        id="thumbnail"
-                                                        style="height: 100px; width: 100px"
-                                                        th:src="@{${merchant.photoPath}}">
+                                                <div style="height: 100px; width: 100px; position: relative;">
+                                                    <img
+                                                            alt="Merchant Photo"
+                                                            class="rounded"
+                                                            id="thumbnail"
+                                                            th:src="${merchant.photoPath != null} ? @{${merchant.photoPath}} : ''"
+                                                            th:style="${merchant.photos != null and merchant.photoPath != null} ? 'height: 100px; width: 100px; display: block;' : 'height: 100px; width: 100px; display: none;'"
+                                                            style="height: 100px; width: 100px; object-fit: cover;">
+                                                    <div class="d-flex align-items-center justify-content-center bg-light rounded"
+                                                         id="thumbnail-placeholder"
+                                                         style="height: 100px; width: 100px; min-height: 100px; min-width: 100px; position: absolute; top: 0; left: 0; display: flex;"
+                                                         th:style="${merchant.photos == null or merchant.photoPath == null} ? 'height: 100px; width: 100px; min-height: 100px; min-width: 100px; display: flex; position: absolute; top: 0; left: 0;' : 'height: 100px; width: 100px; min-height: 100px; min-width: 100px; display: none; position: absolute; top: 0; left: 0;'">
+                                                        <i class="fas fa-store fa-2x text-muted"></i>
+                                                    </div>
+                                                </div>
                                                 <hr>
                                                 <label class="form-label">File input</label>
                                                 <input accept="image/png, image/jpeg"
@@ -115,7 +139,7 @@
                                                        class="form-control"
                                                        id="fileImage"
                                                        name="image"
-                                                       required type="file">
+                                                       type="file"
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-check m-0">
@@ -134,8 +158,15 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <button class="btn btn-primary" type="submit">Submit</button>
+                                        <div class="col-md-12">
+                                            <div class="d-flex gap-3">
+                                                <button class="btn btn-primary" type="submit" id="submitBtn">
+                                                    <i class="fas fa-save me-2"></i>Save Merchant
+                                                </button>
+                                                <a class="btn btn-outline-secondary" th:href="@{/merchants}">
+                                                    <i class="fas fa-times me-2"></i>Cancel
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
@@ -156,27 +187,76 @@
     MAX_FILE_SIZE = 502400; // 500KB
 
     function checkMerchantUnique(form) {
+        // Basic form validation
+        const name = $("#name").val().trim();
+        const merchantType = $("#merchantType").val();
+        const email = $("#email").val().trim();
+        const phoneNumber = $("#phoneNumber").val().trim();
+        
+        if (!name || name.length < 2) {
+            showErrorModal("Please enter a valid merchant name (at least 2 characters).");
+            return false;
+        }
+        
+        if (!merchantType) {
+            showErrorModal("Please select a merchant type.");
+            return false;
+        }
+        
+        if (!email || !isValidEmail(email)) {
+            showErrorModal("Please enter a valid email address.");
+            return false;
+        }
+        
+        if (!phoneNumber || phoneNumber.length < 2) {
+            showErrorModal("Please enter a valid phone number.");
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Checking...';
+        
         url = "[[@{/merchants/rest/check-merchant}]]";
-        merchantName = $("#name").val();
-        merchantType = $("#merchantType").val();
-        merchantId = $("#id").val();
+        merchantName = name;
+        merchantUuid = $("#uuid").val();
         csrfValue = $("input[name='_csrf']").val();
 
-        params = {id: merchantId, merchantName: merchantName, merchantType: merchantType, _csrf: csrfValue};
+        params = {uuid: merchantUuid, merchantName: merchantName, merchantType: merchantType, _csrf: csrfValue};
 
         $.post(url, params, function (response) {
             if (response == "OK") {
                 form.submit();
             } else if (response == "Duplicated") {
-                showWarningModal("There is another merchant having the name " + merchantName);
+                showWarningModal("There is another merchant with the name \"" + merchantName + "\" and type \"" + merchantType + "\". Please choose a different name or type.");
             } else {
                 showErrorModal("Unknown response from server");
             }
-        }).fail(function () {
-            showErrorModal("Could not connect to the server");
+        }).fail(function (xhr) {
+            let errorMessage = "Could not connect to the server";
+            if (xhr.responseText) {
+                try {
+                    const error = JSON.parse(xhr.responseText);
+                    errorMessage = error.message || errorMessage;
+                } catch (e) {
+                    // Use default message if JSON parsing fails
+                }
+            }
+            showErrorModal(errorMessage);
+        }).always(function() {
+            // Restore button state
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         });
 
         return false;
+    }
+    
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
 </script>
 <script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
@@ -209,6 +289,52 @@
 
     // Add click event to place a marker on the map
     map.on('click', add_marker);
+    
+    // Image preview functionality
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            // Check file size (500KB limit)
+            const file = input.files[0];
+            if (file.size > MAX_FILE_SIZE) {
+                alert('File size exceeds 500KB limit. Please choose a smaller image.');
+                input.value = '';
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file (PNG or JPEG).');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const thumbnail = document.getElementById('thumbnail');
+                const placeholder = document.getElementById('thumbnail-placeholder');
+                
+                console.log('Thumbnail element found:', thumbnail);
+                console.log('Placeholder element found:', placeholder);
+                
+                if (thumbnail) {
+                    thumbnail.src = ''; // Clear src to force re-render
+                    thumbnail.src = e.target.result;
+                    thumbnail.style.display = 'block';
+                    console.log('Image preview updated');
+                } else {
+                    console.error('Thumbnail element not found');
+                }
+                
+                if (placeholder) {
+                    placeholder.style.setProperty('display', 'none', 'important');
+                    console.log('Placeholder hidden');
+                } else {
+                    console.error('Placeholder element not found');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 </script>
 
 </body>

@@ -1,6 +1,7 @@
 package org.commons.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -8,12 +9,10 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "api_keys")
-public class APIKey {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class APIKey extends IdBasedEntity {
 
     @Column(name = "reference", length = 128, nullable = false, unique = true)
     private String reference;

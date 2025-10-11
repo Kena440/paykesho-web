@@ -150,7 +150,7 @@
                                                 required th:field="*{organization}">
                                             <option selected value="">Select Organization</option>
                                             <option th:each="os : ${organizationList}" th:text="${os}"
-                                                    th:value="${os.id}"></option>
+                                                    th:value="${os.uuid}"></option>
                                         </select>
                                     </div>
                                 </div>
@@ -271,7 +271,7 @@
             nrc: nrc,
             tpin: tpin,
             manNumber: manNumber,
-            organization: organization,
+            organizationUuid: organization,
             _csrf: csrfValue
         };
 

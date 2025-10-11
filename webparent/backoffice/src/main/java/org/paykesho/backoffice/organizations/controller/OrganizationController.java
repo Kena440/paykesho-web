@@ -115,16 +115,16 @@ public class OrganizationController {
     }
 
 
-    @GetMapping("/view/{id}")
-    public String viewOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
-        if (id == null) {
+    @GetMapping("/view/{uuid}")
+    public String viewOrganization(@PathVariable(name = "uuid") String uuid, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) {
+        if (uuid == null || uuid.trim().isEmpty()) {
             return Constants.REDIRECT_ORGANIZATIONS;
         }
         String pageTitle = "View Organization";
 
         try {
 
-            Organization organization = organizationService.getOrganizationById(id);
+            Organization organization = organizationService.getOrganizationByUuid(uuid);
             List<EmployeeRecord> employeeRecords = null;
             List<Client> clientRecordsSize = null;
             OrganizationAdmin organizationAdmin = organization.getContactPerson();
@@ -165,15 +165,15 @@ public class OrganizationController {
     }
 
 
-    @GetMapping("/edit/{id}")
-    public String editOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) {
-        if (id == null) {
+    @GetMapping("/edit/{uuid}")
+    public String editOrganization(@PathVariable(name = "uuid") String uuid, RedirectAttributes redirectAttributes, Model model) {
+        if (uuid == null || uuid.trim().isEmpty()) {
             return Constants.REDIRECT_ORGANIZATIONS;
         }
         String pageTitle = "Edit Organization";
 
         try {
-            Organization organization = organizationService.getOrganizationById(id);
+            Organization organization = organizationService.getOrganizationByUuid(uuid);
 
             List<State> stateList = settingService.listStatesByCountry("Zambia");
 
@@ -189,14 +189,15 @@ public class OrganizationController {
 
     }
 
-    @GetMapping("delete/{id}")
-    public String deleteOrganization(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
-        if (id == null) {
-            throw new PaykeshoError("no parameter id");
+    @GetMapping("delete/{uuid}")
+    public String deleteOrganization(@PathVariable(name = "uuid") String uuid, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            throw new PaykeshoError("Invalid UUID parameter");
         }
 
         try {
-            organizationService.delete(id);
+            Organization organization = organizationService.getOrganizationByUuid(uuid);
+            organizationService.delete(organization.getId());
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization deleted successfully");
         } catch (PaykeshoError paykeshoError) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
@@ -204,16 +205,16 @@ public class OrganizationController {
         return Constants.REDIRECT_ORGANIZATIONS;
     }
 
-    @GetMapping("/{id}/enabled/{status}")
-    public String updateOrganizationEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+    @GetMapping("/{uuid}/enabled/{status}")
+    public String updateOrganizationEnabledStatus(@PathVariable(name = "uuid") String uuid, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
 
-        if (id == null) {
-            throw new PaykeshoError("no parameter id");
+        if (uuid == null || uuid.trim().isEmpty()) {
+            throw new PaykeshoError("Invalid UUID parameter");
         }
 
         try {
-            Organization organization = organizationService.getOrganizationById(id);
-            organizationService.updateOrganizationStatus(id, enabled);
+            Organization organization = organizationService.getOrganizationByUuid(uuid);
+            organizationService.updateOrganizationStatusByUuid(uuid, enabled);
             String status = enabled ? "enabled" : "has been disabled";
             String operationMSG = organization.getName() + " has been " + status;
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
@@ -224,10 +225,10 @@ public class OrganizationController {
 
     }
 
-    @GetMapping("/details/{id}")
-    public String viewOrganizationDetails(@PathVariable("id") Integer id, Model model) throws PaykeshoError {
+    @GetMapping("/details/{uuid}")
+    public String viewOrganizationDetails(@PathVariable("uuid") String uuid, Model model) throws PaykeshoError {
 
-        Organization organization = organizationService.getOrganizationById(id);
+        Organization organization = organizationService.getOrganizationByUuid(uuid);
         model.addAttribute("organization", organization);
         return "organizations/organization_details_modal";
 
@@ -303,11 +304,12 @@ public class OrganizationController {
     }
 
     // Employee Record CRUD Operations
-    @GetMapping("/{id}/employee-records")
+    @GetMapping("/{uuid}/employee-records")
     @ResponseBody
-    public ResponseEntity<List<EmployeeRecord>> getEmployeeRecords(@PathVariable Integer id) {
+    public ResponseEntity<List<EmployeeRecord>> getEmployeeRecords(@PathVariable String uuid) {
         try {
-            List<EmployeeRecord> employeeRecords = organizationService.listEmployeeRecordsAll(id);
+            Organization organization = organizationService.getOrganizationByUuid(uuid);
+            List<EmployeeRecord> employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
             return ResponseEntity.ok(employeeRecords);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -366,10 +368,10 @@ public class OrganizationController {
 
     @PostMapping("/employee-record/delete")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> deleteEmployeeRecord(@RequestParam Integer id) {
+    public ResponseEntity<Map<String, Object>> deleteEmployeeRecord(@RequestParam String uuid) {
         Map<String, Object> response = new HashMap<>();
         try {
-            organizationService.deleteEmployeeRecord(id);
+            organizationService.deleteEmployeeRecordByUuid(uuid);
             response.put("success", true);
             response.put("message", "Employee record deleted successfully");
             return ResponseEntity.ok(response);
@@ -424,11 +426,12 @@ public class OrganizationController {
     }
 
     // Client Record CRUD Operations
-    @GetMapping("/{id}/client-records")
+    @GetMapping("/{uuid}/client-records")
     @ResponseBody
-    public ResponseEntity<List<Client>> getClientRecords(@PathVariable Integer id) {
+    public ResponseEntity<List<Client>> getClientRecords(@PathVariable String uuid) {
         try {
-            List<Client> clientRecords = organizationService.listClientRecordsAll(id);
+            Organization organization = organizationService.getOrganizationByUuid(uuid);
+            List<Client> clientRecords = organizationService.listClientRecordsAll(organization.getId());
             return ResponseEntity.ok(clientRecords);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -525,10 +528,10 @@ public class OrganizationController {
 
     @PostMapping("/client-record/delete")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> deleteClientRecord(@RequestParam Integer id) {
+    public ResponseEntity<Map<String, Object>> deleteClientRecord(@RequestParam String uuid) {
         Map<String, Object> response = new HashMap<>();
         try {
-            organizationService.deleteClientRecord(id);
+            organizationService.deleteClientRecordByUuid(uuid);
             response.put("success", true);
             response.put("message", "Client record deleted successfully");
             return ResponseEntity.ok(response);

@@ -17,9 +17,11 @@ public class StateRestController {
     @Autowired
     private StateRepository stateRepository;
 
-    @GetMapping("/list-by-country/{id}")
-    public List<StateDto> listByCountry(@PathVariable("id") Integer countryId) {
-        List<State> stateList = stateRepository.findByCountryOrderByNameAsc(new Country(countryId));
+    @GetMapping("/list-by-country/{uuid}")
+    public List<StateDto> listByCountry(@PathVariable("uuid") String countryUuid) {
+        // For settings/location data, using UUID is optional but recommended for consistency
+        // This endpoint is typically internal, but we'll support UUID for security consistency
+        List<State> stateList = stateRepository.findByCountryUuid(countryUuid);
         List<StateDto> result = new ArrayList<>();
 
         for (State state : stateList) {
@@ -35,9 +37,11 @@ public class StateRestController {
         return String.valueOf(savedState.getId());
     }
 
-    @GetMapping("/delete/{id}")
-    public void delete(@PathVariable("id") Integer id) {
-        stateRepository.deleteById(id);
+    @GetMapping("/delete/{uuid}")
+    public void delete(@PathVariable("uuid") String uuid) {
+        State state = stateRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("State not found with UUID: " + uuid));
+        stateRepository.deleteById(state.getId());
     }
 
 }

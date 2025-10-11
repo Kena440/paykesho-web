@@ -45,9 +45,11 @@ public class Merchant extends IdBasedEntity {
     private float longitude;
     private float latitude;
 
+    @Column(length = 512)
     private String photos;
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
+    @Column(length = 512)
     private String photoPath;
 
     @Override

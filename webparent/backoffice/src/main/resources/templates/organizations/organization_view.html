@@ -178,11 +178,11 @@
                                                                 <i class="align-middle" data-lucide="key"></i> Reset
                                                                 Password
                                                             </button>
-                                                            <button class="btn btn-sm toggle-admin-status"
-                                                                    th:classappend="${organizationAdmin?.enabled} ? 'btn-danger' : 'btn-success'"
-                                                                    th:data-admin-id="${organizationAdmin?.id}"
-                                                                    th:data-current-status="${organizationAdmin?.enabled}"
-                                                                    th:if="${organizationAdmin?.id != null}"
+                                        <button class="btn btn-sm toggle-admin-status"
+                                                th:classappend="${organizationAdmin?.enabled} ? 'btn-danger' : 'btn-success'"
+                                                th:data-admin-uuid="${organizationAdmin?.uuid}"
+                                                th:data-current-status="${organizationAdmin?.enabled}"
+                                                th:if="${organizationAdmin?.uuid != null}"
                                                                     type="button">
                                                                 <i class="align-middle" th:data-lucide="${organizationAdmin?.enabled} ? 'user-x' : 'user-check'"></i>
                                                                 <span th:text="${organizationAdmin?.enabled} ? 'Disable' : 'Enable'">Toggle</span>
@@ -856,8 +856,8 @@
 
             <form id="passwordResetForm" method="post"
                   th:action="@{/organization-admin/reset-password}">
-                <input id="adminId" name="adminId" th:value="${organizationAdmin?.id}" type="hidden"/>
-                <input id="organizationId" name="organizationId" th:value="${organization?.id}" type="hidden"/>
+                <input id="adminUuid" name="adminUuid" th:value="${organizationAdmin?.uuid}" type="hidden"/>
+                <input id="organizationUuid" name="organizationUuid" th:value="${organization?.uuid}" type="hidden"/>
 
                 <div class="modal-body">
                     <div class="text-center mb-3">
@@ -994,8 +994,9 @@
 <script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
 <script>
     moduleURL = "[[@{/organizations}]]";
-    var organizationId = /*[[${organization.id}]]*/ 1;
-    console.log('Organization ID from template:', organizationId);
+    var organizationId = /*[[${organization.id}]]*/ 1; // Keep for internal use
+    var organizationUuid = /*[[${organization.uuid}]]*/ '';
+    console.log('Organization UUID from template:', organizationUuid);
     
     $(document).ready(function () {
         // Initialize client records on page load
@@ -1101,12 +1102,12 @@
 
         // Handle delete employee record with enhanced error handling
         $(document).on('click', '.delete-employee-btn', function () {
-            const employeeId = $(this).data('id');
+            const employeeUuid = $(this).data('uuid');
             const employeeName = $(this).data('name');
             const button = $(this);
 
-            if (!employeeId) {
-                showAlert('error', 'Invalid employee record ID');
+            if (!employeeUuid) {
+                showAlert('error', 'Invalid employee record UUID');
                 return;
             }
 
@@ -1117,7 +1118,7 @@
                 $.ajax({
                     url: '/organizations/employee-record/delete',
                     method: 'POST',
-                    data: {id: employeeId},
+                    data: {uuid: employeeUuid},
                     timeout: 10000,
                     dataType: 'json',
                     success: function (response) {
@@ -1162,12 +1163,12 @@
 
         // Handle delete client record with enhanced error handling
         $(document).on('click', '.delete-client-btn', function () {
-            const clientId = $(this).data('id');
+            const clientUuid = $(this).data('uuid');
             const clientName = $(this).data('name');
             const button = $(this);
 
-            if (!clientId) {
-                showAlert('error', 'Invalid client record ID');
+            if (!clientUuid) {
+                showAlert('error', 'Invalid client record UUID');
                 return;
             }
 
@@ -1178,7 +1179,7 @@
                 $.ajax({
                     url: '/organizations/client-record/delete',
                     method: 'POST',
-                    data: {id: clientId},
+                    data: {uuid: clientUuid},
                     timeout: 10000,
                     dataType: 'json',
                     success: function (response) {
@@ -1233,7 +1234,7 @@
         tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>');
 
         $.ajax({
-            url: '/organizations/' + organizationId + '/employee-records',
+            url: '/organizations/' + organizationUuid + '/employee-records',
             method: 'GET',
             timeout: 10000,
             dataType: 'json',
@@ -1322,7 +1323,7 @@
         tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>');
 
         $.ajax({
-            url: '/organizations/' + organizationId + '/client-records',
+            url: '/organizations/' + organizationUuid + '/client-records',
             method: 'GET',
             timeout: 10000,
             dataType: 'json',
@@ -1425,7 +1426,7 @@
         // Show loading state
         tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading employee records...</td></tr>');
 
-        $.get('/organizations/' + organizationId + '/employee-records', function (data) {
+        $.get('/organizations/' + organizationUuid + '/employee-records', function (data) {
             tbody.empty();
             if (data && data.length > 0) {
                 data.forEach(function (employee, index) {
@@ -1447,6 +1448,7 @@
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
                                     <button type="button" class="btn btn-outline-primary edit-employee-btn" 
+                                            data-uuid="${employee.uuid}"
                                             data-id="${employee.id}"
                                             data-name="${employee.name || ''}"
                                             data-nrc="${employee.nrc || ''}"
@@ -1456,7 +1458,7 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-outline-danger delete-employee-btn"
-                                            data-id="${employee.id}"
+                                            data-uuid="${employee.uuid}"
                                             data-name="${employee.name || ''}"
                                             title="Delete">
                                         <i class="fas fa-trash"></i>
@@ -1496,7 +1498,7 @@
         // Show loading state
         tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading client records...</td></tr>');
 
-        $.get('/organizations/' + organizationId + '/client-records', function (data) {
+        $.get('/organizations/' + organizationUuid + '/client-records', function (data) {
             console.log('Client records API response:', data);
             console.log('About to clear tbody and populate with', data.length, 'records');
             tbody.empty();
@@ -1521,6 +1523,7 @@
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
                                     <button type="button" class="btn btn-outline-primary edit-client-btn" 
+                                            data-uuid="${client.uuid}"
                                             data-id="${client.id}"
                                             data-name="${client.name || ''}"
                                             data-nrc="${client.nrc || ''}"
@@ -1530,7 +1533,7 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-outline-danger delete-client-btn"
-                                            data-id="${client.id}"
+                                            data-uuid="${client.uuid}"
                                             data-name="${client.name || ''}"
                                             title="Delete">
                                         <i class="fas fa-trash"></i>
@@ -1615,7 +1618,7 @@
         // Handle organization admin enable/disable toggle
         $('.toggle-admin-status').on('click', function() {
             var button = $(this);
-            var adminId = button.data('admin-id');
+            var adminUuid = button.data('admin-uuid');
             var currentStatus = button.data('current-status');
             var newStatus = !currentStatus;
             var actionText = newStatus ? 'enable' : 'disable';
@@ -1631,7 +1634,7 @@
                 url: '/organization-admin/toggle-status',
                 type: 'POST',
                 data: {
-                    adminId: adminId,
+                    adminUuid: adminUuid,
                     enabled: newStatus
                 },
                 success: function(response) {

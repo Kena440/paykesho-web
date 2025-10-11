@@ -48,8 +48,17 @@
 
                         <!-- Avatar -->
                         <div class="avatar">
-                            <img alt="..." class="avatar-img rounded-circle"
-                                 id="thumbnail" th:src="@{${S3_BASE_URI + SITE_LOGO}}">
+                            <img alt="Site Logo" class="avatar-img rounded-circle"
+                                 id="thumbnail" 
+                                 th:src="${SITE_LOGO != null} ? @{${S3_BASE_URI + SITE_LOGO}} : ''"
+                                 th:style="${SITE_LOGO != null} ? 'display: block;' : 'display: none;'"
+                                 style="width: 64px; height: 64px; object-fit: cover;">
+                            <div class="avatar-img rounded-circle d-flex align-items-center justify-content-center bg-light"
+                                 id="avatar-placeholder"
+                                 style="width: 64px; height: 64px; display: flex;"
+                                 th:style="${SITE_LOGO == null} ? 'width: 64px; height: 64px; display: flex;' : 'width: 64px; height: 64px; display: none;'">
+                                <i class="fas fa-image fa-2x text-muted"></i>
+                            </div>
                         </div>
 
                     </div>

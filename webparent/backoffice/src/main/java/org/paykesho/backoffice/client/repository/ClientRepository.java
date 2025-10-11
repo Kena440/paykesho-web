@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClientRepository extends SearchRepository<Client, Integer> {
 
@@ -53,6 +54,12 @@ public interface ClientRepository extends SearchRepository<Client, Integer> {
     List<Object[]> findTopOrganizationsByClientCount(int limit);
 
     Client findByEmailAndOrganization(String email, Organization organization);
+
+    // UUID-based methods for secure URL access
+    Optional<Client> findByUuid(String uuid);
+    
+    @Query("SELECT COUNT(c) > 0 FROM Client c WHERE c.uuid = ?1")
+    boolean existsByUuid(String uuid);
 
 }
 

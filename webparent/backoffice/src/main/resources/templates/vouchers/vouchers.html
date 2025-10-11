@@ -95,9 +95,9 @@
                                             <th:block
                                                     th:if="${voucher.approved == false and not #strings.equals(voucher.voucherStatus, 'REJECTED')}">
                                                 <a class="dropdown-item" href="#"
-                                                   th:data-approve-url="@{'/vouchers/approve/' + ${voucher.id}}"
+                                                   th:data-approve-url="@{'/vouchers/approve/' + ${voucher.uuid}}"
                                                    th:if="${voucher.payslipPath != null}">
-                                                    <div th:replace="fragments/fragments :: approve('voucher', '/vouchers/approve/' + ${voucher.id})"></div>
+                                                    <div th:replace="fragments/fragments :: approve('voucher', '/vouchers/approve/' + ${voucher.uuid})"></div>
                                                 </a>
                                                 &nbsp;
                                                 <a class="dropdown-item text-danger fas fa-cancel"

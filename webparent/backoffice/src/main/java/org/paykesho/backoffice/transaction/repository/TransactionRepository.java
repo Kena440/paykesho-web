@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionRepository extends SearchRepository<Transaction, Integer> {
 
@@ -73,5 +74,11 @@ public interface TransactionRepository extends SearchRepository<Transaction, Int
             "GROUP BY t.merchant.id, t.merchant.name " +
             "ORDER BY totalValue DESC")
     List<Object[]> findTopMerchantsByTransactionValue(int limit);
+
+    // UUID-based methods for secure URL access
+    Optional<Transaction> findByUuid(String uuid);
+    
+    @Query("SELECT COUNT(t) > 0 FROM Transaction t WHERE t.uuid = ?1")
+    boolean existsByUuid(String uuid);
 
 }

@@ -54,6 +54,19 @@ public class OrganizationAdminService {
         }
     }
 
+    public OrganizationAdmin getByUuid(String uuid) throws PaykeshoError {
+        try {
+            return organizationAdminRepository.findByUuid(uuid)
+                    .orElseThrow(() -> new PaykeshoError("Organization admin not found with UUID: " + uuid));
+        } catch (Exception exception) {
+            throw new PaykeshoError("Organization admin not found: " + exception.getMessage());
+        }
+    }
+
+    public void updateCustomerEnabledStatusByUuid(String uuid, boolean enabled) {
+        organizationAdminRepository.updateEnabledStatusByUuid(uuid, enabled);
+    }
+
     public OrganizationAdmin getByEmail(String email) {
         return organizationAdminRepository.findByEmail(email);
     }

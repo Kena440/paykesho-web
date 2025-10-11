@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -46,6 +47,29 @@ public class ClientService {
         clientRepository.updateEnabledStatus(id, enabled);
     }
 
+    // UUID-based methods
+    public Client getByUuid(String uuid) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            log.error("getByUuid called with null or empty UUID");
+            throw new PaykeshoError("Invalid UUID parameter");
+        }
+
+        try {
+            UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            log.error("getByUuid called with invalid UUID format: {}", uuid);
+            throw new PaykeshoError("Invalid UUID format");
+        }
+
+        return clientRepository.findByUuid(uuid)
+                .orElseThrow(() -> new PaykeshoError("Could not find client with UUID: " + uuid));
+    }
+
+    public void updateClientEnabledStatusByUuid(String uuid, boolean enabled) throws PaykeshoError {
+        Client client = getByUuid(uuid);
+        updateClientEnabledStatus(client.getId(), enabled);
+    }
+
     public Client get(Integer id) throws PaykeshoError {
         try {
             return clientRepository.findById(id).get();
@@ -66,6 +90,25 @@ public class ClientService {
         }
 
         return true;
+    }
+
+    public boolean isEmailUniqueByUuid(String uuid, String email) {
+        // If creating new (no UUID), just check if email exists
+        if (uuid == null || uuid.trim().isEmpty()) {
+            Client existingClient = clientRepository.findByEmail(email);
+            return existingClient == null;
+        }
+
+        // If editing, get the current client and exclude it from the check
+        try {
+            Client currentClient = clientRepository.findByUuid(uuid)
+                    .orElseThrow(() -> new RuntimeException("Client not found"));
+            return isEmailUnique(currentClient.getId(), email);
+        } catch (Exception e) {
+            // If client not found, treat as new
+            Client existingClient = clientRepository.findByEmail(email);
+            return existingClient == null;
+        }
     }
 
     public void save(Client clientInForm) {

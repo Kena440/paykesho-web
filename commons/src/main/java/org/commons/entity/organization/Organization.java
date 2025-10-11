@@ -35,10 +35,12 @@ public class Organization extends IdBasedEntity {
     private float longitude;
     private float latitude;
 
+    @Column(length = 512)
     private String photos;
     private Date registrationDate;
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
+    @Column(length = 512)
     private String photoPath;
 
     @Override

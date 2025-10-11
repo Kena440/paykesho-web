@@ -14,7 +14,7 @@ public class MerchantRestController {
     private MerchantService merchantService;
 
     @PostMapping("/check-merchant")
-    public String checkDuplicateCivilSocietyOrganization(Integer id, String merchantName, String merchantType) {
-        return merchantService.isMerchantUnique(id, merchantName, merchantType) ? "OK" : "Duplicated";
+    public String checkDuplicateMerchant(String uuid, String merchantName, String merchantType) {
+        return merchantService.isMerchantUniqueByUuid(uuid, merchantName, merchantType) ? "OK" : "Duplicated";
     }
 }

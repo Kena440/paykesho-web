@@ -56,11 +56,11 @@ public class ClientController {
         return "clients/clients";
     }
 
-    @GetMapping("/{id}/enabled/{status}")
-    public String updateClientEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+    @GetMapping("/{uuid}/enabled/{status}")
+    public String updateClientEnabledStatus(@PathVariable(name = "uuid") String uuid, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
 
-        Client client = clientService.get(id);
-        clientService.updateClientEnabledStatus(id, enabled);
+        Client client = clientService.getByUuid(uuid);
+        clientService.updateClientEnabledStatusByUuid(uuid, enabled);
         String status = enabled ? "enabled" : "has been disabled";
         String operationMSG = client.getFullName() + " has been " + status;
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, operationMSG);
@@ -81,10 +81,22 @@ public class ClientController {
         return "clients/client_form";
     }
 
-    @GetMapping("/details/{id}")
-    public String viewClient(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
+    @GetMapping("/view/{uuid}")
+    public String viewClient(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
         try {
-            Client client = clientService.get(id);
+            Client client = clientService.getByUuid(uuid);
+            model.addAttribute("customer", client);
+            return "clients/client_view";
+        } catch (PaykeshoError paykeshoError) {
+            redirectAttributes.addFlashAttribute("message", paykeshoError.getMessage());
+            return Constants.REDIRECT_CUSTOMERS;
+        }
+    }
+
+    @GetMapping("/details/{uuid}")
+    public String viewClientDetails(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
+        try {
+            Client client = clientService.getByUuid(uuid);
             model.addAttribute("customer", client);
             return "clients/client_details_modal";
         } catch (PaykeshoError paykeshoError) {
@@ -93,15 +105,15 @@ public class ClientController {
         }
     }
 
-    @GetMapping("/edit/{id}")
-    public String editClient(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
-        if (id == null) {
+    @GetMapping("/edit/{uuid}")
+    public String editClient(@PathVariable(name = "uuid") String uuid, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+        if (uuid == null || uuid.trim().isEmpty()) {
             return Constants.REDIRECT_CUSTOMERS;
         }
         String pageTitle = "Edit Client";
 
         try {
-            Client client = clientService.get(id);
+            Client client = clientService.getByUuid(uuid);
             List<Country> countryList = clientService.countryList();
 
             model.addAttribute("client", client);
