@@ -170,7 +170,7 @@
                                                  th:src="@{${announcement.photosImagePath}}">
                                         </td>
                                         <td class="hideable-column">
-                                            <a th:href="@{'/events/view/'+${announcement.id}}"
+                                            <a th:href="@{'/events/view/'+${announcement.uuid}}"
                                                title="Event View">
                                                 [[${announcement.name}]]
                                             </a>
@@ -183,20 +183,20 @@
                                         <td>[[${announcement.eventDays}]]</td>
                                         <td>
                                             <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                                <div th:replace="fragments/fragments :: status(${announcement.enabled}, 'announcement', '/events/' + ${announcement.id})"></div>
+                                                <div th:replace="fragments/fragments :: status(${announcement.enabled}, 'announcement', '/events/' + ${announcement.uuid})"></div>
                                             </th:block>
                                         </td>
                                         <td>
                                             <a class="fe fe-file"
-                                               th:href="@{'/events/view/'+${announcement.id}}"
+                                               th:href="@{'/events/view/'+${announcement.uuid}}"
                                                title="Event View">
                                                 View
                                             </a>
                                             &nbsp;
                                             <th:block sec:authorize="hasAnyAuthority('General', 'Admin')">
-                                                <div th:replace="fragments/fragments :: edit('announcement', '/events/edit/' + ${announcement.id})"></div>
+                                                <div th:replace="fragments/fragments :: edit('announcement', '/events/edit/' + ${announcement.uuid})"></div>
                                                 &nbsp;
-                                                <div th:replace="fragments/fragments :: delete(${announcement.id}, 'announcement', '/events/delete/' + ${announcement.id}, true)"></div>
+                                                <div th:replace="fragments/fragments :: delete(${announcement.uuid}, 'announcement', '/events/delete/' + ${announcement.uuid}, true)"></div>
                                             </th:block>
                                         </td>
                                     </tr>
