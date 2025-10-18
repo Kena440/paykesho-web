@@ -1,12 +1,11 @@
 -- Migration script to add user_uuid column to file_uploads table
 -- This enables UUID-based file upload functionality
-
-USE paykesho_db;
+-- Works with any database name (uses DATABASE() function)
 
 -- Add user_uuid column to file_uploads table if it doesn't exist
 SET @exist := (SELECT COUNT(*) 
                FROM INFORMATION_SCHEMA.COLUMNS 
-               WHERE TABLE_SCHEMA = 'paykesho_db'
+               WHERE TABLE_SCHEMA = DATABASE()
                AND TABLE_NAME = 'file_uploads' 
                AND COLUMN_NAME = 'user_uuid');
 
@@ -22,7 +21,7 @@ DEALLOCATE PREPARE stmt;
 -- Make user_id nullable since we now support UUID-based uploads
 SET @exist_not_null := (SELECT COUNT(*) 
                         FROM INFORMATION_SCHEMA.COLUMNS 
-                        WHERE TABLE_SCHEMA = 'paykesho_db'
+                        WHERE TABLE_SCHEMA = DATABASE()
                         AND TABLE_NAME = 'file_uploads' 
                         AND COLUMN_NAME = 'user_id' 
                         AND IS_NULLABLE = 'NO');
@@ -39,7 +38,7 @@ DEALLOCATE PREPARE stmt_nullable;
 -- Add index on user_uuid for faster lookups
 SET @exist_index := (SELECT COUNT(*) 
                      FROM INFORMATION_SCHEMA.STATISTICS 
-                     WHERE TABLE_SCHEMA = 'paykesho_db'
+                     WHERE TABLE_SCHEMA = DATABASE()
                      AND TABLE_NAME = 'file_uploads' 
                      AND INDEX_NAME = 'idx_file_uploads_user_uuid');
 
@@ -53,7 +52,7 @@ EXECUTE stmt_index;
 DEALLOCATE PREPARE stmt_index;
 
 -- Verify the changes
-SELECT 'Migration completed successfully!' AS Status;
+SELECT 'File uploads UUID migration completed successfully!' AS Status;
 
 SELECT 
     COLUMN_NAME,
@@ -61,7 +60,7 @@ SELECT
     IS_NULLABLE,
     COLUMN_DEFAULT
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_SCHEMA = 'paykesho_db'
+WHERE TABLE_SCHEMA = DATABASE()
 AND TABLE_NAME = 'file_uploads'
 AND COLUMN_NAME IN ('user_id', 'user_uuid')
 ORDER BY ORDINAL_POSITION;

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -93,13 +94,21 @@ public class ClientController {
     }
 
     @PostMapping("/save")
-    public String saveCustomer(Client client,
+    public String saveCustomer(@Valid Client client,
                                Model model,
                                RedirectAttributes redirectAttributes) throws IOException, PaykeshoError {
 
-        clientService.save(client);
-
-        redirectAttributes.addFlashAttribute(Constants.MESSAGE, "client Operation Successful: " + client.getFullName());
+        try {
+            clientService.save(client);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "client Operation Successful: " + client.getFullName());
+        } catch (Exception ex) {
+            String errorMessage = "Failed to save client. Please check your input.";
+            if (ex.getMessage() != null && ex.getMessage().contains("Malicious content detected")) {
+                errorMessage = "Invalid input detected. Please ensure all fields contain valid data.";
+            }
+            redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+        }
+        
         return Constants.REDIRECT_CUSTOMERS;
     }
 

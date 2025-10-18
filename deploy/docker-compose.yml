@@ -37,7 +37,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -68,11 +68,11 @@ services:
   client-portal:
     build: ./client-portal
     volumes:
-      - ./client-portal/application.yml:/app/application.yml:ro
+      - ./client-portal/application.properties:/app/application.properties:ro
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_CONFIG_LOCATION: file:/app/application.yml
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_CONFIG_LOCATION: file:/app/application.properties
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -103,11 +103,11 @@ services:
   merchant-portal:
     build: ./merchant-portal
     volumes:
-      - ./merchant-portal/application.yml:/app/application.yml:ro
+      - ./merchant-portal/application.properties:/app/application.properties:ro
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_CONFIG_LOCATION: file:/app/application.yml
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_CONFIG_LOCATION: file:/app/application.properties
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -138,11 +138,11 @@ services:
   organization-portal:
     build: ./organization-portal
     volumes:
-      - ./organization-portal/application.yml:/app/application.yml:ro
+      - ./organization-portal/application.properties:/app/application.properties:ro
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_CONFIG_LOCATION: file:/app/application.yml
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_CONFIG_LOCATION: file:/app/application.properties
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -181,7 +181,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       PAYMENT_GATEWAY_URL: ${PAYMENT_GATEWAY_URL}
@@ -217,7 +217,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SMTP_HOST: ${SMTP_HOST}
@@ -257,7 +257,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       FILE_STORAGE_PATH: ${FILE_STORAGE_PATH:-/app/uploads}

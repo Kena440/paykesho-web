@@ -8,6 +8,7 @@ import org.commons.entity.client.ClientBalance;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
+import org.commons.security.SecurityValidator;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.repository.ClientBalanceRepository;
 import org.paykesho.clientportal.clients.repository.ClientRepository;
@@ -75,6 +76,15 @@ public class ClientService {
     public void registerClient(Client client) {
         try {
             log.debug("Registering new client with email: {}", client.getEmail());
+            
+            // SECURITY: Validate and sanitize all client input
+            try {
+                SecurityValidator.validateAndSanitizeClient(client);
+            } catch (SecurityException se) {
+                log.error("SECURITY VIOLATION during client registration: {}", se.getMessage());
+                throw new RuntimeException("Invalid input: Malicious content detected", se);
+            }
+            
             encodePassword(client);
             client.setEnabled(true);
             client.setAccountNonLocked(true);
@@ -198,6 +208,15 @@ public class ClientService {
     public void updateClient(Client clientInForm) {
         try {
             log.debug("Updating client with ID: {}", clientInForm.getId());
+            
+            // SECURITY: Validate and sanitize all client input
+            try {
+                SecurityValidator.validateAndSanitizeClient(clientInForm);
+            } catch (SecurityException se) {
+                log.error("SECURITY VIOLATION during client update: {}", se.getMessage());
+                throw new RuntimeException("Invalid input: Malicious content detected", se);
+            }
+            
             Client clientInDB = clientRepository.findById(clientInForm.getId()).get();
 
             if (clientInDB.getAuthenticationType().equals(AuthenticationType.DATABASE)) {

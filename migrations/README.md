@@ -7,19 +7,28 @@ This folder contains database migration scripts for the Paykesho platform.
 ```
 migrations/
 └── scripts/
+    ├── run_all_uuid_migrations.sql             - ⭐ ALL-IN-ONE comprehensive migration (RECOMMENDED)
     ├── add_uuid_columns.sql                    - Full UUID migration
     ├── add_uuid_columns_safe_mode.sql          - Safe mode compatible version
+    ├── add_user_uuid_to_file_uploads.sql       - File uploads UUID support
     ├── populate_uuids_existing_data.sql        - Populate UUIDs with progress tracking
-    └── simple_populate_uuids.sql               - Simple UUID population (RECOMMENDED)
+    └── simple_populate_uuids.sql               - Simple UUID population
 ```
 
 ---
 
 ## 🚀 **Quick Start - UUID Migration**
 
-### **If UUID Columns Don't Exist:**
+### **⭐ RECOMMENDED: Run All Migrations (One Command):**
+```bash
+mysql -u username -p database_name < migrations/scripts/run_all_uuid_migrations.sql
+```
+This runs everything: adds UUID columns to 30 tables, populates data, adds file_uploads support.
+
+### **Alternative: If UUID Columns Don't Exist:**
 ```bash
 mysql -u username -p database_name < migrations/scripts/add_uuid_columns_safe_mode.sql
+mysql -u username -p database_name < migrations/scripts/add_user_uuid_to_file_uploads.sql
 ```
 
 ### **If UUID Columns Exist But Empty:**
@@ -30,6 +39,18 @@ mysql -u username -p database_name < migrations/scripts/simple_populate_uuids.sq
 ---
 
 ## 📋 **Migration Scripts**
+
+### 0. `run_all_uuid_migrations.sql` ⭐⭐⭐
+- **Purpose**: Complete UUID migration in one script
+- **Includes**: 
+  - Adds UUID to 30 main tables
+  - Populates UUIDs for existing data
+  - Adds user_uuid to file_uploads table
+  - Creates all necessary indexes
+- **Safe Mode**: ✅ Yes (handles automatically)
+- **Idempotent**: ✅ Yes (safe to run multiple times)
+- **Use When**: **ALWAYS - This is the recommended script for production!**
+- **Recommended**: ⭐⭐⭐ **BEST CHOICE**
 
 ### 1. `add_uuid_columns.sql`
 - **Purpose**: Add UUID columns to all tables
@@ -57,17 +78,33 @@ mysql -u username -p database_name < migrations/scripts/simple_populate_uuids.sq
 - **Use When**: After columns added, need to populate
 - **Recommended**: Yes for populating existing data
 
+### 5. `add_user_uuid_to_file_uploads.sql`
+- **Purpose**: Add user_uuid column to file_uploads table
+- **Safe Mode**: ✅ Yes
+- **Idempotent**: ✅ Yes
+- **Use When**: After main UUID migration, for file upload UUID support
+- **Note**: Included in `run_all_uuid_migrations.sql`
+
 ---
 
 ## 🎯 **Recommended Workflow**
 
-### New Database (No UUID Columns):
+### ⭐ Best Practice - Use the Comprehensive Script:
+```bash
+# This handles EVERYTHING (recommended for all scenarios)
+mysql -u username -p database_name < migrations/scripts/run_all_uuid_migrations.sql
+```
+
+### Alternative: Step-by-Step Approach
+
+#### New Database (No UUID Columns):
 ```bash
 # Use the all-in-one script
 mysql -u username -p database_name < migrations/scripts/add_uuid_columns_safe_mode.sql
+mysql -u username -p database_name < migrations/scripts/add_user_uuid_to_file_uploads.sql
 ```
 
-### Existing Database (Columns Added, Need Population):
+#### Existing Database (Columns Added, Need Population):
 ```bash
 # Use the simple populate script
 mysql -u username -p database_name < migrations/scripts/simple_populate_uuids.sql
