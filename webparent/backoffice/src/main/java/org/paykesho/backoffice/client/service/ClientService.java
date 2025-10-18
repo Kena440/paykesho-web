@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
 import org.commons.entity.settings.Country;
+import org.commons.security.SecurityValidator;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.repository.ClientBalanceRepository;
 import org.paykesho.backoffice.client.repository.ClientRepository;
@@ -176,6 +177,14 @@ public class ClientService {
     }
 
     public void save(Client customerInForm) {
+        // SECURITY: Validate and sanitize all client input
+        try {
+            SecurityValidator.validateAndSanitizeClient(customerInForm);
+        } catch (SecurityException se) {
+            log.error("SECURITY VIOLATION during client save: {}", se.getMessage());
+            throw new RuntimeException("Invalid input: Malicious content detected", se);
+        }
+        
         Client customerInDB = clientRepository.findById(customerInForm.getId()).get();
 
         if (!customerInForm.getPassword().isEmpty()) {

@@ -51,6 +51,9 @@ public class Merchant extends IdBasedEntity {
     private Integer remoteFileId;
     @Column(length = 512)
     private String photoPath;
+    
+    @Column(name = "uuid", length = 36, unique = true)
+    private String uuid;
 
     @Override
     public String toString() {

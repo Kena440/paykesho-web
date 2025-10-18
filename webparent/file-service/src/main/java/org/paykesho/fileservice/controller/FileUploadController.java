@@ -25,12 +25,13 @@ public class FileUploadController {
     public ResponseEntity<FileUploadResponse> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("file_type") String fileTypeStr,
-            @RequestParam("user_uuid") String userUuid,
+            @RequestParam(value = "user_uuid", required = false) String userUuid,
+            @RequestParam(value = "user_id", required = false) Integer userId,
             @RequestParam(value = "description", required = false) String description) {
         
         try {
-            log.info("Received file upload request: filename={}, fileType={}, userUuid={}", 
-                    file.getOriginalFilename(), fileTypeStr, userUuid);
+            log.info("Received file upload request: filename={}, fileType={}, userUuid={}, userId={}", 
+                    file.getOriginalFilename(), fileTypeStr, userUuid, userId);
             
             // Validate required parameters
             if (file.isEmpty()) {
@@ -39,10 +40,11 @@ public class FileUploadController {
                         .body(FileUploadResponse.error("Missing required field: file"));
             }
             
-            if (userUuid == null || userUuid.isEmpty()) {
-                log.warn("Missing user_uuid parameter");
+            // Check that at least one user identifier is provided
+            if ((userUuid == null || userUuid.isEmpty()) && userId == null) {
+                log.warn("Missing both user_uuid and user_id parameters");
                 return ResponseEntity.badRequest()
-                        .body(FileUploadResponse.error("Missing required field: user_uuid"));
+                        .body(FileUploadResponse.error("Missing required field: user_uuid or user_id must be provided"));
             }
             
             // Parse file type
@@ -55,8 +57,15 @@ public class FileUploadController {
                         .body(FileUploadResponse.error("Unsupported file type. Allowed: logo, payslip, photo"));
             }
             
-            // Store file using UUID
-            FileUpload fileUpload = fileStorageService.storeFileByUuid(file, fileType, userUuid, description);
+            // Store file using UUID if provided, otherwise use ID (backward compatibility)
+            FileUpload fileUpload;
+            if (userUuid != null && !userUuid.isEmpty()) {
+                fileUpload = fileStorageService.storeFileByUuid(file, fileType, userUuid, description);
+                log.info("File upload using UUID");
+            } else {
+                fileUpload = fileStorageService.storeFile(file, fileType, userId, description);
+                log.info("File upload using ID (legacy)");
+            }
             
             // Return success response
             FileUploadResponse response = FileUploadResponse.success(

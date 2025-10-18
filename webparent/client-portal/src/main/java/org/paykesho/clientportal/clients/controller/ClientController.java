@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
@@ -160,7 +161,7 @@ public class ClientController {
     }
 
     @PostMapping(value = "/save-client")
-    public String signUpClient(Client client, Model model, HttpServletRequest request) {
+    public String signUpClient(@Valid Client client, Model model, HttpServletRequest request) {
         List<Organization> organizationList = organizationService.organizationListEnabled();
         model.addAttribute("organizationList", organizationList);
         model.addAttribute("pageTitle", "Client Registration");
@@ -173,7 +174,9 @@ public class ClientController {
             log.error("Registration failed", ex); // log full stack trace
             model.addAttribute("client", client); // keep user input
             String userMessage = "Registration failed. Please check your details and try again.";
-            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+            if (ex.getMessage() != null && ex.getMessage().contains("Malicious content detected")) {
+                userMessage = "Invalid input detected. Please ensure all fields contain valid data.";
+            } else if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 String causeMsg = ex.getCause().getMessage();
                 if (causeMsg.contains("constraint") || causeMsg.contains("duplicate")) {
                     userMessage = "A user with similar details already exists.";
@@ -185,7 +188,7 @@ public class ClientController {
     }
 
     @PostMapping(value = "/update-account")
-    public String updateAccount(Client client, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+    public String updateAccount(@Valid Client client, RedirectAttributes redirectAttributes, HttpServletRequest request) {
         try {
             log.debug("Updating client account for email: {}", client.getEmail());
 
@@ -198,7 +201,11 @@ public class ClientController {
 
         } catch (Exception ex) {
             log.error("Error updating client account: {}", ex.getMessage(), ex);
-            redirectAttributes.addFlashAttribute("errorMessage", "Account update failed. Please try again later.");
+            String errorMessage = "Account update failed. Please try again later.";
+            if (ex.getMessage() != null && ex.getMessage().contains("Malicious content detected")) {
+                errorMessage = "Invalid input detected. Please ensure all fields contain valid data.";
+            }
+            redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
             return "redirect:/account";
         }
     }

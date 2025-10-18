@@ -7,6 +7,7 @@ import org.commons.enums.NotificationStatus;
 import org.commons.enums.NotificationType;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 /**
@@ -47,24 +48,31 @@ public class NotificationQueue extends IdBasedEntity {
     /**
      * Recipient's email address
      */
+    @NotBlank(message = "Recipient email is required")
+    @Email(message = "Invalid email format")
+    @Size(max = 100, message = "Email must not exceed 100 characters")
     @Column(name = "recipient_email", nullable = false, length = 100)
     private String recipientEmail;
 
     /**
      * Recipient's name (optional)
      */
+    @Size(max = 128, message = "Recipient name must not exceed 128 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s'-]*$", message = "Recipient name can only contain letters, spaces, hyphens and apostrophes")
     @Column(name = "recipient_name", length = 128)
     private String recipientName;
 
     /**
      * Subject of the notification
      */
+    @Size(max = 255, message = "Subject must not exceed 255 characters")
     @Column(name = "subject", length = 255)
     private String subject;
 
     /**
      * Content/body of the notification
      */
+    @Size(max = 65535, message = "Content is too large")
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 

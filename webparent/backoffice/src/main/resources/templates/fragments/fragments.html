@@ -191,6 +191,17 @@
                 </ul>
             </li>
             <li class="sidebar-item">
+                <a class="sidebar-link collapsed" data-bs-target="#security" data-bs-toggle="collapse">
+                    <i class="align-middle" data-lucide="shield"></i> <span
+                        class="align-middle">Security</span>
+                </a>
+                <ul class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar" id="security">
+                    <li class="sidebar-item"><a class='sidebar-link' th:href="@{/security-audit}">
+                        <i class="fas fa-shield-alt"></i> Security Audit</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="sidebar-item">
                 <a class="sidebar-link collapsed" data-bs-target="#siteadmin" data-bs-toggle="collapse">
                     <i class="align-middle" data-lucide="settings"></i> <span
                         class="align-middle">Site Administration</span>
