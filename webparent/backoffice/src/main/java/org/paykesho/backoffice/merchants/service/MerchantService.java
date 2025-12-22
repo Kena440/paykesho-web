@@ -61,6 +61,11 @@ public class MerchantService {
             return null;
         }
 
+        // Ensure UUID is generated for new merchants or if UUID is null/empty
+        if (merchant.getId() == null && (merchant.getUuid() == null || merchant.getUuid().trim().isEmpty())) {
+            merchant.generateUuid();
+        }
+
         return merchantRepository.save(merchant);
     }
 
@@ -242,6 +247,13 @@ public class MerchantService {
                     return new PaykeshoError("Could not find merchant with UUID: " + uuid);
                 });
 
+        // Ensure UUID is set (in case it was null in database)
+        if (merchant.getUuid() == null || merchant.getUuid().trim().isEmpty()) {
+            log.warn("Merchant {} has null or empty UUID, generating new one", merchant.getId());
+            merchant.ensureUuid();
+            merchantRepository.save(merchant);
+        }
+
         // Process photo path
         processPhotoPath(merchant);
 
@@ -280,6 +292,31 @@ public class MerchantService {
                 merchant.setPhotoPath(fileAccessResponse.getFileUrl());
             }
         }
+    }
+
+    /**
+     * Update merchants that have NULL UUIDs to generate proper UUIDs
+     * This method should be called to fix existing merchants without UUIDs
+     * 
+     * @return Number of merchants updated
+     */
+    @Transactional(rollbackOn = {Exception.class})
+    public int updateMerchantsWithNullUuids() {
+        List<Merchant> merchantsWithNullUuid = merchantRepository.findByUuidIsNull();
+        int updatedCount = 0;
+        
+        for (Merchant merchant : merchantsWithNullUuid) {
+            if (merchant.getUuid() == null || merchant.getUuid().trim().isEmpty()) {
+                // Generate new UUID using the same method as @PrePersist
+                merchant.generateUuid();
+                merchantRepository.save(merchant);
+                updatedCount++;
+                log.info("Updated UUID for merchant ID: {}, Name: {}", merchant.getId(), merchant.getName());
+            }
+        }
+        
+        log.info("Updated {} merchants with NULL UUIDs", updatedCount);
+        return updatedCount;
     }
 
 

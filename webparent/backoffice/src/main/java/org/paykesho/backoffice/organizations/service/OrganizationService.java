@@ -199,6 +199,13 @@ public class OrganizationService {
                     return new PaykeshoError("Could not find organization with UUID: " + uuid);
                 });
 
+        // Ensure UUID is set (in case it was null in database)
+        if (organization.getUuid() == null || organization.getUuid().trim().isEmpty()) {
+            log.warn("Organization {} has null or empty UUID, generating new one", organization.getId());
+            organization.ensureUuid();
+            organizationRepository.save(organization);
+        }
+
         processPhotoPath(organization);
         log.debug("Successfully retrieved organization with UUID: {}", uuid);
         return organization;

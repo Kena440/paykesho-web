@@ -172,6 +172,19 @@ public class VoucherController {
 
     // Private method to handle sending notifications
     private void sendNotification(Voucher voucher) {
+        try {
+            // Send notifications to client
+            sendClientNotifications(voucher);
+            
+            // Send notifications to employer (organization)
+            sendEmployerNotifications(voucher);
+        } catch (Exception e) {
+            log.error("Error sending voucher request notifications: {}", e.getMessage(), e);
+            // Don't throw exception - voucher save should succeed even if notifications fail
+        }
+    }
+    
+    private void sendClientNotifications(Voucher voucher) {
         // Send email notification using professional template
         boolean emailSent = notificationClient.sendVoucherNotificationEmail(
             voucher.getClient().getFullName(),
@@ -183,33 +196,72 @@ public class VoucherController {
         );
         
         if (emailSent) {
-            log.info("Email sent successfully to {}", voucher.getClient().getEmail());
+            log.info("Email sent successfully to client: {}", voucher.getClient().getEmail());
         } else {
-            log.error("Failed to send email to {}", voucher.getClient().getEmail());
+            log.error("Failed to send email to client: {}", voucher.getClient().getEmail());
         }
 
-        // Send SMS notification
-        String smsMessage = generateSmsMessage(voucher, "REQUEST");
-        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, "sms");
-        if (smsSent) {
-            log.info("SMS sent successfully to " + voucher.getClient().getPhoneNumber());
-        } else {
-            log.error("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
+        // Send SMS notification to client
+        if (voucher.getClient().getPhoneNumber() != null && !voucher.getClient().getPhoneNumber().isEmpty()) {
+            String smsMessage = generateSmsMessage(voucher, "REQUEST");
+            boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, "sms");
+            if (smsSent) {
+                log.info("SMS sent successfully to client: {}", voucher.getClient().getPhoneNumber());
+            } else {
+                log.error("Failed to send SMS to client: {}", voucher.getClient().getPhoneNumber());
+            }
         }
     }
-
-    // Generate email content based on voucher action type
-    private String generateEmailMessage(Voucher voucher, String actionType) {
-        StringBuilder message = new StringBuilder("<p>Dear ").append(voucher.getClient().getFullName()).append(",</p>");
-
-        if ("REQUEST".equals(actionType)) {
-            message.append("<p>Your voucher request has been submitted successfully. ").append("Please allow some time for processing. ").append("Voucher Reference: ").append(voucher.getReference()).append(".</p>");
-        } else {
-            message.append("<p>Unknown action type.</p>");
+    
+    private void sendEmployerNotifications(Voucher voucher) {
+        // Get organization from client
+        if (voucher.getClient().getOrganization() == null) {
+            log.warn("Client {} has no organization associated. Skipping employer notifications.", voucher.getClient().getEmail());
+            return;
         }
-
-        message.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
-        return message.toString();
+        
+        var organization = voucher.getClient().getOrganization();
+        String organizationName = organization.getName() != null ? organization.getName() : "Employer";
+        
+        // Prepare employer email message
+        String employerEmailMessage = String.format(
+            "<p>Dear %s,</p>" +
+            "<p>A voucher request has been submitted by your employee: %s</p>" +
+            "<p>Voucher Reference: %s</p>" +
+            "<p>Amount: %s</p>" +
+            "<p>Please allow some time for processing.</p>" +
+            "<br><p>Thank you,</p><p>Paykesho Team</p>",
+            organizationName,
+            voucher.getClient().getFullName(),
+            voucher.getReference(),
+            voucher.getAmount()
+        );
+        
+        // Send email to employer
+        if (organization.getEmail() != null && !organization.getEmail().isEmpty()) {
+            boolean emailSent = notificationClient.sendNotification(organization.getEmail(), employerEmailMessage, "email");
+            if (emailSent) {
+                log.info("Voucher request email sent successfully to employer: {}", organization.getEmail());
+            } else {
+                log.error("Failed to send voucher request email to employer: {}", organization.getEmail());
+            }
+        }
+        
+        // Send SMS to employer
+        if (organization.getPhoneNumber() != null && !organization.getPhoneNumber().isEmpty()) {
+            String employerSmsMessage = String.format(
+                "Voucher request submitted by employee %s. Reference: %s, Amount: %s. Await processing. Get lelo, Pay Kesho.",
+                voucher.getClient().getFullName(),
+                voucher.getReference(),
+                voucher.getAmount()
+            );
+            boolean smsSent = notificationClient.sendNotification(organization.getPhoneNumber(), employerSmsMessage, "sms");
+            if (smsSent) {
+                log.info("Voucher request SMS sent successfully to employer: {}", organization.getPhoneNumber());
+            } else {
+                log.error("Failed to send voucher request SMS to employer: {}", organization.getPhoneNumber());
+            }
+        }
     }
 
     // Generate SMS content based on voucher action type

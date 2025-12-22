@@ -4,6 +4,7 @@ import org.commons.entity.Role;
 import org.commons.entity.User;
 import org.commons.enums.FileType;
 import org.commons.utils.PaykeshoError;
+import org.paykesho.backoffice.files.dto.FileAccessResponse;
 import org.paykesho.backoffice.files.dto.FileUploadResponse;
 import org.paykesho.backoffice.files.service.FileUploadService;
 import org.paykesho.backoffice.user.enums.Constants;
@@ -96,8 +97,17 @@ public class UserController {
                 }
 
                 user.setRemoteFileId(uploadResponse.getFileId());
+                // Store the filename in the photos field
                 user.setPhotos(uploadResponse.getFilePath());
-                user.setPhotoPath(uploadResponse.getFilePath());
+                
+                // Get the proper file URL for photo_path field
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(uploadResponse.getFileId());
+                if (fileAccessResponse != null && fileAccessResponse.getFileUrl() != null) {
+                    user.setPhotoPath(fileAccessResponse.getFileUrl());
+                } else {
+                    // Fallback: use the file path if we can't get the full URL from service
+                    user.setPhotoPath(uploadResponse.getFilePath());
+                }
             } else if (existingUser != null) {
                 // Preserve existing image if no new image is uploaded
                 user.setRemoteFileId(existingUser.getRemoteFileId());

@@ -90,6 +90,7 @@
                                                th:if="${voucher.payslipPath != null}">
                                                 Payslip
                                             </a>
+                                            <span th:if="${voucher.payslipPath == null}">-</span>
                                         </td>
                                         <td>
                                             <th:block
@@ -109,7 +110,7 @@
                                                 </a>
                                                 &nbsp;
                                             </th:block>
-
+                                            <span th:if="${voucher.approved == true or #strings.equals(voucher.voucherStatus, 'REJECTED')}">-</span>
                                         </td>
 
                                     </tr>
@@ -202,15 +203,8 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Datatables Responsive
-        $("#datatables-responsive").DataTable({
-            destroy: true,
-            responsive: true,
-            error: function (xhr, error, thrown) {
-                console.error('DataTable error:', error, thrown);
-                showErrorAlert('Failed to load data table. Please refresh the page.');
-            }
-        });
+        // Initialize DataTable for server-side rendered table
+        safeDataTable("#datatables-responsive");
     });
 </script>
 <script>

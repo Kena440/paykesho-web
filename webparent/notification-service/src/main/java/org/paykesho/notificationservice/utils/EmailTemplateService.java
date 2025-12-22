@@ -355,4 +355,73 @@ public class EmailTemplateService {
             throw e;
         }
     }
+
+    /**
+     * Generate registration welcome email
+     */
+    public String generateRegistrationWelcomeEmail(String userName, String userEmail, String userType) {
+        Context context = new Context();
+        context.setVariable("subject", "Welcome to Paykesho - Account Created");
+        context.setVariable("greeting", "Hello " + userName + ",");
+        context.setVariable("recipientEmail", userEmail);
+        
+        String content = "<p>Welcome to <strong>Paykesho</strong>! Your " + userType + " account has been successfully created.</p>" +
+                        "<p>Your account is now active and ready to use.</p>";
+        
+        String highlightContent = "<p><strong>Account Details:</strong></p>" +
+                                "<p><strong>Email:</strong> " + userEmail + "</p>" +
+                                "<p>Please check your email for verification instructions to complete your account setup.</p>";
+        
+        context.setVariable("content", content);
+        context.setVariable("highlightContent", highlightContent);
+        
+        return templateEngine.process("email/base", context);
+    }
+
+    /**
+     * Generate repayment completion email
+     */
+    public String generateRepaymentCompletionEmail(String clientName, String clientEmail, String repaymentReference, 
+                                                   BigDecimal amount, String date) {
+        Context context = new Context();
+        context.setVariable("subject", "Repayment Confirmation - Paykesho");
+        context.setVariable("greeting", "Hello " + clientName + ",");
+        context.setVariable("recipientEmail", clientEmail);
+        
+        String content = "<p>Your credit repayment has been successfully processed by your employer.</p>";
+        
+        String highlightContent = "<p><strong>Repayment Details:</strong></p>" +
+                                "<p><strong>Reference:</strong> " + repaymentReference + "</p>" +
+                                "<p><strong>Amount Paid:</strong> K" + amount + "</p>" +
+                                "<p><strong>Date:</strong> " + date + "</p>" +
+                                "<p>Thank you for using Paykesho for your credit needs.</p>";
+        
+        context.setVariable("content", content);
+        context.setVariable("highlightContent", highlightContent);
+        
+        return templateEngine.process("email/base", context);
+    }
+
+    /**
+     * Generate admin repayment notification email
+     */
+    public String generateAdminRepaymentNotificationEmail(String clientName, String clientEmail, String repaymentReference, 
+                                                         BigDecimal amount, String date) {
+        Context context = new Context();
+        context.setVariable("subject", "Repayment Completion Notification - Paykesho");
+        context.setVariable("greeting", "Hello Admin,");
+        
+        String content = "<p>A credit repayment has been successfully processed.</p>";
+        
+        String highlightContent = "<p><strong>Repayment Details:</strong></p>" +
+                                "<p><strong>Client:</strong> " + clientName + " (" + clientEmail + ")</p>" +
+                                "<p><strong>Reference:</strong> " + repaymentReference + "</p>" +
+                                "<p><strong>Amount:</strong> K" + amount + "</p>" +
+                                "<p><strong>Date:</strong> " + date + "</p>";
+        
+        context.setVariable("content", content);
+        context.setVariable("highlightContent", highlightContent);
+        
+        return templateEngine.process("email/base", context);
+    }
 }

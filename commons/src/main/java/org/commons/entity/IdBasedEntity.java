@@ -15,9 +15,23 @@ public abstract class IdBasedEntity {
     @Column(name = "uuid", unique = true, nullable = false, updatable = false, length = 36)
     private String uuid;
     
+    /**
+     * Default constructor - generates UUID immediately upon instantiation
+     */
+    public IdBasedEntity() {
+        generateUuid();
+    }
+    
+    /**
+     * Method to ensure UUID is generated (can be called explicitly if needed)
+     */
+    public void ensureUuid() {
+        generateUuid();
+    }
+    
     @PrePersist
     public void generateUuid() {
-        if (this.uuid == null) {
+        if (this.uuid == null || this.uuid.trim().isEmpty()) {
             this.uuid = UUID.randomUUID().toString();
         }
     }

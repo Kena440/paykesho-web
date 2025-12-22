@@ -9,6 +9,7 @@ import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.organizationportal.config.Utility;
+import org.paykesho.organizationportal.notification.general.NotificationClient;
 import org.paykesho.organizationportal.organizationadmins.repository.OrganizationAdminRepository;
 import org.paykesho.organizationportal.settings.repository.CountryRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,7 @@ public class OrganizationAdminService {
     private final CountryRepository countryRepository;
     private final OrganizationAdminRepository organizationAdminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationClient notificationClient;
 
     public List<Country> countryList() {
         try {
@@ -68,9 +70,46 @@ public class OrganizationAdminService {
             organizationAdmin.setVerificationCode(randomCode);
             organizationAdminRepository.save(organizationAdmin);
             log.debug("Successfully registered organization admin with ID: {}", organizationAdmin.getId());
+            
+            // Send registration notifications
+            sendRegistrationNotifications(organizationAdmin);
         } catch (Exception ex) {
             log.error("Error registering organization admin with email {}: {}", organizationAdmin.getEmail(), ex.getMessage(), ex);
             throw new RuntimeException("Failed to register organization admin", ex);
+        }
+    }
+
+    private void sendRegistrationNotifications(OrganizationAdmin organizationAdmin) {
+        try {
+            String adminName = organizationAdmin.getName() != null ? organizationAdmin.getName() : "User";
+            String emailMessage = String.format(
+                "<p>Welcome to Paykesho, %s!</p>" +
+                "<p>Your organization admin account has been successfully registered.</p>" +
+                "<p>Email: %s</p>" +
+                "<p>Please check your email for verification instructions.</p>" +
+                "<br><p>Get lelo, Pay Kesho!</p>",
+                adminName, organizationAdmin.getEmail()
+            );
+            
+            String smsMessage = String.format(
+                "Welcome to Paykesho, %s! Your organization admin account has been successfully registered. Email: %s. Please check your email for verification instructions.",
+                adminName, organizationAdmin.getEmail()
+            );
+            
+            // Send email notification
+            if (organizationAdmin.getEmail() != null && !organizationAdmin.getEmail().isEmpty()) {
+                notificationClient.sendNotification(organizationAdmin.getEmail(), emailMessage, "email");
+                log.info("Registration email notification sent to: {}", organizationAdmin.getEmail());
+            }
+            
+            // Send SMS notification
+            if (organizationAdmin.getPhoneNumber() != null && !organizationAdmin.getPhoneNumber().isEmpty()) {
+                notificationClient.sendNotification(organizationAdmin.getPhoneNumber(), smsMessage, "sms");
+                log.info("Registration SMS notification sent to: {}", organizationAdmin.getPhoneNumber());
+            }
+        } catch (Exception e) {
+            log.error("Failed to send registration notifications for organization admin {}: {}", organizationAdmin.getEmail(), e.getMessage(), e);
+            // Don't throw exception - registration should succeed even if notifications fail
         }
     }
 

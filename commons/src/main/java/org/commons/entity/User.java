@@ -21,6 +21,8 @@ import java.util.Set;
 public class User extends IdBasedEntity {
     @Column(length = 128, nullable = false, unique = true)
     private String email;
+    @Column(name = "phone_number", length = 15)
+    private String phoneNumber;
     @Enumerated(EnumType.STRING)
     private GenderType gender;
     @Column(length = 64, nullable = false)

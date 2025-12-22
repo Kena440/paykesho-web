@@ -102,15 +102,8 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Datatables Responsive
-        $("#datatables-responsive").DataTable({
-            destroy: true,
-            responsive: true,
-            error: function (xhr, error, thrown) {
-                console.error('DataTable error:', error, thrown);
-                showErrorAlert('Failed to load data table. Please refresh the page.');
-            }
-        });
+        // Initialize DataTable for server-side rendered table
+        safeDataTable("#datatables-responsive");
     });
 </script>
 

@@ -152,8 +152,17 @@ public class MerchantController {
                 }
 
                 merchant.setRemoteFileId(uploadResponse.getFileId());
+                // Store the filename in the photos field
                 merchant.setPhotos(uploadResponse.getFilePath());
-                merchant.setPhotoPath(uploadResponse.getFilePath());
+                
+                // Get the proper file URL for photo_path field
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(uploadResponse.getFileId());
+                if (fileAccessResponse != null && fileAccessResponse.getFileUrl() != null) {
+                    merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+                } else {
+                    // Fallback: use the file path if we can't get the full URL from service
+                    merchant.setPhotoPath(uploadResponse.getFilePath());
+                }
             }
 
             // Save the merchant
@@ -188,6 +197,14 @@ public class MerchantController {
         try {
 
             Merchant merchant = merchantService.getMerchantByUuid(uuid);
+            
+            // Ensure UUID is set (in case it was null in database)
+            // This should not happen if UUID was used to retrieve, but adding safety check
+            if (merchant.getUuid() == null || merchant.getUuid().trim().isEmpty()) {
+                merchant.ensureUuid();
+                merchantService.save(merchant);
+            }
+            
             MerchantAdmin merchantAdmin = merchant.getContactPerson();
             if (merchantAdmin == null) merchantAdmin = new MerchantAdmin();
 
@@ -280,6 +297,20 @@ public class MerchantController {
         model.addAttribute("pageTitle", "Debug Merchant");
         model.addAttribute("message", "Debug page working correctly");
         return "merchants/merchant_form";
+    }
+
+    @GetMapping("/fix-uuid")
+    public String fixMerchantUuids(RedirectAttributes redirectAttributes) {
+        try {
+            int updatedCount = merchantService.updateMerchantsWithNullUuids();
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, 
+                "Successfully updated " + updatedCount + " merchants with NULL UUIDs");
+        } catch (Exception e) {
+            log.error("Error fixing merchant UUIDs: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", 
+                "Error fixing merchant UUIDs: " + e.getMessage());
+        }
+        return "redirect:/merchants";
     }
 
     private void loadCurrencySetting(HttpServletRequest request) {

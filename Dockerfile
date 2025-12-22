@@ -1,6 +1,11 @@
 # Build stage
-FROM maven:3.8.4-openjdk-15-slim AS build
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
+
+# Install Maven for the build stage
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends maven && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the parent pom files
 COPY pom.xml .
@@ -17,7 +22,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Run stage
-FROM openjdk:15-slim
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copy the built artifacts from the build stage

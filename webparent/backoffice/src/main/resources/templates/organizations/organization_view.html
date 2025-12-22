@@ -383,13 +383,15 @@
                     </div>
                     <div class="form-group">
                         <label>NRC</label>
-                        <input class="form-control" name="nrc" placeholder="Enter NRC"
-                               required type="text">
+                        <input class="form-control" name="nrc" placeholder="NRC (e.g., 123456/78/9)"
+                               required type="text" minlength="11" maxlength="11" pattern="^[0-9]{6}/[0-9]{2}/[0-9]{1}$"
+                               title="NRC must be exactly 11 characters in format XXXXXX/XX/X">
                     </div>
                     <div class="form-group">
                         <label>Tax Payer Identification Number</label>
-                        <input class="form-control" name="tpin" placeholder="Enter TPIN"
-                               required type="text">
+                        <input class="form-control" name="tpin" placeholder="TPIN (10 digits)"
+                               required type="text" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                               title="TPIN must be exactly 10 digits">
                     </div>
                     <div class="form-group">
                         <label>Man Number</label>
@@ -605,13 +607,15 @@
                     </div>
                     <div class="form-group">
                         <label>NRC</label>
-                        <input class="form-control" name="nrc" placeholder="Enter NRC"
-                               required type="text">
+                        <input class="form-control" name="nrc" placeholder="NRC (e.g., 123456/78/9)"
+                               required type="text" minlength="11" maxlength="11" pattern="^[0-9]{6}/[0-9]{2}/[0-9]{1}$"
+                               title="NRC must be exactly 11 characters in format XXXXXX/XX/X">
                     </div>
                     <div class="form-group">
                         <label>Phone Number</label>
-                        <input class="form-control" name="phoneNumber" placeholder="Enter Phone Number"
-                               required type="text">
+                        <input class="form-control" name="phoneNumber" placeholder="Phone Number (e.g., 0977123456)"
+                               required type="tel" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                               title="Phone number must be exactly 10 digits">
                     </div>
                     <div class="form-group">
                         <label>Email Address</label>
@@ -758,13 +762,15 @@
                     </div>
                     <div class="form-group">
                         <label>NRC</label>
-                        <input class="form-control" id="editEmployeeNrc" name="nrc" placeholder="Enter NRC"
-                               required type="text">
+                        <input class="form-control" id="editEmployeeNrc" name="nrc" placeholder="NRC (e.g., 123456/78/9)"
+                               required type="text" minlength="11" maxlength="11" pattern="^[0-9]{6}/[0-9]{2}/[0-9]{1}$"
+                               title="NRC must be exactly 11 characters in format XXXXXX/XX/X">
                     </div>
                     <div class="form-group">
                         <label>Tax Payer Identification Number</label>
-                        <input class="form-control" id="editEmployeeTpin" name="tpin" placeholder="Enter TPIN"
-                               required type="text">
+                        <input class="form-control" id="editEmployeeTpin" name="tpin" placeholder="TPIN (10 digits)"
+                               required type="text" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                               title="TPIN must be exactly 10 digits">
                     </div>
                     <div class="form-group">
                         <label>Man Number</label>
@@ -806,14 +812,16 @@
                     </div>
                     <div class="form-group">
                         <label>NRC</label>
-                        <input class="form-control" id="editClientNrc" name="nrc" placeholder="Enter NRC"
-                               required type="text">
+                        <input class="form-control" id="editClientNrc" name="nrc" placeholder="NRC (e.g., 123456/78/9)"
+                               required type="text" minlength="11" maxlength="11" pattern="^[0-9]{6}/[0-9]{2}/[0-9]{1}$"
+                               title="NRC must be exactly 11 characters in format XXXXXX/XX/X">
                     </div>
                     <div class="form-group">
                         <label>Phone Number</label>
                         <input class="form-control" id="editClientPhone" name="phoneNumber"
-                               placeholder="Enter Phone Number"
-                               required type="text">
+                               placeholder="Phone Number (e.g., 0977123456)"
+                               required type="tel" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                               title="Phone number must be exactly 10 digits">
                     </div>
                     <div class="form-group">
                         <label>Email Address</label>
@@ -994,14 +1002,45 @@
 <script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
 <script>
     moduleURL = "[[@{/organizations}]]";
-    var organizationId = /*[[${organization.id}]]*/ 1; // Keep for internal use
-    var organizationUuid = /*[[${organization.uuid}]]*/ '';
+    var organizationId = /*[[${organization?.id}]]*/ 1; // Keep for internal use
+    var organizationUuid = /*[[${organization?.uuid}]]*/ '';
+    
+    // Fallback: if UUID is not set, try to get it from the URL or use the ID
+    if (!organizationUuid || organizationUuid.trim() === '') {
+        // Try to extract UUID from current URL if available
+        var urlPath = window.location.pathname;
+        var uuidMatch = urlPath.match(/\/view\/([a-f0-9-]{36})/i);
+        if (uuidMatch && uuidMatch[1]) {
+            organizationUuid = uuidMatch[1];
+            console.warn('Organization UUID extracted from URL:', organizationUuid);
+        } else {
+            console.error('CRITICAL: organizationUuid is not set! Employee records loading will fail.');
+            console.error('Organization object:', /*[[${organization}]]*/ null);
+        }
+    }
+    
     console.log('Organization UUID from template:', organizationUuid);
+    console.log('Organization ID from template:', organizationId);
     
     $(document).ready(function () {
         // Initialize client records on page load
         console.log('Page loaded, initializing client records...');
         loadClientRecordsTab();
+        
+        // Load employee records on page load if employees tab is active
+        const activeTab = $('button[data-bs-toggle="tab"].active, a[data-bs-toggle="tab"].active');
+        if (activeTab.length > 0) {
+            const target = activeTab.data('bs-target') || activeTab.attr('href');
+            if (target === '#employees' || target === '#employees-tab') {
+                console.log('Employees tab is active on page load, loading employee records...');
+                setTimeout(function() {
+                    loadEmployeeRecordsTab();
+                }, 500);
+            }
+        }
+        
+        // Initialize NRC and TPIN validation and masking
+        initializeNrcAndTpinValidation();
         
         $(".link-delete").on("click", function (e) {
             e.preventDefault();
@@ -1223,13 +1262,35 @@
         });
     });
 
+    /**
+     * DataTables Usage Guidelines for this file:
+     * 
+     * DO NOT use DataTables for:
+     * - employeeRecordsMainTable (dynamically loaded via AJAX)
+     * - clientRecordsMainTable (dynamically loaded via AJAX)
+     * - employeeRecordsTable (modal, dynamically loaded via AJAX)
+     * - clientRecordsTable (modal, dynamically loaded via AJAX)
+     * 
+     * These tables are populated via AJAX and should NOT have DataTables initialized.
+     * If DataTables was accidentally initialized, use destroyDataTableIfExists() before reloading.
+     * 
+     * USE DataTables for:
+     * - Server-side rendered tables (static HTML from Thymeleaf)
+     * - Tables that don't change after page load
+     * - Use safeDataTable() helper for initialization
+     */
+
     // Function to load employee records with comprehensive error handling
     function loadEmployeeRecords() {
-        const tbody = $('#employeeRecordsTable tbody');
+        const table = $('#employeeRecordsTable');
+        const tbody = table.find('tbody');
         if (!tbody.length) {
             console.error('Employee records table body not found');
             return;
         }
+        
+        // Destroy DataTables if it was initialized on this table
+        destroyDataTableIfExists('#employeeRecordsTable');
         
         tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>');
 
@@ -1421,79 +1482,320 @@
     // Function to load employee records in the main tab
     function loadEmployeeRecordsTab() {
         console.log('Loading employee records for organization ID:', organizationId);
-        const tbody = $('#employeeRecordsMainTable tbody');
+        const table = $('#employeeRecordsMainTable');
+        const tbody = table.find('tbody');
+        
+        if (!tbody.length) {
+            console.error('Employee records table body not found');
+            return;
+        }
+
+        // Destroy DataTables if it was initialized on this table
+        destroyDataTableIfExists('#employeeRecordsMainTable');
+
+        // Validate organizationUuid before making request
+        if (!organizationUuid || organizationUuid.trim() === '') {
+            console.error('Cannot load employee records: organizationUuid is not set');
+            tbody.html('<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>Error: Organization UUID not found. Please refresh the page.</td></tr>');
+            return;
+        }
 
         // Show loading state
         tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading employee records...</td></tr>');
 
-        $.get('/organizations/' + organizationUuid + '/employee-records', function (data) {
-            tbody.empty();
-            if (data && data.length > 0) {
-                data.forEach(function (employee, index) {
-                    const avatar = employee.name ? employee.name.charAt(0).toUpperCase() : 'N';
-                    const row = `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar avatar-sm bg-primary text-white rounded-circle me-2">
-                                        <span>${avatar}</span>
-                                    </div>
-                                    <span>${employee.name || 'N/A'}</span>
-                                </div>
-                            </td>
-                            <td>${employee.nrc || 'N/A'}</td>
-                            <td>${employee.tpin || 'N/A'}</td>
-                            <td>${employee.manNumber || 'N/A'}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-outline-primary edit-employee-btn" 
-                                            data-uuid="${employee.uuid}"
-                                            data-id="${employee.id}"
-                                            data-name="${employee.name || ''}"
-                                            data-nrc="${employee.nrc || ''}"
-                                            data-tpin="${employee.tpin || ''}"
-                                            data-man-number="${employee.manNumber || ''}"
-                                            title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-danger delete-employee-btn"
-                                            data-uuid="${employee.uuid}"
-                                            data-name="${employee.name || ''}"
-                                            title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.append(row);
-                });
+        $.ajax({
+            url: '/organizations/' + organizationUuid + '/employee-records',
+            method: 'GET',
+            timeout: 10000,
+            dataType: 'json',
+            success: function (data) {
+                try {
+                    tbody.empty();
+                    
+                    // Validate data structure
+                    if (!data) {
+                        console.warn('No data received from server');
+                        tbody.html(`
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <p class="mb-0">No employee records found</p>
+                                    <small>Click "Add Employee" to get started</small>
+                                </td>
+                            </tr>
+                        `);
+                        $('#employees-tab .badge').text('0');
+                        return;
+                    }
 
-                // Update badge count
-                $('#employees-tab .badge').text(data.length);
-            } else {
-                tbody.html(`
-                    <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
-                            <i class="fas fa-users fa-2x mb-2"></i>
-                            <p class="mb-0">No employee records found</p>
-                            <small>Click "Add Employee" to get started</small>
-                        </td>
-                    </tr>
-                `);
-                $('#employees-tab .badge').text('0');
+                    if (!Array.isArray(data)) {
+                        console.error('Invalid data format received:', typeof data);
+                        tbody.html('<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>Invalid data format received</td></tr>');
+                        return;
+                    }
+
+                    if (data.length > 0) {
+                        data.forEach(function (employee, index) {
+                            // Validate employee data
+                            if (!employee || typeof employee !== 'object') {
+                                console.warn('Invalid employee data:', employee);
+                                return;
+                            }
+                            
+                            const avatar = employee.name ? employee.name.charAt(0).toUpperCase() : 'N';
+                            const row = `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm bg-primary text-white rounded-circle me-2">
+                                                <span>${avatar}</span>
+                                            </div>
+                                            <span>${employee.name || 'N/A'}</span>
+                                        </div>
+                                    </td>
+                                    <td>${employee.nrc || 'N/A'}</td>
+                                    <td>${employee.tpin || 'N/A'}</td>
+                                    <td>${employee.manNumber || 'N/A'}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-primary edit-employee-btn" 
+                                                    data-uuid="${employee.uuid || ''}"
+                                                    data-id="${employee.id || ''}"
+                                                    data-name="${employee.name || ''}"
+                                                    data-nrc="${employee.nrc || ''}"
+                                                    data-tpin="${employee.tpin || ''}"
+                                                    data-man-number="${employee.manNumber || ''}"
+                                                    title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger delete-employee-btn"
+                                                    data-uuid="${employee.uuid || ''}"
+                                                    data-name="${employee.name || ''}"
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                            tbody.append(row);
+                        });
+
+                        // Update badge count
+                        $('#employees-tab .badge').text(data.length);
+                        console.log('Successfully loaded', data.length, 'employee records');
+                    } else {
+                        tbody.html(`
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <p class="mb-0">No employee records found</p>
+                                    <small>Click "Add Employee" to get started</small>
+                                </td>
+                            </tr>
+                        `);
+                        $('#employees-tab .badge').text('0');
+                    }
+                } catch (error) {
+                    console.error('Error processing employee data:', error);
+                    tbody.html('<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>Error processing employee data</td></tr>');
+                    
+                    if (typeof showAlert === 'function') {
+                        showAlert('error', 'Error processing employee records data');
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Employee records AJAX error:', {xhr, status, error});
+                
+                let errorMessage = 'Error loading employee records';
+                if (xhr.status === 0) {
+                    errorMessage = 'Network connection lost';
+                } else if (xhr.status === 404) {
+                    errorMessage = 'Employee records endpoint not found';
+                } else if (xhr.status === 500) {
+                    errorMessage = 'Server error occurred';
+                } else if (xhr.status === 403) {
+                    errorMessage = 'Access denied';
+                } else if (status === 'timeout') {
+                    errorMessage = 'Request timed out';
+                }
+                
+                tbody.html(`<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>${errorMessage}</td></tr>`);
+                
+                if (typeof showAlert === 'function') {
+                    showAlert('error', errorMessage);
+                }
             }
-        }).fail(function () {
-            tbody.html('<tr><td colspan="6" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>Error loading employee records</td></tr>');
+        });
+    }
+
+    // Initialize NRC masking and TPIN validation for all fields
+    function initializeNrcAndTpinValidation() {
+        // NRC input masking - format: xxxxxx/xx/x
+        function applyNrcMasking(input) {
+            if (!input) return;
+            
+            input.addEventListener('input', function(event) {
+                const field = event.target;
+                let value = field.value.replace(/\D/g, ''); // Remove all non-digits
+                
+                // Limit to 9 digits (6 + 2 + 1) to ensure exactly 11 characters with slashes
+                if (value.length > 9) {
+                    value = value.substring(0, 9);
+                }
+                
+                // Format as xxxxxx/xx/x
+                let formatted = '';
+                if (value.length > 0) {
+                    formatted = value.substring(0, 6);
+                    if (value.length > 6) {
+                        formatted += '/' + value.substring(6, 8);
+                        if (value.length > 8) {
+                            formatted += '/' + value.substring(8, 9);
+                        }
+                    }
+                }
+                
+                field.value = formatted;
+                
+                // Validate format - must be exactly 11 characters
+                const nrcPattern = /^[0-9]{6}\/[0-9]{2}\/[0-9]{1}$/;
+                if (formatted.length > 0 && formatted.length !== 11) {
+                    field.setCustomValidity('NRC must be exactly 11 characters in format XXXXXX/XX/X');
+                } else if (formatted.length === 11 && !nrcPattern.test(formatted)) {
+                    field.setCustomValidity('NRC must be exactly 11 characters in format XXXXXX/XX/X');
+                } else if (formatted.length === 11) {
+                    field.setCustomValidity(''); // Valid
+                } else {
+                    field.setCustomValidity('NRC must be exactly 11 characters in format XXXXXX/XX/X');
+                }
+            });
+
+            input.addEventListener('blur', function(event) {
+                const field = event.target;
+                const value = field.value;
+                // Validate the format matches xxxxxx/xx/x and is exactly 11 characters
+                const nrcPattern = /^[0-9]{6}\/[0-9]{2}\/[0-9]{1}$/;
+                if (value.length > 0 && value.length !== 11) {
+                    field.setCustomValidity('NRC must be exactly 11 characters in format XXXXXX/XX/X');
+                    field.reportValidity();
+                } else if (value.length === 11 && !nrcPattern.test(value)) {
+                    field.setCustomValidity('NRC must be exactly 11 characters in format XXXXXX/XX/X');
+                    field.reportValidity();
+                } else if (value.length === 11) {
+                    field.setCustomValidity(''); // Valid
+                } else if (value.length > 0) {
+                    field.setCustomValidity('NRC must be exactly 11 characters in format XXXXXX/XX/X');
+                    field.reportValidity();
+                } else {
+                    field.setCustomValidity('');
+                }
+            });
+        }
+        
+        // TPIN validation - restrict to digits only, max 10
+        function applyTpinValidation(input) {
+            if (!input) return;
+            
+            input.addEventListener('input', function(event) {
+                const field = event.target;
+                const value = field.value;
+                // Remove any non-digit characters
+                const cleanedValue = value.replace(/\D/g, '');
+                if (value !== cleanedValue) {
+                    field.value = cleanedValue;
+                }
+                // Update validity state
+                if (cleanedValue.length === 10) {
+                    field.setCustomValidity('');
+                } else if (cleanedValue.length > 0) {
+                    field.setCustomValidity('TPIN must be exactly 10 digits');
+                } else {
+                    field.setCustomValidity('');
+                }
+            });
+
+            input.addEventListener('blur', function(event) {
+                const field = event.target;
+                const value = field.value;
+                if (value.length > 0 && value.length !== 10) {
+                    field.setCustomValidity('TPIN must be exactly 10 digits');
+                    field.reportValidity();
+                } else {
+                    field.setCustomValidity('');
+                }
+            });
+        }
+        
+        // Phone number validation - restrict to digits only, max 10
+        function applyPhoneValidation(input) {
+            if (!input) return;
+            
+            input.addEventListener('input', function(event) {
+                const field = event.target;
+                const value = field.value;
+                // Remove any non-digit characters
+                const cleanedValue = value.replace(/\D/g, '');
+                if (value !== cleanedValue) {
+                    field.value = cleanedValue;
+                }
+                // Update validity state
+                if (cleanedValue.length === 10) {
+                    field.setCustomValidity('');
+                } else if (cleanedValue.length > 0) {
+                    field.setCustomValidity('Phone number must be exactly 10 digits');
+                } else {
+                    field.setCustomValidity('');
+                }
+            });
+
+            input.addEventListener('blur', function(event) {
+                const field = event.target;
+                const value = field.value;
+                if (value.length > 0 && value.length !== 10) {
+                    field.setCustomValidity('Phone number must be exactly 10 digits');
+                    field.reportValidity();
+                } else {
+                    field.setCustomValidity('');
+                }
+            });
+        }
+        
+        // Apply to all NRC fields (by name attribute and id)
+        document.querySelectorAll('input[name="nrc"], input[id*="nrc"], input[id*="Nrc"]').forEach(applyNrcMasking);
+        
+        // Apply to all TPIN fields (by name attribute and id)
+        document.querySelectorAll('input[name="tpin"], input[id*="tpin"], input[id*="Tpin"]').forEach(applyTpinValidation);
+        
+        // Apply to all phone number fields (by name attribute and id)
+        document.querySelectorAll('input[name="phoneNumber"], input[id*="phone"], input[id*="Phone"]').forEach(applyPhoneValidation);
+        
+        // Also apply when modals are shown (for dynamically loaded content)
+        $('#modal-add-record, #modal-add-client-record, #modal-edit-employee-record, #modal-edit-client-record').on('shown.bs.modal', function() {
+            const modal = $(this);
+            modal.find('input[name="nrc"], input[id*="nrc"], input[id*="Nrc"]').each(function() {
+                applyNrcMasking(this);
+            });
+            modal.find('input[name="tpin"], input[id*="tpin"], input[id*="Tpin"]').each(function() {
+                applyTpinValidation(this);
+            });
+            modal.find('input[name="phoneNumber"], input[id*="phone"], input[id*="Phone"]').each(function() {
+                applyPhoneValidation(this);
+            });
         });
     }
 
     // Function to load client records in the main tab
     function loadClientRecordsTab() {
         console.log('Loading client records for organization ID:', organizationId);
-        const tbody = $('#clientRecordsMainTable tbody');
+        const table = $('#clientRecordsMainTable');
+        const tbody = table.find('tbody');
         console.log('Found tbody element:', tbody.length);
+        
+        // Destroy DataTables if it was initialized on this table
+        destroyDataTableIfExists('#clientRecordsMainTable');
         
         // Show loading state
         tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading client records...</td></tr>');

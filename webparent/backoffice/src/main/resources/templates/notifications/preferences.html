@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html data-bs-theme="light"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('Notification Preferences','none')"></head>
+<body>
+
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Notification Preferences</h3>
+                    </div>
+
+                    <div class="col-auto ms-auto text-end mt-n1">
+                        <a class="btn btn-secondary shadow-sm" th:href="@{/notifications}">
+                            <i class="align-middle" data-lucide="arrow-left">&nbsp;</i> Back to Notifications
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">[[${pageTitle}]]</h5>
+                                <h6 class="card-subtitle text-muted">Manage user notification preferences and opt-out settings.</h6>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+                                <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+                                <!-- Search Form -->
+                                <form method="get" action="/notifications/preferences" class="mb-4">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <label for="email">User Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   th:value="${emailFilter ?: ''}" placeholder="Enter user email">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>&nbsp;</label>
+                                            <button type="submit" class="btn btn-primary form-control">Search</button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <!-- Preferences Table -->
+                                <div th:if="${preferences != null and !preferences.isEmpty()}">
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>User Email</th>
+                                            <th>Notification Type</th>
+                                            <th>Category</th>
+                                            <th>Enabled</th>
+                                            <th>Updated At</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="pref : ${preferences}">
+                                            <td th:text="${pref.userEmail}">user@example.com</td>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${pref.notificationType == T(org.commons.enums.NotificationType).EMAIL ? 'bg-primary' : 'bg-info'}"
+                                                      th:text="${pref.notificationType}">EMAIL</span>
+                                            </td>
+                                            <td th:text="${pref.category}">CATEGORY</td>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${pref.enabled ? 'bg-success' : 'bg-danger'}"
+                                                      th:text="${pref.enabled ? 'Enabled' : 'Disabled'}">Enabled</span>
+                                            </td>
+                                            <td th:text="${#temporals.format(pref.updatedAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                                            <td>
+                                                <form method="post" action="/notifications/preferences/update" style="display: inline;">
+                                                    <input type="hidden" name="userEmail" th:value="${pref.userEmail}">
+                                                    <input type="hidden" name="notificationType" th:value="${pref.notificationType}">
+                                                    <input type="hidden" name="category" th:value="${pref.category}">
+                                                    <input type="hidden" name="enabled" th:value="${!pref.enabled}">
+                                                    <button type="submit" class="btn btn-sm" 
+                                                            th:classappend="${pref.enabled ? 'btn-danger' : 'btn-success'}"
+                                                            th:text="${pref.enabled ? 'Disable' : 'Enable'}">Toggle</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div th:if="${preferences == null or preferences.isEmpty()}" class="alert alert-info">
+                                    <p th:if="${emailFilter != null and !emailFilter.isEmpty()}">
+                                        No preferences found for <strong th:text="${emailFilter}">email</strong>. 
+                                        Default behavior is to send all notifications.
+                                    </p>
+                                    <p th:unless="${emailFilter != null and !emailFilter.isEmpty()}">
+                                        Enter a user email address to view their notification preferences.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+</html>
+

@@ -1353,16 +1353,27 @@
                 return;
             }
             
-            $("#datatables-dashboard-traffic").DataTable({
-                destroy: true,
-                pageLength: 8,
-                lengthChange: false,
-                bFilter: false,
-                autoWidth: false,
-                order: [
-                    [1, "desc"]
-                ]
-            });
+            // Initialize DataTable for dashboard traffic with custom options
+            // Note: Requires error-handling.js for safeDataTable() function
+            if (typeof safeDataTable === 'function') {
+                safeDataTable("#datatables-dashboard-traffic", {
+                    pageLength: 8,
+                    lengthChange: false,
+                    bFilter: false,
+                    autoWidth: false,
+                    order: [[1, "desc"]]
+                });
+            } else {
+                // Fallback if safeDataTable is not available
+                $("#datatables-dashboard-traffic").DataTable({
+                    destroy: true,
+                    pageLength: 8,
+                    lengthChange: false,
+                    bFilter: false,
+                    autoWidth: false,
+                    order: [[1, "desc"]]
+                });
+            }
             console.log('DataTable initialized successfully');
         } catch (error) {
             console.error('DataTable initialization failed:', error);

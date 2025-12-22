@@ -36,7 +36,7 @@
                                 <h6 class="card-subtitle text-muted">A list of recorded schedules.</h6>
                             </div>
                             <div class="card-body">
-                                <table class="table table-striped w-100" id="datatables-reponsive">
+                                <table class="table table-striped w-100" id="datatables-responsive">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -148,10 +148,17 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        $("#datatables-reponsive").DataTable({
-            destroy: true,
-            responsive: true
-        });
+        // Initialize DataTable for server-side rendered table
+        // Note: Requires error-handling.js for safeDataTable() function
+        if (typeof safeDataTable === 'function') {
+            safeDataTable("#datatables-responsive");
+        } else {
+            // Fallback if safeDataTable is not available
+            $("#datatables-responsive").DataTable({
+                destroy: true,
+                responsive: true
+            });
+        }
     });
 </script>
 <script>
@@ -160,16 +167,28 @@
         var selectedOption = this.options[this.selectedIndex];
         var clientUuid = selectedOption.getAttribute('data-uuid');
 
-        if (clientUuid) {
-            fetch('/clients/rest/voucher-totals?clientUuid=' + clientUuid, {
-                method: 'POST'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('amount-due').value = data;
-                })
-                .catch(error => console.error('Error fetching balance:', error));
+        if (!clientUuid || clientUuid.trim() === '') {
+            console.warn('Client UUID not found for selected client. Cannot fetch voucher totals.');
+            document.getElementById('amount-due').value = '';
+            return;
         }
+
+        fetch('/clients/rest/voucher-totals?clientUuid=' + clientUuid, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch voucher totals');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('amount-due').value = data;
+            })
+            .catch(error => {
+                console.error('Error fetching balance:', error);
+                document.getElementById('amount-due').value = '';
+            });
     });
 </script>
 

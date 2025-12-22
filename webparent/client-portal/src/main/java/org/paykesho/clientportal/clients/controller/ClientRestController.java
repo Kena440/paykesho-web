@@ -23,9 +23,27 @@ public class ClientRestController {
     private OrganizationService organizationService;
 
     @PostMapping("/rest/check-client")
-    public String checkClientStatus(@RequestParam("name") String name, @RequestParam("nrc") String nrc, @RequestParam("tpin") String tpin, @RequestParam("manNumber") String manNumber, @RequestParam("organizationUuid") String organizationUuid) {
+    public String checkClientStatus(@RequestParam("name") String name, 
+                                    @RequestParam("nrc") String nrc, 
+                                    @RequestParam("tpin") String tpin, 
+                                    @RequestParam("manNumber") String manNumber, 
+                                    @RequestParam("organizationUuid") String organizationUuid) {
         try {
             log.debug("Checking client status for name: {}, nrc: {}, organizationUuid: {}", name, nrc, organizationUuid);
+
+            // Validate required parameters
+            if (name == null || name.trim().isEmpty()) {
+                log.warn("Name parameter is missing or empty");
+                return "Not Found"; // Treat as validation failure
+            }
+            if (nrc == null || nrc.trim().isEmpty()) {
+                log.warn("NRC parameter is missing or empty");
+                return "Not Found";
+            }
+            if (organizationUuid == null || organizationUuid.trim().isEmpty()) {
+                log.warn("Organization UUID parameter is missing or empty");
+                return "Organization not found";
+            }
 
             Organization organization = null;
             try {
@@ -35,7 +53,7 @@ public class ClientRestController {
                     return "Organization not found";
                 }
             } catch (Exception ex) {
-                log.error("Error retrieving organization: {}", ex.getMessage(), ex);
+                log.error("Error retrieving organization with UUID {}: {}", organizationUuid, ex.getMessage(), ex);
                 return "Failed to retrieve organization";
             }
 
@@ -44,7 +62,7 @@ public class ClientRestController {
             return result;
 
         } catch (Exception ex) {
-            log.error("Error checking client status: {}", ex.getMessage(), ex);
+            log.error("Error checking client status for name: {}, nrc: {}: {}", name, nrc, ex.getMessage(), ex);
             return "Failed to check client status";
         }
     }

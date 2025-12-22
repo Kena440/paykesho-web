@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html data-bs-theme="light"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('Notification Tracking','none')"></head>
+<body>
+
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Notification Tracking</h3>
+                    </div>
+
+                    <div class="col-auto ms-auto text-end mt-n1">
+                        <a class="btn btn-primary shadow-sm" th:href="@{/notifications/preferences}">
+                            <i class="align-middle" data-lucide="settings">&nbsp;</i> Preferences
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total</h5>
+                                <h3 class="mb-0" th:text="${totalNotifications ?: 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning">Pending</h5>
+                                <h3 class="mb-0" th:text="${pendingCount ?: 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-success">Sent</h5>
+                                <h3 class="mb-0" th:text="${sentCount ?: 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">Failed</h5>
+                                <h3 class="mb-0" th:text="${failedCount ?: 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <form method="get" action="/notifications">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label for="status">Status</label>
+                                            <select class="form-control" id="status" name="status">
+                                                <option value="">All</option>
+                                                <option value="PENDING" th:selected="${statusFilter == 'PENDING'}">Pending</option>
+                                                <option value="PROCESSING" th:selected="${statusFilter == 'PROCESSING'}">Processing</option>
+                                                <option value="SENT" th:selected="${statusFilter == 'SENT'}">Sent</option>
+                                                <option value="FAILED" th:selected="${statusFilter == 'FAILED'}">Failed</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="type">Type</label>
+                                            <select class="form-control" id="type" name="type">
+                                                <option value="">All</option>
+                                                <option value="EMAIL" th:selected="${typeFilter == 'EMAIL'}">Email</option>
+                                                <option value="SMS" th:selected="${typeFilter == 'SMS'}">SMS</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="recipient">Recipient Email</label>
+                                            <input type="text" class="form-control" id="recipient" name="recipient" 
+                                                   th:value="${recipientFilter ?: ''}" placeholder="Enter email">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>&nbsp;</label>
+                                            <button type="submit" class="btn btn-primary form-control">Filter</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Table -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">[[${pageTitle}]]</h5>
+                                <h6 class="card-subtitle text-muted">Track notification delivery status and history.</h6>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+                                
+                                <table class="table table-striped w-100" id="datatables-responsive">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Recipient</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Subject</th>
+                                        <th>Source Module</th>
+                                        <th>Created At</th>
+                                        <th>Sent At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="notification, notificationStat : ${notifications.content}">
+                                        <td th:text="${notificationStat.count}">1</td>
+                                        <td>
+                                            <span th:text="${notification.recipientEmail}">email@example.com</span>
+                                            <br>
+                                            <small class="text-muted" th:if="${notification.recipientPhone != null}" 
+                                                   th:text="${notification.recipientPhone}"></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${notification.notificationType == T(org.commons.enums.NotificationType).EMAIL ? 'bg-primary' : 'bg-info'}"
+                                                  th:text="${notification.notificationType}">EMAIL</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${notification.status == T(org.commons.enums.NotificationStatus).SENT ? 'bg-success' : 
+                                                                   (notification.status == T(org.commons.enums.NotificationStatus).FAILED ? 'bg-danger' : 
+                                                                    (notification.status == T(org.commons.enums.NotificationStatus).PENDING ? 'bg-warning' : 'bg-secondary'))}"
+                                                  th:text="${notification.status}">PENDING</span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${notification.subject ?: 'N/A'}">Subject</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${notification.sourceModule}">MODULE</span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${notification.sentAt != null}" 
+                                                  th:text="${#temporals.format(notification.sentAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</span>
+                                            <span th:unless="${notification.sentAt != null}" class="text-muted">-</span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/notifications/view/{id}(id=${notification.id})}" 
+                                               class="btn btn-sm btn-info">
+                                                <i class="align-middle" data-lucide="eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Pagination -->
+                                <div class="row mt-3" th:if="${notifications.totalPages > 1}">
+                                    <div class="col-12">
+                                        <nav>
+                                            <ul class="pagination justify-content-center">
+                                                <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                                                    <a class="page-link" th:href="@{/notifications(page=${currentPage - 1}, status=${statusFilter}, type=${typeFilter}, recipient=${recipientFilter})}">Previous</a>
+                                                </li>
+                                                <li class="page-item" th:each="i : ${#numbers.sequence(1, notifications.totalPages)}" 
+                                                    th:classappend="${i == currentPage ? 'active' : ''}">
+                                                    <a class="page-link" th:href="@{/notifications(page=${i}, status=${statusFilter}, type=${typeFilter}, recipient=${recipientFilter})}" 
+                                                       th:text="${i}">1</a>
+                                                </li>
+                                                <li class="page-item" th:classappend="${currentPage == notifications.totalPages ? 'disabled' : ''}">
+                                                    <a class="page-link" th:href="@{/notifications(page=${currentPage + 1}, status=${statusFilter}, type=${typeFilter}, recipient=${recipientFilter})}">Next</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+<script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        safeDataTable("#datatables-responsive");
+    });
+</script>
+
+</body>
+</html>
+

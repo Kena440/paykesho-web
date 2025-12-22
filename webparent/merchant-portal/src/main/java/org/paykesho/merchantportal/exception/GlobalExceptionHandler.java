@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 /**
  * Global exception handler for Merchant Portal
@@ -20,18 +21,35 @@ import javax.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final String DEFAULT_HOME_URL = "/";
+    private static final String DEFAULT_HOME_BUTTON_TEXT = "Go to Dashboard";
+
+    /**
+     * Helper method to add common error attributes
+     */
+    private void addCommonAttributes(ModelAndView modelAndView, String errorCode, String title, String message) {
+        modelAndView.addObject("errorCode", errorCode);
+        modelAndView.addObject("title", title);
+        modelAndView.addObject("errorMessage", message);
+        modelAndView.addObject("homeUrl", DEFAULT_HOME_URL);
+        modelAndView.addObject("homeButtonText", DEFAULT_HOME_BUTTON_TEXT);
+        modelAndView.addObject("timestamp", LocalDateTime.now());
+    }
 
     /**
      * Handle general exceptions
      */
     @ExceptionHandler(Exception.class)
     public ModelAndView handleGenericException(Exception ex, HttpServletRequest request) {
-        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+        logger.error("Unexpected error occurred at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
         ModelAndView modelAndView = new ModelAndView("error/500");
-        modelAndView.addObject("errorMessage", "An unexpected error occurred. Please try again later.");
-        modelAndView.addObject("errorCode", "500");
-        modelAndView.addObject("timestamp", System.currentTimeMillis());
+        addCommonAttributes(modelAndView, "500", "Internal Server Error", 
+            "Something went wrong on our end. Our team has been notified and is working to fix the issue. Please try again later.");
+        
+        if (logger.isDebugEnabled()) {
+            modelAndView.addObject("details", ex.getMessage());
+        }
 
         return modelAndView;
     }
@@ -55,11 +73,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ModelAndView handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
-        logger.warn("Access denied for user: {}", request.getRemoteUser());
+        logger.warn("Access denied for user {} at {}: {}", request.getRemoteUser(), request.getRequestURI(), ex.getMessage());
 
         ModelAndView modelAndView = new ModelAndView("error/403");
-        modelAndView.addObject("errorMessage", "You don't have permission to access this resource.");
-        modelAndView.addObject("errorCode", "403");
+        addCommonAttributes(modelAndView, "403", "Access Denied", 
+            "You don't have permission to access this resource. If you believe this is an error, please contact your administrator.");
 
         return modelAndView;
     }
@@ -69,11 +87,19 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ModelAndView handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        logger.warn("Validation error: {}", ex.getMessage());
+        logger.warn("Validation error at {}: {}", request.getRequestURI(), ex.getMessage());
 
         ModelAndView modelAndView = new ModelAndView("error/400");
-        modelAndView.addObject("errorMessage", "Invalid input data. Please check your form and try again.");
-        modelAndView.addObject("errorCode", "400");
+        addCommonAttributes(modelAndView, "400", "Bad Request", 
+            "The request you sent was invalid or malformed. Please check your input and try again.");
+        
+        if (ex.getBindingResult() != null && ex.getBindingResult().hasFieldErrors()) {
+            StringBuilder details = new StringBuilder();
+            ex.getBindingResult().getFieldErrors().forEach(error -> {
+                details.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("\n");
+            });
+            modelAndView.addObject("details", details.toString().trim());
+        }
 
         return modelAndView;
     }
@@ -83,11 +109,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NullPointerException.class)
     public ModelAndView handleNullPointerException(NullPointerException ex, HttpServletRequest request) {
-        logger.error("Null pointer exception: {}", ex.getMessage(), ex);
+        logger.error("Null pointer exception at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
         ModelAndView modelAndView = new ModelAndView("error/500");
-        modelAndView.addObject("errorMessage", "A system error occurred. Please contact support.");
-        modelAndView.addObject("errorCode", "500");
+        addCommonAttributes(modelAndView, "500", "Internal Server Error", 
+            "A system error occurred. Our team has been notified. Please try again later or contact support if the problem persists.");
+        
+        if (logger.isDebugEnabled()) {
+            modelAndView.addObject("details", "NullPointerException: " + ex.getMessage());
+        }
 
         return modelAndView;
     }
@@ -97,11 +127,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ModelAndView handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
-        logger.warn("Illegal argument: {}", ex.getMessage());
+        logger.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage());
 
         ModelAndView modelAndView = new ModelAndView("error/400");
-        modelAndView.addObject("errorMessage", "Invalid request parameters. Please check your input.");
-        modelAndView.addObject("errorCode", "400");
+        addCommonAttributes(modelAndView, "400", "Bad Request", 
+            "Invalid request parameters. Please check your input and try again.");
+        
+        if (logger.isDebugEnabled()) {
+            modelAndView.addObject("details", ex.getMessage());
+        }
 
         return modelAndView;
     }
@@ -115,11 +149,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(org.commons.utils.PaykeshoError.class)
     public ModelAndView handlePaykeshoError(org.commons.utils.PaykeshoError ex, HttpServletRequest request) {
-        logger.error("Paykesho error: {}", ex.getMessage(), ex);
+        logger.error("Paykesho error at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
         ModelAndView modelAndView = new ModelAndView("error/500");
-        modelAndView.addObject("errorMessage", ex.getMessage());
-        modelAndView.addObject("errorCode", "500");
+        addCommonAttributes(modelAndView, "500", "Application Error", ex.getMessage());
+        
+        if (logger.isDebugEnabled()) {
+            modelAndView.addObject("details", ex.getMessage());
+        }
 
         return modelAndView;
     }
