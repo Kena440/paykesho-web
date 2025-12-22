@@ -42,9 +42,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .ignoringAntMatchers("/api/public/**") // Only public API endpoints
                 )
                 .authorizeRequests(authz -> authz
-                        .antMatchers(HttpMethod.GET, "/clients/register", "/clients/save-client", "/clients/verify",
+                        .antMatchers(HttpMethod.GET, "/clients/register", "/clients/verify",
                                 "/business", "/how-it-works", "/faq", "/contact", "/reset-password", "/forgot-password/captcha").permitAll()
-                        .antMatchers(HttpMethod.POST, "/forgot-password", "/reset-password-action").permitAll()
+                        .antMatchers(HttpMethod.POST, "/clients/save-client", "/clients/rest/check-client", "/forgot-password", "/reset-password-action").permitAll()
                         .antMatchers("/clients/dashboard", "/vouchers/**", "/transactions/**").authenticated()
                         .anyRequest().authenticated()
                 )

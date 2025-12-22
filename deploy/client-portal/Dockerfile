@@ -1,8 +1,12 @@
-FROM openjdk:15-slim
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copy the JAR file
 COPY *.jar app.jar
+
+# Create log directories with proper permissions
+RUN mkdir -p /logs/client-portal && \
+    chmod -R 755 /logs
 
 # Set environment variables
 ENV JAVA_OPTS="-Xmx512m -Xms256m"

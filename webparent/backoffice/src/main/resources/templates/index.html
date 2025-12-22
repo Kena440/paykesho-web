@@ -1345,15 +1345,13 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        $("#datatables-dashboard-traffic").DataTable({
-            destroy: true,
+        // Initialize DataTable for dashboard traffic with custom options
+        safeDataTable("#datatables-dashboard-traffic", {
             pageLength: 8,
             lengthChange: false,
             bFilter: false,
             autoWidth: false,
-            order: [
-                [1, "desc"]
-            ]
+            order: [[1, "desc"]]
         });
     });
 </script>

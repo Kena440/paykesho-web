@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="error_base">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Paykesho Limited">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <title th:text="'Error ' + ${errorCode} + ' | Paykesho'">Error | Paykesho</title>
+    
+    <link rel="shortcut icon" th:href="@{/assets/img/favicon/favicon.ico}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    
+    <style>
+        :root {
+            --error-primary: #dc3545;
+            --error-secondary: #6c757d;
+            --error-success: #28a745;
+            --error-warning: #ffc107;
+            --error-info: #17a2b8;
+            --error-bg: #f8f9fa;
+            --error-text: #212529;
+            --error-border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            color: var(--error-text);
+        }
+        
+        .error-container {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .error-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 4rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .error-code {
+            font-size: 5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .error-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--error-text);
+        }
+        
+        .error-message {
+            font-size: 1rem;
+            color: var(--error-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .error-details {
+            background: var(--error-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: left;
+            font-size: 0.875rem;
+            color: var(--error-secondary);
+        }
+        
+        .error-details-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--error-text);
+        }
+        
+        .error-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn-error {
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary-error {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+        }
+        
+        .btn-primary-error:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+            color: #ffffff;
+        }
+        
+        .btn-secondary-error {
+            background: #f8f9fa;
+            color: var(--error-text);
+            border: 2px solid var(--error-border);
+        }
+        
+        .btn-secondary-error:hover {
+            background: #e9ecef;
+            color: var(--error-text);
+        }
+        
+        .error-timestamp {
+            font-size: 0.75rem;
+            color: var(--error-secondary);
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--error-border);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .error-container {
+                padding: 1.5rem;
+                border-radius: 15px;
+            }
+            
+            .error-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .error-code {
+                font-size: 4rem;
+            }
+            
+            .error-title {
+                font-size: 1.5rem;
+            }
+            
+            .error-message {
+                font-size: 0.9375rem;
+            }
+            
+            .btn-error {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9375rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .error-code {
+                font-size: 3rem;
+            }
+            
+            .error-title {
+                font-size: 1.25rem;
+            }
+            
+            .error-container {
+                padding: 1rem;
+            }
+        }
+        
+        /* Error code specific colors */
+        .error-400 .error-icon {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--error-warning);
+        }
+        
+        .error-403 .error-icon {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--error-primary);
+        }
+        
+        .error-404 .error-icon {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--error-info);
+        }
+        
+        .error-500 .error-icon {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--error-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container" th:classappend="'error-' + ${errorCode}">
+        <div class="error-icon" th:text="${icon}">⚠️</div>
+        <div class="error-code" th:text="${errorCode}">500</div>
+        <h1 class="error-title" th:text="${title}">Something went wrong</h1>
+        <p class="error-message" th:text="${errorMessage}">An unexpected error occurred. Please try again later.</p>
+        
+        <div class="error-details" th:if="${details != null and !details.isEmpty()}">
+            <div class="error-details-title">Details:</div>
+            <div th:text="${details}"></div>
+        </div>
+        
+        <div class="error-actions">
+            <a th:href="${homeUrl}" class="btn-error btn-primary-error">
+                <i class="fas fa-home"></i>
+                <span th:text="${homeButtonText}">Go to Home</span>
+            </a>
+            <button onclick="window.history.back()" class="btn-error btn-secondary-error">
+                <i class="fas fa-arrow-left"></i>
+                <span>Go Back</span>
+            </button>
+        </div>
+        
+        <div class="error-timestamp" th:if="${timestamp != null}">
+            <span th:text="'Error occurred at: ' + ${#temporals.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        </div>
+    </div>
+    
+    <script th:src="@{/assets/js/app.js}"></script>
+</body>
+</html>
+

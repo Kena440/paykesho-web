@@ -1,43 +1,16 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-          cpus: '2'
-        reservations:
-          memory: 1G
-          cpus: '1'
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./mysql/init:/docker-entrypoint-initdb.d
-    ports:
-      - "3307:3306"
-    networks:
-      - paykesho-network
-
   backoffice:
     build: ./backoffice
+    network_mode: host
     volumes:
       - ./backoffice/application.properties:/app/application.properties:ro
+      - /opt/kaedigital/paykesho/logs/backoffice:/logs/backoffice
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -57,22 +30,17 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    ports:
-      - "8080:8080"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - paykesho-network
 
   client-portal:
     build: ./client-portal
+    network_mode: host
     volumes:
       - ./client-portal/application.properties:/app/application.properties:ro
+      - /opt/kaedigital/paykesho/logs/client-portal:/logs/client-portal
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -92,22 +60,17 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    ports:
-      - "8081:8081"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - paykesho-network
 
   merchant-portal:
     build: ./merchant-portal
+    network_mode: host
     volumes:
       - ./merchant-portal/application.properties:/app/application.properties:ro
+      - /opt/kaedigital/paykesho/logs/merchant-portal:/logs/merchant-portal
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -127,22 +90,17 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    ports:
-      - "8082:8082"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - paykesho-network
 
   organization-portal:
     build: ./organization-portal
+    network_mode: host
     volumes:
       - ./organization-portal/application.properties:/app/application.properties:ro
+      - /opt/kaedigital/paykesho/logs/organization-portal:/logs/organization-portal
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-default_jwt_secret_change_in_production}
@@ -166,22 +124,17 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    ports:
-      - "8083:8083"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - paykesho-network
 
   payment-service:
     build: ./payment-service
+    network_mode: host
     volumes:
       - ./payment-service/application.properties:/app/application.properties:ro
+      - /opt/kaedigital/paykesho/logs/payment-service:/logs/payment-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       PAYMENT_GATEWAY_URL: ${PAYMENT_GATEWAY_URL}
@@ -202,22 +155,17 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    ports:
-      - "8084:8084"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - paykesho-network
 
   notification-service:
     build: ./notification-service
+    network_mode: host
     volumes:
       - ./notification-service/application.properties:/app/application.properties:ro
+      - /opt/kaedigital/paykesho/logs/notification-service:/logs/notification-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SMTP_HOST: ${SMTP_HOST}
@@ -241,23 +189,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    ports:
-      - "8085:8085"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - paykesho-network
 
   file-service:
     build: ./file-service
+    network_mode: host
     volumes:
       - ./file-service/application.properties:/app/application.properties:ro
-      - file_uploads:/app/uploads
+      - /opt/kaedigital/paykesho/deploy/file-service/uploads:/app/uploads
+      - /opt/kaedigital/paykesho/logs/file-service:/logs/file-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_LOCATION: file:/app/application.properties
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/paykesho_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paykesho_db
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       FILE_STORAGE_PATH: ${FILE_STORAGE_PATH:-/app/uploads}
@@ -276,19 +219,4 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
-    ports:
-      - "8086:8086"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - paykesho-network
-
-networks:
-  paykesho-network:
-    driver: bridge
-
-volumes:
-  mysql_data:
-  file_uploads: 
+      start_period: 60s 

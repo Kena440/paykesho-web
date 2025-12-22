@@ -101,8 +101,17 @@ public class OrganizationController {
             }
 
             organization.setRemoteFileId(uploadResponse.getFileId());
+            // Store the filename in the photos field
             organization.setPhotos(uploadResponse.getFilePath());
-            organization.setPhotoPath(uploadResponse.getFilePath());
+            
+            // Get the proper file URL for photo_path field
+            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(uploadResponse.getFileId());
+            if (fileAccessResponse != null && fileAccessResponse.getFileUrl() != null) {
+                organization.setPhotoPath(fileAccessResponse.getFileUrl());
+            } else {
+                // Fallback: use the file path if we can't get the full URL from service
+                organization.setPhotoPath(uploadResponse.getFilePath());
+            }
         }
 
         // Save the organization
@@ -125,6 +134,13 @@ public class OrganizationController {
         try {
 
             Organization organization = organizationService.getOrganizationByUuid(uuid);
+            
+            // Ensure UUID is set (in case it was null in database)
+            if (organization.getUuid() == null || organization.getUuid().trim().isEmpty()) {
+                organization.ensureUuid();
+                organizationService.save(organization);
+            }
+            
             List<EmployeeRecord> employeeRecords = null;
             List<Client> clientRecordsSize = null;
             OrganizationAdmin organizationAdmin = organization.getContactPerson();
@@ -275,9 +291,16 @@ public class OrganizationController {
             return null;
         }
 
+        // Validate NRC format
+        String nrc = request.getParameter("nrc");
+        if (nrc != null && !nrc.isEmpty() && !isValidNrc(nrc)) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid NRC format. NRC must be exactly 11 characters in format XXXXXX/XX/X (e.g., 123456/78/9).");
+            return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+        }
+
         EmployeeRecord employeeRecord = new EmployeeRecord();
         employeeRecord.setName(request.getParameter("name"));
-        employeeRecord.setNrc(request.getParameter("nrc"));
+        employeeRecord.setNrc(nrc);
         employeeRecord.setTpin(request.getParameter("tpin"));
         employeeRecord.setManNumber(request.getParameter("manNumber"));
         employeeRecord.setOrganization(organization);
@@ -285,12 +308,12 @@ public class OrganizationController {
 
         try {
             organizationService.saveEmployeeRecord(employeeRecord);
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization Operation Successful: " + organization.getEmail());
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Employee record saved successfully");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Error saving employee record: " + e.getMessage());
-            return null;
         }
-
+        
+        // Redirect back to organization view page which will reload employee records
         return Constants.REDIRECT_ORGANIZATIONS_VIEW + organization.getId();
     }
 
@@ -308,11 +331,22 @@ public class OrganizationController {
     @ResponseBody
     public ResponseEntity<List<EmployeeRecord>> getEmployeeRecords(@PathVariable String uuid) {
         try {
+            if (uuid == null || uuid.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+            }
+            
             Organization organization = organizationService.getOrganizationByUuid(uuid);
+            if (organization == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
+            }
+            
             List<EmployeeRecord> employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
-            return ResponseEntity.ok(employeeRecords);
+            return ResponseEntity.ok(employeeRecords != null ? employeeRecords : new ArrayList<>());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            // Log the error for debugging
+            System.err.println("Error loading employee records for organization UUID " + uuid + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ArrayList<>());
         }
     }
 
@@ -341,6 +375,13 @@ public class OrganizationController {
                 return "redirect:/organizations";
             }
 
+            // Validate NRC format
+            String nrc = request.getParameter("nrc");
+            if (nrc != null && !nrc.isEmpty() && !isValidNrc(nrc)) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid NRC format. NRC must be exactly 11 characters in format XXXXXX/XX/X (e.g., 123456/78/9).");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+            }
+
             EmployeeRecord employeeRecord = organizationService.getEmployeeRecordById(employeeId);
             if (employeeRecord == null) {
                 redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Employee record not found.");
@@ -348,7 +389,7 @@ public class OrganizationController {
             }
 
             employeeRecord.setName(request.getParameter("name"));
-            employeeRecord.setNrc(request.getParameter("nrc"));
+            employeeRecord.setNrc(nrc);
             employeeRecord.setTpin(request.getParameter("tpin"));
             employeeRecord.setManNumber(request.getParameter("manNumber"));
             employeeRecord.setOrganization(organization);
@@ -454,9 +495,16 @@ public class OrganizationController {
                 return "redirect:/organizations";
             }
 
+            // Validate NRC format
+            String nrc = request.getParameter("nrc");
+            if (nrc != null && !nrc.isEmpty() && !isValidNrc(nrc)) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid NRC format. NRC must be exactly 11 characters in format XXXXXX/XX/X (e.g., 123456/78/9).");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+            }
+
             Client client = new Client();
             client.setName(request.getParameter("name"));
-            client.setNrc(request.getParameter("nrc"));
+            client.setNrc(nrc);
             client.setPhoneNumber(request.getParameter("phoneNumber"));
             client.setEmail(request.getParameter("email"));
             client.setOrganization(organization);
@@ -507,8 +555,15 @@ public class OrganizationController {
                 return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
             }
 
+            // Validate NRC format
+            String nrc = request.getParameter("nrc");
+            if (nrc != null && !nrc.isEmpty() && !isValidNrc(nrc)) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Invalid NRC format. NRC must be exactly 11 characters in format XXXXXX/XX/X (e.g., 123456/78/9).");
+                return Constants.REDIRECT_ORGANIZATIONS_VIEW + organizationId;
+            }
+
             client.setName(request.getParameter("name"));
-            client.setNrc(request.getParameter("nrc"));
+            client.setNrc(nrc);
             client.setPhoneNumber(request.getParameter("phoneNumber"));
             client.setEmail(request.getParameter("email"));
             client.setOrganization(organization);
@@ -696,5 +751,22 @@ public class OrganizationController {
         }
 
         return clientRecords;
+    }
+
+    /**
+     * Validates NRC format - must be exactly 11 characters in format XXXXXX/XX/X
+     * @param nrc The NRC string to validate
+     * @return true if valid, false otherwise
+     */
+    private boolean isValidNrc(String nrc) {
+        if (nrc == null || nrc.isEmpty()) {
+            return false;
+        }
+        // Must be exactly 11 characters
+        if (nrc.length() != 11) {
+            return false;
+        }
+        // Must match pattern: 6 digits / 2 digits / 1 digit
+        return nrc.matches("^[0-9]{6}/[0-9]{2}/[0-9]{1}$");
     }
 }

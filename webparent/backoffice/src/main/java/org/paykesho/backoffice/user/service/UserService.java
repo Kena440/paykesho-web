@@ -57,6 +57,18 @@ public class UserService {
     }
 
     /**
+     * Get all enabled users (typically admin users) for notification purposes
+     *
+     * @return List of enabled users
+     */
+    public List<User> getAllEnabledUsers() {
+        List<User> allUsers = listAll();
+        return allUsers.stream()
+                .filter(user -> user.isEnabled() && !user.isDeleted())
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
      * +
      * This method lists all users in the system by pagination
      *
@@ -254,6 +266,13 @@ public class UserService {
                     log.error("User not found with UUID: {}", uuid);
                     return new PaykeshoError("Could not find user with UUID: " + uuid);
                 });
+
+        // Ensure UUID is set (in case it was null in database)
+        if (user.getUuid() == null || user.getUuid().trim().isEmpty()) {
+            log.warn("User {} has null or empty UUID, generating new one", user.getId());
+            user.ensureUuid();
+            userRepository.save(user);
+        }
 
         // Process photo path
         processPhotoPath(user);

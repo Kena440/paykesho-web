@@ -117,15 +117,103 @@ public class FileStorageService {
     }
     
     public Optional<FileUpload> getFileMetadata(Long fileId) {
-        return fileUploadRepository.findById(fileId);
+        if (fileId == null) {
+            log.warn("File ID is null");
+            return Optional.empty();
+        }
+        
+        Optional<FileUpload> result = fileUploadRepository.findById(fileId);
+        if (result.isEmpty()) {
+            log.warn("File not found in database for ID: {}", fileId);
+            // Additional diagnostic: check if there are any files with similar IDs
+            checkNearbyFileIds(fileId);
+        } else {
+            FileUpload fileUpload = result.get();
+            log.debug("File found in database for ID: {}, filename: {}, filePath: {}", 
+                     fileId, fileUpload.getFileName(), fileUpload.getFilePath());
+            
+            // Validate that the file actually exists on disk
+            if (!Files.exists(Paths.get(fileUpload.getFilePath()))) {
+                log.error("File exists in database but not on disk: ID={}, path={}", 
+                         fileId, fileUpload.getFilePath());
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Helper method to check for nearby file IDs for diagnostic purposes
+     */
+    private void checkNearbyFileIds(Long missingId) {
+        try {
+            log.warn("Checking for nearby file IDs around missing ID: {}", missingId);
+            boolean foundNearby = false;
+            
+            // Check a few IDs around the missing one to see if there's a pattern
+            for (long i = Math.max(1, missingId - 5); i <= missingId + 5; i++) {
+                if (i != missingId && fileUploadRepository.existsById(i)) {
+                    log.warn("Found nearby file ID: {} (missing ID was {})", i, missingId);
+                    foundNearby = true;
+                }
+            }
+            
+            if (!foundNearby) {
+                log.warn("No nearby file IDs found around missing ID: {}", missingId);
+            }
+        } catch (Exception e) {
+            log.warn("Could not check nearby file IDs for diagnostic: {}", e.getMessage());
+        }
     }
     
     public String generateFileUrl(FileUpload fileUpload) {
-        String fileName = Paths.get(fileUpload.getFilePath()).getFileName().toString();
+        // Use the filename from the file path (which includes the UUID prefix)
+        // to ensure consistency with how the file was actually stored
+        Path filePath = Paths.get(fileUpload.getFilePath());
+        String fileName = filePath.getFileName().toString();
+        
+        // Validate that the file path is properly set and the filename exists
+        if (fileName == null || fileName.isEmpty()) {
+            log.error("Invalid filename in file path for file ID: {}", fileUpload.getId());
+            throw new IllegalStateException("Unable to generate file URL: invalid filename in file path");
+        }
+        
+        // Handle the mismatch between stored path and URL generation
+        // Files are stored under 'logos' (plural) but FileType enum is 'logo' (singular)
+        String fileTypePath = fileUpload.getFileType().name();
+        if ("logo".equals(fileTypePath)) {
+            // For logo files, check if the actual stored path uses plural form
+            String storedPath = fileUpload.getFilePath();
+            if (storedPath != null && storedPath.contains("/logos/")) {
+                fileTypePath = "logos";
+            }
+        }
+        
         return String.format("%s/uploads/%s/%s", 
                            fileStorageProperties.getBaseUrl(),
-                           fileUpload.getFileType().name(),
+                           fileTypePath,
                            fileName);
+    }
+    
+    /**
+     * Checks if a file exists both in database and on disk
+     * Returns true if both exist, false otherwise
+     */
+    public boolean validateFileIntegrity(Long fileId) {
+        Optional<FileUpload> fileUploadOpt = fileUploadRepository.findById(fileId);
+        if (fileUploadOpt.isEmpty()) {
+            log.warn("File ID {} not found in database", fileId);
+            return false;
+        }
+        
+        FileUpload fileUpload = fileUploadOpt.get();
+        boolean existsOnDisk = Files.exists(Paths.get(fileUpload.getFilePath()));
+        
+        if (!existsOnDisk) {
+            log.error("File ID {} exists in database but not on disk: {}", fileId, fileUpload.getFilePath());
+        }
+        
+        return existsOnDisk;
     }
     
     private void validateFile(MultipartFile file) {

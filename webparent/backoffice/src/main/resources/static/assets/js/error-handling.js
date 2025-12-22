@@ -133,7 +133,55 @@ function safeAjaxCall(options) {
     return attemptRequest(1);
 }
 
-// Safe DataTable initialization
+/**
+ * DataTables Utility Functions
+ * 
+ * USAGE GUIDELINES:
+ * - Use DataTables for server-side rendered tables (static HTML from Thymeleaf)
+ * - DO NOT use DataTables for tables populated dynamically via AJAX
+ * - If you must use DataTables with AJAX-loaded data, destroy it before reloading
+ */
+
+/**
+ * Safely destroy a DataTable instance if it exists
+ * Use this before clearing/reloading table data via AJAX
+ * 
+ * @param {string} selector - jQuery selector for the table element
+ * @returns {boolean} - true if DataTable was destroyed, false otherwise
+ */
+function destroyDataTableIfExists(selector) {
+    try {
+        if (typeof $.fn.DataTable === 'undefined') {
+            return false;
+        }
+
+        const element = $(selector);
+        if (element.length === 0) {
+            return false;
+        }
+
+        if ($.fn.DataTable.isDataTable(selector)) {
+            element.DataTable().destroy();
+            console.log('DataTable destroyed for:', selector);
+            return true;
+        }
+
+        return false;
+    } catch (error) {
+        console.warn('Error destroying DataTable (may not be initialized):', error);
+        PaykeshoErrorHandler.logError(error, 'datatable-destroy');
+        return false;
+    }
+}
+
+/**
+ * Safe DataTable initialization
+ * Use this for server-side rendered tables (static HTML)
+ * 
+ * @param {string} selector - jQuery selector for the table element
+ * @param {object} options - DataTables configuration options (optional)
+ * @returns {object|null} - DataTable instance or null if initialization failed
+ */
 function safeDataTable(selector, options) {
     try {
         if (typeof $.fn.DataTable === 'undefined') {
@@ -149,10 +197,42 @@ function safeDataTable(selector, options) {
             return null;
         }
 
+        // Destroy existing instance if it exists
+        if ($.fn.DataTable.isDataTable(selector)) {
+            element.DataTable().destroy();
+        }
+
+        // Count columns from thead to ensure proper configuration
+        const thead = element.find('thead tr');
+        const columnCount = thead.length > 0 ? thead.first().find('th').length : 0;
+        
+        // Create columnDefs to handle empty/null cells gracefully
+        const columnDefs = [];
+        for (let i = 0; i < columnCount; i++) {
+            columnDefs.push({
+                targets: i,
+                defaultContent: '',
+                render: function (data, type, row) {
+                    // Handle null, undefined, or empty data
+                    if (data == null || data === '') {
+                        return '';
+                    }
+                    // For display type, return the data as-is (allows HTML)
+                    if (type === 'display') {
+                        return data;
+                    }
+                    // For other types (sort, filter, etc.), return text content
+                    const $data = $('<div>').html(data);
+                    return $data.text() || '';
+                }
+            });
+        }
+
         const defaultOptions = {
             destroy: true,
             responsive: true,
             processing: true,
+            columnDefs: columnDefs,
             language: {
                 processing: '<i class="fas fa-spinner fa-spin"></i> Loading...',
                 emptyTable: 'No data available',
@@ -176,6 +256,18 @@ function safeDataTable(selector, options) {
         showErrorAlert('Failed to initialize data table.');
         return null;
     }
+}
+
+/**
+ * Initialize DataTable safely with enhanced defaults
+ * Alias for safeDataTable() for consistency
+ * 
+ * @param {string} selector - jQuery selector for the table element
+ * @param {object} options - DataTables configuration options (optional)
+ * @returns {object|null} - DataTable instance or null if initialization failed
+ */
+function initializeDataTableSafely(selector, options) {
+    return safeDataTable(selector, options);
 }
 
 // Alert system

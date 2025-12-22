@@ -166,16 +166,34 @@ public class OrganizationAdminService {
             // Set admin properties
             organizationAdminInForm.setPassword(passwordEncoder.encode(securePassword));
             organizationAdminInForm.setVerificationCode(verificationCode);
+            organizationAdminInForm.setCreatedTime(new Date());
+            organizationAdminInForm.setEnabled(true); // CRITICAL: Enable account for login
             organizationAdminInForm.setAuthenticationType(AuthenticationType.DATABASE);
             organizationAdminInForm.setResetPasswordToken(token);
             organizationAdminInForm.setFailedAttempt(0);
             organizationAdminInForm.setAccountNonLocked(true);
+            
+            LOGGER.info("Organization admin account setup - Enabled: {}, AccountNonLocked: {}, FailedAttempt: {}", 
+                    organizationAdminInForm.isEnabled(), 
+                    organizationAdminInForm.isAccountNonLocked(), 
+                    organizationAdminInForm.getFailedAttempt());
 
             LOGGER.info("Saving new organization admin to database: {}", organizationAdminInForm.getEmail());
             OrganizationAdmin savedOrganizationAdmin;
             try {
                 savedOrganizationAdmin = organizationAdminRepository.save(organizationAdminInForm);
                 LOGGER.info("Successfully saved organization admin with ID: {}", savedOrganizationAdmin.getId());
+                LOGGER.info("Account status after save - Enabled: {}, AccountNonLocked: {}, Password hash length: {}", 
+                        savedOrganizationAdmin.isEnabled(), 
+                        savedOrganizationAdmin.isAccountNonLocked(),
+                        savedOrganizationAdmin.getPassword() != null ? savedOrganizationAdmin.getPassword().length() : 0);
+                
+                // Verify password encoding works
+                boolean passwordMatches = passwordEncoder.matches(securePassword, savedOrganizationAdmin.getPassword());
+                LOGGER.info("Password verification test - Generated password matches encoded password: {}", passwordMatches);
+                if (!passwordMatches) {
+                    LOGGER.error("CRITICAL: Password encoding verification failed! Admin may not be able to login.");
+                }
             } catch (Exception e) {
                 if (e.getMessage() != null && e.getMessage().contains("Duplicate entry") && e.getMessage().contains("email")) {
                     LOGGER.error("Duplicate email error when saving organization admin: {}", organizationAdminInForm.getEmail());
@@ -277,17 +295,26 @@ public class OrganizationAdminService {
             }
 
             // Send SMS notification if phone number is available
-            if (organizationAdmin.getPhoneNumber() != null && !organizationAdmin.getPhoneNumber().trim().isEmpty()) {
+            String phoneNumber = organizationAdmin.getPhoneNumber();
+            if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+                log.info("Attempting to send SMS notification to phone number: {}", phoneNumber);
                 String smsMessage = String.format("Welcome to Paykesho! You're now an organization admin for %s. Login: https://organization.paykesho.com/ Email: %s Password: %s. Change password after first login. Contact support if needed.",
                         organization.getName(), organizationAdmin.getEmail(), password);
 
-                boolean smsSent = notificationClient.sendNotification(organizationAdmin.getPhoneNumber(), smsMessage, "sms");
-                if (smsSent) {
-                    log.info("Welcome SMS sent successfully to {}", organizationAdmin.getPhoneNumber());
-                } else {
-                    log.error("Failed to send welcome SMS to {}", organizationAdmin.getPhoneNumber());
-                    log.warn("Admin was created successfully but welcome SMS could not be sent. Please check notification service availability.");
+                try {
+                    boolean smsSent = notificationClient.sendNotification(phoneNumber, smsMessage, "sms");
+                    if (smsSent) {
+                        log.info("Welcome SMS sent successfully to {}", phoneNumber);
+                    } else {
+                        log.error("Failed to send welcome SMS to {}. Notification service returned false.", phoneNumber);
+                        log.warn("Admin was created successfully but welcome SMS could not be sent. Please check notification service availability.");
+                    }
+                } catch (Exception smsException) {
+                    log.error("Exception occurred while sending SMS to {}: {}", phoneNumber, smsException.getMessage(), smsException);
+                    log.warn("Admin was created successfully but welcome SMS could not be sent due to exception.");
                 }
+            } else {
+                log.warn("SMS notification skipped for {} - Phone number not provided or empty", organizationAdmin.getEmail());
             }
         } catch (Exception e) {
             log.error("Error sending welcome notification: {}", e.getMessage());
@@ -296,6 +323,10 @@ public class OrganizationAdminService {
 
     private boolean sendWelcomeNotificationWithResult(OrganizationAdmin organizationAdmin, String password, Organization organization) {
         try {
+            log.info("Starting welcome notification process for organization admin: {} (Phone: {})", 
+                    organizationAdmin.getEmail(), 
+                    organizationAdmin.getPhoneNumber() != null ? organizationAdmin.getPhoneNumber() : "NOT PROVIDED");
+            
             // Use the new templated email service
             boolean emailSent = notificationClient.sendOrganizationAdminWelcomeEmail(
                     organizationAdmin.getFullName(),
@@ -305,26 +336,49 @@ public class OrganizationAdminService {
                     password
             );
 
-            boolean smsSent = true; // Default to true if no phone number
-            if (organizationAdmin.getPhoneNumber() != null && !organizationAdmin.getPhoneNumber().trim().isEmpty()) {
+            if (emailSent) {
+                log.info("Welcome email sent successfully to {} for organization {}", organizationAdmin.getEmail(), organization.getName());
+            } else {
+                log.error("Failed to send welcome email to {} for organization {}", organizationAdmin.getEmail(), organization.getName());
+            }
+
+            // Send SMS notification if phone number is available
+            boolean smsSent = true; // Default to true if no phone number (not required)
+            String phoneNumber = organizationAdmin.getPhoneNumber();
+            
+            if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+                log.info("Attempting to send SMS notification to phone number: {}", phoneNumber);
                 String smsMessage = String.format("Welcome to Paykesho! You're now an organization admin for %s. Login: https://organization.paykesho.com/ Email: %s Password: %s. Change password after first login. Contact support if needed.",
                         organization.getName(), organizationAdmin.getEmail(), password);
 
-                smsSent = notificationClient.sendNotification(organizationAdmin.getPhoneNumber(), smsMessage, "sms");
+                try {
+                    smsSent = notificationClient.sendNotification(phoneNumber, smsMessage, "sms");
+                    if (smsSent) {
+                        log.info("Welcome SMS sent successfully to {}", phoneNumber);
+                    } else {
+                        log.error("Failed to send welcome SMS to {}. Notification service returned false.", phoneNumber);
+                    }
+                } catch (Exception smsException) {
+                    log.error("Exception occurred while sending SMS to {}: {}", phoneNumber, smsException.getMessage(), smsException);
+                    smsSent = false;
+                }
+            } else {
+                log.warn("SMS notification skipped for {} - Phone number not provided or empty", organizationAdmin.getEmail());
             }
 
             boolean allNotificationsSent = emailSent && smsSent;
 
             if (allNotificationsSent) {
-                log.info("All welcome notifications sent successfully to {} for organization {}", organizationAdmin.getEmail(), organization.getName());
+                log.info("All welcome notifications sent successfully to {} for organization {} (Email: {}, SMS: {})", 
+                        organizationAdmin.getEmail(), organization.getName(), emailSent, smsSent);
             } else {
-                log.warn("Some welcome notifications failed for {} - Email: {}, SMS: {}",
-                        organizationAdmin.getEmail(), emailSent, smsSent);
+                log.warn("Some welcome notifications failed for {} - Email: {}, SMS: {} (Phone provided: {})",
+                        organizationAdmin.getEmail(), emailSent, smsSent, phoneNumber != null && !phoneNumber.trim().isEmpty());
             }
 
             return allNotificationsSent;
         } catch (Exception e) {
-            log.error("Error sending welcome notification: {}", e.getMessage());
+            log.error("Error sending welcome notification to {}: {}", organizationAdmin.getEmail(), e.getMessage(), e);
             return false;
         }
     }

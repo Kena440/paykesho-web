@@ -49,11 +49,8 @@ public class Merchant extends IdBasedEntity {
     private String photos;
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
-    @Column(length = 512)
+    @Column(name = "photo_path", length = 512)
     private String photoPath;
-    
-    @Column(name = "uuid", length = 36, unique = true)
-    private String uuid;
 
     @Override
     public String toString() {
@@ -62,10 +59,11 @@ public class Merchant extends IdBasedEntity {
 
     @Transient
     public String getPhotoPath() {
-        if (id == null || photos == null) {
-            return "/images/default_image.png";
+        // Return the actual photoPath field value if set, otherwise return default
+        if (this.photoPath != null && !this.photoPath.trim().isEmpty()) {
+            return this.photoPath;
         }
-        return this.photoPath;
+        return "/images/default_image.png";
     }
 
 }

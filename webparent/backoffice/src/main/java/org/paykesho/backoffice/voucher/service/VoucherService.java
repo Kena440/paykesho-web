@@ -142,6 +142,13 @@ public class VoucherService {
                     return new PaykeshoError("Could not find voucher with UUID: " + uuid);
                 });
 
+        // Ensure UUID is set (in case it was null in database)
+        if (voucher.getUuid() == null || voucher.getUuid().trim().isEmpty()) {
+            log.warn("Voucher {} has null or empty UUID, generating new one", voucher.getId());
+            voucher.ensureUuid();
+            vouchersRepository.save(voucher);
+        }
+
         processPayslipPath(voucher);
         log.debug("Successfully retrieved voucher with UUID: {}", uuid);
         return voucher;

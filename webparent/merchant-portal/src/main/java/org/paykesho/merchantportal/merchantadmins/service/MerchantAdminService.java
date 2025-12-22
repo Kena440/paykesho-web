@@ -10,6 +10,7 @@ import org.commons.enums.AuthenticationType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.merchantportal.config.Utility;
 import org.paykesho.merchantportal.merchantadmins.repository.MerchantAdminRepository;
+import org.paykesho.merchantportal.notification.general.NotificationClient;
 import org.paykesho.merchantportal.settings.repository.CountryRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class MerchantAdminService {
     private final PasswordEncoder passwordEncoder;
     private final CountryRepository countryRepository;
     private final MerchantAdminRepository merchantAdminRepository;
+    private final NotificationClient notificationClient;
 
     public List<Country> countryList() {
         try {
@@ -68,9 +70,46 @@ public class MerchantAdminService {
             merchantAdmin.setVerificationCode(randomCode);
             merchantAdminRepository.save(merchantAdmin);
             log.debug("Successfully registered merchant admin with ID: {}", merchantAdmin.getId());
+            
+            // Send registration notifications
+            sendRegistrationNotifications(merchantAdmin);
         } catch (Exception ex) {
             log.error("Error registering merchant admin with email {}: {}", merchantAdmin.getEmail(), ex.getMessage(), ex);
             throw new RuntimeException("Failed to register merchant admin", ex);
+        }
+    }
+
+    private void sendRegistrationNotifications(MerchantAdmin merchantAdmin) {
+        try {
+            String adminName = merchantAdmin.getName() != null ? merchantAdmin.getName() : "User";
+            String emailMessage = String.format(
+                "<p>Welcome to Paykesho, %s!</p>" +
+                "<p>Your merchant admin account has been successfully registered.</p>" +
+                "<p>Email: %s</p>" +
+                "<p>Please check your email for verification instructions.</p>" +
+                "<br><p>Get lelo, Pay Kesho!</p>",
+                adminName, merchantAdmin.getEmail()
+            );
+            
+            String smsMessage = String.format(
+                "Welcome to Paykesho, %s! Your merchant admin account has been successfully registered. Email: %s. Please check your email for verification instructions.",
+                adminName, merchantAdmin.getEmail()
+            );
+            
+            // Send email notification
+            if (merchantAdmin.getEmail() != null && !merchantAdmin.getEmail().isEmpty()) {
+                notificationClient.sendNotification(merchantAdmin.getEmail(), emailMessage, "email");
+                log.info("Registration email notification sent to: {}", merchantAdmin.getEmail());
+            }
+            
+            // Send SMS notification
+            if (merchantAdmin.getPhoneNumber() != null && !merchantAdmin.getPhoneNumber().isEmpty()) {
+                notificationClient.sendNotification(merchantAdmin.getPhoneNumber(), smsMessage, "sms");
+                log.info("Registration SMS notification sent to: {}", merchantAdmin.getPhoneNumber());
+            }
+        } catch (Exception e) {
+            log.error("Failed to send registration notifications for merchant admin {}: {}", merchantAdmin.getEmail(), e.getMessage(), e);
+            // Don't throw exception - registration should succeed even if notifications fail
         }
     }
 

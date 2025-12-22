@@ -6,6 +6,7 @@ import org.paykesho.organizationportal.security.oauth.OrganizationAdminOAuth2Use
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -33,6 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final RateLimitingFilter rateLimitingFilter;
 
+    @Value("${paykesho.security.oauth2.enabled:false}")
+    private boolean oauth2Enabled;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -55,13 +59,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .successHandler(databaseLoginSuccessHandler)
                         .failureHandler(loginFailureHandler)
                         .permitAll()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
-                        .successHandler(oAuth2LoginSuccessHandler)
-                )
-                .logout(logout -> logout.permitAll())
+                );
+
+        if (oauth2Enabled) {
+            http.oauth2Login(oauth2 -> oauth2
+                    .loginPage("/login")
+                    .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                    .successHandler(oAuth2LoginSuccessHandler)
+            );
+        }
+
+        http.logout(logout -> logout.permitAll())
                 .rememberMe(remember -> remember
                         .key("${REMEMBER_ME_KEY:1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ}")
                         .tokenValiditySeconds(14 * 24 * 60 * 60)

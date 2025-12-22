@@ -113,6 +113,13 @@ public class ClientService {
                     return new PaykeshoError("Could not find client with UUID: " + uuid);
                 });
 
+        // Ensure UUID is set (in case it was null in database)
+        if (client.getUuid() == null || client.getUuid().trim().isEmpty()) {
+            log.warn("Client {} has null or empty UUID, generating new one", client.getId());
+            client.ensureUuid();
+            clientRepository.save(client);
+        }
+
         log.debug("Successfully retrieved client with UUID: {}", uuid);
         return client;
     }

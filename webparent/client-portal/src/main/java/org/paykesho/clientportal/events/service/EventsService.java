@@ -102,8 +102,17 @@ public class EventsService {
             throw new PaykeshoError("Invalid UUID format");
         }
 
-        return eventsRepository.findByUuid(uuid)
+        Announcement announcement = eventsRepository.findByUuid(uuid)
                 .orElseThrow(() -> new PaykeshoError("Could not find event with UUID: " + uuid));
+
+        // Ensure UUID is set (in case it was null in database)
+        if (announcement.getUuid() == null || announcement.getUuid().trim().isEmpty()) {
+            log.warn("Event {} has null or empty UUID, generating new one", announcement.getId());
+            announcement.ensureUuid();
+            eventsRepository.save(announcement);
+        }
+
+        return announcement;
     }
 
     /**

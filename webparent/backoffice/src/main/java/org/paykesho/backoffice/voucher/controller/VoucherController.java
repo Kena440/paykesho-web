@@ -260,23 +260,135 @@ public class VoucherController {
     }
 
     private void sendNotification(Voucher voucher, String actionType, BigDecimal voucherAmount, String message) {
+        try {
+            // Send notifications to client
+            sendClientNotifications(voucher, actionType, voucherAmount, message);
+            
+            // Send notifications to employer (organization)
+            sendEmployerNotifications(voucher, actionType, voucherAmount, message);
+        } catch (Exception e) {
+            log.error("Error sending voucher notifications: {}", e.getMessage(), e);
+            // Don't throw exception - voucher approval should succeed even if notifications fail
+        }
+    }
+    
+    private void sendClientNotifications(Voucher voucher, String actionType, BigDecimal voucherAmount, String message) {
         String emailMessage = generateEmailMessage(voucher, actionType, voucherAmount, message);
         String smsMessage = generateSmsMessage(voucher, actionType, message);
 
         boolean emailSent = notificationClient.sendNotification(voucher.getClient().getEmail(), emailMessage, "email");
 
         if (emailSent) {
-            log.info("Email sent successfully to {}", voucher.getClient().getEmail());
+            log.info("Email sent successfully to client: {}", voucher.getClient().getEmail());
         } else {
-            log.error("Failed to send email to " + voucher.getClient().getEmail());
+            log.error("Failed to send email to client: {}", voucher.getClient().getEmail());
         }
 
-        boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, "sms");
+        if (voucher.getClient().getPhoneNumber() != null && !voucher.getClient().getPhoneNumber().isEmpty()) {
+            boolean smsSent = notificationClient.sendNotification(voucher.getClient().getPhoneNumber(), smsMessage, "sms");
 
-        if (smsSent) {
-            log.info("SMS sent successfully to {}", voucher.getClient().getPhoneNumber());
-        } else {
-            log.error("Failed to send SMS to " + voucher.getClient().getPhoneNumber());
+            if (smsSent) {
+                log.info("SMS sent successfully to client: {}", voucher.getClient().getPhoneNumber());
+            } else {
+                log.error("Failed to send SMS to client: {}", voucher.getClient().getPhoneNumber());
+            }
+        }
+    }
+    
+    private void sendEmployerNotifications(Voucher voucher, String actionType, BigDecimal voucherAmount, String message) {
+        // Get organization from client
+        if (voucher.getClient().getOrganization() == null) {
+            log.warn("Client {} has no organization associated. Skipping employer notifications.", voucher.getClient().getEmail());
+            return;
+        }
+        
+        var organization = voucher.getClient().getOrganization();
+        String organizationName = organization.getName() != null ? organization.getName() : "Employer";
+        String clientName = voucher.getClient().getFullName() != null ? voucher.getClient().getFullName() : voucher.getClient().getEmail();
+        
+        // Generate employer email message
+        String employerEmailMessage = generateEmployerEmailMessage(voucher, actionType, voucherAmount, message, organizationName, clientName);
+        
+        // Send email to employer
+        if (organization.getEmail() != null && !organization.getEmail().isEmpty()) {
+            boolean emailSent = notificationClient.sendNotification(organization.getEmail(), employerEmailMessage, "email");
+            if (emailSent) {
+                log.info("Voucher {} email sent successfully to employer: {}", actionType, organization.getEmail());
+            } else {
+                log.error("Failed to send voucher {} email to employer: {}", actionType, organization.getEmail());
+            }
+        }
+        
+        // Send SMS to employer
+        if (organization.getPhoneNumber() != null && !organization.getPhoneNumber().isEmpty()) {
+            String employerSmsMessage = generateEmployerSmsMessage(voucher, actionType, voucherAmount, message, clientName);
+            boolean smsSent = notificationClient.sendNotification(organization.getPhoneNumber(), employerSmsMessage, "sms");
+            if (smsSent) {
+                log.info("Voucher {} SMS sent successfully to employer: {}", actionType, organization.getPhoneNumber());
+            } else {
+                log.error("Failed to send voucher {} SMS to employer: {}", actionType, organization.getPhoneNumber());
+            }
+        }
+    }
+    
+    private String generateEmployerEmailMessage(Voucher voucher, String actionType, BigDecimal voucherAmount, String message, String organizationName, String clientName) {
+        StringBuilder emailMessage = new StringBuilder("<p>Dear ").append(organizationName).append(",</p>");
+        
+        String repaymentAmount = "K" + voucher.getRepaymentAmount();
+        String repaymentDate = new Date().toString();
+        
+        switch (actionType) {
+            case "APPROVAL":
+                emailMessage.append("<p>The voucher request submitted by your employee ").append(clientName)
+                    .append(" has been approved.</p>")
+                    .append("<p>Voucher Reference: ").append(voucher.getReference()).append("</p>")
+                    .append("<p>Amount: K").append(voucher.getAmount()).append("</p>")
+                    .append("<p>Repayment amount: ").append(repaymentAmount)
+                    .append(", Repayment date: ").append(repaymentDate).append(".</p>");
+                break;
+            case "REJECTION":
+                emailMessage.append("<p>The voucher request submitted by your employee ").append(clientName)
+                    .append(" has been rejected.</p>")
+                    .append("<p>Voucher Reference: ").append(voucher.getReference()).append("</p>")
+                    .append("<p>Reason: ").append(message != null ? message : "Not specified").append("</p>");
+                break;
+            case "ADJUSTMENT":
+                emailMessage.append("<p>The voucher request submitted by your employee ").append(clientName)
+                    .append(" has been adjusted to K").append(voucherAmount).append(".</p>")
+                    .append("<p>Voucher Reference: ").append(voucher.getReference()).append("</p>")
+                    .append("<p>Repayment amount: ").append(repaymentAmount)
+                    .append(", Repayment date: ").append(repaymentDate).append(".</p>");
+                break;
+            default:
+                emailMessage.append("<p>Voucher status update for employee ").append(clientName).append(".</p>");
+                break;
+        }
+        emailMessage.append("<br><p>Thank you,</p><p>Paykesho Team</p>");
+        return emailMessage.toString();
+    }
+    
+    private String generateEmployerSmsMessage(Voucher voucher, String actionType, BigDecimal voucherAmount, String message, String clientName) {
+        switch (actionType) {
+            case "APPROVAL":
+                return String.format(
+                    "Voucher request by employee %s has been approved. Reference: %s, Amount: K%s. Repayment: K%s. Get lelo, Pay Kesho.",
+                    clientName, voucher.getReference(), voucher.getAmount(), voucher.getRepaymentAmount()
+                );
+            case "REJECTION":
+                return String.format(
+                    "Voucher request by employee %s has been rejected. Reference: %s. Reason: %s. Get lelo, Pay Kesho.",
+                    clientName, voucher.getReference(), message != null ? message : "Not specified"
+                );
+            case "ADJUSTMENT":
+                return String.format(
+                    "Voucher request by employee %s has been adjusted. Reference: %s, Amount: K%s. Repayment: K%s. Get lelo, Pay Kesho.",
+                    clientName, voucher.getReference(), voucherAmount, voucher.getRepaymentAmount()
+                );
+            default:
+                return String.format(
+                    "Voucher status update for employee %s. Reference: %s. Get lelo, Pay Kesho.",
+                    clientName, voucher.getReference()
+                );
         }
     }
 

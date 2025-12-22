@@ -40,7 +40,7 @@
                                 <h6 class="card-subtitle text-muted">A list of recorded payroll deductions.</h6>
                             </div>
                             <div class="card-body">
-                                <table class="table table-striped w-100" id="datatables-reponsive">
+                                <table class="table table-striped w-100" id="datatables-responsive">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -189,11 +189,17 @@
 <script th:src="@{/assets/js/common_list.js}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Initialize DataTable
-        $("#datatables-reponsive").DataTable({
-            destroy: true,
-            responsive: true
-        });
+        // Initialize DataTable for server-side rendered table
+        // Note: Requires error-handling.js for safeDataTable() function
+        if (typeof safeDataTable === 'function') {
+            safeDataTable("#datatables-responsive");
+        } else {
+            // Fallback if safeDataTable is not available
+            $("#datatables-responsive").DataTable({
+                destroy: true,
+                responsive: true
+            });
+        }
 
         // Handle form submission to populate hidden input
         document.querySelector('form').addEventListener('submit', function (event) {

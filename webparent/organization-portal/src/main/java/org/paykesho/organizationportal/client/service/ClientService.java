@@ -61,8 +61,17 @@ public class ClientService {
             throw new PaykeshoError("Invalid UUID format");
         }
 
-        return clientRepository.findByUuid(uuid)
+        Client client = clientRepository.findByUuid(uuid)
                 .orElseThrow(() -> new PaykeshoError("Could not find client with UUID: " + uuid));
+
+        // Ensure UUID is set (in case it was null in database)
+        if (client.getUuid() == null || client.getUuid().trim().isEmpty()) {
+            log.warn("Client {} has null or empty UUID, generating new one", client.getId());
+            client.ensureUuid();
+            clientRepository.save(client);
+        }
+
+        return client;
     }
 
     public void updateClientEnabledStatusByUuid(String uuid, boolean enabled) throws PaykeshoError {

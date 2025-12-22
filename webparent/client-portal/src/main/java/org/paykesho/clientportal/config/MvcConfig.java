@@ -1,7 +1,10 @@
 package org.paykesho.clientportal.config;
 
 import org.paykesho.clientportal.paging.PagingAndSortingArgumentResolver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.lang.NonNull;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -10,6 +13,9 @@ import java.util.List;
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private StringToOrganizationConverter stringToOrganizationConverter;
 
 /*    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -32,5 +38,10 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(@NonNull List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new PagingAndSortingArgumentResolver());
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(stringToOrganizationConverter);
     }
 }

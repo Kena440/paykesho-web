@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html data-bs-theme="light"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('Notification Details','none')"></head>
+<body>
+
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Notification Details</h3>
+                    </div>
+
+                    <div class="col-auto ms-auto text-end mt-n1">
+                        <a class="btn btn-secondary shadow-sm" th:href="@{/notifications}">
+                            <i class="align-middle" data-lucide="arrow-left">&nbsp;</i> Back to List
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">[[${pageTitle}]]</h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+                                
+                                <div th:if="${notification}">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th width="200">ID</th>
+                                            <td th:text="${notification.id}">1</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Recipient Email</th>
+                                            <td th:text="${notification.recipientEmail}">email@example.com</td>
+                                        </tr>
+                                        <tr th:if="${notification.recipientPhone != null}">
+                                            <th>Recipient Phone</th>
+                                            <td th:text="${notification.recipientPhone}">+260...</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Notification Type</th>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${notification.notificationType == T(org.commons.enums.NotificationType).EMAIL ? 'bg-primary' : 'bg-info'}"
+                                                      th:text="${notification.notificationType}">EMAIL</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Status</th>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${notification.status == T(org.commons.enums.NotificationStatus).SENT ? 'bg-success' : 
+                                                                       (notification.status == T(org.commons.enums.NotificationStatus).FAILED ? 'bg-danger' : 
+                                                                        (notification.status == T(org.commons.enums.NotificationStatus).PENDING ? 'bg-warning' : 'bg-secondary'))}"
+                                                      th:text="${notification.status}">PENDING</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <td th:text="${notification.subject ?: 'N/A'}">Subject</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Content</th>
+                                            <td>
+                                                <div class="border p-3" style="max-height: 300px; overflow-y: auto;">
+                                                    <div th:utext="${notification.content}">Content</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Source Module</th>
+                                            <td>
+                                                <span class="badge bg-secondary" th:text="${notification.sourceModule}">MODULE</span>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${notification.entityType != null}">
+                                            <th>Entity Type</th>
+                                            <td th:text="${notification.entityType}">ENTITY</td>
+                                        </tr>
+                                        <tr th:if="${notification.entityReference != null}">
+                                            <th>Entity Reference</th>
+                                            <td th:text="${notification.entityReference}">REF</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Priority</th>
+                                            <td th:text="${notification.priority}">5</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Attempt Count</th>
+                                            <td th:text="${notification.attemptCount}">0</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Max Attempts</th>
+                                            <td th:text="${notification.maxAttempts}">3</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Created At</th>
+                                            <td th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00</td>
+                                        </tr>
+                                        <tr th:if="${notification.sentAt != null}">
+                                            <th>Sent At</th>
+                                            <td th:text="${#temporals.format(notification.sentAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00</td>
+                                        </tr>
+                                        <tr th:if="${notification.failedAt != null}">
+                                            <th>Failed At</th>
+                                            <td th:text="${#temporals.format(notification.failedAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00</td>
+                                        </tr>
+                                        <tr th:if="${notification.errorMessage != null}">
+                                            <th>Error Message</th>
+                                            <td>
+                                                <div class="alert alert-danger" th:text="${notification.errorMessage}">Error message</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<footer th:replace="fragments/fragments :: js_code"></footer>
+
+</body>
+</html>
+

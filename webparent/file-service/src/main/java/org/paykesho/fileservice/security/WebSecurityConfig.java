@@ -1,12 +1,16 @@
 package org.paykesho.fileservice.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Security configuration for File Service
@@ -28,6 +32,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // Disable CSRF for REST API endpoints
             .csrf(csrf -> csrf.disable())
             
+            // Configure CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
             // Configure authorization
             .authorizeRequests(authz -> authz
                 // Allow public access to file operations
@@ -45,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             
-            // Security headers
+            // Security headers - relaxed for file serving
             .headers(headers -> headers
                 .frameOptions().deny()
                 .contentTypeOptions().and()
@@ -54,8 +61,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .maxAgeInSeconds(31536000)
                     .includeSubDomains(true)
                 )
-                .contentSecurityPolicy("default-src 'self'")
+                // Relax CSP to allow file access from external domains
+                .contentSecurityPolicy("default-src 'self' 'unsafe-inline' data: blob: https:")
             );
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/uploads/**", configuration);
+        return source;
     }
 }
 

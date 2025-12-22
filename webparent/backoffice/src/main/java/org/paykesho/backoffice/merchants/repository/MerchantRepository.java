@@ -63,4 +63,11 @@ public interface MerchantRepository extends SearchRepository<Merchant, Integer> 
     @Query("SELECT COUNT(m) > 0 FROM Merchant m WHERE m.uuid = ?1")
     boolean existsByUuid(String uuid);
 
+    /**
+     * Find merchants that have null UUIDs
+     * @return List of merchants with null UUIDs
+     */
+    @Query("SELECT m FROM Merchant m WHERE m.uuid IS NULL")
+    List<Merchant> findByUuidIsNull();
+
 }

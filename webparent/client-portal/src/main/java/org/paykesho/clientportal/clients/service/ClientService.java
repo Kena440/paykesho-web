@@ -14,6 +14,7 @@ import org.paykesho.clientportal.clients.repository.ClientBalanceRepository;
 import org.paykesho.clientportal.clients.repository.ClientRepository;
 import org.paykesho.clientportal.clients.repository.EmployeeRecordRepository;
 import org.paykesho.clientportal.config.Utility;
+import org.paykesho.clientportal.notification.general.NotificationClient;
 import org.paykesho.clientportal.settings.repository.CountryRepository;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,8 @@ public class ClientService {
     private PaykeshoReferenceService paykeshoReferenceService;
     @Autowired
     private ClientBalanceRepository clientBalanceRepository;
+    @Autowired
+    private NotificationClient notificationClient;
 
     public List<Country> countryList() {
         try {
@@ -96,9 +99,46 @@ public class ClientService {
             Client savedClient = clientRepository.save(client);
             createClientBalance(savedClient);
             log.debug("Successfully registered client with ID: {}", savedClient.getId());
+            
+            // Send registration notifications
+            sendRegistrationNotifications(savedClient);
         } catch (Exception ex) {
             log.error("Error registering client with email {}: {}", client.getEmail(), ex.getMessage(), ex);
             throw new RuntimeException("Failed to register client", ex);
+        }
+    }
+
+    private void sendRegistrationNotifications(Client client) {
+        try {
+            String clientName = client.getName() != null ? client.getName() : "User";
+            String emailMessage = String.format(
+                "<p>Welcome to Paykesho, %s!</p>" +
+                "<p>Your account has been successfully registered.</p>" +
+                "<p>Email: %s</p>" +
+                "<p>Please check your email for verification instructions.</p>" +
+                "<br><p>Get lelo, Pay Kesho!</p>",
+                clientName, client.getEmail()
+            );
+            
+            String smsMessage = String.format(
+                "Welcome to Paykesho, %s! Your account has been successfully registered. Email: %s. Please check your email for verification instructions.",
+                clientName, client.getEmail()
+            );
+            
+            // Send email notification
+            if (client.getEmail() != null && !client.getEmail().isEmpty()) {
+                notificationClient.sendNotification(client.getEmail(), emailMessage, "email");
+                log.info("Registration email notification sent to: {}", client.getEmail());
+            }
+            
+            // Send SMS notification
+            if (client.getPhoneNumber() != null && !client.getPhoneNumber().isEmpty()) {
+                notificationClient.sendNotification(client.getPhoneNumber(), smsMessage, "sms");
+                log.info("Registration SMS notification sent to: {}", client.getPhoneNumber());
+            }
+        } catch (Exception e) {
+            log.error("Failed to send registration notifications for client {}: {}", client.getEmail(), e.getMessage(), e);
+            // Don't throw exception - registration should succeed even if notifications fail
         }
     }
 

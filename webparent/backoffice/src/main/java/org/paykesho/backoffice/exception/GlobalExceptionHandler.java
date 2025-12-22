@@ -44,10 +44,8 @@ public class GlobalExceptionHandler {
         // Ensure proper Content-Type header
         response.setContentType("text/html; charset=UTF-8");
         
-        ModelAndView modelAndView = new ModelAndView("error/business-error");
-        modelAndView.addObject("errorMessage", ex.getMessage());
-        modelAndView.addObject("errorCode", "BUSINESS_ERROR");
-        modelAndView.addObject("timestamp", LocalDateTime.now());
+        ModelAndView modelAndView = new ModelAndView("error/500");
+        addCommonAttributes(modelAndView, "500", "Application Error", ex.getMessage());
         modelAndView.addObject("path", request.getRequestURI());
 
         return modelAndView;
@@ -88,12 +86,22 @@ public class GlobalExceptionHandler {
      * Handle general exceptions (non-AJAX)
      */
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex, HttpServletRequest request) {
-        log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+        log.error("Unexpected error occurred at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
-        ModelAndView modelAndView = new ModelAndView("error/500");
-        modelAndView.addObject("errorMessage", "An unexpected error occurred. Please try again later.");
-        modelAndView.addObject("errorCode", "INTERNAL_ERROR");
-        modelAndView.addObject("timestamp", LocalDateTime.now());
+        // Check if it's a regular web request (not AJAX)
+        String accept = request.getHeader("Accept");
+        if (accept != null && !accept.contains("application/json")) {
+            ModelAndView modelAndView = new ModelAndView("error/500");
+            addCommonAttributes(modelAndView, "500", "Internal Server Error", 
+                "Something went wrong on our end. Our team has been notified and is working to fix the issue. Please try again later.");
+            
+            if (log.isDebugEnabled()) {
+                modelAndView.addObject("details", ex.getMessage());
+            }
+            
+            // Return null to indicate we're handling it with ModelAndView
+            // This will be handled by Spring's view resolver
+        }
 
         // Return JSON for programmatic handling
         Map<String, Object> errorResponse = createErrorResponse(
@@ -104,6 +112,18 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.internalServerError().body(errorResponse);
+    }
+    
+    /**
+     * Helper method to add common error attributes
+     */
+    private void addCommonAttributes(ModelAndView modelAndView, String errorCode, String title, String message) {
+        modelAndView.addObject("errorCode", errorCode);
+        modelAndView.addObject("title", title);
+        modelAndView.addObject("errorMessage", message);
+        modelAndView.addObject("homeUrl", "/");
+        modelAndView.addObject("homeButtonText", "Go to Dashboard");
+        modelAndView.addObject("timestamp", LocalDateTime.now());
     }
 
     /**
@@ -128,9 +148,8 @@ public class GlobalExceptionHandler {
         log.warn("Access denied for user {} at {}: {}", request.getRemoteUser(), request.getRequestURI(), ex.getMessage());
 
         ModelAndView modelAndView = new ModelAndView("error/403");
-        modelAndView.addObject("errorMessage", "You don't have permission to access this resource.");
-        modelAndView.addObject("errorCode", "ACCESS_DENIED");
-        modelAndView.addObject("timestamp", LocalDateTime.now());
+        addCommonAttributes(modelAndView, "403", "Access Denied", 
+            "You don't have permission to access this resource. If you believe this is an error, please contact your administrator.");
 
         return modelAndView;
     }
@@ -200,10 +219,8 @@ public class GlobalExceptionHandler {
         // Extract meaningful error message from the exception
         String errorMessage = extractConstraintViolationMessage(ex.getMessage());
         
-        ModelAndView modelAndView = new ModelAndView("error/business-error");
-        modelAndView.addObject("errorMessage", errorMessage);
-        modelAndView.addObject("errorCode", "DATA_INTEGRITY_VIOLATION");
-        modelAndView.addObject("timestamp", LocalDateTime.now());
+        ModelAndView modelAndView = new ModelAndView("error/400");
+        addCommonAttributes(modelAndView, "400", "Data Validation Error", errorMessage);
         modelAndView.addObject("path", request.getRequestURI());
 
         return modelAndView;

@@ -1,4 +1,4 @@
-FROM openjdk:15-slim
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copy the JAR file

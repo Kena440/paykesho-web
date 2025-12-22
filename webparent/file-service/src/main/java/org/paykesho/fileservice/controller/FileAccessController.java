@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @RestController
@@ -39,15 +41,37 @@ public class FileAccessController {
             Optional<FileUpload> fileUploadOpt = fileStorageService.getFileMetadata(request.getFile_id());
             
             if (fileUploadOpt.isEmpty()) {
-                log.warn("File not found: {}", request.getFile_id());
+                log.warn("File not found in database: file_id={}", request.getFile_id());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(FileAccessResponse.error("File not found"));
             }
             
             FileUpload fileUpload = fileUploadOpt.get();
             
+            // Validate file metadata before generating URL
+            if (fileUpload.getFilePath() == null || fileUpload.getFilePath().trim().isEmpty()) {
+                log.error("File has invalid file path for ID: {}", fileUpload.getId());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(FileAccessResponse.error("File metadata is corrupted"));
+            }
+            
+            // Check if the file actually exists on disk before allowing access
+            if (!Files.exists(Paths.get(fileUpload.getFilePath()))) {
+                log.error("File exists in database but not on disk: ID={}, path={}", 
+                         fileUpload.getId(), fileUpload.getFilePath());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(FileAccessResponse.error("File not found on disk"));
+            }
+            
             // Generate file URL
-            String fileUrl = fileStorageService.generateFileUrl(fileUpload);
+            String fileUrl;
+            try {
+                fileUrl = fileStorageService.generateFileUrl(fileUpload);
+            } catch (Exception e) {
+                log.error("Failed to generate file URL for ID: {}, error: {}", fileUpload.getId(), e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(FileAccessResponse.error("Failed to generate file URL: " + e.getMessage()));
+            }
             
             // Return response
             FileAccessResponse response = FileAccessResponse.success(

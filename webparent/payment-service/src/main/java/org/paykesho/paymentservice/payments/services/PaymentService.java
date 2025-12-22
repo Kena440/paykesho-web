@@ -26,14 +26,14 @@ import org.paykesho.paymentservice.idempotency.service.IdempotencyService;
 import org.commons.entity.IdempotencyRecord;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 import java.util.Optional;
+import java.time.Duration;
 
 
 @RequiredArgsConstructor
@@ -44,30 +44,31 @@ public class PaymentService {
     private final PaymentConfigProperties paymentConfig;
     private final PaymentRepository paymentRepository;
     private final IdempotencyService idempotencyService;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final WebClient webClient;
+    private final ObjectMapper objectMapper;
 
     public BankPaymentResponse runWalletToBankPayment(BankPaymentRequest bankPaymentRequest) {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
             bankPaymentRequest.setReferenceNo(UUID.randomUUID().toString());
             BankPaymentDTO bankPaymentDTO = new BankPaymentDTO(paymentConfig, bankPaymentRequest);
 
             String requestBody = objectMapper.writeValueAsString(bankPaymentDTO);
-            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<BankPaymentResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, BankPaymentResponse.class);
+            BankPaymentResponse bankPaymentResponse = webClient.post()
+                    .uri(paymentConfig.getUrl())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(BankPaymentResponse.class)
+                    .block(Duration.ofSeconds(30));
 
-            BankPaymentResponse bankPaymentResponse = responseEntity.getBody();
             handlePaymentResponse(bankPaymentResponse);
             return bankPaymentResponse;
 
         } catch (JsonProcessingException e) {
             log.error("JSON serialization error for wallet-to-bank payment: {}", e.getMessage());
             throw new RuntimeException("Payment request formatting failed", e);
-        } catch (RestClientException e) {
+        } catch (WebClientResponseException e) {
             log.error("Network error during wallet-to-bank payment: {}", e.getMessage());
             throw new RuntimeException("Payment gateway communication failed", e);
         } catch (Exception e) {
@@ -78,26 +79,27 @@ public class PaymentService {
 
     public MoMoPaymentToMerchantResponse runMoMoPaymentToMerchant(MoMoPaymentToMerchantRequest moMoPaymentToMerchantRequest) {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
             moMoPaymentToMerchantRequest.setReferenceNo(UUID.randomUUID().toString());
             MoMoPaymentToMerchantDTO moMoPaymentToMerchantDTO = new MoMoPaymentToMerchantDTO(paymentConfig, moMoPaymentToMerchantRequest);
             BigDecimal amount = new BigDecimal(moMoPaymentToMerchantRequest.getAmount());
 
             String requestBody = objectMapper.writeValueAsString(moMoPaymentToMerchantDTO);
-            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<MoMoPaymentToMerchantResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, MoMoPaymentToMerchantResponse.class);
+            MoMoPaymentToMerchantResponse moMoPaymentToMerchantResponse = webClient.post()
+                    .uri(paymentConfig.getUrl())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(MoMoPaymentToMerchantResponse.class)
+                    .block(Duration.ofSeconds(30));
 
-            MoMoPaymentToMerchantResponse moMoPaymentToMerchantResponse = responseEntity.getBody();
             handleMoMoPaymentToMerchantResponse(moMoPaymentToMerchantResponse, amount);
             return moMoPaymentToMerchantResponse;
 
         } catch (JsonProcessingException e) {
             log.error("JSON serialization error for MoMo merchant payment: {}", e.getMessage());
             throw new RuntimeException("Payment request formatting failed", e);
-        } catch (RestClientException e) {
+        } catch (WebClientResponseException e) {
             log.error("Network error during MoMo merchant payment: {}", e.getMessage());
             throw new RuntimeException("Payment gateway communication failed", e);
         } catch (NumberFormatException e) {
@@ -111,26 +113,27 @@ public class PaymentService {
 
     public MoMoPaymentToPaykeshoResponse runMoMoPaymentToPaykesho(MoMoPaymentToPaykeshoRequest moMoPaymentToPaykeshoRequest) {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
             moMoPaymentToPaykeshoRequest.setReferenceNo(UUID.randomUUID().toString());
             MoMoPaymentToPaykeshoDTO moMoPaymentToPaykeshoDTO = new MoMoPaymentToPaykeshoDTO(paymentConfig, moMoPaymentToPaykeshoRequest);
             BigDecimal amount = new BigDecimal(moMoPaymentToPaykeshoRequest.getAmount());
 
             String requestBody = objectMapper.writeValueAsString(moMoPaymentToPaykeshoDTO);
-            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<MoMoPaymentToPaykeshoResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, MoMoPaymentToPaykeshoResponse.class);
+            MoMoPaymentToPaykeshoResponse moMoPaymentToPaykeshoResponse = webClient.post()
+                    .uri(paymentConfig.getUrl())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(MoMoPaymentToPaykeshoResponse.class)
+                    .block(Duration.ofSeconds(30));
 
-            MoMoPaymentToPaykeshoResponse moMoPaymentToPaykeshoResponse = responseEntity.getBody();
             handleMoMoPaymentToPaykeshoResponse(moMoPaymentToPaykeshoResponse, amount);
             return moMoPaymentToPaykeshoResponse;
 
         } catch (JsonProcessingException e) {
             log.error("JSON serialization error for MoMo to Paykesho payment: {}", e.getMessage());
             throw new RuntimeException("Payment request formatting failed", e);
-        } catch (RestClientException e) {
+        } catch (WebClientResponseException e) {
             log.error("Network error during MoMo to Paykesho payment: {}", e.getMessage());
             throw new RuntimeException("Payment gateway communication failed", e);
         } catch (NumberFormatException e) {
@@ -144,23 +147,23 @@ public class PaymentService {
 
     public CardPaymentInitialResponse runCardPayment(CardPaymentRequest cardPaymentRequest) {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
             cardPaymentRequest.setReferenceNo(UUID.randomUUID().toString());
             CardPaymentDTO cardPaymentDTO = new CardPaymentDTO(paymentConfig, cardPaymentRequest);
 
             String requestBody = objectMapper.writeValueAsString(cardPaymentDTO);
-            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<CardPaymentInitialResponse> responseEntity = restTemplate.exchange(paymentConfig.getUrl(), HttpMethod.POST, request, CardPaymentInitialResponse.class);
-
-            return responseEntity.getBody();
+            return webClient.post()
+                    .uri(paymentConfig.getUrl())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(CardPaymentInitialResponse.class)
+                    .block(Duration.ofSeconds(30));
 
         } catch (JsonProcessingException e) {
             log.error("JSON serialization error for card payment: {}", e.getMessage());
             throw new RuntimeException("Payment request formatting failed", e);
-        } catch (RestClientException e) {
+        } catch (WebClientResponseException e) {
             log.error("Network error during card payment: {}", e.getMessage());
             throw new RuntimeException("Payment gateway communication failed", e);
         } catch (NumberFormatException e) {
