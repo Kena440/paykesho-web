@@ -46,7 +46,7 @@ public class VoucherService {
             log.debug("Found {} vouchers, enriching with file access details", vouchers.size());
 
             for (Voucher voucher : vouchers) {
-                if (voucher.getPayslip() != null) {
+                if (voucher.getPayslip() != null && voucher.getRemoteFileId() != null) {
                     try {
                         FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(voucher.getRemoteFileId());
                         if (fileAccessResponse != null) {
@@ -161,7 +161,7 @@ public class VoucherService {
     }
 
     private void processPayslipPath(Voucher voucher) {
-        if (voucher != null && voucher.getPayslip() != null) {
+        if (voucher != null && voucher.getPayslip() != null && voucher.getRemoteFileId() != null) {
             try {
                 FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(voucher.getRemoteFileId());
                 if (fileAccessResponse != null) {

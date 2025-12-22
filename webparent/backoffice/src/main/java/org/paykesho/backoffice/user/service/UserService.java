@@ -45,7 +45,7 @@ public class UserService {
         List<User> users = (List<User>) userRepository.findAll(Sort.by("firstName").ascending());
 
         for (User user : users) {
-            if (user.getPhotoPath() != null) {
+            if (user.getPhotoPath() != null && user.getRemoteFileId() != null) {
 
                 FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(user.getRemoteFileId());
                 if (fileAccessResponse != null) {
@@ -198,7 +198,7 @@ public class UserService {
             User user = userRepository.findById(id).get();
             
             // Process photoPath the same way as in listAll()
-            if (user.getPhotoPath() != null) {
+            if (user.getPhotoPath() != null && user.getRemoteFileId() != null) {
                 FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(user.getRemoteFileId());
                 if (fileAccessResponse != null) {
                     user.setPhotoPath(fileAccessResponse.getFileUrl());
@@ -305,7 +305,7 @@ public class UserService {
      * @param user The user entity
      */
     private void processPhotoPath(User user) {
-        if (user != null && user.getPhotoPath() != null) {
+        if (user != null && user.getPhotoPath() != null && user.getRemoteFileId() != null) {
             FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(user.getRemoteFileId());
             if (fileAccessResponse != null) {
                 user.setPhotoPath(fileAccessResponse.getFileUrl());

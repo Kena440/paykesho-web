@@ -149,9 +149,11 @@ public class OrganizationController {
             employeeRecords = organizationService.listEmployeeRecordsAll(organization.getId());
             clientRecordsSize = organizationService.listClientRecordsAll(organization.getId());
 
-            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
-            if (fileAccessResponse != null) {
-                organization.setPhotoPath(fileAccessResponse.getFileUrl());
+            if (organization.getRemoteFileId() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    organization.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
             }
             loadCurrencySetting(request);
             model.addAttribute("organization", organization);

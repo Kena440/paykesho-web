@@ -208,9 +208,11 @@ public class MerchantController {
             MerchantAdmin merchantAdmin = merchant.getContactPerson();
             if (merchantAdmin == null) merchantAdmin = new MerchantAdmin();
 
-            FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
-            if (fileAccessResponse != null) {
-                merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+            if (merchant.getRemoteFileId() != null) {
+                FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(merchant.getRemoteFileId());
+                if (fileAccessResponse != null) {
+                    merchant.setPhotoPath(fileAccessResponse.getFileUrl());
+                }
             }
 
             loadCurrencySetting(request);
