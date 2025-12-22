@@ -51,7 +51,7 @@ public class OrganizationService {
         List<Organization> organizations = (List<Organization>) organizationRepository.findAll(Sort.by("name").ascending());
 
         for (Organization organization : organizations) {
-            if (organization.getPhotoPath() != null) {
+            if (organization.getPhotoPath() != null && organization.getRemoteFileId() != null) {
                 FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
                 if (fileAccessResponse != null) {
                     organization.setPhotoPath(fileAccessResponse.getFileUrl());
@@ -124,7 +124,7 @@ public class OrganizationService {
             Organization organization = organizationRepository.findById(id).get();
             
             // Process photoPath the same way as in listAll()
-            if (organization.getPhotoPath() != null) {
+            if (organization.getPhotoPath() != null && organization.getRemoteFileId() != null) {
                 FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
                 if (fileAccessResponse != null) {
                     organization.setPhotoPath(fileAccessResponse.getFileUrl());
@@ -230,7 +230,7 @@ public class OrganizationService {
      * @param organization The organization entity
      */
     private void processPhotoPath(Organization organization) {
-        if (organization != null && organization.getPhotoPath() != null) {
+        if (organization != null && organization.getPhotoPath() != null && organization.getRemoteFileId() != null) {
             FileAccessResponse fileAccessResponse = fileUploadService.getFileAccessDetails(organization.getRemoteFileId());
             if (fileAccessResponse != null) {
                 organization.setPhotoPath(fileAccessResponse.getFileUrl());

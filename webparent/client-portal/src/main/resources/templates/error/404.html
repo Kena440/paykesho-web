@@ -258,8 +258,8 @@
         <div class="error-icon">🔍</div>
         <div class="error-code" th:text="${errorCode ?: '404'}">404</div>
         <h1 class="error-title" th:text="${title ?: 'Page Not Found'}">Page Not Found</h1>
-        <p class="error-message" th:text="${errorMessage ?: 'Oops! The page you\'re looking for doesn\'t exist. It might have been moved, deleted, or the URL might be incorrect.'}">
-            Oops! The page you're looking for doesn't exist. It might have been moved, deleted, or the URL might be incorrect.
+        <p class="error-message" th:text="${errorMessage ?: 'Oops! The page you are looking for does not exist. It might have been moved, deleted, or the URL might be incorrect.'}">
+            Oops! The page you are looking for does not exist. It might have been moved, deleted, or the URL might be incorrect.
         </p>
         
         <div class="error-details" th:if="${details != null and !details.isEmpty()}">
