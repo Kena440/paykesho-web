@@ -96,7 +96,7 @@ export class FileService extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "file-service"];
-  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", FILE_STORAGE_UPLOAD_DIR: "/app/uploads" };
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", FILE_STORAGE_UPLOAD_DIR: "/app/uploads", FILE_PUBLIC_BASE_URL: env.FILE_PUBLIC_BASE_URL ?? "" };
 }
 
 function route(prefix: string, binding: keyof Env, name: string, request: Request, env: Env) {
