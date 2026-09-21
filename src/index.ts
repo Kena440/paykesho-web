@@ -1,4 +1,5 @@
 import { Container, ContainerProxy, getContainer } from "@cloudflare/containers";
+import { env } from "cloudflare:workers";
 
 export interface Env {
   PAYKESHO_CLIENT: DurableObjectNamespace<ClientPortal>;
@@ -8,6 +9,22 @@ export interface Env {
   PAYKESHO_PAYMENT: DurableObjectNamespace<PaymentService>;
   PAYKESHO_NOTIFICATION: DurableObjectNamespace<NotificationService>;
   PAYKESHO_FILE: DurableObjectNamespace<FileService>;
+  SUPABASE_DB_URL: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  FACEBOOK_CLIENT_ID?: string;
+  FACEBOOK_CLIENT_SECRET?: string;
+  ZYNLEPAY_MERCHANT_ID?: string;
+  ZYNLEPAY_API_ID?: string;
+  ZYNLEPAY_API_KEY?: string;
+  ZYNLEPAY_URL?: string;
+  SMTP_HOST?: string;
+  SMTP_PORT?: string;
+  SMTP_USERNAME?: string;
+  SMTP_PASSWORD?: string;
+  NOTIFICATION_PASSWORD?: string;
+  NOTIFICATION_USERNAME?: string;
+  RATE_LIMITING_ENABLED?: string;
 }
 
 function proxy(binding: keyof Env, name: string) {
@@ -19,6 +36,7 @@ export class ClientPortal extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "client-portal"];
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID ?? "", GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET ?? "", FACEBOOK_CLIENT_ID: env.FACEBOOK_CLIENT_ID ?? "", FACEBOOK_CLIENT_SECRET: env.FACEBOOK_CLIENT_SECRET ?? "", RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", NOTIFICATION_SERVICE_URL: "http://notification.internal", FILE_SERVICE_URL: "http://file.internal" };
   static outboundByHost = {
     "notification.internal": proxy("PAYKESHO_NOTIFICATION", "notification"),
     "file.internal": proxy("PAYKESHO_FILE", "file"),
@@ -29,6 +47,7 @@ export class MerchantPortal extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "merchant-portal"];
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID ?? "", GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET ?? "", FACEBOOK_CLIENT_ID: env.FACEBOOK_CLIENT_ID ?? "", FACEBOOK_CLIENT_SECRET: env.FACEBOOK_CLIENT_SECRET ?? "", RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", NOTIFICATION_SERVICE_URL: "http://notification.internal", FILE_SERVICE_URL: "http://file.internal" };
   static outboundByHost = {
     "notification.internal": proxy("PAYKESHO_NOTIFICATION", "notification"),
     "file.internal": proxy("PAYKESHO_FILE", "file"),
@@ -39,6 +58,7 @@ export class OrganizationPortal extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "organization-portal"];
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", NOTIFICATION_SERVICE_URL: "http://notification.internal" };
   static outboundByHost = {
     "notification.internal": proxy("PAYKESHO_NOTIFICATION", "notification"),
   };
@@ -48,6 +68,7 @@ export class Backoffice extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "backoffice"];
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", NOTIFICATION_SERVICE_URL: "http://notification.internal", FILE_SERVICE_URL: "http://file.internal" };
   static outboundByHost = {
     "notification.internal": proxy("PAYKESHO_NOTIFICATION", "notification"),
     "file.internal": proxy("PAYKESHO_FILE", "file"),
@@ -58,6 +79,7 @@ export class PaymentService extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "payment-service"];
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, ZYNLEPAY_MERCHANT_ID: env.ZYNLEPAY_MERCHANT_ID ?? "", ZYNLEPAY_API_ID: env.ZYNLEPAY_API_ID ?? "", ZYNLEPAY_API_KEY: env.ZYNLEPAY_API_KEY ?? "", ZYNLEPAY_URL: env.ZYNLEPAY_URL ?? "https://sandbox.zynlepay.com/zynlepay/jsonapi", RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", NOTIFICATION_SERVICE_URL: "http://notification.internal" };
   static outboundByHost = {
     "notification.internal": proxy("PAYKESHO_NOTIFICATION", "notification"),
   };
@@ -67,12 +89,14 @@ export class NotificationService extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "notification-service"];
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, SMTP_HOST: env.SMTP_HOST ?? "smtp.gmail.com", SMTP_PORT: env.SMTP_PORT ?? "587", SMTP_USERNAME: env.SMTP_USERNAME ?? "", SMTP_PASSWORD: env.SMTP_PASSWORD ?? "", NOTIFICATION_PASSWORD: env.NOTIFICATION_PASSWORD ?? "", NOTIFICATION_USERNAME: env.NOTIFICATION_USERNAME ?? "Paykesho", RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true" };
 }
 
 export class FileService extends Container {
   defaultPort = 8080;
   sleepAfter = "30m";
   entrypoint = ["/app/run-service.sh", "file-service"];
+  envVars = { SUPABASE_DB_URL: env.SUPABASE_DB_URL, RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED ?? "true", FILE_STORAGE_UPLOAD_DIR: "/app/uploads" };
 }
 
 function route(prefix: string, binding: keyof Env, name: string, request: Request, env: Env) {
