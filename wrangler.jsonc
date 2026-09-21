@@ -5,6 +5,7 @@
   "compatibility_date": "2026-09-20",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  "secrets": { "required": ["SUPABASE_DB_URL", "ZYNLEPAY_MERCHANT_ID", "ZYNLEPAY_API_ID", "ZYNLEPAY_API_KEY", "SMTP_USERNAME", "SMTP_PASSWORD", "NOTIFICATION_PASSWORD"] },
   "containers": [
     { "class_name": "ClientPortal", "name": "paykesho-client", "image": "./Dockerfile.cloudflare", "image_build_context": ".", "instance_type": "basic", "max_instances": 1 },
     { "class_name": "MerchantPortal", "name": "paykesho-merchant", "image": "./Dockerfile.cloudflare", "image_build_context": ".", "instance_type": "basic", "max_instances": 1 },
