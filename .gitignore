@@ -35,3 +35,8 @@ deploy/
 
 # JAR files
 *.jar
+
+# Local environment files
+.env
+.env.*
+!.env.example
