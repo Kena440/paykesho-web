@@ -1,101 +1,74 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - paykesho-network
-
   backoffice:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      RATE_LIMITING_ENABLED: ${RATE_LIMITING_ENABLED:-false}
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql
     networks:
       - paykesho-network
 
   client-portal:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      RATE_LIMITING_ENABLED: ${RATE_LIMITING_ENABLED:-false}
     ports:
       - "8081:8080"
-    depends_on:
-      - mysql
     networks:
       - paykesho-network
 
   merchant-portal:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      RATE_LIMITING_ENABLED: ${RATE_LIMITING_ENABLED:-false}
     ports:
       - "8082:8080"
-    depends_on:
-      - mysql
     networks:
       - paykesho-network
 
   payment-service:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      ZYNLEPAY_MERCHANT_ID: ${ZYNLEPAY_MERCHANT_ID}
+      ZYNLEPAY_API_ID: ${ZYNLEPAY_API_ID}
+      ZYNLEPAY_API_KEY: ${ZYNLEPAY_API_KEY}
+      ZYNLEPAY_URL: ${ZYNLEPAY_URL:-https://sandbox.zynlepay.com/zynlepay/jsonapi}
     ports:
       - "8083:8080"
-    depends_on:
-      - mysql
     networks:
       - paykesho-network
 
   notification-service:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      NOTIFICATION_PASSWORD: ${NOTIFICATION_PASSWORD}
+      NOTIFICATION_USERNAME: ${NOTIFICATION_USERNAME:-Paykesho}
     ports:
       - "8084:8080"
-    depends_on:
-      - mysql
     networks:
       - paykesho-network
 
   file-service:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      FILE_STORAGE_PATH: ${FILE_STORAGE_PATH:-/app/uploads}
     ports:
       - "8085:8080"
-    depends_on:
-      - mysql
     networks:
       - paykesho-network
 
 networks:
   paykesho-network:
     driver: bridge
-
-volumes:
-  mysql_data: 
