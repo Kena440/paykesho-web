@@ -25,6 +25,7 @@ export interface Env {
   NOTIFICATION_PASSWORD?: string;
   NOTIFICATION_USERNAME?: string;
   RATE_LIMITING_ENABLED?: string;
+  FILE_PUBLIC_BASE_URL?: string;
 }
 
 function proxy(binding: keyof Env, name: string) {
