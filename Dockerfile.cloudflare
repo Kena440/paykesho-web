@@ -7,10 +7,22 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends maven && \
     rm -rf /var/lib/apt/lists/*
 
+# Copy the complete Maven multi-module project before resolving dependencies.
+# The webparent POM declares all seven service modules, so their POMs must
+# exist when Maven evaluates the reactor.
 COPY pom.xml .
 COPY webparent/pom.xml webparent/
+COPY webparent/backoffice/pom.xml webparent/backoffice/
+COPY webparent/client-portal/pom.xml webparent/client-portal/
+COPY webparent/organization-portal/pom.xml webparent/organization-portal/
+COPY webparent/merchant-portal/pom.xml webparent/merchant-portal/
+COPY webparent/payment-service/pom.xml webparent/payment-service/
+COPY webparent/notification-service/pom.xml webparent/notification-service/
+COPY webparent/file-service/pom.xml webparent/file-service/
 COPY commons/pom.xml commons/
+
 RUN mvn dependency:go-offline -B
+
 COPY . .
 RUN mvn clean package -DskipTests
 
