@@ -1,4 +1,5 @@
 import { Container, getContainer } from "@cloudflare/containers";
+import { env } from "cloudflare:workers";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -10,7 +11,17 @@ export class PaykeshoWebContainer extends Container {
 
   envVars = {
     SPRING_PROFILES_ACTIVE: "cloudflare",
-    JAVA_OPTS: "-Xmx768m -Xms256m"
+    JAVA_OPTS: "-Xmx768m -Xms256m",
+    SPRING_DATASOURCE_URL: env.SPRING_DATASOURCE_URL,
+    SPRING_DATASOURCE_USERNAME: env.SPRING_DATASOURCE_USERNAME,
+    SPRING_DATASOURCE_PASSWORD: env.SPRING_DATASOURCE_PASSWORD,
+    GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET,
+    FACEBOOK_CLIENT_ID: env.FACEBOOK_CLIENT_ID,
+    FACEBOOK_CLIENT_SECRET: env.FACEBOOK_CLIENT_SECRET,
+    NOTIFICATION_SERVICE_URL: env.NOTIFICATION_SERVICE_URL || "http://localhost:8085",
+    FILE_SERVICE_URL: env.FILE_SERVICE_URL || "http://localhost:8086",
+    RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED || "true"
   };
 
   override onStart() {
