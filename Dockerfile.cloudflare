@@ -1,0 +1,32 @@
+# Cloudflare Containers requires linux/amd64.
+FROM eclipse-temurin:17-jdk-jammy AS build
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends maven \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pom.xml .
+COPY commons/pom.xml commons/
+COPY webparent/pom.xml webparent/
+
+RUN mvn -B -pl webparent/client-portal -am dependency:go-offline
+
+COPY commons/src commons/src
+COPY webparent/client-portal webparent/client-portal
+
+RUN mvn -B -pl webparent/client-portal -am clean package -DskipTests
+
+FROM eclipse-temurin:17-jre-jammy
+
+WORKDIR /app
+
+COPY --from=build /app/webparent/client-portal/target/*.jar /app/app.jar
+
+ENV JAVA_OPTS="-Xmx768m -Xms256m"
+ENV SPRING_PROFILES_ACTIVE="cloudflare"
+
+EXPOSE 8080
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
