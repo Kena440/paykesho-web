@@ -1,5 +1,5 @@
 # Cloudflare Containers requires linux/amd64.
-FROM eclipse-temurin:17-jdk-jammy AS build
+FROM --platform=linux/amd64 eclipse-temurin:17-jdk-jammy AS build
 
 WORKDIR /app
 
@@ -7,18 +7,15 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends maven \
     && rm -rf /var/lib/apt/lists/*
 
-COPY pom.xml .
-COPY commons/pom.xml commons/
-COPY webparent/pom.xml webparent/
+# Copy the complete Maven reactor before resolving dependencies.
+# The root/webparent POMs declare multiple child modules, so copying
+# only a subset of POM files causes Maven's reactor resolution to fail.
+COPY . .
 
-RUN mvn -B -pl webparent/client-portal -am dependency:go-offline
-
-COPY commons/src commons/src
-COPY webparent/client-portal webparent/client-portal
-
+# Build only the client portal and the modules it actually depends on.
 RUN mvn -B -pl webparent/client-portal -am clean package -DskipTests
 
-FROM eclipse-temurin:17-jre-jammy
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
