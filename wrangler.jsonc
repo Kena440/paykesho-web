@@ -29,9 +29,9 @@
   ],
   "secrets": {
     "required": [
-      "SPRING_DATASOURCE_URL",
-      "SPRING_DATASOURCE_USERNAME",
-      "SPRING_DATASOURCE_PASSWORD"
+      "PAYKESHO_DB_URL",
+      "PAYKESHO_DB_USERNAME",
+      "PAYKESHO_DB_PASSWORD"
     ]
   },
   "vars": {
