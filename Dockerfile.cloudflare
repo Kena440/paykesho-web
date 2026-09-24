@@ -1,19 +1,19 @@
 # Cloudflare Containers requires linux/amd64.
-# Use the official Maven image so the build does not depend on the
-# Linux distribution's Maven package version.
+# Use the official Maven image for a predictable Maven + JDK toolchain.
 FROM --platform=linux/amd64 maven:3.9.16-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
 # Copy the complete Maven reactor. The root/webparent POMs declare
-# multiple child modules, so all module POMs must be present when
-# Maven builds the selected reactor.
+# multiple child modules, so all module POMs must be present.
 COPY . .
 
-# Build only the client portal and its required reactor dependencies.
-# Tests are intentionally skipped for the production image build.
+# Build only the client portal and its reactor dependencies.
+# -DskipTests keeps test sources available so Maven can package the
+# commons test-jar required by client-portal, while skipping execution.
+# JaCoCo is unnecessary for the production image.
 RUN mvn -B -ntp -pl webparent/client-portal -am clean package \
-    -Dmaven.test.skip=true \
+    -DskipTests \
     -Djacoco.skip=true
 
 FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
