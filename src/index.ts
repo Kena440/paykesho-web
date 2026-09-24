@@ -46,6 +46,7 @@ export default {
     }
 
     const container = getContainer(env.PAYKESHO_WEB, "web");
+    await container.startAndWaitForPorts({ ports: 8080 });
     return container.fetch(request);
   }
 };
