@@ -27,3 +27,6 @@ jobs:
 
       - name: Build client portal
         run: mvn -B -ntp -pl webparent/client-portal -am clean package -DskipTests -Djacoco.skip=true
+
+      - name: Build Cloudflare container image
+        run: docker build --platform linux/amd64 -f Dockerfile.cloudflare -t paykesho-web:ci .
