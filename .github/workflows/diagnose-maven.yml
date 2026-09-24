@@ -26,4 +26,4 @@ jobs:
           mvn -version
 
       - name: Build client portal
-        run: mvn -B -ntp -pl webparent/client-portal -am clean package -Dmaven.test.skip=true -Djacoco.skip=true
+        run: mvn -B -ntp -pl webparent/client-portal -am clean package -DskipTests -Djacoco.skip=true
