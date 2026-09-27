@@ -40,12 +40,31 @@ export class PaykeshoWebContainer extends Container {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    const container = getContainer(env.PAYKESHO_WEB, "web");
 
     if (url.pathname === "/health" || url.pathname === "/api/health") {
-      return Response.json({ ok: true, service: "paykesho-web" });
+      try {
+        await container.startAndWaitForPorts({ ports: 8080 });
+        const healthUrl = new URL("/actuator/health", request.url);
+        const healthRequest = new Request(healthUrl, request);
+        const response = await container.fetch(healthRequest);
+
+        return new Response(response.body, {
+          status: response.status,
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store"
+          }
+        });
+      } catch (error) {
+        console.error("PayKesho health check failed", error);
+        return Response.json(
+          { ok: false, service: "paykesho-web", error: "container_unhealthy" },
+          { status: 503, headers: { "cache-control": "no-store" } }
+        );
+      }
     }
 
-    const container = getContainer(env.PAYKESHO_WEB, "web");
     await container.startAndWaitForPorts({ ports: 8080 });
     return container.fetch(request);
   }
