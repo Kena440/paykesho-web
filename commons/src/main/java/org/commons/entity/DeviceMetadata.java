@@ -21,7 +21,7 @@ import java.util.Objects;
 @Table(name = "device_meta_data")
 public class DeviceMetadata extends IdBasedEntity {
     @ManyToOne
-    @JoinColumn(name = "user")
+    @JoinColumn(name = "user_id")
     private User userId;
     private String deviceDetails;
     private String location;
