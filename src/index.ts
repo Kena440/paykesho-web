@@ -12,6 +12,8 @@ export interface Env {
 
 export class PaykeshoWebContainer extends Container {
   defaultPort = 8080;
+  // Spring Boot exposes a public health endpoint; use it for Container readiness.
+  pingEndpoint = "actuator/health";
   sleepAfter = "10m";
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
@@ -34,6 +36,10 @@ export class PaykeshoWebContainer extends Container {
 
   override onError(error: unknown) {
     console.error("PayKesho web container error", error);
+  }
+
+  override onStop(params: { exitCode?: number; reason: string }) {
+    console.error("PayKesho web container stopped", params);
   }
 }
 
