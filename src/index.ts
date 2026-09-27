@@ -12,8 +12,6 @@ export interface Env {
 
 export class PaykeshoWebContainer extends Container {
   defaultPort = 8080;
-  // Spring Boot exposes a public health endpoint; use it for Container readiness.
-  pingEndpoint = "actuator/health";
   sleepAfter = "10m";
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
@@ -48,25 +46,27 @@ export default {
     const url = new URL(request.url);
     const container = getContainer(env.PAYKESHO_WEB, "web");
 
-    // Explicitly start and wait for Spring Boot to bind 8080 before proxying.
-    // This avoids the transient "container is not running, consider calling start()"
-    // state returned by the Container supervisor during cold starts.
+    // Start the container explicitly, but do not make the Worker-side startup
+    // health probe depend on Spring Boot Actuator/DB readiness. The first
+    // container.fetch() will wait for the application port as part of the
+    // normal Container request lifecycle.
     try {
-      await container.startAndWaitForPorts({
-        ports: 8080,
-        cancellationOptions: {
-          portReadyTimeoutMS: 120000,
-          waitInterval: 1000
-        }
-      });
+      await container.start();
     } catch (error) {
-      console.error("PayKesho container startup failed", error);
+      console.error("PayKesho container start failed", error);
+      let state: unknown = null;
+      try {
+        state = await container.getState();
+      } catch (stateError) {
+        console.error("PayKesho container state lookup failed", stateError);
+      }
       return Response.json(
         {
           ok: false,
           service: "paykesho-web",
           error: "container_start_failed",
-          message: error instanceof Error ? error.message : String(error)
+          message: error instanceof Error ? error.message : String(error),
+          state
         },
         { status: 503, headers: { "cache-control": "no-store" } }
       );
