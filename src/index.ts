@@ -44,7 +44,13 @@ export default {
 
     if (url.pathname === "/health" || url.pathname === "/api/health") {
       try {
-        await container.startAndWaitForPorts({ ports: 8080 });
+        await container.startAndWaitForPorts({
+          ports: [8080],
+          cancellationOptions: {
+            instanceGetTimeoutMS: 15000,
+            portReadyTimeoutMS: 120000
+          }
+        });
         const healthUrl = new URL("/actuator/health", request.url);
         const healthRequest = new Request(healthUrl, request);
         const response = await container.fetch(healthRequest);
