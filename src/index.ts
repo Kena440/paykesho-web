@@ -65,7 +65,12 @@ export default {
       } catch (error) {
         console.error("PayKesho health check failed", error);
         return Response.json(
-          { ok: false, service: "paykesho-web", error: "container_unhealthy" },
+          {
+            ok: false,
+            service: "paykesho-web",
+            error: "container_unhealthy",
+            message: error instanceof Error ? error.message : String(error)
+          },
           { status: 503, headers: { "cache-control": "no-store" } }
         );
       }
