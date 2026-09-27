@@ -71,7 +71,29 @@ export default {
       }
     }
 
-    await container.startAndWaitForPorts({ ports: 8080 });
-    return container.fetch(request);
+    try {
+      await container.startAndWaitForPorts({
+        ports: [8080],
+        cancellationOptions: {
+          instanceGetTimeoutMS: 15000,
+          portReadyTimeoutMS: 120000
+        }
+      });
+      return container.fetch(request);
+    } catch (error) {
+      console.error("PayKesho container startup/request failed", error);
+      return Response.json(
+        {
+          ok: false,
+          service: "paykesho-web",
+          error: "container_startup_failed",
+          message: error instanceof Error ? error.message : String(error)
+        },
+        {
+          status: 503,
+          headers: { "cache-control": "no-store" }
+        }
+      );
+    }
   }
 };
