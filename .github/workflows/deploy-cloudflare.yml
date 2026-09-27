@@ -30,3 +30,20 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify container health
+        run: |
+          set +e
+          echo "Waiting for the PayKesho container to become ready..."
+          response=$(curl -sS --max-time 150 -w "\nHTTP_STATUS:%{http_code}" https://paykesho-web.amukenam1.workers.dev/health)
+          status=$?
+          echo "$response"
+          if [ $status -ne 0 ]; then
+            echo "Health request failed at the network level."
+            exit $status
+          fi
+          code=$(printf '%s\n' "$response" | sed -n 's/^HTTP_STATUS://p')
+          if [ "$code" != "200" ]; then
+            echo "PayKesho container health check failed with HTTP $code."
+            exit 1
+          fi
