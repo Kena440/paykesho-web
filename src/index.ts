@@ -44,15 +44,7 @@ export default {
 
     if (url.pathname === "/health" || url.pathname === "/api/health") {
       try {
-        await container.startAndWaitForPorts({
-          ports: [8080],
-          cancellationOptions: {
-            instanceGetTimeoutMS: 15000,
-            portReadyTimeoutMS: 120000
-          }
-        });
-        const healthUrl = new URL("/actuator/health", request.url);
-        const healthRequest = new Request(healthUrl, request);
+        const healthRequest = new Request(new URL("/actuator/health", request.url), request);
         const response = await container.fetch(healthRequest);
 
         return new Response(response.body, {
@@ -77,21 +69,14 @@ export default {
     }
 
     try {
-      await container.startAndWaitForPorts({
-        ports: [8080],
-        cancellationOptions: {
-          instanceGetTimeoutMS: 15000,
-          portReadyTimeoutMS: 120000
-        }
-      });
-      return container.fetch(request);
+      return await container.fetch(request);
     } catch (error) {
-      console.error("PayKesho container startup/request failed", error);
+      console.error("PayKesho container request failed", error);
       return Response.json(
         {
           ok: false,
           service: "paykesho-web",
-          error: "container_startup_failed",
+          error: "container_request_failed",
           message: error instanceof Error ? error.message : String(error)
         },
         {
