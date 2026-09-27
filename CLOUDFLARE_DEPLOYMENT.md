@@ -12,13 +12,11 @@ Cloudflare Containers requires the Worker Paid plan. The production deployment c
 
 Set these with Wrangler or in Cloudflare Workers > Settings > Variables and Secrets:
 
-- `SPRING_DATASOURCE_URL` - Supabase PostgreSQL connection string
-- `SPRING_DATASOURCE_USERNAME` - Supabase database username
-- `SPRING_DATASOURCE_PASSWORD` - Supabase database password
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `FACEBOOK_CLIENT_ID`
-- `FACEBOOK_CLIENT_SECRET`
+- `PAYKESHO_DB_URL` - Supabase PostgreSQL JDBC connection string (use Session pooler/direct connection, port 5432, with `sslmode=require`)
+- `PAYKESHO_DB_USERNAME` - Supabase database username
+- `PAYKESHO_DB_PASSWORD` - Supabase database password
+
+Google and Facebook OAuth remain disabled in the Cloudflare profile until configured.
 
 Do not commit these values.
 
@@ -39,7 +37,11 @@ Do not commit these values.
 
 ## Important database note
 
-The original PayKesho codebase was MySQL-based. This branch adds the PostgreSQL JDBC driver and a Cloudflare/Supabase Spring profile, but the application schema and SQL must still be verified against the target Supabase database before production traffic is enabled.
+The original PayKesho codebase was MySQL-based. This branch adds the PostgreSQL JDBC driver and a Cloudflare/Supabase Spring profile, but the Cloudflare profile now targets the Supabase PostgreSQL `app` schema. The `supabase/migrations/20260927140000_create_paykesho_app_schema.sql` migration creates that schema; Hibernate then creates/updates the mapped PayKesho tables on application startup.
+
+## Supabase connection
+
+Use the Supabase Session pooler on port `5432` for this persistent Spring/JPA container, or the direct connection when IPv6 is available. Do not use the transaction pooler on port `6543` for Hibernate/JPA.
 
 ## Production CI/CD
 
