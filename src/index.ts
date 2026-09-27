@@ -14,7 +14,7 @@ export class PaykeshoWebContainer extends Container {
   defaultPort = 8080;
   sleepAfter = "10m";
 
-  constructor(ctx: DurableObjectState, env: Env) {
+  constructor(ctx: DurableObjectState<{}>, env: Env) {
     super(ctx, env);
     this.envVars = {
       SPRING_PROFILES_ACTIVE: "cloudflare",
