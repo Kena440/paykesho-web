@@ -48,6 +48,30 @@ export default {
     const url = new URL(request.url);
     const container = getContainer(env.PAYKESHO_WEB, "web");
 
+    // Explicitly start and wait for Spring Boot to bind 8080 before proxying.
+    // This avoids the transient "container is not running, consider calling start()"
+    // state returned by the Container supervisor during cold starts.
+    try {
+      await container.startAndWaitForPorts({
+        ports: 8080,
+        cancellationOptions: {
+          portReadyTimeoutMS: 120000,
+          waitInterval: 1000
+        }
+      });
+    } catch (error) {
+      console.error("PayKesho container startup failed", error);
+      return Response.json(
+        {
+          ok: false,
+          service: "paykesho-web",
+          error: "container_start_failed",
+          message: error instanceof Error ? error.message : String(error)
+        },
+        { status: 503, headers: { "cache-control": "no-store" } }
+      );
+    }
+
     if (url.pathname === "/health" || url.pathname === "/api/health") {
       try {
         const healthRequest = new Request(new URL("/actuator/health", request.url), request);
