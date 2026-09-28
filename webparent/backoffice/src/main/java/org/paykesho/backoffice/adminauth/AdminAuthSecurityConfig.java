@@ -16,13 +16,13 @@ public class AdminAuthSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean public PasswordEncoder passwordEncoder(){return new BCryptPasswordEncoder();}
     @Override protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-            .antMatchers("/login","/assets/**","/images/**","/webjars/**","/actuator/health").permitAll()
+            .antMatchers("/login","/admin/login","/assets/**","/images/**","/webjars/**","/actuator/health").permitAll()
             .anyRequest().authenticated()
             .and().userDetailsService(userDetailsService)
-            .formLogin().loginPage("/login").loginProcessingUrl("/login")
+            .formLogin().loginPage("/admin/login").loginProcessingUrl("/login")
             .usernameParameter("email").defaultSuccessUrl("/",true)
-            .failureUrl("/login?error=true").permitAll()
-            .and().logout().logoutSuccessUrl("/login?logout=true").permitAll()
+            .failureUrl("/admin/login?error=true").permitAll()
+            .and().logout().logoutSuccessUrl("/admin/login?logout=true").permitAll()
             .and().rememberMe().key("paykesho-admin-remember-2026").tokenValiditySeconds(604800);
     }
 }
