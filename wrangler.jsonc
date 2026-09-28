@@ -31,7 +31,9 @@
     "required": [
       "PAYKESHO_DB_URL",
       "PAYKESHO_DB_USERNAME",
-      "PAYKESHO_DB_PASSWORD"
+      "PAYKESHO_DB_PASSWORD",
+      "PAYKESHO_ADMIN_EMAIL",
+      "PAYKESHO_ADMIN_PASSWORD"
     ]
   },
   "vars": {
