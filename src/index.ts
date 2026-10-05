@@ -51,6 +51,35 @@ export default {
     const url = new URL(request.url);
     const container = getContainer(env.PAYKESHO_WEB, "web");
 
+    // Explicitly start the named container before proxying requests. This
+    // repository uses the Durable Object deployment path, where the stub can
+    // otherwise report that the container is not running.
+    try {
+      await container.start({ enableInternet: true }, {
+        portToCheck: 8080,
+        retries: 100,
+        waitInterval: 500
+      });
+    } catch (error) {
+      console.error("PayKesho container start failed", error);
+      let state: unknown = null;
+      try {
+        state = await container.getState();
+      } catch (stateError) {
+        console.error("PayKesho container state lookup failed", stateError);
+      }
+      return Response.json(
+        {
+          ok: false,
+          service: "paykesho-web",
+          error: "container_start_failed",
+          message: error instanceof Error ? error.message : String(error),
+          state
+        },
+        { status: 503, headers: { "cache-control": "no-store" } }
+      );
+    }
+
     if (url.pathname === "/health" || url.pathname === "/api/health") {
       try {
         const healthRequest = new Request(new URL("/actuator/health", request.url), request);
