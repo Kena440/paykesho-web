@@ -53,11 +53,7 @@ export default {
     // Explicitly start the named container before proxying requests. The
     // Durable Object path should wait for the application port before routing.
     try {
-      await container.start({ enableInternet: true }, {
-        portToCheck: 8080,
-        retries: 100,
-        waitInterval: 500
-      });
+      await container.start();
     } catch (error) {
       console.error("PayKesho container start failed", error);
       let state: unknown = null;
