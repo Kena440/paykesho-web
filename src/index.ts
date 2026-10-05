@@ -21,7 +21,7 @@ export class PaykeshoWebContainer extends Container {
     super(ctx, env);
     this.envVars = {
       SPRING_PROFILES_ACTIVE: "cloudflare",
-      JAVA_OPTS: "-Xmx768m -Xms256m",
+      JAVA_OPTS: "-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m",
       PAYKESHO_DB_URL: env.PAYKESHO_DB_URL,
       PAYKESHO_DB_USERNAME: env.PAYKESHO_DB_USERNAME,
       PAYKESHO_DB_PASSWORD: env.PAYKESHO_DB_PASSWORD,
