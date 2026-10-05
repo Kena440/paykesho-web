@@ -18,4 +18,4 @@ ENV JAVA_OPTS="-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m"
 ENV SPRING_PROFILES_ACTIVE="cloudflare"
 
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "set -o pipefail; java $JAVA_OPTS -jar /app/app.jar 2>&1 | tee /tmp/paykesho-java.log; code=$?; echo PAYKESHO_JAVA_EXIT_CODE=$code; cat /tmp/paykesho-java.log; sleep 60; exit $code"]
