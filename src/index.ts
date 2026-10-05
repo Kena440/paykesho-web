@@ -48,6 +48,21 @@ export class PaykeshoWebContainer extends Container {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/debug/config") {
+      const dbUrl = env.PAYKESHO_DB_URL || "";
+      return Response.json({
+        dbUrlPresent: Boolean(dbUrl),
+        dbUrlJdbcPostgres: dbUrl.startsWith("jdbc:postgresql://"),
+        dbHostPresent: Boolean(dbUrl.match(/^jdbc:postgresql:\/\/([^/?]+)/)),
+        dbUsernamePresent: Boolean(env.PAYKESHO_DB_USERNAME),
+        dbPasswordPresent: Boolean(env.PAYKESHO_DB_PASSWORD),
+        adminEmailPresent: Boolean(env.PAYKESHO_ADMIN_EMAIL),
+        adminPasswordPresent: Boolean(env.PAYKESHO_ADMIN_PASSWORD),
+        adminEmail: env.PAYKESHO_ADMIN_EMAIL || null
+      }, { headers: { "cache-control": "no-store" } });
+    }
+
     const container = getContainer(env.PAYKESHO_WEB, "web");
 
     // Explicitly start the named container before proxying requests. The
