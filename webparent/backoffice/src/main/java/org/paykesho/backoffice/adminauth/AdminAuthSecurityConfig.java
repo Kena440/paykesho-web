@@ -16,7 +16,7 @@ public class AdminAuthSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean public PasswordEncoder passwordEncoder(){return new BCryptPasswordEncoder();}
     @Override protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-            .antMatchers("/login","/admin/login","/assets/**","/images/**","/webjars/**","/actuator/health").permitAll()
+            .antMatchers("/login","/admin/login","/ping","/assets/**","/images/**","/webjars/**","/actuator/health").permitAll()
             .anyRequest().authenticated()
             .and().userDetailsService(userDetailsService)
             .formLogin().loginPage("/admin/login").loginProcessingUrl("/login")
