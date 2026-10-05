@@ -15,7 +15,6 @@ export interface Env {
 export class PaykeshoWebContainer extends Container {
   defaultPort = 8080;
   sleepAfter = "10m";
-  pingEndpoint = "ping";
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
     super(ctx, env);
@@ -54,11 +53,7 @@ export default {
     // Explicitly start the named container before proxying requests. The
     // Durable Object path should wait for the application port before routing.
     try {
-      await container.start({ enableInternet: true }, {
-        portToCheck: 8080,
-        retries: 100,
-        waitInterval: 500
-      });
+      await container.start();
     } catch (error) {
       console.error("PayKesho container start failed", error);
       let state: unknown = null;
@@ -106,18 +101,6 @@ export default {
     }
 
     try {
-      const state = await container.getState();
-      if (state.status !== "running" && state.status !== "healthy") {
-        return Response.json(
-          {
-            ok: false,
-            service: "paykesho-web",
-            error: "container_not_ready",
-            state
-          },
-          { status: 503, headers: { "cache-control": "no-store" } }
-        );
-      }
       return await container.fetch(request);
     } catch (error) {
       console.error("PayKesho container request failed", error);
