@@ -14,7 +14,7 @@ FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/webparent/backoffice/target/*.jar /app/app.jar
 
-ENV JAVA_OPTS="-Xmx768m -Xms256m"
+ENV JAVA_OPTS="-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m"
 ENV SPRING_PROFILES_ACTIVE="cloudflare"
 
 EXPOSE 8080
