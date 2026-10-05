@@ -106,6 +106,18 @@ export default {
     }
 
     try {
+      const state = await container.getState();
+      if (state.status !== "running" && state.status !== "healthy") {
+        return Response.json(
+          {
+            ok: false,
+            service: "paykesho-web",
+            error: "container_not_ready",
+            state
+          },
+          { status: 503, headers: { "cache-control": "no-store" } }
+        );
+      }
       return await container.fetch(request);
     } catch (error) {
       console.error("PayKesho container request failed", error);
