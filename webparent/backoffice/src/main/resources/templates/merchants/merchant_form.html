@@ -149,6 +149,64 @@
                                                     <span class="form-check-label">Enabled</span>
                                                 </label>
                                             </div>
+
+                                            <hr>
+                                            <div class="mb-3">
+                                                <h5 class="mb-1">Lenco Settlement Profile</h5>
+                                                <small class="text-muted">Configure where PayKesho should send merchant payments.</small>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Payout Method</label>
+                                                <select class="form-select" id="payoutMethod" th:field="*{payoutMethod}">
+                                                    <option value="">Not configured</option>
+                                                    <option value="mobile-money">Mobile Money</option>
+                                                    <option value="bank-account">Bank Account</option>
+                                                </select>
+                                            </div>
+
+                                            <div id="mobileMoneyFields">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Mobile Money Operator</label>
+                                                    <select class="form-select" th:field="*{payoutOperator}">
+                                                        <option value="">Select operator...</option>
+                                                        <option value="airtel">Airtel</option>
+                                                        <option value="mtn">MTN</option>
+                                                        <option value="zamtel">Zamtel</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Payout Phone</label>
+                                                    <input class="form-control" maxlength="20"
+                                                           placeholder="+260..."
+                                                           th:field="*{payoutPhone}" type="text">
+                                                </div>
+                                            </div>
+
+                                            <div id="bankFields" style="display:none;">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Bank ID</label>
+                                                    <input class="form-control" maxlength="64"
+                                                           placeholder="Lenco bank ID"
+                                                           th:field="*{payoutBankId}" type="text">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Account Number</label>
+                                                    <input class="form-control" maxlength="64"
+                                                           th:field="*{payoutAccountNumber}" type="text">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Lenco Transfer Recipient ID</label>
+                                                <input class="form-control" maxlength="64"
+                                                       placeholder="Optional — use a Lenco recipient UUID when available"
+                                                       th:field="*{lencoTransferRecipientId}" type="text">
+                                            </div>
+
+                                            <div class="alert alert-info py-2">
+                                                <small><strong>Security:</strong> Lenco API credentials are never stored on the merchant record. Only the merchant's payout destination is stored here.</small>
+                                            </div>
                                             <hr>
                                             <div class="mb-3">
                                                 <label class="form-label">Location</label>
@@ -184,6 +242,17 @@
 <footer th:replace="fragments/fragments :: js_code"></footer>
 <script type="text/javascript">
     moduleURL = "[[@{/}]]";
+
+    function togglePayoutFields() {
+        const method = document.getElementById('payoutMethod').value;
+        document.getElementById('mobileMoneyFields').style.display = method === 'mobile-money' ? 'block' : 'none';
+        document.getElementById('bankFields').style.display = method === 'bank-account' ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        togglePayoutFields();
+        document.getElementById('payoutMethod').addEventListener('change', togglePayoutFields);
+    });
     MAX_FILE_SIZE = 502400; // 500KB
 
     function checkMerchantUnique(form) {
