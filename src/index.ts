@@ -146,9 +146,14 @@ export default {
     const container = getContainer(namespace, containerId);
 
     try {
-      await container.start();
+      await container.startAndWaitForPorts({
+        ports: [isPayment ? 8084 : 8080],
+        cancellationOptions: {
+          portReadyTimeoutMS: 30000
+        }
+      });
     } catch (error) {
-      console.error(`PayKesho ${containerId} container start failed`, error);
+      console.error(`PayKesho ${containerId} container start/readiness failed`, error);
       let state: unknown = null;
       try {
         state = await container.getState();
@@ -166,34 +171,6 @@ export default {
         { status: 503, headers: { "cache-control": "no-store" } }
       );
     }
-
-    if (url.pathname === "/health" || url.pathname === "/api/health") {
-      try {
-        const healthPath = isAdmin ? "/admin/actuator/health" : "/actuator/health";
-        const healthRequest = new Request(new URL(healthPath, request.url), request);
-        const response = await container.fetch(healthRequest);
-
-        return new Response(response.body, {
-          status: response.status,
-          headers: {
-            "content-type": "application/json; charset=utf-8",
-            "cache-control": "no-store"
-          }
-        });
-      } catch (error) {
-        console.error("PayKesho health check failed", error);
-        return Response.json(
-          {
-            ok: false,
-            service: "paykesho-web",
-            error: "container_unhealthy",
-            message: error instanceof Error ? error.message : String(error)
-          },
-          { status: 503, headers: { "cache-control": "no-store" } }
-        );
-      }
-    }
-
     try {
       if (isPayment && url.pathname.startsWith("/internal/payment/")) {
         const rewritten = new URL(request.url);
