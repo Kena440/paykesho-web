@@ -138,7 +138,7 @@ export class PaykeshoWebContainer extends PaykeshoDirectContainer {
 
 export class PaykeshoPaymentContainer extends PaykeshoDirectContainer {
   readonly port = 8084;
-  readonly healthPath = "/actuator/health";
+  readonly healthPath = "/actuator/health/liveness";
   buildEnv(env: Env) {
     return paymentEnv(env);
   }
