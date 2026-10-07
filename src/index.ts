@@ -34,7 +34,8 @@ function paykeshoEnv(env: Env, profile: string): Record<string, string> {
     LENCO_API_BASE_URL: env.LENCO_API_BASE_URL || "https://api.lenco.co/access/v2",
     LENCO_API_TOKEN: env.LENCO_API_TOKEN || "",
     LENCO_ACCOUNT_ID: env.LENCO_ACCOUNT_ID || "",
-    PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || ""
+    PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || "",
+    PAYMENT_SERVICE_URL: env.PAYMENT_SERVICE_URL || "http://localhost:8787/internal/payment"
   };
 }
 
