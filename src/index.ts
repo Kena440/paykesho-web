@@ -96,7 +96,7 @@ async function forwardToContainer(
       waitInterval: 500
     }
   });
-  return await container.fetch(request);
+  return await container.containerFetch(request, port);
 }
 
 export default {
