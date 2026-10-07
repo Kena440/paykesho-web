@@ -118,6 +118,22 @@ export class PaykeshoClientContainer extends Container {
   }
 }
 
+async function forwardToContainer(
+  container: PaykeshoWebContainer | PaykeshoClientContainer | PaykeshoPaymentContainer,
+  request: Request,
+  port: number
+): Promise<Response> {
+  // Explicitly wait for readiness. This avoids routing a request into an instance
+  // that is still starting (or racing another request that is starting it).
+  await container.startAndWaitForPorts({
+    ports: [port],
+    cancellationOptions: {
+      portReadyTimeoutMS: 60_000
+    }
+  });
+  return await container.fetch(request);
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -149,9 +165,14 @@ export default {
       if (isPayment && url.pathname.startsWith("/internal/payment/")) {
         const rewritten = new URL(request.url);
         rewritten.pathname = url.pathname.replace(/^\/internal\/payment/, "") || "/";
-        return await container.fetch(new Request(rewritten.toString(), request));
+        return await forwardToContainer(
+          container,
+          new Request(rewritten.toString(), request),
+          8084
+        );
       }
-      return await container.fetch(request);
+
+      return await forwardToContainer(container, request, 8080);
     } catch (error) {
       console.error(`PayKesho ${containerId} container request failed`, error);
       let state: unknown = null;
