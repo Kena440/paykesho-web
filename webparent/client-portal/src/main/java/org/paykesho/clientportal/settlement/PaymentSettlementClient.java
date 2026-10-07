@@ -27,6 +27,27 @@ public class PaymentSettlementClient {
         this.internalToken = internalToken;
     }
 
+    public String validateMerchantPayoutProfile(Merchant merchant) {
+        if (merchant == null) return "Merchant payout profile is missing.";
+        String method = merchant.getPayoutMethod();
+        if ("mobile-money".equalsIgnoreCase(method)) {
+            if (merchant.getPayoutOperator() == null || merchant.getPayoutOperator().trim().isEmpty()) {
+                return "Merchant mobile-money operator is not configured.";
+            }
+            if (merchant.getPayoutPhone() == null || merchant.getPayoutPhone().trim().isEmpty()) {
+                return "Merchant payout phone is not configured.";
+            }
+        } else if ("bank-account".equalsIgnoreCase(method)) {
+            if (merchant.getPayoutBankId() == null || merchant.getPayoutBankId().trim().isEmpty()
+                    || merchant.getPayoutAccountNumber() == null || merchant.getPayoutAccountNumber().trim().isEmpty()) {
+                return "Merchant bank payout details are not configured.";
+            }
+        } else {
+            return "Merchant payout method is not configured.";
+        }
+        return null;
+    }
+
     public SettlementClientResponse settle(Merchant merchant, BigDecimal amount, String reference) {
         if (merchant == null || amount == null || reference == null) {
             return new SettlementClientResponse(false, "FAILED", "Invalid settlement details.", null);
