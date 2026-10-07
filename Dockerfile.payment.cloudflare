@@ -16,6 +16,7 @@ COPY --from=build /app/webparent/payment-service/target/payment-service-*.jar /a
 
 ENV JAVA_OPTS="-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m"
 ENV SPRING_PROFILES_ACTIVE="cloudflare"
+ENV SERVER_ADDRESS="0.0.0.0"
 
 EXPOSE 8084
-ENTRYPOINT ["bash", "-c", "java $JAVA_OPTS -jar /app/payment-service.jar 2>&1 | tee /tmp/paykesho-payment-java.log; echo PAYKESHO_PAYMENT_JAVA_PROCESS_FINISHED; cat /tmp/paykesho-payment-java.log; sleep 60"]
+ENTRYPOINT ["bash", "-c", "exec java $JAVA_OPTS -jar /app/payment-service.jar"]
