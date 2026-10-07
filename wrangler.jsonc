@@ -8,19 +8,19 @@
       "class_name": "PaykeshoWebContainer",
       "image": "./Dockerfile.cloudflare",
       "instance_type": "basic",
-      "max_instances": 3
+      "max_instances": 1
     },
     {
       "class_name": "PaykeshoClientContainer",
       "image": "./Dockerfile.client.cloudflare",
       "instance_type": "basic",
-      "max_instances": 3
+      "max_instances": 1
     },
     {
       "class_name": "PaykeshoPaymentContainer",
       "image": "./Dockerfile.payment.cloudflare",
       "instance_type": "basic",
-      "max_instances": 2
+      "max_instances": 1
     }
   ],
   "durable_objects": {
