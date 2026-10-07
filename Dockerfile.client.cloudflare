@@ -19,4 +19,4 @@ ENV SPRING_PROFILES_ACTIVE="cloudflare"
 ENV SERVER_ADDRESS="0.0.0.0"
 
 EXPOSE 8080
-ENTRYPOINT ["bash", "-c", "java $JAVA_OPTS -jar /app/app.jar 2>&1 | tee /tmp/paykesho-java.log; echo PAYKESHO_CLIENT_JAVA_PROCESS_FINISHED; cat /tmp/paykesho-java.log; sleep 60"]
+ENTRYPOINT ["bash", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
