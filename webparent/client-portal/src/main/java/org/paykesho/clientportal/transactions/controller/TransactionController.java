@@ -247,7 +247,11 @@ public class TransactionController {
         } else if ("FAILED".equalsIgnoreCase(settlement.getStatus())) {
             savedTxn.setSettled(false);
             try {
-                paymentSettlementClient.reconcile(paykeshoRef, "FAILED", settlement.getLencoReference(), settlement.getMessage());
+                SettlementClientResponse reconciliation = paymentSettlementClient.reconcile(
+                        paykeshoRef, "FAILED", settlement.getLencoReference(), settlement.getMessage());
+                if (!reconciliation.isAccepted()) {
+                    transactionsService.refundFailedSettlement(savedTxn);
+                }
             } catch (Exception reconcileError) {
                 log.error("Failed to reconcile failed Lenco payout {}: {}", paykeshoRef, reconcileError.getMessage());
                 transactionsService.refundFailedSettlement(savedTxn);
