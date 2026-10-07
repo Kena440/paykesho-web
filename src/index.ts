@@ -70,7 +70,10 @@ async function waitForContainerPort(
   await container.setInactivityTimeout(10 * 60 * 1000);
 
   if (!container.running) {
-    container.start({ envVars });
+    container.start({ env: envVars, enableInternet: true });
+    void container.monitor().catch((error) => {
+      console.error("PayKesho container monitor error", error);
+    });
   }
 
   const port = container.getTcpPort(portNumber);
@@ -146,7 +149,7 @@ export class PaykeshoPaymentContainer extends PaykeshoDirectContainer {
 
 export class PaykeshoClientContainer extends PaykeshoDirectContainer {
   readonly port = 8080;
-  readonly healthPath = "/actuator/health";
+  readonly healthPath = "/login";
   buildEnv(env: Env) {
     return paykeshoEnv(env, "cloudflare");
   }
