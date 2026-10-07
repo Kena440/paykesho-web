@@ -144,13 +144,17 @@ export default {
       : (isAdmin ? env.PAYKESHO_WEB : env.PAYKESHO_CLIENT);
     const containerId = isPayment ? "payment" : (isAdmin ? "backoffice" : "client");
     const container = getContainer(namespace, containerId);
+    const port = isPayment ? 8084 : 8080;
 
     try {
-      await container.startAndWaitForPorts({
-        ports: [isPayment ? 8084 : 8080],
-        cancellationOptions: {
-          portReadyTimeoutMS: 30000
-        }
+      // Start explicitly, then wait for the application port. This avoids a
+      // transient startAndWaitForPorts race while a new Container Durable
+      // Object is transitioning from running to port-ready.
+      await container.start();
+      await container.waitForPort({
+        portToCheck: port,
+        retries: 100,
+        waitInterval: 300
       });
     } catch (error) {
       console.error(`PayKesho ${containerId} container start/readiness failed`, error);
@@ -171,6 +175,7 @@ export default {
         { status: 503, headers: { "cache-control": "no-store" } }
       );
     }
+
     try {
       if (isPayment && url.pathname.startsWith("/internal/payment/")) {
         const rewritten = new URL(request.url);
