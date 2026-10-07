@@ -1,15 +1,19 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS build
-WORKDIR /workspace
+# Cloudflare Containers requires linux/amd64.
+FROM --platform=linux/amd64 maven:3.9.16-eclipse-temurin-17 AS build
 
-COPY pom.xml ./pom.xml
-COPY commons ./commons
-COPY webparent ./webparent
-
-RUN mvn -pl webparent/payment-service -am -DskipTests package
-
-FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY --from=build /workspace/webparent/payment-service/target/payment-service-*.jar /app/payment-service.jar
+COPY . .
+
+# Build the dedicated Lenco settlement service.
+RUN mvn -B -ntp -pl webparent/payment-service -am clean package     -DskipTests     -Djacoco.skip=true
+
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
+
+WORKDIR /app
+COPY --from=build /app/webparent/payment-service/target/payment-service-*.jar /app/payment-service.jar
+
+ENV JAVA_OPTS="-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m"
+ENV SPRING_PROFILES_ACTIVE="cloudflare"
 
 EXPOSE 8084
-ENTRYPOINT ["java","-jar","/app/payment-service.jar"]
+ENTRYPOINT ["bash", "-c", "java $JAVA_OPTS -jar /app/payment-service.jar 2>&1 | tee /tmp/paykesho-payment-java.log; echo PAYKESHO_PAYMENT_JAVA_PROCESS_FINISHED; cat /tmp/paykesho-payment-java.log; sleep 60"]
