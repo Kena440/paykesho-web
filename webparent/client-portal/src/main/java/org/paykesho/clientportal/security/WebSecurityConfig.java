@@ -49,6 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers(HttpMethod.GET, "/clients/register", "/clients/verify",
                                 "/business", "/how-it-works", "/faq", "/contact", "/reset-password", "/forgot-password/captcha").permitAll()
                         .antMatchers(HttpMethod.POST, "/clients/save-client", "/clients/rest/check-client", "/forgot-password", "/reset-password-action").permitAll()
+                        .antMatchers("/actuator/health/**").permitAll()
                         .antMatchers("/clients/dashboard", "/vouchers/**", "/transactions/**").authenticated()
                         .anyRequest().authenticated()
                 )
