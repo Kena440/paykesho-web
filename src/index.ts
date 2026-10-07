@@ -56,82 +56,38 @@ export class PaykeshoWebContainer extends Container {
   defaultPort = 8080;
   pingEndpoint = "admin/actuator/health";
   sleepAfter = "10m";
-
-  constructor(ctx: DurableObjectState<{}>, env: Env) {
-    super(ctx, env);
-    this.envVars = backofficeEnv(env);
-  }
-
-  override onStart() {
-    console.log("PayKesho back-office container started");
-  }
-
-  override onError(error: unknown) {
-    console.error("PayKesho back-office container error", error);
-  }
-
-  override onStop(params: { exitCode?: number; reason: string }) {
-    console.error("PayKesho back-office container stopped", params);
-  }
+  constructor(ctx: DurableObjectState<{}>, env: Env) { super(ctx, env); this.envVars = backofficeEnv(env); }
+  override onStart() { console.log("PayKesho back-office container started"); }
+  override onError(error: unknown) { console.error("PayKesho back-office container error", error); }
+  override onStop(params: { exitCode?: number; reason: string }) { console.error("PayKesho back-office container stopped", params); }
 }
 
 export class PaykeshoPaymentContainer extends Container {
   defaultPort = 8084;
   pingEndpoint = "actuator/health";
   sleepAfter = "10m";
-
-  constructor(ctx: DurableObjectState<{}>, env: Env) {
-    super(ctx, env);
-    this.envVars = paymentEnv(env);
-  }
-
-  override onStart() {
-    console.log("PayKesho payment container started");
-  }
-
-  override onError(error: unknown) {
-    console.error("PayKesho payment container error", error);
-  }
-
-  override onStop(params: { exitCode?: number; reason: string }) {
-    console.error("PayKesho payment container stopped", params);
-  }
+  constructor(ctx: DurableObjectState<{}>, env: Env) { super(ctx, env); this.envVars = paymentEnv(env); }
+  override onStart() { console.log("PayKesho payment container started"); }
+  override onError(error: unknown) { console.error("PayKesho payment container error", error); }
+  override onStop(params: { exitCode?: number; reason: string }) { console.error("PayKesho payment container stopped", params); }
 }
 
 export class PaykeshoClientContainer extends Container {
   defaultPort = 8080;
   pingEndpoint = "actuator/health";
   sleepAfter = "10m";
-
-  constructor(ctx: DurableObjectState<{}>, env: Env) {
-    super(ctx, env);
-    this.envVars = paykeshoEnv(env, "cloudflare");
-  }
-
-  override onStart() {
-    console.log("PayKesho customer container started");
-  }
-
-  override onError(error: unknown) {
-    console.error("PayKesho customer container error", error);
-  }
-
-  override onStop(params: { exitCode?: number; reason: string }) {
-    console.error("PayKesho customer container stopped", params);
-  }
+  constructor(ctx: DurableObjectState<{}>, env: Env) { super(ctx, env); this.envVars = paykeshoEnv(env, "cloudflare"); }
+  override onStart() { console.log("PayKesho customer container started"); }
+  override onError(error: unknown) { console.error("PayKesho customer container error", error); }
+  override onStop(params: { exitCode?: number; reason: string }) { console.error("PayKesho customer container stopped", params); }
 }
 
 async function forwardToContainer(
   container: PaykeshoWebContainer | PaykeshoClientContainer | PaykeshoPaymentContainer,
-  request: Request,
-  port: number
+  request: Request
 ): Promise<Response> {
-  await container.startAndWaitForPorts({
-    ports: [port],
-    cancellationOptions: {
-      portReadyTimeoutMS: 60_000
-    }
-  });
+  // Container.fetch() handles startup/readiness automatically. Avoid a separate
+  // startAndWaitForPorts() call followed by fetch(), which can race lifecycle state.
   return await container.fetch(request);
 }
 
@@ -155,10 +111,7 @@ export default {
     const isPayment = url.pathname === "/webhooks/lenco"
       || url.pathname.startsWith("/internal/payment/");
     const isAdmin = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
-
-    const namespace = isPayment
-      ? env.PAYKESHO_PAYMENT
-      : (isAdmin ? env.PAYKESHO_WEB : env.PAYKESHO_CLIENT);
+    const namespace = isPayment ? env.PAYKESHO_PAYMENT : (isAdmin ? env.PAYKESHO_WEB : env.PAYKESHO_CLIENT);
     const containerId = isPayment ? "payment" : (isAdmin ? "backoffice" : "client");
     const container = getContainer(namespace, containerId);
 
@@ -166,32 +119,20 @@ export default {
       if (isPayment && url.pathname.startsWith("/internal/payment/")) {
         const rewritten = new URL(request.url);
         rewritten.pathname = url.pathname.replace(/^\/internal\/payment/, "") || "/";
-        return await forwardToContainer(
-          container,
-          new Request(rewritten.toString(), request),
-          8084
-        );
+        return await forwardToContainer(container, new Request(rewritten.toString(), request));
       }
-
-      return await forwardToContainer(container, request, 8080);
+      return await forwardToContainer(container, request);
     } catch (error) {
       console.error(`PayKesho ${containerId} container request failed`, error);
       let state: unknown = null;
-      try {
-        state = await container.getState();
-      } catch (stateError) {
-        console.error("PayKesho container state lookup failed", stateError);
-      }
-      return Response.json(
-        {
-          ok: false,
-          service: `paykesho-${containerId}`,
-          error: "container_request_failed",
-          message: error instanceof Error ? error.message : String(error),
-          state
-        },
-        { status: 503, headers: { "cache-control": "no-store" } }
-      );
+      try { state = await container.getState(); } catch (stateError) { console.error("PayKesho container state lookup failed", stateError); }
+      return Response.json({
+        ok: false,
+        service: `paykesho-${containerId}`,
+        error: "container_request_failed",
+        message: error instanceof Error ? error.message : String(error),
+        state
+      }, { status: 503, headers: { "cache-control": "no-store" } });
     }
   }
 };
