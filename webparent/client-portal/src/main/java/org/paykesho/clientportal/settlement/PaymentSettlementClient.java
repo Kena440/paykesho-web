@@ -100,8 +100,11 @@ public class PaymentSettlementClient {
                     ? new SettlementClientResponse(false, "FAILED", "Empty response from settlement service.", null)
                     : result;
         } catch (RestClientException e) {
-            log.error("Payment settlement service call failed for {}: {}", path, e.getMessage());
-            return new SettlementClientResponse(false, "FAILED", "Unable to reach payment settlement service.", null);
+            // The payment service may have accepted the request before the network
+            // connection failed. Treat the outcome as uncertain rather than FAILED;
+            // reconciliation will query Lenco and prevent an unsafe e-value refund.
+            log.error("Payment settlement service call outcome is uncertain for {}: {}", path, e.getMessage());
+            return new SettlementClientResponse(true, "PENDING", "Settlement outcome is being reconciled.", null);
         }
     }
 }
