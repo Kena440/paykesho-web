@@ -6,7 +6,7 @@ COPY . .
 
 # Build the PayKesho BackOffice application used for administrator login.
 RUN mvn -B -ntp -pl webparent/backoffice -am clean package \
-    -DskipTests \
+    -Dmaven.test.skip=true \
     -Djacoco.skip=true
 
 FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
@@ -16,6 +16,7 @@ COPY --from=build /app/webparent/backoffice/target/*.jar /app/app.jar
 
 ENV JAVA_OPTS="-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m"
 ENV SPRING_PROFILES_ACTIVE="cloudflare"
+ENV SERVER_ADDRESS="0.0.0.0"
 
 EXPOSE 8080
-ENTRYPOINT ["bash", "-c", "java $JAVA_OPTS -jar /app/app.jar 2>&1 | tee /tmp/paykesho-java.log; echo PAYKESHO_JAVA_PROCESS_FINISHED; cat /tmp/paykesho-java.log; sleep 60"]
+ENTRYPOINT ["bash", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
