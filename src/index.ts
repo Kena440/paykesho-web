@@ -54,6 +54,7 @@ function paymentEnv(env: Env): Record<string, string> {
 
 export class PaykeshoWebContainer extends Container {
   defaultPort = 8080;
+  pingEndpoint = "admin/actuator/health";
   sleepAfter = "10m";
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
@@ -76,6 +77,7 @@ export class PaykeshoWebContainer extends Container {
 
 export class PaykeshoPaymentContainer extends Container {
   defaultPort = 8084;
+  pingEndpoint = "actuator/health";
   sleepAfter = "10m";
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
@@ -98,6 +100,7 @@ export class PaykeshoPaymentContainer extends Container {
 
 export class PaykeshoClientContainer extends Container {
   defaultPort = 8080;
+  pingEndpoint = "actuator/health";
   sleepAfter = "10m";
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
@@ -123,8 +126,6 @@ async function forwardToContainer(
   request: Request,
   port: number
 ): Promise<Response> {
-  // Explicitly wait for readiness. This avoids routing a request into an instance
-  // that is still starting (or racing another request that is starting it).
   await container.startAndWaitForPorts({
     ports: [port],
     cancellationOptions: {
