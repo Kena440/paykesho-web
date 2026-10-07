@@ -167,7 +167,7 @@ public class TransactionController {
         }
     }
 
-    private ResponseEntity<Map<String, Boolean>> updateClientBalance(Client client) throws PaykeshoError {
+    private ResponseEntity<Map<String, Object>> updateClientBalance(Client client, Transaction transaction) throws PaykeshoError {
         ClientBalance clientBalance = clientService.getClientBalance(client);
         if (clientBalance == null) {
             clientBalance = new ClientBalance();
@@ -184,8 +184,19 @@ public class TransactionController {
                 clientBalance.getTotalDebits() == null ? BigDecimal.ZERO : clientBalance.getTotalDebits()
         );
         clientBalance.setLastUpdate(new Date());
+        clientBalance.setLastTransactionId(transaction.getReference());
+        clientBalance.setLastTransactionType("PAYMENT");
+        clientBalance.setLastTransactionAmount(transaction.getAmount());
         clientService.saveClientBalance(clientBalance);
-        return ResponseEntity.ok(Collections.singletonMap("success", true));
+
+        Map<String, Object> response = new java.util.LinkedHashMap<>();
+        response.put("success", true);
+        response.put("transactionRef", transaction.getReference());
+        response.put("merchant", transaction.getMerchant().getName());
+        response.put("amount", transaction.getAmount());
+        response.put("remainingBalance", remaining);
+        response.put("settled", transaction.isSettled());
+        return ResponseEntity.ok(response);
     }
 
     private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, Voucher voucher, BigDecimal amount) throws PaykeshoError {
