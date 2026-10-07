@@ -109,8 +109,11 @@ public class TransactionController {
         BigDecimal amount;
         try {
             amount = new BigDecimal(requestBody.get("amount"));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format. Please enter a valid number."));
+        }
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Payment amount must be greater than zero."));
         }
 
         // Create idempotency record at START of processing
