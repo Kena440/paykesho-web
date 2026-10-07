@@ -146,14 +146,14 @@ export default {
     const container = getContainer(namespace, containerId);
 
     try {
-      await container.startAndWaitForPorts({
-        ports: [isPayment ? 8084 : 8080],
-        cancellationOptions: {
-          portReadyTimeoutMS: 30000
-        }
-      });
+      if (isPayment && url.pathname.startsWith("/internal/payment/")) {
+        const rewritten = new URL(request.url);
+        rewritten.pathname = url.pathname.replace(/^\/internal\/payment/, "") || "/";
+        return await container.fetch(new Request(rewritten.toString(), request));
+      }
+      return await container.fetch(request);
     } catch (error) {
-      console.error(`PayKesho ${containerId} container start/readiness failed`, error);
+      console.error(`PayKesho ${containerId} container request failed`, error);
       let state: unknown = null;
       try {
         state = await container.getState();
@@ -164,28 +164,9 @@ export default {
         {
           ok: false,
           service: `paykesho-${containerId}`,
-          error: "container_start_failed",
+          error: "container_request_failed",
           message: error instanceof Error ? error.message : String(error),
           state
-        },
-        { status: 503, headers: { "cache-control": "no-store" } }
-      );
-    }
-    try {
-      if (isPayment && url.pathname.startsWith("/internal/payment/")) {
-        const rewritten = new URL(request.url);
-        rewritten.pathname = url.pathname.replace(/^\/internal\/payment/, "") || "/";
-        return await container.fetch(new Request(rewritten.toString(), request));
-      }
-      return await container.fetch(request);
-    } catch (error) {
-      console.error(`PayKesho ${containerId} request failed`, error);
-      return Response.json(
-        {
-          ok: false,
-          service: `paykesho-${containerId}`,
-          error: "container_request_failed",
-          message: error instanceof Error ? error.message : String(error)
         },
         { status: 503, headers: { "cache-control": "no-store" } }
       );
