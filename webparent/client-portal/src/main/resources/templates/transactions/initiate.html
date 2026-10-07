@@ -136,6 +136,8 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <dl class="row mb-1">
+                                                        <dt class="col-4 col-xxl-3">Merchant Number</dt>
+                                                        <dd class="col-8 col-xxl-9"><span id="merchantNumber"></span></dd>
                                                         <dt class="col-4 col-xxl-3">Name</dt>
                                                         <dd class="col-8 col-xxl-9"><span id="merchantName"></span></dd>
                                                         <dt class="col-4 col-xxl-3">Type</dt>
@@ -271,6 +273,7 @@
     const qrScannerContainer = document.getElementById('qrScannerContainer');
     const reader = document.getElementById('reader');
     const merchantDetailsDiv = document.getElementById('merchantDetails');
+    const merchantNumberSpan = document.getElementById('merchantNumber');
     const merchantNameSpan = document.getElementById('merchantName');
     const merchantTypeSpan = document.getElementById('merchantType');
     const amountSection = document.getElementById('amountSection');
@@ -440,6 +443,7 @@
                 // Log for debugging
                 console.log('Merchant details response:', data);
                 if (data && data.name && data.type) {
+                    merchantNumberSpan.textContent = data.code || merchantCode;
                     merchantNameSpan.textContent = data.name;
                     merchantTypeSpan.textContent = data.type;
                     merchantDetailsDiv.style.display = 'block';
@@ -461,8 +465,9 @@
     merchantCodeInput.addEventListener('input', () => {
         const merchantCode = merchantCodeInput.value.trim();
         if (merchantFetchTimeout) clearTimeout(merchantFetchTimeout);
-        // Only fetch if code is exactly 11 characters (e.g. M20241MT6ZW)
-        if (merchantCode.length === 11) {
+        // Merchant references grow as records are added, so do not hard-code
+        // a single reference length. Accept the existing alphanumeric code format.
+        if (merchantCode.length >= 6 && merchantCode.length <= 32) {
             merchantFetchTimeout = setTimeout(() => {
                 fetchMerchantDetails(merchantCode);
             }, 500); // 500ms debounce
@@ -473,10 +478,10 @@
     fetchMerchantButton.addEventListener('click', () => {
         const merchantCode = merchantCodeInput.value.trim();
         if (merchantFetchTimeout) clearTimeout(merchantFetchTimeout);
-        if (merchantCode.length === 11) {
+        if (merchantCode.length >= 6 && merchantCode.length <= 32) {
             fetchMerchantDetails(merchantCode);
         } else {
-            showNotification('Error', 'Please enter a valid merchant code (11 characters).', 'error');
+            showNotification('Error', 'Please enter a valid merchant code.', 'error');
         }
     });
 
