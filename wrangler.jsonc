@@ -67,8 +67,7 @@
       "PAYKESHO_ADMIN_EMAIL",
       "PAYKESHO_ADMIN_PASSWORD",
       "LENCO_API_TOKEN",
-      "LENCO_ACCOUNT_ID",
-      "PAYKESHO_INTERNAL_TOKEN"
+      "LENCO_ACCOUNT_ID"
     ]
   },
   "vars": {
