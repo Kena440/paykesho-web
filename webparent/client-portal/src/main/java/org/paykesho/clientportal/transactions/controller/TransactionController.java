@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,6 +83,7 @@ public class TransactionController {
     }
 
     @PostMapping("/confirm")
+    @Transactional
     public ResponseEntity<?> saveSubmittedPayment(
             @AuthenticationPrincipal ClientUserDetails loggedInUser, 
             @RequestBody Map<String, String> requestBody,
@@ -131,14 +133,17 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
             }
 
-            BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
+            Voucher voucher = voucherService.getApprovedAndValidClientVouchers(client).stream()
+                    .filter(v -> v.getAvailableAmount() != null && v.getAvailableAmount().compareTo(amount) >= 0)
+                    .findFirst()
+                    .orElse(null);
 
-            if (availableBalance.compareTo(amount) < 0) {
-                idempotencyService.markAsFailed(finalIdempotencyKey, "Insufficient balance", 400);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Insufficient balance."));
+            if (voucher == null) {
+                idempotencyService.markAsFailed(finalIdempotencyKey, "Insufficient e-value", 400);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Insufficient PayKesho e-value."));
             }
 
-            Transaction trx = runPaymentSubmission(client, merchant, amount);
+            Transaction trx = runPaymentSubmission(client, merchant, voucher, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
                 ResponseEntity<?> response = updateClientBalance(amount, client, clientService.getClientBalance(client).getCurrentBalance());
@@ -171,7 +176,7 @@ public class TransactionController {
         return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
-    private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, BigDecimal amount) throws PaykeshoError {
+    private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, Voucher voucher, BigDecimal amount) throws PaykeshoError {
 
         Transaction savedTxn = null;
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_TRX");
@@ -191,7 +196,7 @@ public class TransactionController {
         transaction.setSettled(false);
 
         try {
-            savedTxn = transactionsService.save(transaction);
+            savedTxn = transactionsService.savePaymentAndConsumeVoucher(transaction, voucher.getId(), amount);
         } catch (Exception e) {
             log.error("Error saving transaction:", e);
             throw new PaykeshoError("Failed to save transaction: " + e.getMessage());
