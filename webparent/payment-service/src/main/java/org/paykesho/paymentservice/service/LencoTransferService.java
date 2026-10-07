@@ -35,6 +35,34 @@ public class LencoTransferService {
         this.accountId = accountId;
     }
 
+    public LencoSettlementResponse getStatus(String reference) {
+        if (apiToken == null || apiToken.trim().isEmpty() || reference == null || reference.trim().isEmpty()) {
+            return new LencoSettlementResponse(false, "FAILED", "Lenco status lookup is not configured.", null);
+        }
+        try {
+            JsonNode root = webClient.get()
+                    .uri("/transfers/status/" + reference)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken)
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block();
+
+            JsonNode data = root == null ? null : root.path("data");
+            String status = data == null ? "FAILED" : data.path("status").asText("FAILED").toUpperCase();
+            String message = root == null ? "Empty response from Lenco." : root.path("message").asText("");
+            String lencoReference = data == null ? null : data.path("lencoReference").asText(null);
+            return new LencoSettlementResponse(
+                    "PENDING".equals(status) || "SUCCESSFUL".equals(status),
+                    status,
+                    message,
+                    lencoReference
+            );
+        } catch (Exception e) {
+            log.warn("Unable to re-query Lenco transfer {}: {}", reference, e.getMessage());
+            return new LencoSettlementResponse(false, "PENDING", "Status lookup temporarily unavailable.", null);
+        }
+    }
+
     public LencoSettlementResponse initiate(LencoSettlementRequest request) {
         if (apiToken == null || apiToken.trim().isEmpty() || accountId == null || accountId.trim().isEmpty()) {
             return new LencoSettlementResponse(false, "FAILED", "Lenco is not configured.", null);
