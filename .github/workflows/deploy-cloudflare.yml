@@ -33,13 +33,13 @@ jobs:
           cache: maven
 
       - name: Compile back-office
-        run: mvn -B -ntp -pl webparent/backoffice -am package -DskipTests -Djacoco.skip=true
+        run: mvn -B -ntp -pl webparent/backoffice -am package -Dmaven.test.skip=true -Djacoco.skip=true
 
       - name: Compile customer portal
-        run: mvn -B -ntp -pl webparent/client-portal -am package -DskipTests -Djacoco.skip=true
+        run: mvn -B -ntp -pl webparent/client-portal -am package -Dmaven.test.skip=true -Djacoco.skip=true
 
       - name: Compile payment service
-        run: mvn -B -ntp -pl webparent/payment-service -am package -DskipTests -Djacoco.skip=true
+        run: mvn -B -ntp -pl webparent/payment-service -am package -Dmaven.test.skip=true -Djacoco.skip=true
 
       - name: Deploy to Cloudflare
         run: npx wrangler deploy
