@@ -1,0 +1,17 @@
+name: PayKesho Runner Smoke Test
+
+on:
+  push:
+    branches:
+      - feature/paykesho-customer-journey
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Runner smoke test
+        run: |
+          echo "GitHub Actions runner is available"
+          node --version
+          java -version
