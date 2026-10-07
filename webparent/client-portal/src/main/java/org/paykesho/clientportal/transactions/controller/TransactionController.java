@@ -234,6 +234,11 @@ public class TransactionController {
             throw new PaykeshoError("Failed to save transaction: " + e.getMessage());
         }
 
+        String payoutValidationError = paymentSettlementClient.validateMerchantPayoutProfile(merchant);
+        if (payoutValidationError != null) {
+            throw new PaykeshoError(payoutValidationError);
+        }
+
         // The PayKesho ledger is debited first; Lenco is the external settlement rail.
         // The transaction remains PENDING until Lenco confirms the payout.
         SettlementClientResponse settlement = paymentSettlementClient.settle(merchant, amount, paykeshoRef);
@@ -294,7 +299,10 @@ public class TransactionController {
             // Notify merchant immediately for verification/receipt.
             if (transaction.getMerchant().getPhoneNumber() != null && !transaction.getMerchant().getPhoneNumber().trim().isEmpty()) {
                 String merchantSms = String.format(
-                    "PAYKESHO PAYMENT RECEIVED: K%s from %s. Reference: %s. Merchant: %s.",
+                    "PAYKESHO PAYMENT %s: K%s from %s. Reference: %s. Merchant: %s.",
+
+                    transaction.isSettled() ? "RECEIVED" : "INITIATED",
+                    transaction.isSettled() ? "received" : "initiated",
                     transaction.getAmount(),
                     transaction.getClient().getFullName(),
                     transaction.getReference(),
@@ -304,7 +312,8 @@ public class TransactionController {
             }
             if (transaction.getMerchant().getEmail() != null && !transaction.getMerchant().getEmail().trim().isEmpty()) {
                 String merchantEmail = String.format(
-                    "Payment received: K%s from %s. Reference: %s. Merchant: %s.",
+                    "PayKesho payment %s: K%s from %s. Reference: %s. Merchant: %s.",
+
                     transaction.getAmount(),
                     transaction.getClient().getFullName(),
                     transaction.getReference(),
