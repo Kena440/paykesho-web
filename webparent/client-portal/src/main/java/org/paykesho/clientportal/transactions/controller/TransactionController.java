@@ -150,7 +150,7 @@ public class TransactionController {
             Transaction trx = runPaymentSubmission(client, merchant, voucher, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
-                ResponseEntity<?> response = updateClientBalance(client);
+                ResponseEntity<?> response = updateClientBalance(client, trx);
                 
                 // Mark as completed after successful transaction
                 idempotencyService.markAsCompleted(finalIdempotencyKey, 200, "{\"transactionRef\":\"" + trx.getReference() + "\"}", null);
