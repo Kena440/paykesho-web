@@ -304,7 +304,6 @@ public class TransactionController {
                     "PAYKESHO PAYMENT %s: K%s from %s. Reference: %s. Merchant: %s.",
 
                     transaction.isSettled() ? "RECEIVED" : "INITIATED",
-                    transaction.isSettled() ? "received" : "initiated",
                     transaction.getAmount(),
                     transaction.getClient().getFullName(),
                     transaction.getReference(),
