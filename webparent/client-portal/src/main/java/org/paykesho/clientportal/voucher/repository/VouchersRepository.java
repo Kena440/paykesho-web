@@ -5,6 +5,8 @@ import org.commons.entity.client.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Lock;
+import javax.persistence.LockModeType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,5 +34,9 @@ public interface VouchersRepository extends JpaRepository<Voucher, Integer> {
 
     // Additional methods for dashboard analytics
     List<Voucher> findByClient(Client client);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select v from Voucher v where v.id = :id")
+    Voucher findByIdForUpdate(@Param("id") Integer id);
 }
 
