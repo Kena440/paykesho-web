@@ -246,6 +246,28 @@ public class TransactionController {
                 log.error("Failed to create email notification request for: {}", transaction.getClient().getEmail());
             }
 
+            // Notify merchant immediately for verification/receipt.
+            if (transaction.getMerchant().getPhoneNumber() != null && !transaction.getMerchant().getPhoneNumber().trim().isEmpty()) {
+                String merchantSms = String.format(
+                    "PAYKESHO PAYMENT RECEIVED: K%s from %s. Reference: %s. Merchant: %s.",
+                    transaction.getAmount(),
+                    transaction.getClient().getFullName(),
+                    transaction.getReference(),
+                    transaction.getMerchant().getName()
+                );
+                notificationClient.sendNotification(transaction.getMerchant().getPhoneNumber(), merchantSms, "sms");
+            }
+            if (transaction.getMerchant().getEmail() != null && !transaction.getMerchant().getEmail().trim().isEmpty()) {
+                String merchantEmail = String.format(
+                    "Payment received: K%s from %s. Reference: %s. Merchant: %s.",
+                    transaction.getAmount(),
+                    transaction.getClient().getFullName(),
+                    transaction.getReference(),
+                    transaction.getMerchant().getName()
+                );
+                notificationClient.sendNotification(transaction.getMerchant().getEmail(), merchantEmail, "email");
+            }
+
             // Send SMS notification via NotificationClient
             if (transaction.getClient().getPhoneNumber() != null && !transaction.getClient().getPhoneNumber().trim().isEmpty()) {
                 boolean smsSent = notificationClient.sendNotification(
