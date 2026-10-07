@@ -26,13 +26,19 @@ function paykeshoEnv(env: Env, profile: string): Record<string, string> {
     PAYKESHO_DB_URL: env.PAYKESHO_DB_URL,
     PAYKESHO_DB_USERNAME: env.PAYKESHO_DB_USERNAME,
     PAYKESHO_DB_PASSWORD: env.PAYKESHO_DB_PASSWORD,
-    PAYKESHO_ADMIN_EMAIL: env.PAYKESHO_ADMIN_EMAIL,
-    PAYKESHO_ADMIN_PASSWORD: env.PAYKESHO_ADMIN_PASSWORD,
     NOTIFICATION_SERVICE_URL: env.NOTIFICATION_SERVICE_URL || "http://localhost:8085",
     FILE_SERVICE_URL: env.FILE_SERVICE_URL || "http://localhost:8086",
     RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED || "true",
     PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || "",
     PAYMENT_SERVICE_URL: env.PAYMENT_SERVICE_URL || "http://localhost:8787/internal/payment"
+  };
+}
+
+function backofficeEnv(env: Env): Record<string, string> {
+  return {
+    ...paykeshoEnv(env, "cloudflare"),
+    PAYKESHO_ADMIN_EMAIL: env.PAYKESHO_ADMIN_EMAIL,
+    PAYKESHO_ADMIN_PASSWORD: env.PAYKESHO_ADMIN_PASSWORD
   };
 }
 
@@ -51,7 +57,7 @@ export class PaykeshoWebContainer extends Container {
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
     super(ctx, env);
-    this.envVars = paykeshoEnv(env, "cloudflare");
+    this.envVars = backofficeEnv(env);
   }
 
   override onStart() {
@@ -124,8 +130,7 @@ export default {
         dbUsernamePresent: Boolean(env.PAYKESHO_DB_USERNAME),
         dbPasswordPresent: Boolean(env.PAYKESHO_DB_PASSWORD),
         adminEmailPresent: Boolean(env.PAYKESHO_ADMIN_EMAIL),
-        adminPasswordPresent: Boolean(env.PAYKESHO_ADMIN_PASSWORD),
-        adminEmail: env.PAYKESHO_ADMIN_EMAIL || null
+        adminPasswordPresent: Boolean(env.PAYKESHO_ADMIN_PASSWORD)
       }, { headers: { "cache-control": "no-store" } });
     }
 
