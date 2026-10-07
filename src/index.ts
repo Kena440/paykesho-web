@@ -84,13 +84,13 @@ export class PaykeshoClientContainer extends Container {
 
 async function forwardToContainer(
   container: PaykeshoWebContainer | PaykeshoClientContainer | PaykeshoPaymentContainer,
-  request: Request
+  request: Request,
+  port: number
 ): Promise<Response> {
-  // Spring Boot + Hibernate can exceed Cloudflare's 20-second default cold-start
-  // readiness window. Explicitly wait for the application port for up to 120s,
-  // then forward the request once the process is actually accepting connections.
+  // Use a plain number here. Container properties such as defaultPort are RPC-backed
+  // and must not be passed as serialized method arguments.
   await container.startAndWaitForPorts({
-    ports: [container.defaultPort],
+    ports: [port],
     cancellationOptions: {
       portReadyTimeoutMS: 120_000,
       waitInterval: 500
@@ -127,9 +127,9 @@ export default {
       if (isPayment && url.pathname.startsWith("/internal/payment/")) {
         const rewritten = new URL(request.url);
         rewritten.pathname = url.pathname.replace(/^\/internal\/payment/, "") || "/";
-        return await forwardToContainer(container, new Request(rewritten.toString(), request));
+        return await forwardToContainer(container, new Request(rewritten.toString(), request), 8084);
       }
-      return await forwardToContainer(container, request);
+      return await forwardToContainer(container, request, 8080);
     } catch (error) {
       console.error(`PayKesho ${containerId} container request failed`, error);
       let state: unknown = null;
