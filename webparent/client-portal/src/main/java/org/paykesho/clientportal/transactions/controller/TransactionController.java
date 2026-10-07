@@ -100,9 +100,21 @@ public class TransactionController {
 
         // IDEMPOTENCY CHECK: Check if this transaction was already processed
         Optional<IdempotencyRecord> existingRecord = idempotencyService.checkIdempotency(idempotencyKey);
-        if (existingRecord.isPresent() && existingRecord.get().isCompleted()) {
-            log.warn("Duplicate transaction attempt detected with idempotency key: {}", idempotencyKey);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Transaction already processed. Please check your transaction history."));
+        if (existingRecord.isPresent()) {
+            IdempotencyRecord record = existingRecord.get();
+            if (record.isCompleted()) {
+                log.warn("Duplicate completed transaction attempt detected with idempotency key: {}", idempotencyKey);
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Collections.singletonMap("message", "Transaction already processed. Please check your transaction history."));
+            }
+            if ("PROCESSING".equalsIgnoreCase(record.getStatus())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Collections.singletonMap("message", "This payment is already being processed. Please wait for the result."));
+            }
+            if ("FAILED".equalsIgnoreCase(record.getStatus())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Collections.singletonMap("message", "This payment attempt previously failed. Please start a new payment attempt."));
+            }
         }
 
         String merchantCode = requestBody.get("merchantCode");
