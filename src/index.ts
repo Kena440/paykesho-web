@@ -54,7 +54,7 @@ function paymentEnv(env: Env): Record<string, string> {
 
 export class PaykeshoWebContainer extends Container {
   defaultPort = 8080;
-  pingEndpoint = "admin/actuator/health";
+  pingEndpoint = "localhost/admin/actuator/health";
   sleepAfter = "10m";
   constructor(ctx: DurableObjectState<{}>, env: Env) { super(ctx, env); this.envVars = backofficeEnv(env); }
   override onStart() { console.log("PayKesho back-office container started"); }
@@ -64,7 +64,7 @@ export class PaykeshoWebContainer extends Container {
 
 export class PaykeshoPaymentContainer extends Container {
   defaultPort = 8084;
-  pingEndpoint = "actuator/health";
+  pingEndpoint = "localhost/actuator/health";
   sleepAfter = "10m";
   constructor(ctx: DurableObjectState<{}>, env: Env) { super(ctx, env); this.envVars = paymentEnv(env); }
   override onStart() { console.log("PayKesho payment container started"); }
@@ -86,8 +86,16 @@ async function forwardToContainer(
   container: PaykeshoWebContainer | PaykeshoClientContainer | PaykeshoPaymentContainer,
   request: Request
 ): Promise<Response> {
-  // Container.fetch() handles startup/readiness automatically. Avoid a separate
-  // startAndWaitForPorts() call followed by fetch(), which can race lifecycle state.
+  // Spring Boot + Hibernate can exceed Cloudflare's 20-second default cold-start
+  // readiness window. Explicitly wait for the application port for up to 120s,
+  // then forward the request once the process is actually accepting connections.
+  await container.startAndWaitForPorts({
+    ports: [container.defaultPort],
+    cancellationOptions: {
+      portReadyTimeoutMS: 120_000,
+      waitInterval: 500
+    }
+  });
   return await container.fetch(request);
 }
 
