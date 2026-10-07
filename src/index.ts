@@ -169,7 +169,8 @@ export default {
 
     if (url.pathname === "/health" || url.pathname === "/api/health") {
       try {
-        const healthRequest = new Request(new URL("/actuator/health", request.url), request);
+        const healthPath = isAdmin ? "/admin/actuator/health" : "/actuator/health";
+        const healthRequest = new Request(new URL(healthPath, request.url), request);
         const response = await container.fetch(healthRequest);
 
         return new Response(response.body, {
