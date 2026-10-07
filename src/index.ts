@@ -1,3 +1,4 @@
+// PayKesho production deployment is managed by Cloudflare Workers Builds.
 import { Container, getContainer } from "@cloudflare/containers";
 
 export interface Env {
