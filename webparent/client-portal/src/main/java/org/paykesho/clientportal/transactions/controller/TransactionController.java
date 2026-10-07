@@ -326,7 +326,7 @@ public class TransactionController {
             if (transaction.getMerchant().getEmail() != null && !transaction.getMerchant().getEmail().trim().isEmpty()) {
                 String merchantEmail = String.format(
                     "PayKesho payment %s: K%s from %s. Reference: %s. Merchant: %s.",
-
+                    transaction.isSettled() ? "RECEIVED" : "INITIATED",
                     transaction.getAmount(),
                     transaction.getClient().getFullName(),
                     transaction.getReference(),
