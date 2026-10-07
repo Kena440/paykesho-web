@@ -29,7 +29,7 @@ function paykeshoEnv(env: Env, profile: string): Record<string, string> {
     NOTIFICATION_SERVICE_URL: env.NOTIFICATION_SERVICE_URL || "http://localhost:8085",
     FILE_SERVICE_URL: env.FILE_SERVICE_URL || "http://localhost:8086",
     RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED || "true",
-    PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || "",
+    PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || env.PAYKESHO_ADMIN_PASSWORD || "",
     PAYMENT_SERVICE_URL: env.PAYMENT_SERVICE_URL || "http://localhost:8787/internal/payment"
   };
 }
