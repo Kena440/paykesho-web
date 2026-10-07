@@ -25,13 +25,29 @@ public class SettlementReconciliationService {
             return;
         }
 
-        Transaction transaction = transactionRepository.findByReference(reference).orElse(null);
+        Transaction transaction = transactionRepository.findByReferenceForUpdate(reference).orElse(null);
         if (transaction == null) {
             log.warn("Received Lenco settlement event for unknown PayKesho reference {}", reference);
             return;
         }
 
         String normalized = status == null ? "PENDING" : status.toUpperCase();
+        String current = transaction.getSettlementStatus() == null
+                ? "PENDING"
+                : transaction.getSettlementStatus().toUpperCase();
+
+        // Terminal states are immutable. This prevents a duplicate or out-of-order
+        // webhook from refunding an already successful payment or marking a refunded
+        // payment successful after the e-value has been released.
+        if ("SUCCESSFUL".equals(current) && "FAILED".equals(normalized)) {
+            log.warn("Ignoring late FAILED settlement event for already successful transaction {}", reference);
+            return;
+        }
+        if ("FAILED".equals(current) && "SUCCESSFUL".equals(normalized)) {
+            log.error("Ignoring late SUCCESSFUL settlement event for already refunded transaction {}. Manual reconciliation required.", reference);
+            return;
+        }
+
         if ("SUCCESSFUL".equals(normalized)) {
             transaction.setSettled(true);
             transaction.setSettlementStatus("SUCCESSFUL");
@@ -46,6 +62,7 @@ public class SettlementReconciliationService {
             // A failed payout must release the e-value consumed for this payment.
             // Guard on settlement status so a repeated webhook cannot refund twice.
             if (!"FAILED".equalsIgnoreCase(transaction.getSettlementStatus())
+                    && !"SUCCESSFUL".equalsIgnoreCase(transaction.getSettlementStatus())
                     && transaction.getVoucher() != null) {
                 Voucher voucher = transaction.getVoucher();
                 if (voucher.getAvailableAmount() == null) {
