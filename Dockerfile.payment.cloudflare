@@ -6,7 +6,7 @@ COPY . .
 
 # Build the dedicated Lenco settlement service.
 RUN mvn -B -ntp -pl webparent/payment-service -am clean package \
-    -Dmaven.test.skip=true \
+    -DskipTests \
     -Djacoco.skip=true
 
 FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
