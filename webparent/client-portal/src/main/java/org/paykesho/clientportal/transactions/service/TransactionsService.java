@@ -74,6 +74,25 @@ public class TransactionsService {
         return transactionRepository.save(transaction);
     }
 
+    @Transactional
+    public void refundFailedSettlement(Transaction transaction) throws PaykeshoError {
+        if (transaction == null || transaction.getVoucher() == null || transaction.getAmount() == null) {
+            throw new PaykeshoError("Transaction cannot be refunded");
+        }
+        Voucher voucher = vouchersRepository.findByIdForUpdate(transaction.getVoucher().getId());
+        if (voucher == null) {
+            throw new PaykeshoError("Voucher no longer exists");
+        }
+        voucher.setAvailableAmount(
+                (voucher.getAvailableAmount() == null ? BigDecimal.ZERO : voucher.getAvailableAmount())
+                        .add(transaction.getAmount())
+        );
+        vouchersRepository.save(voucher);
+        transaction.setSettlementStatus("FAILED");
+        transaction.setSettled(false);
+        transactionRepository.save(transaction);
+    }
+
     public List<TransactionDto> getClientTransactionsFlat(Client client) throws PaykeshoError {
         if (client == null) {
             throw new PaykeshoError("no client");
