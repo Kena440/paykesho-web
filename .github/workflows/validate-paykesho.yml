@@ -27,7 +27,7 @@ jobs:
           cache: npm
 
       - name: Install Worker dependencies
-        run: npm ci
+        run: npm install
 
       - name: Typecheck Worker
         run: npm run typecheck
