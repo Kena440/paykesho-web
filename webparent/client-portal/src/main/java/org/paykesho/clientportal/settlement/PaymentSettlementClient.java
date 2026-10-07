@@ -30,16 +30,18 @@ public class PaymentSettlementClient {
     public String validateMerchantPayoutProfile(Merchant merchant) {
         if (merchant == null) return "Merchant payout profile is missing.";
         String method = merchant.getPayoutMethod();
+        boolean hasRecipientId = merchant.getLencoTransferRecipientId() != null
+                && !merchant.getLencoTransferRecipientId().trim().isEmpty();
         if ("mobile-money".equalsIgnoreCase(method)) {
-            if (merchant.getPayoutOperator() == null || merchant.getPayoutOperator().trim().isEmpty()) {
+            if (!hasRecipientId && (merchant.getPayoutOperator() == null || merchant.getPayoutOperator().trim().isEmpty())) {
                 return "Merchant mobile-money operator is not configured.";
             }
-            if (merchant.getPayoutPhone() == null || merchant.getPayoutPhone().trim().isEmpty()) {
+            if (!hasRecipientId && (merchant.getPayoutPhone() == null || merchant.getPayoutPhone().trim().isEmpty())) {
                 return "Merchant payout phone is not configured.";
             }
         } else if ("bank-account".equalsIgnoreCase(method)) {
-            if (merchant.getPayoutBankId() == null || merchant.getPayoutBankId().trim().isEmpty()
-                    || merchant.getPayoutAccountNumber() == null || merchant.getPayoutAccountNumber().trim().isEmpty()) {
+            if (!hasRecipientId && (merchant.getPayoutBankId() == null || merchant.getPayoutBankId().trim().isEmpty()
+                    || merchant.getPayoutAccountNumber() == null || merchant.getPayoutAccountNumber().trim().isEmpty())) {
                 return "Merchant bank payout details are not configured.";
             }
         } else {
