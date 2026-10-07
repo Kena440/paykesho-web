@@ -105,6 +105,8 @@ async function waitForContainerPort(
 }
 
 abstract class PaykeshoDirectContainer extends DurableObject<Env> {
+  private starting?: Promise<void>;
+
   abstract readonly port: number;
   abstract readonly healthPath: string;
   abstract buildEnv(env: Env): Record<string, string>;
@@ -118,12 +120,16 @@ abstract class PaykeshoDirectContainer extends DurableObject<Env> {
       );
     }
 
-    await waitForContainerPort(
+    this.starting ??= waitForContainerPort(
       container,
       this.port,
       this.healthPath,
       this.buildEnv(this.env)
-    );
+    ).finally(() => {
+      this.starting = undefined;
+    });
+
+    await this.starting;
 
     return container.getTcpPort(this.port).fetch(
       rewriteRequestForContainer(request)
