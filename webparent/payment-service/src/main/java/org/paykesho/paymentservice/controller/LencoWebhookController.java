@@ -61,10 +61,14 @@ public class LencoWebhookController {
 
         try {
             MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            byte[] webhookKey = sha256.digest(apiToken.getBytes(StandardCharsets.UTF_8));
+            byte[] digest = sha256.digest(apiToken.getBytes(StandardCharsets.UTF_8));
+            StringBuilder webhookKeyHex = new StringBuilder();
+            for (byte b : digest) {
+                webhookKeyHex.append(String.format("%02x", b));
+            }
 
             Mac mac = Mac.getInstance("HmacSHA512");
-            mac.init(new SecretKeySpec(webhookKey, "HmacSHA512"));
+            mac.init(new SecretKeySpec(webhookKeyHex.toString().getBytes(StandardCharsets.UTF_8), "HmacSHA512"));
             byte[] expected = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
 
             StringBuilder hex = new StringBuilder();
