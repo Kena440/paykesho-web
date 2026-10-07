@@ -82,20 +82,28 @@ export class PaykeshoClientContainer extends Container {
   override onStop(params: { exitCode?: number; reason: string }) { console.error("PayKesho customer container stopped", params); }
 }
 
+const startupLocks = new WeakMap<object, Promise<void>>();
+
 async function forwardToContainer(
   container: PaykeshoWebContainer | PaykeshoClientContainer | PaykeshoPaymentContainer,
   request: Request,
   port: number
 ): Promise<Response> {
-  // Use a plain number here. Container properties such as defaultPort are RPC-backed
-  // and must not be passed as serialized method arguments.
-  await container.startAndWaitForPorts({
-    ports: [port],
-    cancellationOptions: {
-      portReadyTimeoutMS: 120_000,
-      waitInterval: 500
-    }
-  });
+  // Cloudflare recommends sharing one startup promise across concurrent requests.
+  // This prevents multiple requests from racing the same Durable Object/container
+  // instance during a cold start.
+  let starting = startupLocks.get(container);
+  if (!starting) {
+    starting = container.startAndWaitForPorts({
+      ports: [port],
+      cancellationOptions: {
+        portReadyTimeoutMS: 120_000,
+        waitInterval: 500
+      }
+    }).finally(() => startupLocks.delete(container));
+    startupLocks.set(container, starting);
+  }
+  await starting;
   return await container.containerFetch(request, port);
 }
 
