@@ -68,5 +68,17 @@
   },
   "observability": {
     "enabled": true
+  },
+  "secrets": {
+    "required": [
+      "PAYKESHO_DB_URL",
+      "PAYKESHO_DB_USERNAME",
+      "PAYKESHO_DB_PASSWORD",
+      "PAYKESHO_ADMIN_EMAIL",
+      "PAYKESHO_ADMIN_PASSWORD",
+      "LENCO_API_TOKEN",
+      "LENCO_ACCOUNT_ID",
+      "PAYKESHO_INTERNAL_TOKEN"
+    ]
   }
 }
