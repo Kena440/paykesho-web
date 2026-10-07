@@ -139,11 +139,6 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
             }
 
-        String payoutValidationError = paymentSettlementClient.validateMerchantPayoutProfile(merchant);
-        if (payoutValidationError != null) {
-            throw new PaykeshoError(payoutValidationError);
-        }
-
         Voucher voucher = voucherService.getApprovedAndValidClientVouchers(client).stream()
                     .filter(v -> v.getAvailableAmount() != null && v.getAvailableAmount().compareTo(amount) >= 0)
                     .findFirst()
@@ -222,6 +217,11 @@ public class TransactionController {
         Merchant merchant = merchantService.getMerchantByPaykeshoRef(merchantDto.getCode());
         if (merchant == null) {
             throw new PaykeshoError("Could not find merchant with the provided code.");
+        }
+
+        String payoutValidationError = paymentSettlementClient.validateMerchantPayoutProfile(merchant);
+        if (payoutValidationError != null) {
+            throw new PaykeshoError(payoutValidationError);
         }
 
         transaction.setMerchant(merchant);
