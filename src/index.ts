@@ -31,11 +31,17 @@ function paykeshoEnv(env: Env, profile: string): Record<string, string> {
     NOTIFICATION_SERVICE_URL: env.NOTIFICATION_SERVICE_URL || "http://localhost:8085",
     FILE_SERVICE_URL: env.FILE_SERVICE_URL || "http://localhost:8086",
     RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED || "true",
-    LENCO_API_BASE_URL: env.LENCO_API_BASE_URL || "https://api.lenco.co/access/v2",
-    LENCO_API_TOKEN: env.LENCO_API_TOKEN || "",
-    LENCO_ACCOUNT_ID: env.LENCO_ACCOUNT_ID || "",
     PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || "",
     PAYMENT_SERVICE_URL: env.PAYMENT_SERVICE_URL || "http://localhost:8787/internal/payment"
+  };
+}
+
+function paymentEnv(env: Env): Record<string, string> {
+  return {
+    ...paykeshoEnv(env, "cloudflare"),
+    LENCO_API_BASE_URL: env.LENCO_API_BASE_URL || "https://api.lenco.co/access/v2",
+    LENCO_API_TOKEN: env.LENCO_API_TOKEN || "",
+    LENCO_ACCOUNT_ID: env.LENCO_ACCOUNT_ID || ""
   };
 }
 
@@ -67,7 +73,7 @@ export class PaykeshoPaymentContainer extends Container {
 
   constructor(ctx: DurableObjectState<{}>, env: Env) {
     super(ctx, env);
-    this.envVars = paykeshoEnv(env, "cloudflare");
+    this.envVars = paymentEnv(env);
   }
 
   override onStart() {
