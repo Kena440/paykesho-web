@@ -37,4 +37,16 @@ public class Transaction extends IdBasedEntity {
 
     private boolean settled;
 
+    @Column(name = "settlement_status", length = 32)
+    private String settlementStatus; // PENDING, SUCCESSFUL, FAILED
+
+    @Column(name = "settlement_reference", length = 128)
+    private String settlementReference;
+
+    @Column(name = "settlement_reason", length = 255)
+    private String settlementReason;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "settlement_updated_at")
+    private Date settlementUpdatedAt;
 }
