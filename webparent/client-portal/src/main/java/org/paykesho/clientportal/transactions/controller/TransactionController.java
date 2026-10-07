@@ -18,12 +18,15 @@ import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.paykesho.clientportal.idempotency.service.IdempotencyService;
+import org.paykesho.clientportal.settlement.PaymentSettlementClient;
+import org.paykesho.clientportal.settlement.SettlementClientResponse;
 import org.commons.entity.IdempotencyRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +61,8 @@ public class TransactionController {
     private NotificationClient notificationClient;
     @Autowired
     private IdempotencyService idempotencyService;
+    @Autowired
+    private PaymentSettlementClient paymentSettlementClient;
 
     @GetMapping("")
     public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
@@ -95,17 +100,32 @@ public class TransactionController {
 
         // IDEMPOTENCY CHECK: Check if this transaction was already processed
         Optional<IdempotencyRecord> existingRecord = idempotencyService.checkIdempotency(idempotencyKey);
-        if (existingRecord.isPresent() && existingRecord.get().isCompleted()) {
-            log.warn("Duplicate transaction attempt detected with idempotency key: {}", idempotencyKey);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Transaction already processed. Please check your transaction history."));
+        if (existingRecord.isPresent()) {
+            IdempotencyRecord record = existingRecord.get();
+            if (record.isCompleted()) {
+                log.warn("Duplicate completed transaction attempt detected with idempotency key: {}", idempotencyKey);
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Collections.singletonMap("message", "Transaction already processed. Please check your transaction history."));
+            }
+            if ("PROCESSING".equalsIgnoreCase(record.getStatus())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Collections.singletonMap("message", "This payment is already being processed. Please wait for the result."));
+            }
+            if ("FAILED".equalsIgnoreCase(record.getStatus())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Collections.singletonMap("message", "This payment attempt previously failed. Please start a new payment attempt."));
+            }
         }
 
         String merchantCode = requestBody.get("merchantCode");
         BigDecimal amount;
         try {
             amount = new BigDecimal(requestBody.get("amount"));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format. Please enter a valid number."));
+        }
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Payment amount must be greater than zero."));
         }
 
         // Create idempotency record at START of processing
@@ -131,17 +151,20 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
             }
 
-            BigDecimal availableBalance = clientService.getClientBalance(client).getAvailableBalance();
+        Voucher voucher = voucherService.getApprovedAndValidClientVouchers(client).stream()
+                    .filter(v -> v.getAvailableAmount() != null && v.getAvailableAmount().compareTo(amount) >= 0)
+                    .findFirst()
+                    .orElse(null);
 
-            if (availableBalance.compareTo(amount) < 0) {
-                idempotencyService.markAsFailed(finalIdempotencyKey, "Insufficient balance", 400);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Insufficient balance."));
+            if (voucher == null) {
+                idempotencyService.markAsFailed(finalIdempotencyKey, "Insufficient e-value", 400);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Insufficient PayKesho e-value."));
             }
 
-            Transaction trx = runPaymentSubmission(client, merchant, amount);
+            Transaction trx = runPaymentSubmission(client, merchant, voucher, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
-                ResponseEntity<?> response = updateClientBalance(amount, client, clientService.getClientBalance(client).getCurrentBalance());
+                ResponseEntity<?> response = updateClientBalance(client, trx);
                 
                 // Mark as completed after successful transaction
                 idempotencyService.markAsCompleted(finalIdempotencyKey, 200, "{\"transactionRef\":\"" + trx.getReference() + "\"}", null);
@@ -162,18 +185,42 @@ public class TransactionController {
         }
     }
 
-    private ResponseEntity<Map<String, Boolean>> updateClientBalance(BigDecimal amount, Client client, BigDecimal currentBalance) {
+    private ResponseEntity<Map<String, Object>> updateClientBalance(Client client, Transaction transaction) throws PaykeshoError {
         ClientBalance clientBalance = clientService.getClientBalance(client);
-        BigDecimal newBalance = currentBalance.subtract(amount);
-        clientBalance.setCurrentBalance(newBalance);
-        clientBalance.setAvailableBalance(newBalance);
+        if (clientBalance == null) {
+            clientBalance = new ClientBalance();
+            clientBalance.setClient(client);
+            clientBalance.setTotalCredits(BigDecimal.ZERO);
+            clientBalance.setTotalDebits(BigDecimal.ZERO);
+            clientBalance.setHeldBalance(BigDecimal.ZERO);
+        }
+
+        BigDecimal remaining = voucherService.getApprovedAndValidClientVouchersBalance(client);
+        clientBalance.setCurrentBalance(remaining);
+        clientBalance.setAvailableBalance(remaining);
+        clientBalance.setTotalDebits(
+                clientBalance.getTotalDebits() == null ? BigDecimal.ZERO : clientBalance.getTotalDebits()
+        );
+        clientBalance.setLastUpdate(new Date());
+        clientBalance.setLastTransactionId(transaction.getReference());
+        clientBalance.setLastTransactionType("PAYMENT");
+        clientBalance.setLastTransactionAmount(transaction.getAmount());
         clientService.saveClientBalance(clientBalance);
-        return ResponseEntity.ok(Collections.singletonMap("success", true));
+
+        Map<String, Object> response = new java.util.LinkedHashMap<>();
+        response.put("success", true);
+        response.put("transactionRef", transaction.getReference());
+        response.put("merchant", transaction.getMerchant().getName());
+        response.put("amount", transaction.getAmount());
+        response.put("remainingBalance", remaining);
+        response.put("settled", transaction.isSettled());
+        response.put("settlementStatus", transaction.getSettlementStatus());
+        response.put("settlementReference", transaction.getSettlementReference());
+        return ResponseEntity.ok(response);
     }
 
-    private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, BigDecimal amount) throws PaykeshoError {
+    private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, Voucher voucher, BigDecimal amount) throws PaykeshoError {
 
-        Transaction savedTxn = null;
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_TRX");
         if (paykeshoRef == null) throw new PaykeshoError("Failed to generate transaction reference.");
 
@@ -183,24 +230,58 @@ public class TransactionController {
         if (merchant == null) {
             throw new PaykeshoError("Could not find merchant with the provided code.");
         }
+
+        String payoutValidationError = paymentSettlementClient.validateMerchantPayoutProfile(merchant);
+        if (payoutValidationError != null) {
+            throw new PaykeshoError(payoutValidationError);
+        }
+
         transaction.setMerchant(merchant);
         transaction.setAmount(amount);
         transaction.setReference(paykeshoRef);
         transaction.setNaration(paykeshoRef);
         transaction.setTxnDate(new Date());
+        transaction.setCurrency("ZMW");
         transaction.setSettled(false);
+        transaction.setSettlementStatus("PENDING");
 
+        Transaction savedTxn;
         try {
-            savedTxn = transactionsService.save(transaction);
+            savedTxn = transactionsService.savePaymentAndConsumeVoucher(transaction, voucher.getId(), amount);
         } catch (Exception e) {
             log.error("Error saving transaction:", e);
             throw new PaykeshoError("Failed to save transaction: " + e.getMessage());
         }
 
-        if (savedTxn != null) {
-            sendNotification(savedTxn);
+        // The PayKesho ledger is debited first; Lenco is the external settlement rail.
+        // The transaction remains PENDING until Lenco confirms the payout.
+        SettlementClientResponse settlement = paymentSettlementClient.settle(merchant, amount, paykeshoRef);
+        savedTxn.setSettlementStatus(settlement.getStatus());
+        savedTxn.setSettlementReference(settlement.getLencoReference());
+        savedTxn.setSettlementReason(settlement.getMessage());
+        savedTxn.setSettlementUpdatedAt(new Date());
+
+        if ("SUCCESSFUL".equalsIgnoreCase(settlement.getStatus())) {
+            savedTxn.setSettled(true);
+        } else if ("FAILED".equalsIgnoreCase(settlement.getStatus())) {
+            savedTxn.setSettled(false);
+            try {
+                SettlementClientResponse reconciliation = paymentSettlementClient.reconcile(
+                        paykeshoRef, "FAILED", settlement.getLencoReference(), settlement.getMessage());
+                if (!reconciliation.isAccepted()) {
+                    transactionsService.refundFailedSettlement(savedTxn);
+                }
+            } catch (Exception reconcileError) {
+                log.error("Failed to reconcile failed Lenco payout {}: {}", paykeshoRef, reconcileError.getMessage());
+                transactionsService.refundFailedSettlement(savedTxn);
+            }
+            throw new PaykeshoError("Merchant settlement failed: " + settlement.getMessage());
+        } else {
+            savedTxn.setSettled(false);
         }
 
+        savedTxn = transactionsService.save(savedTxn);
+        sendNotification(savedTxn);
         return savedTxn;
     }
 
@@ -227,6 +308,31 @@ public class TransactionController {
                 log.info("Transaction email notification request created for: {}", transaction.getClient().getEmail());
             } else {
                 log.error("Failed to create email notification request for: {}", transaction.getClient().getEmail());
+            }
+
+            // Notify merchant immediately for verification/receipt.
+            if (transaction.getMerchant().getPhoneNumber() != null && !transaction.getMerchant().getPhoneNumber().trim().isEmpty()) {
+                String merchantSms = String.format(
+                    "PAYKESHO PAYMENT %s: K%s from %s. Reference: %s. Merchant: %s.",
+
+                    transaction.isSettled() ? "RECEIVED" : "INITIATED",
+                    transaction.getAmount(),
+                    transaction.getClient().getFullName(),
+                    transaction.getReference(),
+                    transaction.getMerchant().getName()
+                );
+                notificationClient.sendNotification(transaction.getMerchant().getPhoneNumber(), merchantSms, "sms");
+            }
+            if (transaction.getMerchant().getEmail() != null && !transaction.getMerchant().getEmail().trim().isEmpty()) {
+                String merchantEmail = String.format(
+                    "PayKesho payment %s: K%s from %s. Reference: %s. Merchant: %s.",
+
+                    transaction.getAmount(),
+                    transaction.getClient().getFullName(),
+                    transaction.getReference(),
+                    transaction.getMerchant().getName()
+                );
+                notificationClient.sendNotification(transaction.getMerchant().getEmail(), merchantEmail, "email");
             }
 
             // Send SMS notification via NotificationClient
@@ -279,7 +385,11 @@ public class TransactionController {
         String txnAmount = "K" + transaction.getAmount();
         if ("PAYMENT".equals(actionType)) {
             String clientName = transaction.getClient().getFullName() != null ? transaction.getClient().getFullName() : "Client";
-            return String.format("Dear %s, your payment request processed successfully. Amount: %s. Merchant: %s. Reference: %s. Thank you. Get lelo, Pay Kesho.", clientName, txnAmount, transaction.getMerchant().getName(), transaction.getReference());
+            String statusText = transaction.isSettled()
+                    ? "was completed successfully"
+                    : "was initiated and is awaiting merchant settlement";
+            return String.format("Dear %s, your PayKesho payment %s. Amount: %s. Merchant: %s. Reference: %s.",
+                    clientName, statusText, txnAmount, transaction.getMerchant().getName(), transaction.getReference());
         }
         return "Unknown action type.";
     }
