@@ -149,7 +149,7 @@ export class PaykeshoPaymentContainer extends PaykeshoDirectContainer {
 
 export class PaykeshoClientContainer extends PaykeshoDirectContainer {
   readonly port = 8080;
-  readonly healthPath = "/login";
+  readonly healthPath = "/actuator/health/liveness";
   buildEnv(env: Env) {
     return paykeshoEnv(env, "cloudflare");
   }
