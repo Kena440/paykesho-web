@@ -57,9 +57,15 @@ public class LencoTransferService {
                     message,
                     lencoReference
             );
+        } catch (WebClientResponseException e) {
+            log.warn("Lenco transfer status lookup failed for {}: {}", reference, e.getStatusCode());
+            if (e.getStatusCode().value() == 401) {
+                return new LencoSettlementResponse(false, "FAILED", "Lenco authorization failed.", null);
+            }
+            return new LencoSettlementResponse(true, "PENDING", "Status lookup temporarily unavailable.", null);
         } catch (Exception e) {
             log.warn("Unable to re-query Lenco transfer {}: {}", reference, e.getMessage());
-            return new LencoSettlementResponse(false, "PENDING", "Status lookup temporarily unavailable.", null);
+            return new LencoSettlementResponse(true, "PENDING", "Status lookup temporarily unavailable.", null);
         }
     }
 
@@ -118,10 +124,17 @@ public class LencoTransferService {
             return new LencoSettlementResponse(accepted, status, message, lencoReference);
         } catch (WebClientResponseException e) {
             log.error("Lenco payout request failed: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
+            if (e.getStatusCode().value() == 401) {
+                return new LencoSettlementResponse(false, "FAILED", "Lenco authorization failed.", null);
+            }
+            LencoSettlementResponse status = getStatus(request.getReference());
+            if ("SUCCESSFUL".equalsIgnoreCase(status.getStatus()) || "PENDING".equalsIgnoreCase(status.getStatus())) {
+                return status;
+            }
             return new LencoSettlementResponse(false, "FAILED", "Lenco payout request failed.", null);
         } catch (Exception e) {
-            log.error("Unexpected Lenco payout error", e);
-            return new LencoSettlementResponse(false, "FAILED", "Unable to reach Lenco.", null);
+            log.error("Unexpected Lenco payout error; outcome cannot be confirmed", e);
+            return new LencoSettlementResponse(true, "PENDING", "Lenco payout outcome is being reconciled.", null);
         }
     }
 }
