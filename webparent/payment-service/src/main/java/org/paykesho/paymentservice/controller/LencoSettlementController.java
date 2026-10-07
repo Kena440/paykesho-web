@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.paykesho.paymentservice.dto.LencoSettlementRequest;
 import org.paykesho.paymentservice.dto.LencoSettlementResponse;
 import org.paykesho.paymentservice.service.LencoTransferService;
+import org.paykesho.paymentservice.service.SettlementReconciliationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class LencoSettlementController {
 
     private final LencoTransferService lencoTransferService;
+    private final SettlementReconciliationService reconciliationService;
 
     @Value("${paykesho.internal.token:}")
     private String internalToken;
@@ -35,5 +37,30 @@ public class LencoSettlementController {
 
         LencoSettlementResponse response = lencoTransferService.initiate(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reconcile")
+    public ResponseEntity<?> reconcile(
+            @RequestHeader(value = "X-PayKesho-Internal-Token", required = false) String suppliedToken,
+            @RequestBody Map<String, String> request) {
+
+        if (internalToken == null || internalToken.trim().isEmpty()
+                || suppliedToken == null || !internalToken.equals(suppliedToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "Unauthorized settlement reconciliation request."));
+        }
+
+        reconciliationService.applyLencoResult(
+                request.get("reference"),
+                request.get("status"),
+                request.get("lencoReference"),
+                request.get("reason")
+        );
+        return ResponseEntity.ok(new org.paykesho.paymentservice.dto.LencoSettlementResponse(
+                true,
+                request.getOrDefault("status", "PENDING"),
+                "Settlement reconciliation applied.",
+                request.get("lencoReference")
+        ));
     }
 }
