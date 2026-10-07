@@ -146,7 +146,7 @@ public class TransactionController {
             Transaction trx = runPaymentSubmission(client, merchant, voucher, amount);
 
             if (trx != null && trx.getReference() != null && !trx.getReference().isEmpty()) {
-                ResponseEntity<?> response = updateClientBalance(amount, client, clientService.getClientBalance(client).getCurrentBalance());
+                ResponseEntity<?> response = updateClientBalance(client);
                 
                 // Mark as completed after successful transaction
                 idempotencyService.markAsCompleted(finalIdempotencyKey, 200, "{\"transactionRef\":\"" + trx.getReference() + "\"}", null);
@@ -167,11 +167,23 @@ public class TransactionController {
         }
     }
 
-    private ResponseEntity<Map<String, Boolean>> updateClientBalance(BigDecimal amount, Client client, BigDecimal currentBalance) {
+    private ResponseEntity<Map<String, Boolean>> updateClientBalance(Client client) throws PaykeshoError {
         ClientBalance clientBalance = clientService.getClientBalance(client);
-        BigDecimal newBalance = currentBalance.subtract(amount);
-        clientBalance.setCurrentBalance(newBalance);
-        clientBalance.setAvailableBalance(newBalance);
+        if (clientBalance == null) {
+            clientBalance = new ClientBalance();
+            clientBalance.setClient(client);
+            clientBalance.setTotalCredits(BigDecimal.ZERO);
+            clientBalance.setTotalDebits(BigDecimal.ZERO);
+            clientBalance.setHeldBalance(BigDecimal.ZERO);
+        }
+
+        BigDecimal remaining = voucherService.getApprovedAndValidClientVouchersBalance(client);
+        clientBalance.setCurrentBalance(remaining);
+        clientBalance.setAvailableBalance(remaining);
+        clientBalance.setTotalDebits(
+                clientBalance.getTotalDebits() == null ? BigDecimal.ZERO : clientBalance.getTotalDebits()
+        );
+        clientBalance.setLastUpdate(new Date());
         clientService.saveClientBalance(clientBalance);
         return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
