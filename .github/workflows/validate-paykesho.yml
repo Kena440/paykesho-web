@@ -37,3 +37,6 @@ jobs:
 
       - name: Compile back-office
         run: mvn -B -ntp -pl webparent/backoffice -am package -DskipTests -Djacoco.skip=true
+
+      - name: Compile payment service
+        run: mvn -B -ntp -pl webparent/payment-service -am package -DskipTests -Djacoco.skip=true
