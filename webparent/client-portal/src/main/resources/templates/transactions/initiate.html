@@ -571,10 +571,13 @@
 
         showLoader();
 
+        const idempotencyKey = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('PK-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+
         fetch('/transactions/confirm', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Idempotency-Key': idempotencyKey
             },
             body: JSON.stringify({merchantCode, amount})
         })
@@ -595,7 +598,8 @@
                 }
                 // Accept multiple success patterns
                 if (data.success === true || data.status === 'success' || data.paymentId || data.id) {
-                    showNotification('Success', 'Payment successful!', 'success');
+                    const settlementMessage = data.settled ? 'Merchant settlement confirmed.' : 'Payment recorded; merchant settlement is pending.';
+                    showNotification('Payment Successful', `<p><strong>K${data.amount || amount}</strong> paid to <strong>${data.merchant || 'merchant'}</strong>.</p><p>Reference: <strong>${data.transactionRef || 'N/A'}</strong></p><p>Remaining PayKesho balance: <strong>K${data.remainingBalance ?? '0.00'}</strong></p><p>${settlementMessage}</p>`, data.settled ? 'success' : 'info');
                     paymentForm.reset();
                     paymentForm.classList.remove('was-validated');
                     merchantDetailsDiv.style.display = 'none';
