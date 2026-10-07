@@ -52,6 +52,21 @@ public class Merchant extends IdBasedEntity {
     @Column(name = "photo_path", length = 512)
     private String photoPath;
 
+    // Lenco payout routing. These fields are intentionally optional so existing
+    // merchants remain valid while their payout profile is completed.
+    @Column(name = "lenco_transfer_recipient_id", length = 64)
+    private String lencoTransferRecipientId;
+    @Column(name = "payout_method", length = 32)
+    private String payoutMethod; // mobile-money or bank-account
+    @Column(name = "payout_operator", length = 16)
+    private String payoutOperator; // airtel, mtn, zamtel
+    @Column(name = "payout_phone", length = 20)
+    private String payoutPhone;
+    @Column(name = "payout_bank_id", length = 64)
+    private String payoutBankId;
+    @Column(name = "payout_account_number", length = 64)
+    private String payoutAccountNumber;
+
     @Override
     public String toString() {
         return name + " ~ " + merchantType;
@@ -59,11 +74,9 @@ public class Merchant extends IdBasedEntity {
 
     @Transient
     public String getPhotoPath() {
-        // Return the actual photoPath field value if set, otherwise return default
         if (this.photoPath != null && !this.photoPath.trim().isEmpty()) {
             return this.photoPath;
         }
         return "/images/default_image.png";
     }
-
 }
