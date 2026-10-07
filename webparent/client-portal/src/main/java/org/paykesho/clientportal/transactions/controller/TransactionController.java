@@ -18,6 +18,8 @@ import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.paykesho.clientportal.idempotency.service.IdempotencyService;
+import org.paykesho.clientportal.settlement.PaymentSettlementClient;
+import org.paykesho.clientportal.settlement.SettlementClientResponse;
 import org.commons.entity.IdempotencyRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,6 +61,8 @@ public class TransactionController {
     private NotificationClient notificationClient;
     @Autowired
     private IdempotencyService idempotencyService;
+    @Autowired
+    private PaymentSettlementClient paymentSettlementClient;
 
     @GetMapping("")
     public String showClientTransactions(@AuthenticationPrincipal ClientUserDetails loggedInUser, Model model) throws PaykeshoError {
@@ -196,12 +200,13 @@ public class TransactionController {
         response.put("amount", transaction.getAmount());
         response.put("remainingBalance", remaining);
         response.put("settled", transaction.isSettled());
+        response.put("settlementStatus", transaction.getSettlementStatus());
+        response.put("settlementReference", transaction.getSettlementReference());
         return ResponseEntity.ok(response);
     }
 
     private Transaction runPaymentSubmission(Client client, MerchantDto merchantDto, Voucher voucher, BigDecimal amount) throws PaykeshoError {
 
-        Transaction savedTxn = null;
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_TRX");
         if (paykeshoRef == null) throw new PaykeshoError("Failed to generate transaction reference.");
 
@@ -211,13 +216,17 @@ public class TransactionController {
         if (merchant == null) {
             throw new PaykeshoError("Could not find merchant with the provided code.");
         }
+
         transaction.setMerchant(merchant);
         transaction.setAmount(amount);
         transaction.setReference(paykeshoRef);
         transaction.setNaration(paykeshoRef);
         transaction.setTxnDate(new Date());
+        transaction.setCurrency("ZMW");
         transaction.setSettled(false);
+        transaction.setSettlementStatus("PENDING");
 
+        Transaction savedTxn;
         try {
             savedTxn = transactionsService.savePaymentAndConsumeVoucher(transaction, voucher.getId(), amount);
         } catch (Exception e) {
@@ -225,10 +234,31 @@ public class TransactionController {
             throw new PaykeshoError("Failed to save transaction: " + e.getMessage());
         }
 
-        if (savedTxn != null) {
-            sendNotification(savedTxn);
+        // The PayKesho ledger is debited first; Lenco is the external settlement rail.
+        // The transaction remains PENDING until Lenco confirms the payout.
+        SettlementClientResponse settlement = paymentSettlementClient.settle(merchant, amount, paykeshoRef);
+        savedTxn.setSettlementStatus(settlement.getStatus());
+        savedTxn.setSettlementReference(settlement.getLencoReference());
+        savedTxn.setSettlementReason(settlement.getMessage());
+        savedTxn.setSettlementUpdatedAt(new Date());
+
+        if ("SUCCESSFUL".equalsIgnoreCase(settlement.getStatus())) {
+            savedTxn.setSettled(true);
+        } else if ("FAILED".equalsIgnoreCase(settlement.getStatus())) {
+            savedTxn.setSettled(false);
+            try {
+                paymentSettlementClient.reconcile(paykeshoRef, "FAILED", settlement.getLencoReference(), settlement.getMessage());
+            } catch (Exception reconcileError) {
+                log.error("Failed to reconcile failed Lenco payout {}: {}", paykeshoRef, reconcileError.getMessage());
+                transactionsService.refundFailedSettlement(savedTxn);
+            }
+            throw new PaykeshoError("Merchant settlement failed: " + settlement.getMessage());
+        } else {
+            savedTxn.setSettled(false);
         }
 
+        savedTxn = transactionsService.save(savedTxn);
+        sendNotification(savedTxn);
         return savedTxn;
     }
 
