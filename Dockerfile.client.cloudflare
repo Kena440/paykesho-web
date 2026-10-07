@@ -1,0 +1,21 @@
+# Cloudflare Containers requires linux/amd64.
+FROM --platform=linux/amd64 maven:3.9.16-eclipse-temurin-17 AS build
+
+WORKDIR /app
+COPY . .
+
+# Build the PayKesho customer portal.
+RUN mvn -B -ntp -pl webparent/client-portal -am clean package \
+    -DskipTests \
+    -Djacoco.skip=true
+
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
+
+WORKDIR /app
+COPY --from=build /app/webparent/client-portal/target/*.jar /app/app.jar
+
+ENV JAVA_OPTS="-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m"
+ENV SPRING_PROFILES_ACTIVE="cloudflare"
+
+EXPOSE 8080
+ENTRYPOINT ["bash", "-c", "java $JAVA_OPTS -jar /app/app.jar 2>&1 | tee /tmp/paykesho-java.log; echo PAYKESHO_CLIENT_JAVA_PROCESS_FINISHED; cat /tmp/paykesho-java.log; sleep 60"]
