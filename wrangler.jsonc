@@ -15,6 +15,12 @@
       "image": "./Dockerfile.client.cloudflare",
       "instance_type": "basic",
       "max_instances": 3
+    },
+    {
+      "class_name": "PaykeshoPaymentContainer",
+      "image": "./Dockerfile.payment.cloudflare",
+      "instance_type": "basic",
+      "max_instances": 2
     }
   ],
   "durable_objects": {
@@ -26,6 +32,10 @@
       {
         "name": "PAYKESHO_CLIENT",
         "class_name": "PaykeshoClientContainer"
+      },
+      {
+        "name": "PAYKESHO_PAYMENT",
+        "class_name": "PaykeshoPaymentContainer"
       }
     ]
   },
@@ -49,13 +59,18 @@
       "PAYKESHO_DB_USERNAME",
       "PAYKESHO_DB_PASSWORD",
       "PAYKESHO_ADMIN_EMAIL",
-      "PAYKESHO_ADMIN_PASSWORD"
+      "PAYKESHO_ADMIN_PASSWORD",
+      "LENCO_API_TOKEN",
+      "LENCO_ACCOUNT_ID",
+      "PAYKESHO_INTERNAL_TOKEN"
     ]
   },
   "vars": {
     "NOTIFICATION_SERVICE_URL": "http://localhost:8085",
     "FILE_SERVICE_URL": "http://localhost:8086",
-    "RATE_LIMITING_ENABLED": "true"
+    "RATE_LIMITING_ENABLED": "true",
+    "LENCO_API_BASE_URL": "https://api.lenco.co/access/v2",
+    "PAYMENT_SERVICE_URL": "http://localhost:8787/internal/payment"
   },
   "observability": {
     "enabled": true
