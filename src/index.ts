@@ -3,6 +3,7 @@ import { Container, getContainer } from "@cloudflare/containers";
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
   PAYKESHO_CLIENT: DurableObjectNamespace<PaykeshoClientContainer>;
+  PAYKESHO_PAYMENT: DurableObjectNamespace<PaykeshoPaymentContainer>;
   PAYKESHO_DB_URL: string;
   PAYKESHO_DB_USERNAME: string;
   PAYKESHO_DB_PASSWORD: string;
@@ -11,6 +12,11 @@ export interface Env {
   NOTIFICATION_SERVICE_URL?: string;
   FILE_SERVICE_URL?: string;
   RATE_LIMITING_ENABLED?: string;
+  LENCO_API_BASE_URL?: string;
+  LENCO_API_TOKEN: string;
+  LENCO_ACCOUNT_ID: string;
+  PAYKESHO_INTERNAL_TOKEN: string;
+  PAYMENT_SERVICE_URL?: string;
 }
 
 function paykeshoEnv(env: Env, profile: string): Record<string, string> {
@@ -24,7 +30,11 @@ function paykeshoEnv(env: Env, profile: string): Record<string, string> {
     PAYKESHO_ADMIN_PASSWORD: env.PAYKESHO_ADMIN_PASSWORD,
     NOTIFICATION_SERVICE_URL: env.NOTIFICATION_SERVICE_URL || "http://localhost:8085",
     FILE_SERVICE_URL: env.FILE_SERVICE_URL || "http://localhost:8086",
-    RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED || "true"
+    RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED || "true",
+    LENCO_API_BASE_URL: env.LENCO_API_BASE_URL || "https://api.lenco.co/access/v2",
+    LENCO_API_TOKEN: env.LENCO_API_TOKEN || "",
+    LENCO_ACCOUNT_ID: env.LENCO_ACCOUNT_ID || "",
+    PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || ""
   };
 }
 
@@ -47,6 +57,28 @@ export class PaykeshoWebContainer extends Container {
 
   override onStop(params: { exitCode?: number; reason: string }) {
     console.error("PayKesho back-office container stopped", params);
+  }
+}
+
+export class PaykeshoPaymentContainer extends Container {
+  defaultPort = 8084;
+  sleepAfter = "10m";
+
+  constructor(ctx: DurableObjectState<{}>, env: Env) {
+    super(ctx, env);
+    this.envVars = paykeshoEnv(env, "cloudflare");
+  }
+
+  override onStart() {
+    console.log("PayKesho payment container started");
+  }
+
+  override onError(error: unknown) {
+    console.error("PayKesho payment container error", error);
+  }
+
+  override onStop(params: { exitCode?: number; reason: string }) {
+    console.error("PayKesho payment container stopped", params);
   }
 }
 
@@ -90,9 +122,14 @@ export default {
       }, { headers: { "cache-control": "no-store" } });
     }
 
+    const isPayment = url.pathname === "/webhooks/lenco"
+      || url.pathname.startsWith("/internal/payment/");
     const isAdmin = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
-    const namespace = isAdmin ? env.PAYKESHO_WEB : env.PAYKESHO_CLIENT;
-    const containerId = isAdmin ? "backoffice" : "client";
+
+    const namespace = isPayment
+      ? env.PAYKESHO_PAYMENT
+      : (isAdmin ? env.PAYKESHO_WEB : env.PAYKESHO_CLIENT);
+    const containerId = isPayment ? "payment" : (isAdmin ? "backoffice" : "client");
     const container = getContainer(namespace, containerId);
 
     try {
@@ -144,6 +181,11 @@ export default {
     }
 
     try {
+      if (isPayment && url.pathname.startsWith("/internal/payment/")) {
+        const rewritten = new URL(request.url);
+        rewritten.pathname = url.pathname.replace(/^\/internal\/payment/, "") || "/";
+        return await container.fetch(new Request(rewritten.toString(), request));
+      }
       return await container.fetch(request);
     } catch (error) {
       console.error(`PayKesho ${containerId} request failed`, error);
