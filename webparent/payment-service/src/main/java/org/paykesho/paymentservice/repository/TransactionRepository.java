@@ -11,5 +11,9 @@ import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
     Optional<Transaction> findByReference(String reference);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select t from Transaction t where t.reference = :reference")
+    Optional<Transaction> findByReferenceForUpdate(@Param("reference") String reference);
     List<Transaction> findBySettlementStatus(String settlementStatus);
 }
