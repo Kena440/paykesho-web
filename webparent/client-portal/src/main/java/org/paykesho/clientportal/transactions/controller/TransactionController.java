@@ -87,7 +87,6 @@ public class TransactionController {
     }
 
     @PostMapping("/confirm")
-    @Transactional
     public ResponseEntity<?> saveSubmittedPayment(
             @AuthenticationPrincipal ClientUserDetails loggedInUser, 
             @RequestBody Map<String, String> requestBody,
@@ -137,7 +136,12 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid merchant code."));
             }
 
-            Voucher voucher = voucherService.getApprovedAndValidClientVouchers(client).stream()
+        String payoutValidationError = paymentSettlementClient.validateMerchantPayoutProfile(merchant);
+        if (payoutValidationError != null) {
+            throw new PaykeshoError(payoutValidationError);
+        }
+
+        Voucher voucher = voucherService.getApprovedAndValidClientVouchers(client).stream()
                     .filter(v -> v.getAvailableAmount() != null && v.getAvailableAmount().compareTo(amount) >= 0)
                     .findFirst()
                     .orElse(null);
@@ -232,11 +236,6 @@ public class TransactionController {
         } catch (Exception e) {
             log.error("Error saving transaction:", e);
             throw new PaykeshoError("Failed to save transaction: " + e.getMessage());
-        }
-
-        String payoutValidationError = paymentSettlementClient.validateMerchantPayoutProfile(merchant);
-        if (payoutValidationError != null) {
-            throw new PaykeshoError(payoutValidationError);
         }
 
         // The PayKesho ledger is debited first; Lenco is the external settlement rail.
