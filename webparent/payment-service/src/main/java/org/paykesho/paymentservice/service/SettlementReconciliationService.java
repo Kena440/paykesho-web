@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.Transaction;
 import org.commons.entity.Voucher;
 import org.paykesho.paymentservice.repository.TransactionRepository;
+import org.paykesho.paymentservice.repository.VoucherRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Date;
 public class SettlementReconciliationService {
 
     private final TransactionRepository transactionRepository;
+    private final VoucherRepository voucherRepository;
 
     @Transactional
     public void applyLencoResult(String reference, String status, String lencoReference, String reason) {
@@ -51,6 +53,7 @@ public class SettlementReconciliationService {
                 } else {
                     voucher.setAvailableAmount(voucher.getAvailableAmount().add(transaction.getAmount()));
                 }
+                voucherRepository.save(voucher);
             }
             transaction.setSettled(false);
             transaction.setSettlementStatus("FAILED");
