@@ -374,7 +374,11 @@ public class TransactionController {
         String txnAmount = "K" + transaction.getAmount();
         if ("PAYMENT".equals(actionType)) {
             String clientName = transaction.getClient().getFullName() != null ? transaction.getClient().getFullName() : "Client";
-            return String.format("Dear %s, your payment request processed successfully. Amount: %s. Merchant: %s. Reference: %s. Thank you. Get lelo, Pay Kesho.", clientName, txnAmount, transaction.getMerchant().getName(), transaction.getReference());
+            String statusText = transaction.isSettled()
+                    ? "was completed successfully"
+                    : "was initiated and is awaiting merchant settlement";
+            return String.format("Dear %s, your PayKesho payment %s. Amount: %s. Merchant: %s. Reference: %s.",
+                    clientName, statusText, txnAmount, transaction.getMerchant().getName(), transaction.getReference());
         }
         return "Unknown action type.";
     }
