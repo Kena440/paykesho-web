@@ -13,7 +13,7 @@
     {
       "class_name": "PaykeshoClientContainer",
       "image": "./Dockerfile.client.cloudflare",
-      "instance_type": "basic",
+      "instance_type": "standard-1",
       "max_instances": 1
     },
     {
