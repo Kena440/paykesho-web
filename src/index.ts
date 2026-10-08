@@ -69,9 +69,12 @@ async function waitForContainerPort(
 ): Promise<void> {
   await container.setInactivityTimeout(10 * 60 * 1000);
 
+  let containerFailure: unknown;
+
   if (!container.running) {
     container.start({ env: envVars, enableInternet: true });
     void container.monitor().catch((error) => {
+      containerFailure = error;
       console.error("PayKesho container monitor error", error);
     });
   }
@@ -82,6 +85,9 @@ async function waitForContainerPort(
   // Cloudflare's direct Container API returns from start() before the
   // application is ready. Poll the real Spring Boot health endpoint.
   for (let attempt = 0; attempt < 120; attempt++) {
+    if (containerFailure) {
+      throw new Error("PayKesho container exited during startup", { cause: containerFailure });
+    }
     try {
       const response = await port.fetch(`http://container${healthPath}`, {
         signal: AbortSignal.timeout(1000)
@@ -96,6 +102,10 @@ async function waitForContainerPort(
       lastError = error;
     }
     await scheduler.wait(1000);
+  }
+
+  if (containerFailure) {
+    throw new Error("PayKesho container exited during startup", { cause: containerFailure });
   }
 
   throw new Error(
