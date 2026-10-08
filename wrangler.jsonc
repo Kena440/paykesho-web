@@ -62,7 +62,7 @@
   "vars": {
     "NOTIFICATION_SERVICE_URL": "http://localhost:8085",
     "FILE_SERVICE_URL": "http://localhost:8086",
-    "RATE_LIMITING_ENABLED": "true",
+    "RATE_LIMITING_ENABLED": "false",
     "LENCO_API_BASE_URL": "https://api.lenco.co/access/v2",
     "PAYMENT_SERVICE_URL": "https://paykesho-web.amukenam1.workers.dev/internal/payment"
   },
