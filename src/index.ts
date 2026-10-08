@@ -82,11 +82,37 @@ async function waitForContainerPort(
   const port = container.getTcpPort(portNumber);
   let lastError: unknown;
 
+  const readStartupLog = async (): Promise<string> => {
+    if (!container.running) return "";
+    try {
+      const process = await container.exec([
+        "sh",
+        "-c",
+        "if [ -f /tmp/paykesho-startup.log ]; then tail -120 /tmp/paykesho-startup.log; fi"
+      ]);
+      const output = await process.output();
+      const decoder = new TextDecoder();
+      return decoder.decode(output.stdout) + decoder.decode(output.stderr);
+    } catch {
+      return "";
+    }
+  };
+
   // Cloudflare's direct Container API returns from start() before the
   // application is ready. Poll the real Spring Boot health endpoint.
   for (let attempt = 0; attempt < 120; attempt++) {
     if (containerFailure) {
       throw new Error("PayKesho container exited during startup", { cause: containerFailure });
+    }
+    if (attempt === 15 || attempt === 30) {
+      const startupLog = await readStartupLog();
+      if (startupLog.includes("APPLICATION FAILED TO START")
+        || startupLog.includes("Error starting ApplicationContext")
+        || startupLog.includes("Exception in thread")) {
+        throw new Error("PayKesho Spring Boot startup failed", {
+          cause: new Error(startupLog.slice(-6000))
+        });
+      }
     }
     try {
       const response = await port.fetch(`http://container${healthPath}`, {
@@ -106,6 +132,14 @@ async function waitForContainerPort(
 
   if (containerFailure) {
     throw new Error("PayKesho container exited during startup", { cause: containerFailure });
+  }
+
+  const startupLog = await readStartupLog();
+  if (startupLog) {
+    throw new Error(
+      `Container did not become ready on port ${portNumber} within 120 seconds`,
+      { cause: new Error(startupLog.slice(-6000)) }
+    );
   }
 
   throw new Error(
