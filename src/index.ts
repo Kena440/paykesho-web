@@ -215,7 +215,11 @@ export default {
         ok: false,
         service: `paykesho-${containerId}`,
         error: "container_request_failed",
-        message: error instanceof Error ? error.message : String(error)
+        message: error instanceof Error
+          ? (error.cause instanceof Error
+            ? `${error.message}: ${error.cause.message}${"exitCode" in error.cause ? ` (exitCode=${String(error.cause.exitCode)})` : ""}`
+            : error.message)
+          : String(error)
       }, {
         status: 503,
         headers: { "cache-control": "no-store" }
