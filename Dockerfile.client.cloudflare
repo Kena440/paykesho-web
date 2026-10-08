@@ -14,9 +14,8 @@ FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/webparent/client-portal/target/*.jar /app/app.jar
 
-ENV JAVA_OPTS="-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m"
 ENV SPRING_PROFILES_ACTIVE="cloudflare"
 ENV SERVER_ADDRESS="0.0.0.0"
 
 EXPOSE 8080
-ENTRYPOINT ["bash", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["java", "-Xmx512m", "-Xms128m", "-XX:MaxMetaspaceSize=192m", "-jar", "/app/app.jar"]
