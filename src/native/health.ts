@@ -18,7 +18,8 @@ export function nativeLiveness(): Response {
     ok: true,
     service: "paykesho-worker-native",
     runtime: "cloudflare-workers",
-    springBootRequired: false
+    route: "worker-native",
+    containerRequired: false
   });
 }
 
