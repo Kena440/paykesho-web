@@ -10,7 +10,8 @@
     "build": "npm run typecheck"
   },
   "dependencies": {
-    "@cloudflare/containers": "0.3.7"
+    "@cloudflare/containers": "0.3.7",
+    "bcryptjs": "^3.0.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260927.1",
