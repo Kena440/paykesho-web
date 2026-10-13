@@ -22,6 +22,7 @@ export interface Env {
   PAYMENT_SERVICE_URL?: string;
   SUPABASE_URL?: string;
   SUPABASE_SERVICE_ROLE_KEY?: string;
+  PAYKESHO_SESSION_SECRET?: string;
 }
 
 function paykeshoEnv(env: Env, profile: string): Record<string, string> {
