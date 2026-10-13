@@ -57,9 +57,56 @@ function upstreamResponse(response: Response): Response {
   });
 }
 
-function bearerToken(request: Request): string | null {
-  const value = request.headers.get("authorization");
-  return value && /^Bearer\s+\S+$/i.test(value) ? value : null;
+function cookieValue(request: Request, name: string): string | null {
+  const cookieHeader = request.headers.get("cookie");
+  if (!cookieHeader) return null;
+  for (const part of cookieHeader.split(";")) {
+    const separator = part.indexOf("=");
+    if (separator < 0 || part.slice(0, separator).trim() !== name) continue;
+    try { return decodeURIComponent(part.slice(separator + 1).trim()); }
+    catch { return null; }
+  }
+  return null;
+}
+
+function sessionCookie(name: string, value: string, maxAge: number): string {
+  return name + "=" + encodeURIComponent(value) + "; Max-Age=" + maxAge + "; Path=/; Secure; HttpOnly; SameSite=Lax";
+}
+
+function withSessionCookies(response: Response, values: { accessToken?: string; refreshToken?: string; accessMaxAge?: number; clear?: boolean }): Response {
+  const headers = new Headers(response.headers);
+  if (values.clear) {
+    headers.append("set-cookie", sessionCookie("pk_access", "", 0));
+    headers.append("set-cookie", sessionCookie("pk_refresh", "", 0));
+  } else {
+    if (values.accessToken) headers.append("set-cookie", sessionCookie("pk_access", values.accessToken, values.accessMaxAge ?? 3600));
+    if (values.refreshToken) headers.append("set-cookie", sessionCookie("pk_refresh", values.refreshToken, 30 * 24 * 60 * 60));
+  }
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+async function authSessionResponse(response: Response): Promise<Response> {
+  const raw = await response.text();
+  let payload: unknown = null;
+  try { payload = raw ? JSON.parse(raw) as unknown : null; } catch { payload = null; }
+  if (!response.ok) return json(isRecord(payload) ? payload : { ok: false, error: "authentication_failed" }, response.status);
+
+  const result = isRecord(payload) ? payload : {};
+  const nested = isRecord(result.session) ? result.session : {};
+  const accessToken = typeof result.access_token === "string" ? result.access_token : (typeof nested.access_token === "string" ? nested.access_token : undefined);
+  const refreshToken = typeof result.refresh_token === "string" ? result.refresh_token : (typeof nested.refresh_token === "string" ? nested.refresh_token : undefined);
+  const expiresIn = typeof result.expires_in === "number" ? result.expires_in : (typeof nested.expires_in === "number" ? nested.expires_in : 3600);
+  const body = json({ user: result.user ?? nested.user ?? null, session: Boolean(accessToken && refreshToken) }, response.status);
+  return withSessionCookies(body, { accessToken, refreshToken, accessMaxAge: Math.min(Math.max(expiresIn, 60), 86400) });
+}
+
+function clearSession(response: Response): Response {
+  return withSessionCookies(response, { clear: true });
+}
+
+function originAllowed(request: Request, env: Env): boolean {
+  const origin = request.headers.get("origin");
+  return !origin || !env.ALLOWED_ORIGIN || origin === env.ALLOWED_ORIGIN;
 }
 
 async function handleApi(request: Request, env: Env): Promise<Response> {
@@ -110,7 +157,7 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
         ...(fullName ? { full_name: fullName } : {}),
       },
     });
-    return upstreamResponse(response);
+    return await authSessionResponse(response);
   }
 
   if (pathname === "/api/auth/signin" && request.method === "POST") {
@@ -123,7 +170,7 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
     }
 
     const response = await supabaseAuth(env, "token?grant_type=password", { email, password });
-    return upstreamResponse(response);
+    return await authSessionResponse(response);
   }
 
   if (pathname === "/api/auth/refresh" && request.method === "POST") {
@@ -136,6 +183,16 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
       refresh_token: refreshToken,
     });
     return upstreamResponse(response);
+  }
+
+  if (pathname === "/api/auth/refresh" && request.method === "POST") {
+    if (!originAllowed(request, env)) return json({ ok: false, error: "origin_not_allowed" }, 403);
+    const refreshToken = cookieValue(request, "pk_refresh");
+    if (!refreshToken) return clearSession(json({ ok: false, error: "session_expired" }, 401));
+    const response = await supabaseAuth(env, "token?grant_type=refresh_token", { refresh_token: refreshToken });
+    if (response.ok) return await authSessionResponse(response);
+    if (response.status === 400 || response.status === 401) return clearSession(json({ ok: false, error: "session_expired" }, 401));
+    return json({ ok: false, error: "session_refresh_unavailable" }, 503);
   }
 
   if (pathname === "/api/auth/password-reset" && request.method === "POST") {
@@ -154,24 +211,26 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
   }
 
   if (pathname === "/api/auth/signout" && request.method === "POST") {
-    const authorization = bearerToken(request);
-    if (!authorization) return json({ ok: false, error: "unauthorized" }, 401);
-
-    const response = await fetch(`${supabaseBase(env)}/auth/v1/logout`, {
-      method: "POST",
-      headers: { apikey: env.SUPABASE_ANON_KEY, authorization },
-    });
-    return response.status === 204
-      ? new Response(null, { status: 204, headers: { "cache-control": "no-store" } })
-      : upstreamResponse(response);
+    if (!originAllowed(request, env)) return json({ ok: false, error: "origin_not_allowed" }, 403);
+    const accessToken = cookieValue(request, "pk_access");
+    if (accessToken) {
+      try {
+        await fetch(supabaseBase(env) + "/auth/v1/logout", {
+          method: "POST",
+          headers: { apikey: env.SUPABASE_ANON_KEY, authorization: "Bearer " + accessToken },
+        });
+      } catch (error) {
+        console.warn("Supabase sign-out could not be confirmed; clearing local session", error);
+      }
+    }
+    return clearSession(new Response(null, { status: 204, headers: { "cache-control": "no-store" } }));
   }
 
   if (pathname === "/api/auth/user" && request.method === "GET") {
-    const authorization = bearerToken(request);
-    if (!authorization) return json({ ok: false, error: "unauthorized" }, 401);
-
-    const response = await fetch(`${supabaseBase(env)}/auth/v1/user`, {
-      headers: { apikey: env.SUPABASE_ANON_KEY, authorization },
+    const accessToken = cookieValue(request, "pk_access");
+    if (!accessToken) return json({ ok: false, error: "unauthorized" }, 401);
+    const response = await fetch(supabaseBase(env) + "/auth/v1/user", {
+      headers: { apikey: env.SUPABASE_ANON_KEY, authorization: "Bearer " + accessToken },
     });
     return upstreamResponse(response);
   }
