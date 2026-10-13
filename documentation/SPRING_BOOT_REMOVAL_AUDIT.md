@@ -51,3 +51,7 @@ Read-only review of the existing customer/payment code on `feature/paykesho-cust
 - The existing customer endpoint uses idempotency records with request hashes and a 24-hour expiry. The replacement should retain idempotency, but strengthen the legacy behavior: never proceed with a financial mutation if the idempotency record cannot be reserved, and reject reuse of the same key with a different request hash.
 
 These rules should become executable integration tests and atomic PostgreSQL functions before the 501 financial routes are enabled. Notifications and balance summaries should follow committed transaction state; they must not be the source of truth for money movement.
+
+## Legacy customer registration fields
+
+The legacy `app.clients` entity requires more than an email/password: phone number, address, TPIN, MAN number, name, email, NRC and client income are non-null fields; TPIN, MAN number, email and NRC are unique. The legacy client model also carries enablement/lock state and optional organization/file references. Supabase Auth signup alone therefore must not create or imply a complete PayKesho client. The migration preview collects only name, phone and email for Auth and intentionally does not create a legacy client row or authorize credit.
