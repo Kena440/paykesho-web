@@ -162,7 +162,6 @@ async function showSignedIn(user) {
   signupForm.hidden = true;
   signinForm.hidden = true;
   resetForm.hidden = true;
-  document.querySelector(".auth-tabs").hidden = true;
   kicker.textContent = "SIGNED IN";
   title.textContent = "You're signed in";
   intro.textContent = "Your PayKesho account session is active in this tab.";
@@ -188,7 +187,7 @@ async function restoreSession() {
   try {
     const user = await api("/api/auth/user", null);
     markSignedIn(true);
-    window.paykeshoCurrentUser = user;
+    // Keep the landing page visible; the cookie session is checked when My account is opened.
   } catch (_) {
     markSignedIn(false);
   }
