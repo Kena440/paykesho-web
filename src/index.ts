@@ -106,7 +106,10 @@ function clearSession(response: Response): Response {
 
 function originAllowed(request: Request, env: Env): boolean {
   const origin = request.headers.get("origin");
-  return !origin || !env.ALLOWED_ORIGIN || origin === env.ALLOWED_ORIGIN;
+  if (!origin || !env.ALLOWED_ORIGIN || origin === env.ALLOWED_ORIGIN) return true;
+  const requestUrl = new URL(request.url);
+  const localHost = requestUrl.hostname === "localhost" || requestUrl.hostname === "127.0.0.1";
+  return localHost && origin === requestUrl.origin;
 }
 
 async function handleApi(request: Request, env: Env): Promise<Response> {
@@ -171,18 +174,6 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
 
     const response = await supabaseAuth(env, "token?grant_type=password", { email, password });
     return await authSessionResponse(response);
-  }
-
-  if (pathname === "/api/auth/refresh" && request.method === "POST") {
-    const body = await readJson(request);
-    const refreshToken = typeof body?.refresh_token === "string" ? body.refresh_token : "";
-    if (!refreshToken || refreshToken.length > 4096) {
-      return json({ ok: false, error: "invalid_refresh_token" }, 400);
-    }
-    const response = await supabaseAuth(env, "token?grant_type=refresh_token", {
-      refresh_token: refreshToken,
-    });
-    return upstreamResponse(response);
   }
 
   if (pathname === "/api/auth/refresh" && request.method === "POST") {
