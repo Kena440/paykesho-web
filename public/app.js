@@ -57,7 +57,7 @@ function closeView() {
   overlay.hidden = true;
   document.body.style.overflow = "";
 }
-async function api(path, payload, token) {
+async function rawApi(path, payload, token) {
   const response = await fetch(path, {
     method: path === "/api/auth/user" ? "GET" : "POST",
     headers: {
@@ -67,11 +67,29 @@ async function api(path, payload, token) {
     ...(payload ? { body: JSON.stringify(payload) } : {})
   });
   const data = response.status === 204 ? null : await response.json().catch(() => null);
-  if (!response.ok) {
-    const description = data && (data.msg || data.message || data.error_description || data.error);
+  return { response, data };
+}
+async function api(path, payload, token) {
+  let result = await rawApi(path, payload, token);
+  if (result.response.status === 401 && token && path !== "/api/auth/signout" && path !== "/api/auth/refresh") {
+    const refreshToken = sessionStorage.getItem("paykesho_refresh_token");
+    if (refreshToken) {
+      const refreshed = await rawApi("/api/auth/refresh", { refresh_token: refreshToken }, null);
+      if (refreshed.response.ok && refreshed.data?.access_token) {
+        sessionStorage.setItem("paykesho_access_token", refreshed.data.access_token);
+        if (refreshed.data.refresh_token) sessionStorage.setItem("paykesho_refresh_token", refreshed.data.refresh_token);
+        result = await rawApi(path, payload, refreshed.data.access_token);
+      } else {
+        sessionStorage.removeItem("paykesho_access_token");
+        sessionStorage.removeItem("paykesho_refresh_token");
+      }
+    }
+  }
+  if (!result.response.ok) {
+    const description = result.data && (result.data.msg || result.data.message || result.data.error_description || result.data.error);
     throw new Error(typeof description === "string" ? description : "Something went wrong. Please try again.");
   }
-  return data;
+  return result.data;
 }
 function safeMessage(error) {
   const value = error instanceof Error ? error.message : "";
@@ -104,6 +122,7 @@ signupForm.addEventListener("submit", async (event) => {
     const data = await api("/api/auth/signup", payload);
     if (data?.access_token) {
       sessionStorage.setItem("paykesho_access_token", data.access_token);
+      if (data.refresh_token) sessionStorage.setItem("paykesho_refresh_token", data.refresh_token);
       await showSignedIn(data.user);
     } else {
       setMessage("Your registration request was received. Check your email for a confirmation link if email confirmation is enabled.");
@@ -127,6 +146,7 @@ signinForm.addEventListener("submit", async (event) => {
     const data = await api("/api/auth/signin", payload);
     if (!data?.access_token) throw new Error("We couldn't start a session. Please try again.");
     sessionStorage.setItem("paykesho_access_token", data.access_token);
+    if (data.refresh_token) sessionStorage.setItem("paykesho_refresh_token", data.refresh_token);
     await showSignedIn(data.user);
   } catch (error) {
     setMessage(safeMessage(error), true);
@@ -173,6 +193,7 @@ signoutButton.addEventListener("click", async () => {
     // Always clear the local tab session even if the upstream sign-out fails.
   } finally {
     sessionStorage.removeItem("paykesho_access_token");
+    sessionStorage.removeItem("paykesho_refresh_token");
     document.querySelector(".auth-tabs").hidden = false;
     showView("signin");
   }
@@ -187,6 +208,7 @@ async function restoreSession() {
     await showSignedIn(user);
   } catch (_) {
     sessionStorage.removeItem("paykesho_access_token");
+    sessionStorage.removeItem("paykesho_refresh_token");
   }
 }
 restoreSession();
