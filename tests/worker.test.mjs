@@ -58,8 +58,8 @@ test("sign-in sets HttpOnly cookies and never returns tokens to browser JavaScri
   assert.equal(body.session, true);
   assert.equal(body.access_token, undefined);
   assert.equal(body.refresh_token, undefined);
-  assert.match(cookies, /pk_access=.*HttpOnly; Secure; SameSite=Lax/);
-  assert.match(cookies, /pk_refresh=.*HttpOnly; Secure; SameSite=Lax/);
+  assert.match(cookies, /pk_access=.*Secure; HttpOnly; SameSite=Lax/);
+  assert.match(cookies, /pk_refresh=.*Secure; HttpOnly; SameSite=Lax/);
   assert.match(response.headers.get("content-security-policy"), /frame-ancestors 'none'/);
 });
 
