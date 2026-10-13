@@ -30,7 +30,7 @@ Remove Spring Boot and Java runtime dependencies from the PayKesho production re
 
 ### Phase 2 — worker-native foundation
 - Added the first administrator-session slice at `/api/native/admin/login`, `/api/native/admin/session`, and `/api/native/admin/logout`. It uses a signed, eight-hour, Secure/HttpOnly/SameSite=Strict cookie and requires a session-signing secret.
-- This first slice authenticates only the configured bootstrap administrator (`PAYKESHO_ADMIN_EMAIL` / `PAYKESHO_ADMIN_PASSWORD`). It does **not** yet replace database-backed administrator accounts or protect the legacy `/admin` routes; keep those routes on the existing service until full parity is implemented.
+- The native login now supports both the configured bootstrap administrator (`PAYKESHO_ADMIN_EMAIL` / `PAYKESHO_ADMIN_PASSWORD`) and database-backed administrator accounts. Database login checks the stored BCrypt hash, account enabled/deleted/locked flags and active `Admin`/`SuperAdmin` role membership. It still does **not** replace the legacy `/admin` routes or migrate password-reset/remember-me flows; keep those routes on the existing service until full parity is implemented.
 - Configure `PAYKESHO_SESSION_SECRET` as a Cloudflare Worker secret with at least 32 characters, and `SUPABASE_SERVICE_ROLE_KEY` as a separate Worker secret. Never paste either secret into Git or browser code.
 - Add a TypeScript API module, structured error handling, request IDs, health endpoints, and tests.
 - Add server-only Supabase configuration. Never fall back to permissive authorization if a secret is absent.
@@ -63,6 +63,7 @@ Remove Spring Boot and Java runtime dependencies from the PayKesho production re
 ## Latest migration increment
 
 - Added session-protected, read-only paginated/searchable merchant and organization directory endpoints. Merchant payout routing and account fields are excluded from the response.
+- Extended native login to verify database-backed administrator BCrypt hashes and role membership while preserving bootstrap-admin precedence.
 
 
 ## Read-only transaction API increment
