@@ -29,6 +29,9 @@ Remove Spring Boot and Java runtime dependencies from the PayKesho production re
 - Identify the Supabase API schema exposure and current authentication model before choosing the data access method.
 
 ### Phase 2 — worker-native foundation
+- Added the first administrator-session slice at `/api/native/admin/login`, `/api/native/admin/session`, and `/api/native/admin/logout`. It uses a signed, eight-hour, Secure/HttpOnly/SameSite=Strict cookie and requires a session-signing secret.
+- This first slice authenticates only the configured bootstrap administrator (`PAYKESHO_ADMIN_EMAIL` / `PAYKESHO_ADMIN_PASSWORD`). It does **not** yet replace database-backed administrator accounts or protect the legacy `/admin` routes; keep those routes on the existing service until full parity is implemented.
+- Configure `PAYKESHO_SESSION_SECRET` as a Cloudflare Worker secret with at least 32 characters, and `SUPABASE_SERVICE_ROLE_KEY` as a separate Worker secret. Never paste either secret into Git or browser code.
 - Add a TypeScript API module, structured error handling, request IDs, health endpoints, and tests.
 - Add server-only Supabase configuration. Never fall back to permissive authorization if a secret is absent.
 - Add authentication/authorization middleware and audit logging before migrating administrative mutations.
