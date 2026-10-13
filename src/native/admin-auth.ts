@@ -1,4 +1,5 @@
-import type { SupabaseWorkerEnv } from "./supabase";
+import bcrypt from "bcryptjs";
+import { supabaseAppRequest, type SupabaseWorkerEnv } from "./supabase";
 
 export interface NativeAuthEnv extends SupabaseWorkerEnv {
   PAYKESHO_ADMIN_EMAIL?: string;
@@ -144,6 +145,89 @@ function sameOrigin(request: Request): boolean {
   }
 }
 
+type DatabaseAdmin = {
+  id: number;
+  email: string;
+  password: string;
+  enabled: boolean;
+  deleted: boolean;
+  account_non_locked: boolean;
+};
+
+const ADMIN_ROLE_NAMES = new Set(["admin", "superadmin", "role_admin", "role_superadmin"]);
+
+async function authenticateDatabaseAdmin(email: string, password: string, env: NativeAuthEnv): Promise<DatabaseAdmin | null> {
+  const userParams = new URLSearchParams({
+    select: "id,email,password,enabled,deleted,account_non_locked",
+    email: `eq.${email}`,
+    limit: "1"
+  });
+  const userResponse = await supabaseAppRequest(env, `rest/v1/users?${userParams.toString()}`, {
+    method: "GET",
+    headers: { accept: "application/json" }
+  });
+  if (!userResponse.ok) {
+    await userResponse.body?.cancel();
+    throw new Error("Administrator lookup failed");
+  }
+
+  const userRows: unknown = await userResponse.json();
+  if (!Array.isArray(userRows) || userRows.length === 0) return null;
+  const user = userRows[0] as Partial<DatabaseAdmin>;
+  if (
+    !Number.isSafeInteger(user.id) ||
+    typeof user.email !== "string" ||
+    typeof user.password !== "string" ||
+    user.enabled !== true ||
+    user.deleted !== false ||
+    user.account_non_locked !== true
+  ) return null;
+
+  const rolesParams = new URLSearchParams({ select: "role_id", user_id: `eq.${user.id}` });
+  const membershipResponse = await supabaseAppRequest(env, `rest/v1/user_roles?${rolesParams.toString()}`, {
+    method: "GET",
+    headers: { accept: "application/json" }
+  });
+  if (!membershipResponse.ok) {
+    await membershipResponse.body?.cancel();
+    throw new Error("Administrator role lookup failed");
+  }
+  const membershipRows: unknown = await membershipResponse.json();
+  if (!Array.isArray(membershipRows)) throw new Error("Invalid administrator role response");
+
+  const roleIds = membershipRows
+    .map((row) => (row && typeof row === "object" ? (row as { role_id?: unknown }).role_id : null))
+    .filter((id): id is number => typeof id === "number" && Number.isSafeInteger(id) && id > 0);
+  if (roleIds.length === 0) return null;
+
+  const rolesParams = new URLSearchParams({
+    select: "name,deleted",
+    id: `in.(${[...new Set(roleIds)].join(",")})`
+  });
+  const rolesResponse = await supabaseAppRequest(env, `rest/v1/role?${rolesParams.toString()}`, {
+    method: "GET",
+    headers: { accept: "application/json" }
+  });
+  if (!rolesResponse.ok) {
+    await rolesResponse.body?.cancel();
+    throw new Error("Administrator role definitions could not be loaded");
+  }
+  const roleRows: unknown = await rolesResponse.json();
+  if (!Array.isArray(roleRows)) throw new Error("Invalid administrator role definitions");
+
+  const isAdmin = roleRows.some((row) => {
+    if (!row || typeof row !== "object") return false;
+    const role = row as { name?: unknown; deleted?: unknown };
+    return role.deleted !== true &&
+      typeof role.name === "string" &&
+      ADMIN_ROLE_NAMES.has(role.name.trim().toLowerCase());
+  });
+  if (!isAdmin) return null;
+
+  const matches = await bcrypt.compare(password, user.password);
+  return matches ? user as DatabaseAdmin : null;
+}
+
 /**
  * Initial Worker-native administrator session slice.
  * This intentionally supports only the configured bootstrap administrator;
@@ -160,7 +244,7 @@ export async function nativeAdminLogin(request: Request, env: NativeAuthEnv): Pr
 
   const configuredEmail = env.PAYKESHO_ADMIN_EMAIL?.trim();
   const configuredPassword = env.PAYKESHO_ADMIN_PASSWORD;
-  if (!configuredEmail || !configuredPassword || !(await signingKey(env))) {
+  if (!(await signingKey(env))) {
     return json({ ok: false, error: "admin_auth_not_configured" }, 503);
   }
 
@@ -179,16 +263,42 @@ export async function nativeAdminLogin(request: Request, env: NativeAuthEnv): Pr
   const email = typeof input?.email === "string" ? input.email.trim() : "";
   const password = typeof input?.password === "string" ? input.password : "";
   if (
-    !constantTimeEqual(email.toLowerCase(), configuredEmail.toLowerCase()) ||
-    !constantTimeEqual(password, configuredPassword)
+    !email ||
+    email.length > 128 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+    !password ||
+    password.length > 1024
   ) {
     return json({ ok: false, error: "invalid_credentials" }, 401);
   }
 
-  const token = await issueSession(env, configuredEmail);
+  let authenticatedEmail: string | null = null;
+  if (configuredEmail && configuredPassword && email.toLowerCase() === configuredEmail.toLowerCase()) {
+    // Keep the bootstrap administrator's precedence consistent with Spring.
+    if (
+      constantTimeEqual(email.toLowerCase(), configuredEmail.toLowerCase()) &&
+      constantTimeEqual(password, configuredPassword)
+    ) {
+      authenticatedEmail = configuredEmail;
+    } else {
+      return json({ ok: false, error: "invalid_credentials" }, 401);
+    }
+  } else {
+    try {
+      const databaseAdmin = await authenticateDatabaseAdmin(email, password, env);
+      if (databaseAdmin) authenticatedEmail = databaseAdmin.email;
+    } catch {
+      return json({ ok: false, error: "admin_auth_unavailable" }, 503);
+    }
+    if (!authenticatedEmail) {
+      return json({ ok: false, error: "invalid_credentials" }, 401);
+    }
+  }
+
+  const token = await issueSession(env, authenticatedEmail);
   if (!token) return json({ ok: false, error: "admin_auth_not_configured" }, 503);
   return json(
-    { ok: true, user: { email: configuredEmail, role: "ADMIN" }, expiresIn: SESSION_SECONDS },
+    { ok: true, user: { email: authenticatedEmail, role: "ADMIN" }, expiresIn: SESSION_SECONDS },
     200,
     { "set-cookie": cookie(token, SESSION_SECONDS) }
   );
