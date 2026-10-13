@@ -11,11 +11,12 @@ This branch is a staged migration, not a production cutover. The existing Spring
   - `POST /api/auth/signup`
   - `POST /api/auth/signin`
   - `GET /api/auth/user`
+  - `POST /api/auth/refresh`
   - `POST /api/auth/signout`
   - `POST /api/auth/password-reset`
-- Worker security headers and GitHub Actions type-check CI.
+- Worker security headers, secure `HttpOnly; Secure; SameSite=Lax` session cookies with refresh rotation, and GitHub Actions build validation.
 
-Required Worker secrets: `SUPABASE_URL`, `SUPABASE_ANON_KEY`. These can be set as Cloudflare secrets; never place a service-role key in frontend code. The current auth-only slice does not require a service-role key.
+Required Worker secrets: `SUPABASE_URL`, `SUPABASE_ANON_KEY`. These can be set as Cloudflare secrets; never place a service-role key in frontend code. The current auth-only slice does not require a service-role key. Browser JavaScript does not receive Supabase access or refresh tokens; the Worker sets them as secure HttpOnly cookies.
 
 ## Explicitly not migrated
 
