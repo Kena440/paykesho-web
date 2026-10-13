@@ -1,5 +1,6 @@
 // PayKesho production deployment is managed by Cloudflare Workers Builds.
 import { DurableObject } from "cloudflare:workers";
+import { nativeDatabaseReadiness, nativeLiveness } from "./native/health";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -18,6 +19,8 @@ export interface Env {
   LENCO_ACCOUNT_ID: string;
   PAYKESHO_INTERNAL_TOKEN: string;
   PAYMENT_SERVICE_URL?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_SERVICE_ROLE_KEY?: string;
 }
 
 function paykeshoEnv(env: Env, profile: string): Record<string, string> {
@@ -208,6 +211,14 @@ export class PaykeshoClientContainer extends PaykeshoDirectContainer {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    // Worker-native migration probes bypass all Java/Spring containers.
+    if (url.pathname === "/api/native/health" && request.method === "GET") {
+      return nativeLiveness();
+    }
+    if (url.pathname === "/api/native/db-health" && request.method === "GET") {
+      return nativeDatabaseReadiness(env);
+    }
 
     if (url.pathname === "/debug/config") {
       const dbUrl = env.PAYKESHO_DB_URL || "";
