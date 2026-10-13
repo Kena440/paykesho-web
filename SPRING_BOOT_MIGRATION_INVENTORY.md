@@ -51,6 +51,7 @@ RLS is enabled on the observed app tables. Existing policy coverage is incomplet
 - `GET /api/native/admin/dashboard`: session-protected read-only counts for organizations, merchants, clients, transactions, and vouchers, including active/inactive counts for organizations, merchants, and clients. It returns aggregate counts only; transaction values, trends, top performers, and UI parity remain to be migrated.
 - `GET /api/native/admin/clients`: session-protected, paginated/searchable read-only client directory. Returns only ID, UUID, code, name, email, phone, enabled status, creation time and organization ID; omits passwords, NRC, TPIN, verification/reset tokens and balances.
 - `GET /api/native/admin/merchants` and `GET /api/native/admin/organizations`: session-protected, paginated/searchable read-only directories with active/inactive filtering. Merchant responses intentionally omit Lenco recipient IDs, payout phone, bank identifiers and account numbers; neither endpoint supports writes.
+- `GET /api/native/admin/transactions`: session-protected, paginated/searchable read-only transaction listing with optional settlement-status and settled filters. It exposes transaction amounts and settlement references only to the signed administrator session; it has no mutation actions.
 - Non-GET requests to the health endpoints return 405.
 
 ## Migration order
