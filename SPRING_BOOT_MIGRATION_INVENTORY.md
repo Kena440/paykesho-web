@@ -43,6 +43,13 @@ The active PayKesho project contains the `app` schema with tables including:
 
 RLS is enabled on the observed app tables. Existing policy coverage is incomplete/deny-all for direct user roles, so do not expose the service-role key or switch the browser to direct table access. Worker server routes must enforce identity and authorization explicitly; RLS should remain defense-in-depth.
 
+## Worker-native endpoints added on the migration branch
+
+- `GET /api/native/health`: Worker liveness; does not contact a container.
+- `GET /api/native/db-health`: server-side readiness probe against `app.settings`; requires the service-role Worker secret and Supabase Data API exposure for the `app` schema.
+- `POST /api/native/admin/login`, `GET /api/native/admin/session`, `POST /api/native/admin/logout`: initial bootstrap-admin cookie-session slice. It does not yet support database-backed admin accounts or replace the legacy `/admin` pages. Do not treat it as complete authentication parity.
+- Non-GET requests to the health endpoints return 405.
+
 ## Migration order
 
 1. Worker-native liveness/readiness and safe Supabase REST adapter.
