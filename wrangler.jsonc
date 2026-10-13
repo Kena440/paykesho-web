@@ -1,9 +1,18 @@
 {
- "$schema":"./node_modules/wrangler/config-schema.json",
- "name":"paykesho-web",
- "main":"src/index.ts",
- "compatibility_date":"2026-10-13",
- "vars":{"ALLOWED_ORIGIN":"https://paykesho-web.amukenam1.workers.dev"},
- "observability":{"enabled":true},
- "secrets":{"required":["SUPABASE_URL","SUPABASE_ANON_KEY","SUPABASE_SERVICE_ROLE_KEY"]}
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "paykesho-web",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-13",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "vars": {
+    "ALLOWED_ORIGIN": "https://paykesho-web.amukenam1.workers.dev"
+  },
+  "observability": { "enabled": true },
+  "secrets": {
+    "required": ["SUPABASE_URL", "SUPABASE_ANON_KEY"]
+  }
 }
