@@ -96,8 +96,11 @@ async function authSessionResponse(response: Response): Promise<Response> {
   const accessToken = typeof result.access_token === "string" ? result.access_token : (typeof nested.access_token === "string" ? nested.access_token : undefined);
   const refreshToken = typeof result.refresh_token === "string" ? result.refresh_token : (typeof nested.refresh_token === "string" ? nested.refresh_token : undefined);
   const expiresIn = typeof result.expires_in === "number" ? result.expires_in : (typeof nested.expires_in === "number" ? nested.expires_in : 3600);
-  const body = json({ user: result.user ?? nested.user ?? null, session: Boolean(accessToken && refreshToken) }, response.status);
-  return withSessionCookies(body, { accessToken, refreshToken, accessMaxAge: Math.min(Math.max(expiresIn, 60), 86400) });
+  const hasSession = Boolean(accessToken && refreshToken);
+  const body = json({ user: result.user ?? nested.user ?? null, session: hasSession }, response.status);
+  return withSessionCookies(body, hasSession
+    ? { accessToken, refreshToken, accessMaxAge: Math.min(Math.max(expiresIn, 60), 86400) }
+    : {});
 }
 
 function clearSession(response: Response): Response {
