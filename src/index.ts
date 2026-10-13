@@ -2,6 +2,7 @@ export interface Env {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
   ALLOWED_ORIGIN?: string;
+  ASSETS: Fetcher;
 }
 
 type JsonRecord = Record<string, unknown>;
@@ -61,7 +62,7 @@ function bearerToken(request: Request): string | null {
   return value && /^Bearer\s+\S+$/i.test(value) ? value : null;
 }
 
-async function handle(request: Request, env: Env): Promise<Response> {
+async function handleApi(request: Request, env: Env): Promise<Response> {
   const { pathname } = new URL(request.url);
 
   if (request.method === "OPTIONS") {
@@ -134,7 +135,6 @@ async function handle(request: Request, env: Env): Promise<Response> {
     }
 
     const response = await supabaseAuth(env, "recover", { email });
-    // Avoid exposing whether an account exists.
     if (response.ok || response.status === 400 || response.status === 404) {
       return json({ ok: true, message: "If the account exists, password reset instructions will be sent." });
     }
@@ -172,26 +172,41 @@ async function handle(request: Request, env: Env): Promise<Response> {
   return json({ ok: false, error: "not_found" }, 404);
 }
 
+function secureHeaders(response: Response, request: Request, env: Env): Response {
+  const headers = new Headers(response.headers);
+  const origin = request.headers.get("origin");
+
+  if (origin && env.ALLOWED_ORIGIN && origin === env.ALLOWED_ORIGIN) {
+    headers.set("access-control-allow-origin", origin);
+  }
+  headers.set("vary", "Origin");
+  headers.set("x-content-type-options", "nosniff");
+  headers.set("x-frame-options", "DENY");
+  headers.set("referrer-policy", "strict-origin-when-cross-origin");
+  headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
+  headers.set("content-security-policy", "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; upgrade-insecure-requests");
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     try {
-      const response = await handle(request, env);
-      const headers = new Headers(response.headers);
-      const origin = request.headers.get("origin");
+      const url = new URL(request.url);
+      const response = url.pathname.startsWith("/api/")
+        ? await handleApi(request, env)
+        : (request.method === "GET" || request.method === "HEAD")
+          ? await env.ASSETS.fetch(request)
+          : json({ ok: false, error: "method_not_allowed" }, 405);
 
-      if (origin && env.ALLOWED_ORIGIN && origin === env.ALLOWED_ORIGIN) {
-        headers.set("access-control-allow-origin", origin);
-      }
-      headers.set("vary", "Origin");
-
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers,
-      });
+      return secureHeaders(response, request, env);
     } catch (error) {
-      console.error("PayKesho API request failed", error);
-      return json({ ok: false, error: "internal_error" }, 500);
+      console.error("PayKesho request failed", error);
+      return secureHeaders(json({ ok: false, error: "internal_error" }, 500), request, env);
     }
   },
 };
