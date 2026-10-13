@@ -57,33 +57,24 @@ function closeView() {
   overlay.hidden = true;
   document.body.style.overflow = "";
 }
-async function rawApi(path, payload, token) {
+async function rawApi(path, payload) {
   const response = await fetch(path, {
     method: path === "/api/auth/user" ? "GET" : "POST",
-    headers: {
-      ...(payload ? { "content-type": "application/json" } : {}),
-      ...(token ? { authorization: `Bearer ${token}` } : {})
-    },
+    credentials: "same-origin",
+    headers: payload ? { "content-type": "application/json" } : {},
     ...(payload ? { body: JSON.stringify(payload) } : {})
   });
   const data = response.status === 204 ? null : await response.json().catch(() => null);
   return { response, data };
 }
-async function api(path, payload, token) {
-  let result = await rawApi(path, payload, token);
-  if (result.response.status === 401 && token && path !== "/api/auth/signout" && path !== "/api/auth/refresh") {
-    const refreshToken = sessionStorage.getItem("paykesho_refresh_token");
-    if (refreshToken) {
-      const refreshed = await rawApi("/api/auth/refresh", { refresh_token: refreshToken }, null);
-      if (refreshed.response.ok && refreshed.data?.access_token) {
-        sessionStorage.setItem("paykesho_access_token", refreshed.data.access_token);
-        if (refreshed.data.refresh_token) sessionStorage.setItem("paykesho_refresh_token", refreshed.data.refresh_token);
-        result = await rawApi(path, payload, refreshed.data.access_token);
-      } else {
-        sessionStorage.removeItem("paykesho_access_token");
-        sessionStorage.removeItem("paykesho_refresh_token");
-      }
-    }
+async function api(path, payload) {
+  let result = await rawApi(path, payload);
+  const canRefresh = path !== "/api/auth/refresh" && path !== "/api/auth/signin"
+    && path !== "/api/auth/signup" && path !== "/api/auth/signout"
+    && path !== "/api/auth/password-reset";
+  if (result.response.status === 401 && canRefresh) {
+    const refreshed = await rawApi("/api/auth/refresh", {});
+    if (refreshed.response.ok && refreshed.data?.session) result = await rawApi(path, payload);
   }
   if (!result.response.ok) {
     const description = result.data && (result.data.msg || result.data.message || result.data.error_description || result.data.error);
@@ -99,9 +90,7 @@ function safeMessage(error) {
   return value || "We couldn't complete that request. Please try again.";
 }
 
-document.querySelectorAll("[data-view]").forEach((button) => {
-  button.addEventListener("click", () => showView(button.dataset.view));
-});
+// View handlers are registered below so account buttons can validate the cookie session.
 document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", closeView));
 overlay.addEventListener("click", (event) => { if (event.target === overlay) closeView(); });
 document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !overlay.hidden) closeView(); });
@@ -120,9 +109,7 @@ signupForm.addEventListener("submit", async (event) => {
   setMessage("");
   try {
     const data = await api("/api/auth/signup", payload);
-    if (data?.access_token) {
-      sessionStorage.setItem("paykesho_access_token", data.access_token);
-      if (data.refresh_token) sessionStorage.setItem("paykesho_refresh_token", data.refresh_token);
+    if (data?.session) {
       await showSignedIn(data.user);
     } else {
       setMessage("Your registration request was received. Check your email for a confirmation link if email confirmation is enabled.");
@@ -144,9 +131,7 @@ signinForm.addEventListener("submit", async (event) => {
   setMessage("");
   try {
     const data = await api("/api/auth/signin", payload);
-    if (!data?.access_token) throw new Error("We couldn't start a session. Please try again.");
-    sessionStorage.setItem("paykesho_access_token", data.access_token);
-    if (data.refresh_token) sessionStorage.setItem("paykesho_refresh_token", data.refresh_token);
+    if (!data?.session) throw new Error("We couldn't start a session. Check your email confirmation settings and try again.");
     await showSignedIn(data.user);
   } catch (error) {
     setMessage(safeMessage(error), true);
@@ -172,6 +157,7 @@ resetForm.addEventListener("submit", async (event) => {
 });
 
 async function showSignedIn(user) {
+  markSignedIn(true);
   document.querySelector(".auth-tabs").hidden = true;
   signupForm.hidden = true;
   signinForm.hidden = true;
@@ -186,29 +172,36 @@ async function showSignedIn(user) {
   setMessage("");
 }
 signoutButton.addEventListener("click", async () => {
-  const token = sessionStorage.getItem("paykesho_access_token");
-  try {
-    if (token) await api("/api/auth/signout", {}, token);
-  } catch (_) {
-    // Always clear the local tab session even if the upstream sign-out fails.
-  } finally {
-    sessionStorage.removeItem("paykesho_access_token");
-    sessionStorage.removeItem("paykesho_refresh_token");
-    document.querySelector(".auth-tabs").hidden = false;
-    showView("signin");
-  }
+  try { await api("/api/auth/signout", {}); } catch (_) {}
+  document.querySelector(".auth-tabs").hidden = false;
+  markSignedIn(false);
+  showView("signin");
 });
 
+function markSignedIn(signedIn) {
+  document.querySelectorAll('header [data-view="signin"], header [data-view="account"]').forEach((button) => {
+    button.dataset.view = signedIn ? "account" : "signin";
+    button.textContent = signedIn ? "My account" : "Sign in";
+  });
+}
 async function restoreSession() {
-  const token = sessionStorage.getItem("paykesho_access_token");
-  if (!token) return;
   try {
-    const user = await api("/api/auth/user", null, token);
-    showView("signin");
-    await showSignedIn(user);
+    const user = await api("/api/auth/user", null);
+    markSignedIn(true);
+    window.paykeshoCurrentUser = user;
   } catch (_) {
-    sessionStorage.removeItem("paykesho_access_token");
-    sessionStorage.removeItem("paykesho_refresh_token");
+    markSignedIn(false);
   }
 }
+document.querySelectorAll('header [data-view]').forEach((button) => {
+  button.addEventListener("click", async () => {
+    const view = button.dataset.view;
+    if (view === "account") {
+      showView("signin");
+      try { await showSignedIn(await api("/api/auth/user", null)); } catch (_) {}
+      return;
+    }
+    showView(view);
+  });
+});
 restoreSession();
