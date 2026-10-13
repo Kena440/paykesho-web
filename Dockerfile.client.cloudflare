@@ -17,8 +17,11 @@ COPY --from=build /app/webparent/client-portal/target/*.jar /app/app.jar
 ENV SPRING_PROFILES_ACTIVE="cloudflare"
 ENV SERVER_ADDRESS="0.0.0.0"
 
+# Fail the image build if the expected Java runtime or application artifact is missing.
+RUN test -x /opt/java/openjdk/bin/java && test -s /app/app.jar && /opt/java/openjdk/bin/java -version
+
 EXPOSE 8080
 
-# Keep the container alive after a failed Spring Boot startup so the Worker
-# can retrieve the actual startup log instead of returning only a timeout.
-ENTRYPOINT ["sh", "-c", "java -Xmx1024m -Xms256m -XX:MaxMetaspaceSize=256m -Dserver.port=8080 -Dserver.address=0.0.0.0 -Dspring.profiles.active=cloudflare -jar /app/app.jar > /tmp/paykesho-startup.log 2>&1; code=$?; echo "PayKesho Spring process exited with code $code" >> /tmp/paykesho-startup.log; if [ "$code" -ne 0 ]; then sleep 3600; fi; exit "$code""]
+# Use the explicit Temurin Java path. Capture Spring startup output and keep
+# the container available for Worker-side log collection if Spring exits.
+ENTRYPOINT ["/bin/sh", "-c", "/opt/java/openjdk/bin/java -Xmx1024m -Xms256m -XX:MaxMetaspaceSize=256m -Dserver.port=8080 -Dserver.address=0.0.0.0 -Dspring.profiles.active=cloudflare -jar /app/app.jar > /tmp/paykesho-startup.log 2>&1; code=$?; echo \"PayKesho Spring process exited with code $code\" >> /tmp/paykesho-startup.log; if [ \"$code\" -ne 0 ]; then /bin/sleep 3600; fi; exit \"$code\""]
