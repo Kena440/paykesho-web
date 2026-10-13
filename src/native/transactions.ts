@@ -4,7 +4,6 @@ import { supabaseAppRequest } from "./supabase";
 const MAX_PAGE_SIZE = 100;
 const DEFAULT_PAGE_SIZE = 25;
 const SEARCH_PATTERN = /^[\p{L}\p{N} @._'-]{1,80}$/u;
-const SETTLEMENT_STATUSES = ["all", "PENDING", "SUCCESSFUL", "FAILED"] as const;
 
 function json(body: unknown, status = 200): Response {
   return Response.json(body, {
@@ -45,11 +44,6 @@ export async function nativeAdminTransactions(
     return json({ ok: false, error: "invalid_pagination" }, 400);
   }
 
-  const status = url.searchParams.get("settlementStatus") || "all";
-  if (!(SETTLEMENT_STATUSES as readonly string[]).includes(status)) {
-    return json({ ok: false, error: "invalid_settlement_status" }, 400);
-  }
-
   const settled = url.searchParams.get("settled") || "all";
   if (!["all", "true", "false"].includes(settled)) {
     return json({ ok: false, error: "invalid_settled_filter" }, 400);
@@ -61,12 +55,11 @@ export async function nativeAdminTransactions(
   }
 
   const params = new URLSearchParams({
-    select: "id,uuid,reference,client_id,merchant_id,voucher_id,amount,currency,naration,txn_date,settled,settlement_status,settlement_reference,settlement_updated_at",
+    select: "id,uuid,reference,client_id,merchant_id,voucher_id,amount,currency,naration,txn_date,settled",
     order: "txn_date.desc.nullslast",
     limit: String(pageSize),
     offset: String((page - 1) * pageSize)
   });
-  if (status !== "all") params.set("settlement_status", `eq.${status}`);
   if (settled === "true") params.set("settled", "eq.true");
   if (settled === "false") params.set("settled", "eq.false");
   if (search) {
