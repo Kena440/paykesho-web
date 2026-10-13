@@ -193,7 +193,7 @@ async function restoreSession() {
     markSignedIn(false);
   }
 }
-document.querySelectorAll('header [data-view]').forEach((button) => {
+document.querySelectorAll("[data-view]").forEach((button) => {
   button.addEventListener("click", async () => {
     const view = button.dataset.view;
     if (view === "account") {
