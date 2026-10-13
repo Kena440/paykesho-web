@@ -1,6 +1,7 @@
 // PayKesho production deployment is managed by Cloudflare Workers Builds.
 import { DurableObject } from "cloudflare:workers";
 import { nativeDatabaseReadiness, nativeLiveness } from "./native/health";
+import { nativeAdminLogin, nativeAdminLogout, nativeAdminSession } from "./native/admin-auth";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -212,12 +213,31 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    // Worker-native migration probes bypass all Java/Spring containers.
-    if (url.pathname === "/api/native/health" && request.method === "GET") {
-      return nativeLiveness();
+    // Worker-native migration routes bypass all Java/Spring containers.
+    if (url.pathname === "/api/native/health") {
+      return request.method === "GET"
+        ? nativeLiveness()
+        : Response.json({ ok: false, error: "method_not_allowed" }, {
+            status: 405,
+            headers: { allow: "GET", "cache-control": "no-store" }
+          });
     }
-    if (url.pathname === "/api/native/db-health" && request.method === "GET") {
-      return nativeDatabaseReadiness(env);
+    if (url.pathname === "/api/native/db-health") {
+      return request.method === "GET"
+        ? nativeDatabaseReadiness(env)
+        : Response.json({ ok: false, error: "method_not_allowed" }, {
+            status: 405,
+            headers: { allow: "GET", "cache-control": "no-store" }
+          });
+    }
+    if (url.pathname === "/api/native/admin/login") {
+      return nativeAdminLogin(request, env);
+    }
+    if (url.pathname === "/api/native/admin/session") {
+      return nativeAdminSession(request, env);
+    }
+    if (url.pathname === "/api/native/admin/logout") {
+      return nativeAdminLogout(request);
     }
 
     if (url.pathname === "/debug/config") {
