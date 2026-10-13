@@ -64,7 +64,8 @@
     "FILE_SERVICE_URL": "http://localhost:8086",
     "RATE_LIMITING_ENABLED": "false",
     "LENCO_API_BASE_URL": "https://api.lenco.co/access/v2",
-    "PAYMENT_SERVICE_URL": "https://paykesho-web.amukenam1.workers.dev/internal/payment"
+    "PAYMENT_SERVICE_URL": "https://paykesho-web.amukenam1.workers.dev/internal/payment",
+    "SUPABASE_URL": "https://fjfgjfprhtdanjohabuj.supabase.co"
   },
   "observability": {
     "enabled": true
