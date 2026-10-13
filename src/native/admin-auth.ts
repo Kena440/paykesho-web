@@ -200,11 +200,11 @@ async function authenticateDatabaseAdmin(email: string, password: string, env: N
     .filter((id): id is number => typeof id === "number" && Number.isSafeInteger(id) && id > 0);
   if (roleIds.length === 0) return null;
 
-  const rolesParams = new URLSearchParams({
+  const roleDefinitionsParams = new URLSearchParams({
     select: "name,deleted",
     id: `in.(${[...new Set(roleIds)].join(",")})`
   });
-  const rolesResponse = await supabaseAppRequest(env, `rest/v1/role?${rolesParams.toString()}`, {
+  const rolesResponse = await supabaseAppRequest(env, `rest/v1/role?${roleDefinitionsParams.toString()}`, {
     method: "GET",
     headers: { accept: "application/json" }
   });
