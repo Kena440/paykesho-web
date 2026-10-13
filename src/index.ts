@@ -5,6 +5,7 @@ import { nativeAdminLogin, nativeAdminLogout, nativeAdminSession } from "./nativ
 import { nativeAdminDashboard } from "./native/dashboard";
 import { nativeAdminClients } from "./native/clients";
 import { nativeAdminDirectory } from "./native/directories";
+import { nativeAdminTransactions } from "./native/transactions";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -251,6 +252,9 @@ export default {
     }
     if (url.pathname === "/api/native/admin/organizations") {
       return nativeAdminDirectory(request, env, "organizations");
+    }
+    if (url.pathname === "/api/native/admin/transactions") {
+      return nativeAdminTransactions(request, env);
     }
     if (url.pathname === "/api/native/admin/logout") {
       return nativeAdminLogout(request);
