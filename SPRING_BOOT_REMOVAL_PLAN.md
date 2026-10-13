@@ -58,3 +58,8 @@ Remove Spring Boot and Java runtime dependencies from the PayKesho production re
 - Do not disable authentication/RLS to make the new app work.
 - Do not switch production routing to incomplete replacement handlers.
 - Keep the existing production branch untouched until the replacement is tested.
+
+
+## Latest migration increment
+
+- Added session-protected, read-only paginated/searchable merchant and organization directory endpoints. Merchant payout routing and account fields are excluded from the response.
