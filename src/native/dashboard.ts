@@ -9,6 +9,20 @@ const DASHBOARD_TABLES = {
   vouchers: "vouchers"
 } as const;
 
+const DASHBOARD_COUNTS = [
+  ["organizations", "organizations", ""],
+  ["merchants", "merchants", ""],
+  ["clients", "clients", ""],
+  ["transactions", "transactions", ""],
+  ["vouchers", "vouchers", ""],
+  ["activeOrganizations", "organizations", "enabled=eq.true"],
+  ["inactiveOrganizations", "organizations", "enabled=eq.false"],
+  ["activeMerchants", "merchants", "enabled=eq.true"],
+  ["inactiveMerchants", "merchants", "enabled=eq.false"],
+  ["activeClients", "clients", "enabled=eq.true"],
+  ["inactiveClients", "clients", "enabled=eq.false"]
+] as const;
+
 function json(body: unknown, status = 200): Response {
   return Response.json(body, {
     status,
@@ -23,11 +37,12 @@ function json(body: unknown, status = 200): Response {
 
 async function countTable(
   env: NativeAuthEnv,
-  table: string
+  table: string,
+  filters = ""
 ): Promise<number> {
   const response = await supabaseAppRequest(
     env,
-    `rest/v1/${table}?select=*&limit=0`,
+    `rest/v1/${table}?select=id${filters ? "&" + filters : ""}&limit=0`,
     {
       method: "GET",
       headers: {
@@ -68,9 +83,9 @@ export async function nativeAdminDashboard(
 
   try {
     const entries = await Promise.all(
-      Object.entries(DASHBOARD_TABLES).map(async ([metric, table]) => [
+      DASHBOARD_COUNTS.map(async ([metric, table, filters]) => [
         metric,
-        await countTable(env, table)
+        await countTable(env, table, filters)
       ] as const)
     );
 
