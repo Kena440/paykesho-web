@@ -1,5 +1,11 @@
 // PayKesho production deployment is managed by Cloudflare Workers Builds.
 import { DurableObject } from "cloudflare:workers";
+import { nativeDatabaseReadiness, nativeLiveness } from "./native/health";
+import { nativeAdminLogin, nativeAdminLogout, nativeAdminSession } from "./native/admin-auth";
+import { nativeAdminDashboard } from "./native/dashboard";
+import { nativeAdminClients } from "./native/clients";
+import { nativeAdminDirectory } from "./native/directories";
+import { nativeAdminTransactions } from "./native/transactions";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -18,6 +24,9 @@ export interface Env {
   LENCO_ACCOUNT_ID: string;
   PAYKESHO_INTERNAL_TOKEN: string;
   PAYMENT_SERVICE_URL?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_SERVICE_ROLE_KEY?: string;
+  PAYKESHO_SESSION_SECRET?: string;
 }
 
 function paykeshoEnv(env: Env, profile: string): Record<string, string> {
@@ -208,6 +217,48 @@ export class PaykeshoClientContainer extends PaykeshoDirectContainer {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    // Worker-native migration routes bypass all Java/Spring containers.
+    if (url.pathname === "/api/native/health") {
+      return request.method === "GET"
+        ? nativeLiveness()
+        : Response.json({ ok: false, error: "method_not_allowed" }, {
+            status: 405,
+            headers: { allow: "GET", "cache-control": "no-store" }
+          });
+    }
+    if (url.pathname === "/api/native/db-health") {
+      return request.method === "GET"
+        ? nativeDatabaseReadiness(env)
+        : Response.json({ ok: false, error: "method_not_allowed" }, {
+            status: 405,
+            headers: { allow: "GET", "cache-control": "no-store" }
+          });
+    }
+    if (url.pathname === "/api/native/admin/login") {
+      return nativeAdminLogin(request, env);
+    }
+    if (url.pathname === "/api/native/admin/session") {
+      return nativeAdminSession(request, env);
+    }
+    if (url.pathname === "/api/native/admin/dashboard") {
+      return nativeAdminDashboard(request, env);
+    }
+    if (url.pathname === "/api/native/admin/clients") {
+      return nativeAdminClients(request, env);
+    }
+    if (url.pathname === "/api/native/admin/merchants") {
+      return nativeAdminDirectory(request, env, "merchants");
+    }
+    if (url.pathname === "/api/native/admin/organizations") {
+      return nativeAdminDirectory(request, env, "organizations");
+    }
+    if (url.pathname === "/api/native/admin/transactions") {
+      return nativeAdminTransactions(request, env);
+    }
+    if (url.pathname === "/api/native/admin/logout") {
+      return nativeAdminLogout(request);
+    }
 
     if (url.pathname === "/debug/config") {
       const dbUrl = env.PAYKESHO_DB_URL || "";
