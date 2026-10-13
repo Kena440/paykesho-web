@@ -63,3 +63,8 @@ Remove Spring Boot and Java runtime dependencies from the PayKesho production re
 ## Latest migration increment
 
 - Added session-protected, read-only paginated/searchable merchant and organization directory endpoints. Merchant payout routing and account fields are excluded from the response.
+
+
+## Read-only transaction API increment
+
+- Added `GET /api/native/admin/transactions` with signed-admin session protection, pagination, text search, settlement-status filtering and settled/unsettled filtering. This endpoint is read-only; payment and settlement mutations remain on the existing services until idempotency, reconciliation and parity checks are in place.
