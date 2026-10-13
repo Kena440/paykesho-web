@@ -37,3 +37,17 @@ Do not grant `anon` or `authenticated` broad access to `app`. Do not put a servi
 - Implement and test advance eligibility, voucher issuance/redemption, merchant payments, Lenco webhook signatures, payout failure/refund behavior, pending/uncertain outcomes, reconciliation, notifications and admin authorization.
 - Run tests for duplicate requests, replayed webhooks, retries, concurrent spending, unauthorized cross-account access and rollback.
 - Deploy only to staging first. Keep `master` and production unchanged until all gates pass.
+
+## Legacy payment behavior to preserve during replacement
+
+Read-only review of the existing customer/payment code on `feature/paykesho-customer-journey` identified these behaviors:
+
+- A payment requires a positive amount, a valid merchant, a configured/valid merchant payout profile, and an approved valid client voucher with enough available e-value.
+- Voucher ownership must match the authenticated client. The existing JPA service uses a pessimistic row lock and consumes voucher value in the same database transaction that creates the PayKesho transaction, preventing concurrent QR payments from spending the same balance.
+- New transactions use currency `ZMW` and begin with settlement status `PENDING`. Lenco is the external settlement rail; a successful HTTP request alone is not sufficient to mark a transfer successful.
+- A confirmed Lenco failure refunds the voucher value once. Duplicate or out-of-order settlement events must not refund a successful payment or re-mark a refunded payment as successful. Ambiguous payout outcomes stay `PENDING` and are reconciled rather than risking a double spend/refund.
+- The existing Lenco webhook validates `X-Lenco-Signature` against the raw request payload using HMAC-SHA512 and a key derived from the SHA-256 digest of the configured API token, then compares signatures in constant time. Preserve this exact protocol only after confirming it against current Lenco documentation and a real signed test fixture.
+- A scheduled reconciliation job revisits `PENDING` transfers and applies only terminal `SUCCESSFUL` or `FAILED` outcomes.
+- The existing customer endpoint uses idempotency records with request hashes and a 24-hour expiry. The replacement should retain idempotency, but strengthen the legacy behavior: never proceed with a financial mutation if the idempotency record cannot be reserved, and reject reuse of the same key with a different request hash.
+
+These rules should become executable integration tests and atomic PostgreSQL functions before the 501 financial routes are enabled. Notifications and balance summaries should follow committed transaction state; they must not be the source of truth for money movement.
