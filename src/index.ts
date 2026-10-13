@@ -2,6 +2,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { nativeDatabaseReadiness, nativeLiveness } from "./native/health";
 import { nativeAdminLogin, nativeAdminLogout, nativeAdminSession } from "./native/admin-auth";
+import { nativeAdminDashboard } from "./native/dashboard";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -236,6 +237,9 @@ export default {
     }
     if (url.pathname === "/api/native/admin/session") {
       return nativeAdminSession(request, env);
+    }
+    if (url.pathname === "/api/native/admin/dashboard") {
+      return nativeAdminDashboard(request, env);
     }
     if (url.pathname === "/api/native/admin/logout") {
       return nativeAdminLogout(request);
