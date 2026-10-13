@@ -4,6 +4,7 @@ import { nativeDatabaseReadiness, nativeLiveness } from "./native/health";
 import { nativeAdminLogin, nativeAdminLogout, nativeAdminSession } from "./native/admin-auth";
 import { nativeAdminDashboard } from "./native/dashboard";
 import { nativeAdminClients } from "./native/clients";
+import { nativeAdminDirectory } from "./native/directories";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -244,6 +245,12 @@ export default {
     }
     if (url.pathname === "/api/native/admin/clients") {
       return nativeAdminClients(request, env);
+    }
+    if (url.pathname === "/api/native/admin/merchants") {
+      return nativeAdminDirectory(request, env, "merchants");
+    }
+    if (url.pathname === "/api/native/admin/organizations") {
+      return nativeAdminDirectory(request, env, "organizations");
     }
     if (url.pathname === "/api/native/admin/logout") {
       return nativeAdminLogout(request);
