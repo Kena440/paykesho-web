@@ -1,14 +1,6 @@
 import { verifyAdminSession, type NativeAuthEnv } from "./admin-auth";
 import { supabaseAppRequest } from "./supabase";
 
-const DASHBOARD_TABLES = {
-  organizations: "organizations",
-  merchants: "merchants",
-  clients: "clients",
-  transactions: "transactions",
-  vouchers: "vouchers"
-} as const;
-
 const DASHBOARD_COUNTS = [
   ["organizations", "organizations", ""],
   ["merchants", "merchants", ""],
