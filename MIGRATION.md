@@ -29,4 +29,5 @@ Financial endpoints intentionally return `501 workflow_not_migrated`: advances, 
 3. Implement financial mutations as atomic Postgres functions/transactions with authorization, idempotency and auditable ledger entries.
 4. Migrate KYC/private file storage, Lenco webhook verification, notifications and admin functions.
 5. Run staging tests for registration, existing-account migration, credit eligibility, payments, refunds, retries, reconciliation, permissions and failure handling.
-6. Configure production secrets and approved origins, then perform a planned cutover. Do not merge/deploy this branch before the gates above pass.
+6. Add rate limits/abuse controls to signup, sign-in, refresh and password-reset routes; verify email-confirmation and recovery redirects.
+7. Configure production secrets and approved origins, then perform a planned cutover. Do not merge/deploy this branch before the gates above pass.
