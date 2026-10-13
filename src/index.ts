@@ -126,6 +126,18 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
     return upstreamResponse(response);
   }
 
+  if (pathname === "/api/auth/refresh" && request.method === "POST") {
+    const body = await readJson(request);
+    const refreshToken = typeof body?.refresh_token === "string" ? body.refresh_token : "";
+    if (!refreshToken || refreshToken.length > 4096) {
+      return json({ ok: false, error: "invalid_refresh_token" }, 400);
+    }
+    const response = await supabaseAuth(env, "token?grant_type=refresh_token", {
+      refresh_token: refreshToken,
+    });
+    return upstreamResponse(response);
+  }
+
   if (pathname === "/api/auth/password-reset" && request.method === "POST") {
     const body = await readJson(request);
     const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
