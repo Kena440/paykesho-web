@@ -31,6 +31,7 @@ function setBusy(form, value) {
 }
 function showView(view) {
   currentView = view;
+  document.querySelector(".auth-tabs").hidden = false;
   overlay.hidden = false;
   document.body.style.overflow = "hidden";
   setMessage("");
@@ -151,6 +152,7 @@ resetForm.addEventListener("submit", async (event) => {
 });
 
 async function showSignedIn(user) {
+  document.querySelector(".auth-tabs").hidden = true;
   signupForm.hidden = true;
   signinForm.hidden = true;
   resetForm.hidden = true;
