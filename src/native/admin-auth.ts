@@ -38,6 +38,12 @@ function base64UrlDecode(value: string): Uint8Array {
   return Uint8Array.from(binary, (char) => char.charCodeAt(0));
 }
 
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
+
 function constantTimeEqual(left: string, right: string): boolean {
   const a = new TextEncoder().encode(left);
   const b = new TextEncoder().encode(right);
@@ -101,7 +107,7 @@ export async function verifyAdminSession(
     const valid = await crypto.subtle.verify(
       "HMAC",
       key,
-      base64UrlDecode(parts[1]),
+      toArrayBuffer(base64UrlDecode(parts[1])),
       new TextEncoder().encode(parts[0])
     );
     if (!valid) return null;
