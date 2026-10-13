@@ -24,7 +24,7 @@ Financial endpoints intentionally return `501 workflow_not_migrated`: advances, 
 ## Required before cutover
 
 1. Define and test the Supabase Auth ↔ legacy `app.clients` / `app.users` identity-linking strategy; do not recreate or overwrite existing customer records or legacy password hashes.
-2. Confirm Supabase Data API exposure/access for the `app` schema; its tables currently have RLS enabled and no row policies, so do not expose them directly to browser clients.
+2. Follow [the database and cutover audit](documentation/SPRING_BOOT_REMOVAL_AUDIT.md): the `app` schema currently has no API-role USAGE/table grants, and RLS is enabled without policies. Choose a controlled server-only access pattern before implementing database routes.
 3. Implement financial mutations as atomic Postgres functions/transactions with authorization, idempotency and auditable ledger entries.
 4. Migrate KYC/private file storage, Lenco webhook verification, notifications and admin functions.
 5. Run staging tests for registration, existing-account migration, credit eligibility, payments, refunds, retries, reconciliation, permissions and failure handling.
