@@ -1,0 +1,39 @@
+name: Worker TypeScript validation
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "src/**/*.ts"
+      - "package.json"
+      - "tsconfig.json"
+      - "wrangler.jsonc"
+      - ".github/workflows/worker-typecheck.yml"
+  push:
+    branches:
+      - replace-springboot-worker-native
+    paths:
+      - "src/**/*.ts"
+      - "package.json"
+      - "tsconfig.json"
+      - "wrangler.jsonc"
+      - ".github/workflows/worker-typecheck.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pinned project dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Type-check Worker source
+        run: npm run build
