@@ -153,24 +153,6 @@ public class MainController {
         }
     }
 
-    @GetMapping("/debug/admin/{email}")
-    @ResponseBody
-    public String debugAdminInfo(@PathVariable String email) {
-        try {
-            logger.debug("Debug request for admin email: {}", email);
-            OrganizationAdmin admin = organizationAdminService.getOrganizationAdminByEmail(email);
-            if (admin == null) {
-                return "Admin not found for email: " + email;
-            }
-            return String.format("Admin found: %s - ID: %d, Enabled: %b, AccountNonLocked: %b, FailedAttempts: %d, Password Hash: %s",
-                    admin.getEmail(), admin.getId(), admin.isEnabled(), admin.isAccountNonLocked(),
-                    admin.getFailedAttempt(), admin.getPassword().substring(0, Math.min(20, admin.getPassword().length())) + "...");
-        } catch (Exception ex) {
-            logger.error("Error in debug endpoint: {}", ex.getMessage(), ex);
-            return "Error: " + ex.getMessage();
-        }
-    }
-
     @GetMapping("/api/dashboard/clients")
     @ResponseBody
     public Map<String, Object> getDashboardClientData(HttpServletRequest request) {

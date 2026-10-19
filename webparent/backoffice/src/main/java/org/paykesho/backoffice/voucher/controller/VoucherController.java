@@ -240,7 +240,7 @@ public class VoucherController {
     }
 
     private void updateVoucherForApproval(Voucher voucher, HttpServletRequest request) {
-        voucher.setInterestPercent(15);
+        voucher.setInterestPercent(new BigDecimal("15"));
         BigDecimal totalRepaymentAmount = calculateTotalRepayment(voucher).setScale(2, RoundingMode.HALF_EVEN);
         voucher.setRepaymentAmount(totalRepaymentAmount);
         voucher.setApproved(true);
@@ -394,15 +394,13 @@ public class VoucherController {
 
 
     private BigDecimal calculateTotalRepayment(Voucher voucher) {
-        BigDecimal interestAmount = BigDecimal.valueOf(voucher.getInterestPercent() / 100).multiply(voucher.getAmount());
-        return voucher.getAmount().add(interestAmount);
+        return org.commons.utils.MoneyMath.totalRepayment(voucher.getAmount(), voucher.getInterestPercent());
     }
 
     private BigDecimal calculateTotalRepayment(HttpServletRequest request) {
         BigDecimal adjustedAmount = new BigDecimal(request.getParameter("voucherAdjustedAmount"));
-        float interestPercent = Float.parseFloat(request.getParameter("voucherInterestPercent"));
-        BigDecimal interestAmount = BigDecimal.valueOf(interestPercent / 100).multiply(adjustedAmount);
-        return adjustedAmount.add(interestAmount);
+        BigDecimal interestPercent = new BigDecimal(request.getParameter("voucherInterestPercent"));
+        return org.commons.utils.MoneyMath.totalRepayment(adjustedAmount, interestPercent);
     }
 
     private String generateEmailMessage(Voucher voucher, String actionType, BigDecimal voucherAmount, String message1) {

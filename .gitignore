@@ -35,3 +35,9 @@ deploy/
 
 # JAR files
 *.jar
+### Secrets — never commit ###
+.env
+*.env
+!environment-template.env
+!*.env.example
+deploy/.env
