@@ -1,0 +1,45 @@
+# syntax=docker/dockerfile:1
+
+FROM eclipse-temurin:17-jdk-jammy AS build
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends maven && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the complete Maven multi-module project before resolving dependencies.
+# The webparent POM declares all seven service modules, so their POMs must
+# exist when Maven evaluates the reactor.
+COPY pom.xml .
+COPY webparent/pom.xml webparent/
+COPY webparent/backoffice/pom.xml webparent/backoffice/
+COPY webparent/client-portal/pom.xml webparent/client-portal/
+COPY webparent/organization-portal/pom.xml webparent/organization-portal/
+COPY webparent/merchant-portal/pom.xml webparent/merchant-portal/
+COPY webparent/payment-service/pom.xml webparent/payment-service/
+COPY webparent/notification-service/pom.xml webparent/notification-service/
+COPY webparent/file-service/pom.xml webparent/file-service/
+COPY commons/pom.xml commons/
+
+RUN mvn dependency:go-offline -B
+
+COPY . .
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+
+COPY --from=build /app/webparent/backoffice/target/backoffice-1.0-SNAPSHOT.jar /app/jars/backoffice.jar
+COPY --from=build /app/webparent/client-portal/target/client-portal-1.0-SNAPSHOT.jar /app/jars/client-portal.jar
+COPY --from=build /app/webparent/organization-portal/target/organization-portal-1.0-SNAPSHOT.jar /app/jars/organization-portal.jar
+COPY --from=build /app/webparent/merchant-portal/target/merchant-portal-1.0-SNAPSHOT.jar /app/jars/merchant-portal.jar
+COPY --from=build /app/webparent/payment-service/target/payment-service-1.0-SNAPSHOT.jar /app/jars/payment-service.jar
+COPY --from=build /app/webparent/notification-service/target/notification-service-1.0-SNAPSHOT.jar /app/jars/notification-service.jar
+COPY --from=build /app/webparent/file-service/target/file-service-1.0-SNAPSHOT.jar /app/jars/file-service.jar
+COPY deploy/cloudflare/run-service.sh /app/run-service.sh
+RUN chmod +x /app/run-service.sh
+
+ENV JAVA_OPTS="-Xmx768m -Xms256m"
+ENV SPRING_PROFILES_ACTIVE="prod"
+EXPOSE 8080
+ENTRYPOINT ["/app/run-service.sh"]
