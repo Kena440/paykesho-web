@@ -19,6 +19,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    // Remember-me signing key comes from the REMEMBER_ME_KEY secret. If it is not
+    // set, a random per-start key is used so no hard-coded key can ever sign cookies.
+    @org.springframework.beans.factory.annotation.Value("${REMEMBER_ME_KEY:}")
+    private String configuredRememberMeKey;
+
+    private String rememberMeKey() {
+        if (configuredRememberMeKey != null && !configuredRememberMeKey.trim().isEmpty()) {
+            return configuredRememberMeKey;
+        }
+        byte[] bytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(bytes);
+        configuredRememberMeKey = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        return configuredRememberMeKey;
+    }
+
     private static final String ROLE_ADMIN = "Admin";
     private static final String ROLE_SUPERADMIN = "SuperAdmin";
 
@@ -62,7 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests(authz -> authz
                         .antMatchers("/assessments/registration/**",
-                                "/assessments/generateQRCode", "/actuator/health", "/test/**", "/debug/**",
+                                "/assessments/generateQRCode", "/actuator/health",
                                 "/forgot-password", "/forgot-password/captcha", "/reset-password").permitAll()
                         .antMatchers("/actuator/**").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
                         .antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
@@ -77,7 +92,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .logout(logout -> logout.permitAll())
                 .rememberMe(remember -> remember
-                        .key("${REMEMBER_ME_KEY:AbcDefgHijklmnOpqrs_1234567890}")
+                        .key(rememberMeKey())
                         .tokenValiditySeconds(7 * 24 * 60 * 60)
                 )
                 .headers(headers -> headers

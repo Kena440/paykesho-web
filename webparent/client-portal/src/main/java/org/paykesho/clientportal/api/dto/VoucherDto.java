@@ -13,7 +13,7 @@ public class VoucherDto {
     private BigDecimal voucherAmount;
     private BigDecimal voucherAvailableAmount;
     private BigDecimal voucherRepaymentAmount;
-    private float voucherInterestPercent;
+    private BigDecimal voucherInterestPercent;
     private String voucherRepaymentCycle;
     private Date voucherRepaymentDate;
     private Date voucherRequestDate;

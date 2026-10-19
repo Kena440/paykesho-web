@@ -108,7 +108,7 @@ public class VoucherController {
             voucher.setVoucherStatus(VoucherStatus.PENDING);
             voucher.setReason(voucherRequestDto.getReason());
             voucher.setClient(client);
-            voucher.setInterestPercent(15);
+            voucher.setInterestPercent(new BigDecimal("15"));
             voucher.setAmount(voucherRequestDto.getAmount());
             voucher.setRepaymentCycle(voucherRequestDto.getRepaymentCycle());
             voucher.setAvailableAmount(voucherRequestDto.getAmount());
@@ -153,8 +153,7 @@ public class VoucherController {
     }
 
     private BigDecimal calculateTotalRepayment(Voucher voucher) {
-        BigDecimal interestAmount = BigDecimal.valueOf(voucher.getInterestPercent() / 100).multiply(voucher.getAmount());
-        return voucher.getAmount().add(interestAmount);
+        return org.commons.utils.MoneyMath.totalRepayment(voucher.getAmount(), voucher.getInterestPercent());
     }
 
     private boolean isValidFileType(MultipartFile file) {

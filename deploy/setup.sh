@@ -12,10 +12,10 @@ done
 if [ ! -f .env ]; then
     cat > .env << EOF
 # MySQL Configuration
-MYSQL_ROOT_PASSWORD=***REMOVED***
+MYSQL_ROOT_PASSWORD=$(openssl rand -base64 24)
 MYSQL_DATABASE=paykesho
 MYSQL_USER=paykesho_user
-MYSQL_PASSWORD=***REMOVED***
+MYSQL_PASSWORD=$(openssl rand -base64 24)
 
 # Java Options
 JAVA_OPTS=-Xmx512m -Xms256m

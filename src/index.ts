@@ -209,17 +209,12 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    if (url.pathname === "/debug/config") {
-      const dbUrl = env.PAYKESHO_DB_URL || "";
-      return Response.json({
-        dbUrlPresent: Boolean(dbUrl),
-        dbUrlJdbcPostgres: dbUrl.startsWith("jdbc:postgresql://"),
-        dbHostPresent: Boolean(dbUrl.match(/^jdbc:postgresql:\/\/([^/?]+)/)),
-        dbUsernamePresent: Boolean(env.PAYKESHO_DB_USERNAME),
-        dbPasswordPresent: Boolean(env.PAYKESHO_DB_PASSWORD),
-        adminEmailPresent: Boolean(env.PAYKESHO_ADMIN_EMAIL),
-        adminPasswordPresent: Boolean(env.PAYKESHO_ADMIN_PASSWORD)
-      }, { headers: { "cache-control": "no-store" } });
+    // Only the token-protected settlement API and the signed Lenco webhook may
+    // reach the payment container from outside. The legacy /rest/api/** payment
+    // endpoints have no authentication and must never be publicly routable.
+    if (url.pathname.startsWith("/internal/payment/")
+      && !url.pathname.startsWith("/internal/payment/internal/v1/")) {
+      return new Response("Not found", { status: 404, headers: { "cache-control": "no-store" } });
     }
 
     const isPayment = url.pathname === "/webhooks/lenco"

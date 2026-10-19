@@ -284,23 +284,6 @@ public class MerchantController {
         outputStream.write(qrCode);
     }
     
-    @GetMapping("/debug")
-    public String debugPage(Model model) {
-        Merchant merchant = new Merchant();
-        merchant.setName("Debug Merchant");
-        merchant.setEmail("debug@test.com");
-        merchant.setPhoneNumber("123456789");
-        merchant.setMerchantType(org.commons.enums.MerchantType.CAFE);
-        merchant.setDetails("Debug details");
-        merchant.setServicesOffered("Debug services");
-        merchant.setEnabled(true);
-        
-        model.addAttribute("merchant", merchant);
-        model.addAttribute("pageTitle", "Debug Merchant");
-        model.addAttribute("message", "Debug page working correctly");
-        return "merchants/merchant_form";
-    }
-
     @GetMapping("/fix-uuid")
     public String fixMerchantUuids(RedirectAttributes redirectAttributes) {
         try {

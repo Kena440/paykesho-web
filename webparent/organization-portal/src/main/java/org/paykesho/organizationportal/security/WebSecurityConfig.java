@@ -23,6 +23,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    // Remember-me signing key comes from the REMEMBER_ME_KEY secret. If it is not
+    // set, a random per-start key is used so no hard-coded key can ever sign cookies.
+    @org.springframework.beans.factory.annotation.Value("${REMEMBER_ME_KEY:}")
+    private String configuredRememberMeKey;
+
+    private String rememberMeKey() {
+        if (configuredRememberMeKey != null && !configuredRememberMeKey.trim().isEmpty()) {
+            return configuredRememberMeKey;
+        }
+        byte[] bytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(bytes);
+        configuredRememberMeKey = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        return configuredRememberMeKey;
+    }
+
 
     private final OrganizationAdminOAuth2UserService oAuth2UserService;
 
@@ -46,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf
-                        .ignoringAntMatchers("/api/dashboard/**", "/debug/**") // Only specific API endpoints
+                        .ignoringAntMatchers("/api/dashboard/**") // Only specific API endpoints
                 )
                 .authorizeRequests(authz -> authz
                         .antMatchers("/forgot-password", "/forgot-password/captcha", "/reset-password", "/reset-password-action").permitAll()
@@ -71,7 +86,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.logout(logout -> logout.permitAll())
                 .rememberMe(remember -> remember
-                        .key("${REMEMBER_ME_KEY:1234567890_aBcDeFgHiJkLmNoPqRsTuVwXyZ}")
+                        .key(rememberMeKey())
                         .tokenValiditySeconds(14 * 24 * 60 * 60)
                 )
                 .sessionManagement(session -> session

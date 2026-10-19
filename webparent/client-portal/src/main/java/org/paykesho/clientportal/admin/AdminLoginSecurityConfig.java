@@ -13,6 +13,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 @Order(1)
 public class AdminLoginSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    // Remember-me signing key comes from the REMEMBER_ME_KEY secret. If it is not
+    // set, a random per-start key is used so no hard-coded key can ever sign cookies.
+    @org.springframework.beans.factory.annotation.Value("${REMEMBER_ME_KEY:}")
+    private String configuredRememberMeKey;
+
+    private String rememberMeKey() {
+        if (configuredRememberMeKey != null && !configuredRememberMeKey.trim().isEmpty()) {
+            return configuredRememberMeKey;
+        }
+        byte[] bytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(bytes);
+        configuredRememberMeKey = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        return configuredRememberMeKey;
+    }
     @Value("${PAYKESHO_ADMIN_EMAIL:}") private String adminEmail;
     @Value("${PAYKESHO_ADMIN_PASSWORD:}") private String adminPassword;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -52,7 +67,7 @@ public class AdminLoginSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
             .rememberMe()
-                .key("paykesho-admin-remember-2026")
+                .key(rememberMeKey())
                 .tokenValiditySeconds(604800);
     }
 }

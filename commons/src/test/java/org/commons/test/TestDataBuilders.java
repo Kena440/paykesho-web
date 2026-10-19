@@ -94,7 +94,7 @@ public class TestDataBuilders {
         private BigDecimal availableAmount;
         private VoucherStatus status = VoucherStatus.PENDING;
         private boolean approved = false;
-        private float interestPercent = 15.0f;
+        private java.math.BigDecimal interestPercent = new java.math.BigDecimal("15");
 
         public VoucherBuilder withId(Integer id) {
             this.id = id;
@@ -131,7 +131,7 @@ public class TestDataBuilders {
             return this;
         }
 
-        public VoucherBuilder withInterestPercent(float interestPercent) {
+        public VoucherBuilder withInterestPercent(java.math.BigDecimal interestPercent) {
             this.interestPercent = interestPercent;
             return this;
         }

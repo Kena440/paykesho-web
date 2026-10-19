@@ -29,8 +29,10 @@ public class Voucher extends IdBasedEntity {
     @Column(name = "repayment_amount", length = 128)
     private BigDecimal repaymentAmount;
 
-    @Column(name = "interest_amount", length = 128)
-    private float interestPercent;
+    // Interest rate in percent (e.g. 15.0000). Stored as exact decimal, never float.
+    // The column keeps its historical name "interest_amount".
+    @Column(name = "interest_amount", precision = 9, scale = 4)
+    private BigDecimal interestPercent;
 
     @Column(name = "repayment_cyle", length = 128)
     private Integer repaymentCycle;
