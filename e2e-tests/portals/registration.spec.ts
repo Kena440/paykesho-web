@@ -31,7 +31,7 @@ test('an employee whose details do not match the staff list cannot register', as
   await page.locator('input[name="email"]').fill('mary.wrong@ci.paykesho.test');
   await page.locator('input[name="password"]').fill('Mary-Test-2026');
   await page.locator('form:has(input[name="password"]) [type="submit"]').first().click();
-  await expect(page).toHaveURL(/\/login/);
+  await expect(page).toHaveURL(/\/login\?error/);
 });
 
 test('an employee on the staff list registers and can sign in', async ({ page }) => {

@@ -33,8 +33,10 @@ async function signIn(page: Page, p: Portal, password = PASSWORD) {
   await page.goto(p.loginPath);
   await page.locator('input[name="email"]').first().fill(p.email);
   await page.locator('input[name="password"]').first().fill(password);
+  // Dashboards poll in the background, so wait for the post-login navigation
+  // (or the error redirect) rather than for network idle.
   await Promise.all([
-    page.waitForLoadState('networkidle'),
+    page.waitForURL((u) => u.pathname !== p.loginPath || u.search.includes('error'), { waitUntil: 'load' }),
     page.locator('form:has(input[name="password"]) [type="submit"]').first().click(),
   ]);
 }
