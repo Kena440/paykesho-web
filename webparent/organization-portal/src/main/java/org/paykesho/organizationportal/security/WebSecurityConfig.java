@@ -52,14 +52,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomLoginFailureHandler loginFailureHandler;
 
     private final RateLimitingFilter rateLimitingFilter;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${paykesho.security.oauth2.enabled:false}")
     private boolean oauth2Enabled;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -119,7 +116,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
 
         return authProvider;
     }

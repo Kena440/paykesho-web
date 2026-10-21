@@ -51,11 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomLoginFailureHandler loginFailureHandler;
 
     private final RateLimitingFilter rateLimitingFilter;
+    private final PasswordEncoder passwordEncoder;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -116,7 +113,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
 
         return authProvider;
     }
