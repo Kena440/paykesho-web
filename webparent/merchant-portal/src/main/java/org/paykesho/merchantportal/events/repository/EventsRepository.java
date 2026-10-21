@@ -20,8 +20,14 @@ public interface EventsRepository extends SearchRepository<Announcement, Integer
     @Query("select e from Announcement e where e.enabled = true and e.name = :name")
     Announcement getEventByName(String name);
 
-    @Query("SELECT e FROM Announcement e WHERE e.eventDate > CURRENT_DATE AND DATEDIFF(e.eventDate, CURRENT_DATE) <= :days")
-    public List<Announcement> findUpcomingEvents(@Param("days") int days);
+    // Portable (PostgreSQL and MySQL): DATEDIFF does not exist in PostgreSQL.
+    @Query("SELECT e FROM Announcement e WHERE e.eventDate > CURRENT_DATE AND e.eventDate <= :until")
+    List<Announcement> findEventsAfterTodayUntil(@Param("until") java.util.Date until);
+
+    default List<Announcement> findUpcomingEvents(int days) {
+        java.time.LocalDate until = java.time.LocalDate.now().plusDays(days);
+        return findEventsAfterTodayUntil(java.sql.Date.valueOf(until));
+    }
 
     // UUID-based methods
     Optional<Announcement> findByUuid(String uuid);

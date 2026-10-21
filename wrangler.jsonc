@@ -7,7 +7,7 @@
     {
       "class_name": "PaykeshoWebContainer",
       "image": "./Dockerfile.cloudflare",
-      "instance_type": "basic",
+      "instance_type": "standard-1",
       "max_instances": 1
     },
     {
@@ -20,6 +20,18 @@
       "class_name": "PaykeshoPaymentContainer",
       "image": "./Dockerfile.payment.cloudflare",
       "instance_type": "basic",
+      "max_instances": 1
+    },
+    {
+      "class_name": "PaykeshoMerchantContainer",
+      "image": "./Dockerfile.merchant.cloudflare",
+      "instance_type": "standard-1",
+      "max_instances": 1
+    },
+    {
+      "class_name": "PaykeshoEmployerContainer",
+      "image": "./Dockerfile.employer.cloudflare",
+      "instance_type": "standard-1",
       "max_instances": 1
     }
   ],
@@ -36,6 +48,14 @@
       {
         "name": "PAYKESHO_PAYMENT",
         "class_name": "PaykeshoPaymentContainer"
+      },
+      {
+        "name": "PAYKESHO_MERCHANT",
+        "class_name": "PaykeshoMerchantContainer"
+      },
+      {
+        "name": "PAYKESHO_EMPLOYER",
+        "class_name": "PaykeshoEmployerContainer"
       }
     ]
   },
@@ -56,6 +76,13 @@
       "tag": "v3",
       "new_sqlite_classes": [
         "PaykeshoPaymentContainer"
+      ]
+    },
+    {
+      "tag": "v4",
+      "new_sqlite_classes": [
+        "PaykeshoMerchantContainer",
+        "PaykeshoEmployerContainer"
       ]
     }
   ],

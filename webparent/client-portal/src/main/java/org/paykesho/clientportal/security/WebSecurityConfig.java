@@ -29,6 +29,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @org.springframework.beans.factory.annotation.Value("${REMEMBER_ME_KEY:}")
     private String configuredRememberMeKey;
 
+    // Every portal shares one host, so each needs its own remember-me cookie name.
+    @org.springframework.beans.factory.annotation.Value("${paykesho.security.remember-me-cookie:pk_client_remember}")
+    private String rememberMeCookieName;
+
     private String rememberMeKey() {
         if (configuredRememberMeKey != null && !configuredRememberMeKey.trim().isEmpty()) {
             return configuredRememberMeKey;
@@ -45,14 +49,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomLoginFailureHandler loginFailureHandler;
 
     private final RateLimitingFilter rateLimitingFilter;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${paykesho.security.oauth2.enabled:false}")
     private boolean oauth2Enabled;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -87,6 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout(logout -> logout.permitAll())
                 .rememberMe(remember -> remember
                         .key(rememberMeKey())
+                        .rememberMeCookieName(rememberMeCookieName)
                         .tokenValiditySeconds(14 * 24 * 60 * 60)
                 )
                 .sessionManagement(session -> session
@@ -113,7 +115,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
 
         return authProvider;
     }

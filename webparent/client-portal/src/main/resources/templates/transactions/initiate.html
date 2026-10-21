@@ -422,7 +422,7 @@
     // Fetch Merchant Details Function
     function fetchMerchantDetails(merchantCode) {
         showLoader();
-        fetch(`/merchants/rest/merchant-details?code=${merchantCode}`)
+        fetch(PK_CTX + `merchants/rest/merchant-details?code=${merchantCode}`)
             .then(async response => {
                 hideLoader();
                 if (!response.ok) {
@@ -578,7 +578,7 @@
 
         const idempotencyKey = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('PK-' + Date.now() + '-' + Math.random().toString(36).slice(2));
 
-        fetch('/transactions/confirm', {
+        fetch(PK_CTX + 'transactions/confirm', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -611,7 +611,7 @@
                     amountSection.style.display = 'none';
                     submitSection && (submitSection.style.display = 'none');
                     setTimeout(() => {
-                        window.location.href = '/transactions';
+                        window.location.href = PK_CTX + 'transactions';
                     }, 2000);
                 } else {
                     showNotification('Error', 'Payment failed: ' + (data.message || 'Unknown error'), 'error');

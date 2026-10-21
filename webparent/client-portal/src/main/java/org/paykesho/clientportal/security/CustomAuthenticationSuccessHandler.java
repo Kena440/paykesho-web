@@ -13,6 +13,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        response.sendRedirect("/clients/dashboard");
+        response.sendRedirect(request.getContextPath() + "/clients/dashboard");
     }
 }

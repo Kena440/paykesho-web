@@ -41,3 +41,6 @@ deploy/
 !environment-template.env
 !*.env.example
 deploy/.env
+
+# Local Worker tooling
+node_modules/

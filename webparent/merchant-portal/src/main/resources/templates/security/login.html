@@ -125,6 +125,8 @@
                             <button class='btn btn-lg btn-primary' type="submit">Sign in</button>
                         </div>
                     </form>
+                    <!-- PayKesho portals share one site; these links cross portal context paths on purpose. -->
+                    <p class="text-center small mt-3 mb-0 pk-portal-switch">Signing in as a different account type? <a href="/login">Client</a> &middot; <a href="/employer/login">Employer</a></p>
                 </div>
             </div>
         </div>
@@ -202,7 +204,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.querySelector('form[th\\:action="@{/login}"]');
+    // th:action is gone after rendering, so find the form through its password field.
+    const loginForm = document.getElementById('password').form;
     const submitButton = loginForm.querySelector('button[type="submit"]');
     
     // Show loading state on form submission

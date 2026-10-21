@@ -1015,7 +1015,7 @@
         },
 
         loadVoucherData: function () {
-            fetch('/api/admin/vouchers/summary')
+            fetch(PK_CTX + 'api/admin/vouchers/summary')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1032,7 +1032,7 @@
         },
 
         loadTransactionData: function () {
-            fetch('/api/admin/transactions/summary')
+            fetch(PK_CTX + 'api/admin/transactions/summary')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1242,7 +1242,7 @@
         attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    fetch('/general/rest/map-data')
+    fetch(PK_CTX + 'general/rest/map-data')
         .then(response => response.json())
         .then(mapData => {
 
@@ -1351,7 +1351,7 @@
             lengthChange: false,
             bFilter: false,
             autoWidth: false,
-            order: [[1, "desc"]]
+            order: [ [1, "desc"] ]
         });
     });
 </script>

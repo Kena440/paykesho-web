@@ -1,0 +1,170 @@
+name: Portals integration
+
+# Builds every portal, runs them together behind one origin (same routing as the
+# Cloudflare Worker) against Postgres loaded with the live Supabase "app" schema,
+# and signs in to each portal with Playwright.
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  portals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: paykesho
+          POSTGRES_PASSWORD: localdev
+          POSTGRES_DB: paykesho
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U paykesho" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGUSER: paykesho
+      PGPASSWORD: localdev
+      PAYKESHO_DB_USERNAME: paykesho
+      PAYKESHO_DB_PASSWORD: localdev
+      PAYKESHO_DB_SSLMODE: disable
+      RATE_LIMITING_ENABLED: 'false'
+      REMEMBER_ME_KEY: ci-only-remember-me-key
+      PAYKESHO_INTERNAL_TOKEN: ci-only-internal-token
+      JAVA_OPTS: -Xmx512m -Xms128m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Load app schema, pending migrations and test accounts
+        run: |
+          set -e
+          # The images log to /logs (writable as root in the containers); mirror that here.
+          sudo mkdir -p /logs && sudo chmod 777 /logs
+          for db in paykesho paykesho_probe; do
+            [ "$db" = paykesho ] || psql -d paykesho -c "create database $db"
+            psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/local/app_schema_snapshot.sql
+            psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261021090000_app_settlement_payout_columns.sql
+          done
+          psql -d paykesho -v ON_ERROR_STOP=1 -q -f e2e-tests/portals/fixtures.sql
+
+      - name: Build
+        run: |
+          mvn -B -ntp -f commons/pom.xml install -DskipTests
+          mvn -B -ntp -f webparent/pom.xml -DskipTests package
+          ls -la webparent/*/target/*.jar
+
+      - name: Schema check (entities vs app schema)
+        id: schema
+        continue-on-error: true
+        run: |
+          set +e
+          mkdir -p logs
+          status=0
+          for m in client-portal merchant-portal organization-portal backoffice payment-service; do
+            jar=$(ls webparent/$m/target/*.jar | grep -v plain | head -1)
+            timeout 150 java $JAVA_OPTS -jar "$jar" --spring.profiles.active=cloudflare \
+              --server.port=9100 --spring.main.lazy-initialization=false \
+              --spring.datasource.url=jdbc:postgresql://localhost:5432/paykesho_probe \
+              --spring.jpa.hibernate.ddl-auto=update --logging.level.org.hibernate.SQL=DEBUG \
+              --paykesho.admin.bootstrap-email= > logs/schema-$m.log 2>&1 &
+            pid=$!
+            for i in $(seq 1 120); do
+              grep -qE "Started .* in|APPLICATION FAILED TO START|Application run failed" logs/schema-$m.log && break; sleep 1
+            done
+            kill $pid 2>/dev/null; wait $pid 2>/dev/null
+            gaps=$(grep -iE "alter table .* add column|create table" logs/schema-$m.log | sed -E 's/.*DEBUG org.hibernate.SQL - //' | sort -u)
+            if grep -q "Application run failed" logs/schema-$m.log; then
+              echo "::error::$m did not start for the schema check"; status=1
+            elif [ -n "$gaps" ]; then
+              echo "::error::$m maps columns/tables missing from the app schema"
+              echo "$gaps"
+              status=1
+            else
+              echo "$m: entities match the app schema"
+            fi
+          done
+          exit $status
+
+      - name: Start portals
+        run: |
+          set -e
+          mkdir -p logs
+          export PAYKESHO_DB_URL=jdbc:postgresql://localhost:5432/paykesho
+          export PAYKESHO_ADMIN_EMAIL=bootstrap@ci.paykesho.test PAYKESHO_ADMIN_PASSWORD=Bootstrap-CI-2026!
+          start() { # module port
+            jar=$(ls webparent/$1/target/*.jar | grep -v plain | head -1)
+            nohup java $JAVA_OPTS -Dserver.port=$2 -Dspring.profiles.active=cloudflare -jar "$jar" > logs/$1.log 2>&1 &
+          }
+          start client-portal 9001
+          start backoffice 9002
+          start merchant-portal 9003
+          start organization-portal 9004
+          start payment-service 9005
+          CLIENT_URL=http://127.0.0.1:9001 BACKOFFICE_URL=http://127.0.0.1:9002 \
+          MERCHANT_URL=http://127.0.0.1:9003 EMPLOYER_URL=http://127.0.0.1:9004 PAYMENT_URL=http://127.0.0.1:9005 \
+            nohup node --experimental-strip-types scripts/portal-router.mjs > logs/router.log 2>&1 &
+          # Same readiness probes the Worker uses.
+          for probe in 9001/actuator/health/liveness 9002/admin/actuator/health \
+                       9003/merchant/actuator/health/liveness 9004/employer/actuator/health/liveness \
+                       9005/actuator/health/liveness; do
+            ok=
+            for i in $(seq 1 90); do
+              if curl -fsS "http://127.0.0.1:$probe" >/dev/null 2>&1; then ok=1; break; fi; sleep 2
+            done
+            if [ -n "$ok" ]; then echo "ready: $probe"; else echo "::error::not ready: $probe"; failed=1; fi
+          done
+          [ -z "$failed" ]
+
+      - name: Bootstrap administrator was created
+        run: |
+          psql -d paykesho -tAc "select count(*) from app.users u join app.user_roles ur on ur.user_id=u.id join app.role r on r.id=ur.role_id where u.email='bootstrap@ci.paykesho.test' and r.name='Admin'" | grep -qx 1
+
+      - name: Playwright portal suite
+        working-directory: e2e-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          set -o pipefail
+          BASE_URL=http://localhost:8787 npx playwright test -c playwright.portals.config.ts 2>&1 | tee results.txt
+
+      - name: Report diagnostics as annotations
+        if: always()
+        run: |
+          # Annotations are readable through the checks API, so failures can be
+          # diagnosed without downloading artifacts. GitHub keeps at most 10
+          # notices per step: Playwright first, then the running portals.
+          enc() { python3 -c 'import sys;d=sys.stdin.read()[-60000:];print(d.replace("%","%25").replace("\r","").replace("\n","%0A"))'; }
+          if [ -f e2e-tests/portals-results.json ]; then
+            echo "::notice title=playwright::$(node scripts/summarize-playwright.mjs e2e-tests/portals-results.json | enc)"
+          fi
+          for f in logs/client-portal.log logs/backoffice.log logs/merchant-portal.log logs/organization-portal.log logs/payment-service.log; do
+            [ -f "$f" ] || continue
+            body=$( { grep -E "^Caused by|APPLICATION FAILED|ERROR|WARN .*Error [0-9]{3}" "$f" | grep -v "BeanPropertyBindingResult" | cut -c1-260 | sort | uniq -c | sort -rn | head -14; } | enc)
+            echo "::notice title=log $(basename $f)::$body"
+          done
+          for f in logs/schema-*.log; do
+            grep -q "Application run failed" "$f" 2>/dev/null && echo "::notice title=$(basename $f)::$( { grep -E '^Caused by' "$f" | tail -5; } | enc)"
+          done
+          true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portals-integration
+          path: |
+            logs/
+            e2e-tests/portals-report/
+            e2e-tests/test-results/
+          retention-days: 7
+
+      - name: Fail if the schema check found gaps
+        if: steps.schema.outcome == 'failure'
+        run: exit 1
