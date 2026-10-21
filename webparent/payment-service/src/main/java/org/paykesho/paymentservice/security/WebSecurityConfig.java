@@ -20,7 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests(authz -> authz
-                        .antMatchers("/rest/api/**", "/actuator/health").permitAll()
+                        .antMatchers("/rest/api/**", "/actuator/health", "/actuator/health/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -33,7 +33,8 @@ public class RateLimitingFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String clientIp = getClientIpAddress(httpRequest);
-        String requestPath = httpRequest.getRequestURI();
+        // Path inside this portal (portals are mounted under /admin, /merchant, /employer).
+        String requestPath = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
         String method = httpRequest.getMethod();
 
         // Skip rate limiting if disabled or for static resources
@@ -79,7 +80,8 @@ public class RateLimitingFilter implements Filter {
     }
 
     private boolean isStaticResource(String path) {
-        if (path == null) return false;
+        if (path == null) return path.startsWith("/actuator/health") ||
+                false;
 
         return path.startsWith("/assets/") ||
                 path.startsWith("/images/") ||
