@@ -112,11 +112,12 @@ jobs:
                        9003/merchant/actuator/health/liveness 9004/employer/actuator/health/liveness \
                        9005/actuator/health/liveness; do
             ok=
-            for i in $(seq 1 150); do
+            for i in $(seq 1 90); do
               if curl -fsS "http://127.0.0.1:$probe" >/dev/null 2>&1; then ok=1; break; fi; sleep 2
             done
-            [ -n "$ok" ] && echo "ready: $probe" || { echo "::error::not ready: $probe"; exit 1; }
+            if [ -n "$ok" ]; then echo "ready: $probe"; else echo "::error::not ready: $probe"; failed=1; fi
           done
+          [ -z "$failed" ]
 
       - name: Bootstrap administrator was created
         run: |
@@ -127,14 +128,23 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
-          BASE_URL=http://localhost:8787 npx playwright test -c playwright.portals.config.ts
+          set -o pipefail
+          BASE_URL=http://localhost:8787 npx playwright test -c playwright.portals.config.ts 2>&1 | tee results.txt
 
-      - name: Server errors in logs
+      - name: Report diagnostics as annotations
         if: always()
         run: |
+          # Annotations are readable through the checks API, so failures can be
+          # diagnosed without downloading artifacts.
+          enc() { python3 -c 'import sys;d=sys.stdin.read()[-60000:];print(d.replace("%","%25").replace("\r","").replace("\n","%0A"))'; }
           for f in logs/*.log; do
-            echo "== $f"; grep -nE "ERROR|Exception|FAILED" "$f" | grep -v "schema-" | head -40 || true
+            [ -f "$f" ] || continue
+            body=$( { grep -nE "APPLICATION FAILED|Caused by|ERROR|Exception|add column|create table" "$f" | grep -v "DEBUG org.hibernate.SQL - (select|insert|update)" | head -60; echo ----- tail -----; tail -40 "$f"; } | enc)
+            echo "::notice title=log $(basename $f)::$body"
           done
+          if [ -f e2e-tests/results.txt ]; then
+            echo "::notice title=playwright::$(tail -c 60000 e2e-tests/results.txt | enc)"
+          fi
 
       - uses: actions/upload-artifact@v4
         if: always()

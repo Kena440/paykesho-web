@@ -174,7 +174,9 @@ public class ClientController {
             log.error("Registration failed", ex); // log full stack trace
             model.addAttribute("client", client); // keep user input
             String userMessage = "Registration failed. Please check your details and try again.";
-            if (ex.getMessage() != null && ex.getMessage().contains("Malicious content detected")) {
+            if (ex instanceof org.paykesho.clientportal.clients.service.RegistrationRejectedException) {
+                userMessage = ex.getMessage();
+            } else if (ex.getMessage() != null && ex.getMessage().contains("Malicious content detected")) {
                 userMessage = "Invalid input detected. Please ensure all fields contain valid data.";
             } else if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 String causeMsg = ex.getCause().getMessage();

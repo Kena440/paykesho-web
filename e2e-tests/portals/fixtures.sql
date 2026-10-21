@@ -27,3 +27,8 @@ from app.merchant_admins where email = 'merchant@ci.paykesho.test';
 insert into app.clients (uuid, phone_number, address, code, tpin, man_number, name, email, nrc, password, enabled, account_non_locked, created_time, organization_id, client_type)
 select '00000000-0000-0000-0000-00000000c001', '260970000003', 'Plot 1, Lusaka', 'CICLIENT001', '1000000001', 'MAN-CI-001', 'Thomas CI', 'client@ci.paykesho.test', '111111/11/1', :pw, true, true, now(), id, null
 from app.organizations where name = 'XYZ Limited (CI)';
+
+-- Employer staff list entry for the registration test (employee not yet registered).
+insert into app.employee_records (uuid, name, nrc, tpin, man_number, organization_id, registration_date)
+select '00000000-0000-0000-0000-00000000e001', 'Mary Banda', '222222/22/2', '2000000002', 'MAN-CI-002', id, now()
+from app.organizations where name = 'XYZ Limited (CI)';
