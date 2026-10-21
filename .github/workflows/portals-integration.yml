@@ -46,6 +46,8 @@ jobs:
       - name: Load app schema, pending migrations and test accounts
         run: |
           set -e
+          # The images log to /logs (writable as root in the containers); mirror that here.
+          sudo mkdir -p /logs && sudo chmod 777 /logs
           for db in paykesho paykesho_probe; do
             [ "$db" = paykesho ] || psql -d paykesho -c "create database $db"
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/local/app_schema_snapshot.sql
@@ -75,11 +77,13 @@ jobs:
               --paykesho.admin.bootstrap-email= > logs/schema-$m.log 2>&1 &
             pid=$!
             for i in $(seq 1 120); do
-              grep -qE "Started .* in|APPLICATION FAILED TO START" logs/schema-$m.log && break; sleep 1
+              grep -qE "Started .* in|APPLICATION FAILED TO START|Application run failed" logs/schema-$m.log && break; sleep 1
             done
             kill $pid 2>/dev/null; wait $pid 2>/dev/null
             gaps=$(grep -iE "alter table .* add column|create table" logs/schema-$m.log | sed -E 's/.*DEBUG org.hibernate.SQL - //' | sort -u)
-            if [ -n "$gaps" ]; then
+            if grep -q "Application run failed" logs/schema-$m.log; then
+              echo "::error::$m did not start for the schema check"; status=1
+            elif [ -n "$gaps" ]; then
               echo "::error::$m maps columns/tables missing from the app schema"
               echo "$gaps"
               status=1
