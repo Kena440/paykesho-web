@@ -23,7 +23,11 @@ const portals: Portal[] = [
 function watchServerErrors(page: Page): string[] {
   const failures: string[] = [];
   page.on('response', (r: Response) => {
-    if (r.status() >= 500) failures.push(`${r.status()} ${r.request().method()} ${new URL(r.url()).pathname}`);
+    const type = r.request().resourceType();
+    // Server errors anywhere, and missing endpoints behind the dashboards' own API calls.
+    if (r.status() >= 500 || (r.status() === 404 && (type === 'fetch' || type === 'xhr'))) {
+      failures.push(`${r.status()} ${r.request().method()} ${new URL(r.url()).pathname}`);
+    }
   });
   page.on('pageerror', (e) => failures.push(`page error: ${e.message}`));
   return failures;
@@ -33,12 +37,12 @@ async function signIn(page: Page, p: Portal, password = PASSWORD) {
   await page.goto(p.loginPath);
   await page.locator('input[name="email"]').first().fill(p.email);
   await page.locator('input[name="password"]').first().fill(password);
-  // Dashboards poll in the background, so wait for the post-login navigation
-  // (or the error redirect) rather than for network idle.
-  await Promise.all([
-    page.waitForURL((u) => u.pathname !== p.loginPath || u.search.includes('error'), { waitUntil: 'load' }),
-    page.locator('form:has(input[name="password"]) [type="submit"]').first().click(),
-  ]);
+  // Dashboards poll in the background, so wait for the sign-in POST and the
+  // page it leads to rather than for network idle.
+  const posted = page.waitForResponse((r) => r.request().method() === 'POST' && new URL(r.url()).pathname.endsWith('/login'));
+  await page.locator('form:has(input[name="password"]) [type="submit"]').first().click();
+  await posted;
+  await page.waitForLoadState('load');
 }
 
 for (const p of portals) {
@@ -61,14 +65,16 @@ for (const p of portals) {
 
     test('rejects a wrong password', async ({ page }) => {
       await signIn(page, p, 'definitely-wrong-password');
-      expect(new URL(page.url()).pathname).toBe(p.loginPath);
+      await expect(page).toHaveURL((u) => u.pathname === p.loginPath);
+      await expect(page.locator('input[name="password"]').first()).toBeVisible();
     });
 
     test('signs in and loads the dashboard without server errors', async ({ page }) => {
       const errors = watchServerErrors(page);
       await signIn(page, p);
-      expect(page.url()).toMatch(p.landing);
+      await expect(page).toHaveURL(p.landing);
       await expect(page.locator('body')).not.toContainText(/Whitelabel Error|Internal Server Error|Exception/);
+      await page.waitForTimeout(3000); // let the dashboard cards load
       expect(errors).toEqual([]);
     });
   });
@@ -78,7 +84,7 @@ test('one browser can be signed in to all portals at once without sessions colli
   const errors = watchServerErrors(page);
   for (const p of portals) {
     await signIn(page, p);
-    expect(page.url(), `${p.name} sign-in`).toMatch(p.landing);
+    await expect(page, `${p.name} sign-in`).toHaveURL(p.landing);
   }
   // Revisit each portal: every session must still be valid.
   for (const p of portals) {
@@ -111,4 +117,21 @@ test('sign-in pages link to the other portals', async ({ page }) => {
 test('legacy unauthenticated payment endpoints stay unreachable', async ({ request }) => {
   const res = await request.get('/internal/payment/rest/api/payments');
   expect(res.status()).toBe(404);
+});
+
+test('dashboard data endpoints return the signed-in user\'s own data', async ({ page }) => {
+  await signIn(page, portals[0]); // client
+  const balance = await page.request.get('/api/client/balance');
+  expect(balance.status()).toBe(200);
+  expect((await balance.json()).formattedBalance).toMatch(/^K \d/);
+  const score = await page.request.get('/api/client/credit-score');
+  expect(score.status()).toBe(200);
+
+  await signIn(page, portals[1]); // merchant
+  const info = await page.request.get('/merchant/api/merchant/info');
+  expect(info.status()).toBe(200);
+  expect((await info.json()).code).toBe('CIMERCH001');
+  const summary = await page.request.get('/merchant/api/transactions/summary');
+  expect(summary.status()).toBe(200);
+  expect(typeof (await summary.json()).totalTransactions).toBe('number');
 });

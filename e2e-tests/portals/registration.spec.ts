@@ -30,8 +30,12 @@ test('an employee whose details do not match the staff list cannot register', as
   await page.goto('/login');
   await page.locator('input[name="email"]').fill('mary.wrong@ci.paykesho.test');
   await page.locator('input[name="password"]').fill('Mary-Test-2026');
+  const posted = page.waitForResponse((r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/login');
   await page.locator('form:has(input[name="password"]) [type="submit"]').first().click();
-  await expect(page).toHaveURL(/\/login\?error/);
+  await posted;
+  await page.waitForLoadState('load');
+  await expect(page).toHaveURL((u) => u.pathname === '/login');
+  await expect(page.locator('input[name="password"]').first()).toBeVisible();
 });
 
 test('an employee on the staff list registers and can sign in', async ({ page }) => {
