@@ -28,6 +28,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @org.springframework.beans.factory.annotation.Value("${REMEMBER_ME_KEY:}")
     private String configuredRememberMeKey;
 
+    // Every portal shares one host, so each needs its own remember-me cookie name.
+    @org.springframework.beans.factory.annotation.Value("${paykesho.security.remember-me-cookie:pk_employer_remember}")
+    private String rememberMeCookieName;
+
     private String rememberMeKey() {
         if (configuredRememberMeKey != null && !configuredRememberMeKey.trim().isEmpty()) {
             return configuredRememberMeKey;
@@ -65,6 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .authorizeRequests(authz -> authz
                         .antMatchers("/forgot-password", "/forgot-password/captcha", "/reset-password", "/reset-password-action").permitAll()
+                        .antMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .antMatchers("/", "/account", "/assessors/update-account").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -87,6 +92,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout(logout -> logout.permitAll())
                 .rememberMe(remember -> remember
                         .key(rememberMeKey())
+                        .rememberMeCookieName(rememberMeCookieName)
                         .tokenValiditySeconds(14 * 24 * 60 * 60)
                 )
                 .sessionManagement(session -> session

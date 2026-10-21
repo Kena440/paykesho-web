@@ -1155,7 +1155,7 @@
                 button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
                 
                 $.ajax({
-                    url: '/organizations/employee-record/delete',
+                    url: PK_CTX + 'organizations/employee-record/delete',
                     method: 'POST',
                     data: {uuid: employeeUuid},
                     timeout: 10000,
@@ -1216,7 +1216,7 @@
                 button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
                 
                 $.ajax({
-                    url: '/organizations/client-record/delete',
+                    url: PK_CTX + 'organizations/client-record/delete',
                     method: 'POST',
                     data: {uuid: clientUuid},
                     timeout: 10000,
@@ -1295,7 +1295,7 @@
         tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>');
 
         $.ajax({
-            url: '/organizations/' + organizationUuid + '/employee-records',
+            url: PK_CTX + 'organizations/' + organizationUuid + '/employee-records',
             method: 'GET',
             timeout: 10000,
             dataType: 'json',
@@ -1384,7 +1384,7 @@
         tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>');
 
         $.ajax({
-            url: '/organizations/' + organizationUuid + '/client-records',
+            url: PK_CTX + 'organizations/' + organizationUuid + '/client-records',
             method: 'GET',
             timeout: 10000,
             dataType: 'json',
@@ -1504,7 +1504,7 @@
         tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading employee records...</td></tr>');
 
         $.ajax({
-            url: '/organizations/' + organizationUuid + '/employee-records',
+            url: PK_CTX + 'organizations/' + organizationUuid + '/employee-records',
             method: 'GET',
             timeout: 10000,
             dataType: 'json',
@@ -1800,7 +1800,7 @@
         // Show loading state
         tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading client records...</td></tr>');
 
-        $.get('/organizations/' + organizationUuid + '/client-records', function (data) {
+        $.get(PK_CTX + 'organizations/' + organizationUuid + '/client-records', function (data) {
             console.log('Client records API response:', data);
             console.log('About to clear tbody and populate with', data.length, 'records');
             tbody.empty();
@@ -1933,7 +1933,7 @@
             button.prop('disabled', true);
             
             $.ajax({
-                url: '/organization-admin/toggle-status',
+                url: PK_CTX + 'organization-admin/toggle-status',
                 type: 'POST',
                 data: {
                     adminUuid: adminUuid,

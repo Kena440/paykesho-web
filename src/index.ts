@@ -1,10 +1,13 @@
 // PayKesho production deployment is managed by Cloudflare Workers Builds.
 import { DurableObject } from "cloudflare:workers";
+import { forwardedHeaders, resolveRoute, type PortalId } from "./routing";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
   PAYKESHO_CLIENT: DurableObjectNamespace<PaykeshoClientContainer>;
   PAYKESHO_PAYMENT: DurableObjectNamespace<PaykeshoPaymentContainer>;
+  PAYKESHO_MERCHANT: DurableObjectNamespace<PaykeshoMerchantContainer>;
+  PAYKESHO_EMPLOYER: DurableObjectNamespace<PaykeshoEmployerContainer>;
   PAYKESHO_DB_URL: string;
   PAYKESHO_DB_USERNAME: string;
   PAYKESHO_DB_PASSWORD: string;
@@ -18,6 +21,12 @@ export interface Env {
   LENCO_ACCOUNT_ID: string;
   PAYKESHO_INTERNAL_TOKEN: string;
   PAYMENT_SERVICE_URL?: string;
+  REMEMBER_ME_KEY?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  FACEBOOK_CLIENT_ID?: string;
+  FACEBOOK_CLIENT_SECRET?: string;
+  PAYKESHO_OAUTH2_ENABLED?: string;
 }
 
 function paykeshoEnv(env: Env, profile: string): Record<string, string> {
@@ -31,7 +40,15 @@ function paykeshoEnv(env: Env, profile: string): Record<string, string> {
     FILE_SERVICE_URL: env.FILE_SERVICE_URL || "http://localhost:8086",
     RATE_LIMITING_ENABLED: env.RATE_LIMITING_ENABLED || "true",
     PAYKESHO_INTERNAL_TOKEN: env.PAYKESHO_INTERNAL_TOKEN || "",
-    PAYMENT_SERVICE_URL: env.PAYMENT_SERVICE_URL || "http://localhost:8787/internal/payment"
+    PAYMENT_SERVICE_URL: env.PAYMENT_SERVICE_URL || "http://localhost:8787/internal/payment",
+    // Without a shared key each container signs remember-me cookies with a
+    // random per-start key, which silently logs users out on every restart.
+    REMEMBER_ME_KEY: env.REMEMBER_ME_KEY || "",
+    PAYKESHO_OAUTH2_ENABLED: env.PAYKESHO_OAUTH2_ENABLED || "false",
+    GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID || "",
+    GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET || "",
+    FACEBOOK_CLIENT_ID: env.FACEBOOK_CLIENT_ID || "",
+    FACEBOOK_CLIENT_SECRET: env.FACEBOOK_CLIENT_SECRET || ""
   };
 }
 
@@ -53,12 +70,16 @@ function paymentEnv(env: Env): Record<string, string> {
 }
 
 function rewriteRequestForContainer(request: Request): Request {
+  const publicUrl = new URL(request.url);
   const url = new URL(request.url);
   url.protocol = "http:";
   url.host = "container";
-  const forwarded = new Request(url, request);
-  forwarded.headers.delete("host");
-  return forwarded;
+  return new Request(url, {
+    method: request.method,
+    headers: forwardedHeaders(publicUrl, request.headers),
+    body: request.body,
+    redirect: "manual"
+  });
 }
 
 async function waitForContainerPort(
@@ -205,39 +226,50 @@ export class PaykeshoClientContainer extends PaykeshoDirectContainer {
   }
 }
 
+export class PaykeshoMerchantContainer extends PaykeshoDirectContainer {
+  readonly port = 8080;
+  readonly healthPath = "/merchant/actuator/health/liveness";
+  buildEnv(env: Env) {
+    return paykeshoEnv(env, "cloudflare");
+  }
+}
+
+export class PaykeshoEmployerContainer extends PaykeshoDirectContainer {
+  readonly port = 8080;
+  readonly healthPath = "/employer/actuator/health/liveness";
+  buildEnv(env: Env) {
+    return paykeshoEnv(env, "cloudflare");
+  }
+}
+
+function namespaceFor(env: Env, portal: PortalId): DurableObjectNamespace<PaykeshoDirectContainer> {
+  switch (portal) {
+    case "payment": return env.PAYKESHO_PAYMENT;
+    case "backoffice": return env.PAYKESHO_WEB;
+    case "merchant": return env.PAYKESHO_MERCHANT;
+    case "employer": return env.PAYKESHO_EMPLOYER;
+    case "client": return env.PAYKESHO_CLIENT;
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-
-    // Only the token-protected settlement API and the signed Lenco webhook may
-    // reach the payment container from outside. The legacy /rest/api/** payment
-    // endpoints have no authentication and must never be publicly routable.
-    if (url.pathname.startsWith("/internal/payment/")
-      && !url.pathname.startsWith("/internal/payment/internal/v1/")) {
+    const route = resolveRoute(url.pathname);
+    if (route.kind === "blocked") {
       return new Response("Not found", { status: 404, headers: { "cache-control": "no-store" } });
     }
 
-    const isPayment = url.pathname === "/webhooks/lenco"
-      || url.pathname.startsWith("/internal/payment/");
-    const isAdmin = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
-    const namespace = isPayment
-      ? env.PAYKESHO_PAYMENT
-      : (isAdmin ? env.PAYKESHO_WEB : env.PAYKESHO_CLIENT);
-    const containerId = isPayment
-      ? "payment"
-      : (isAdmin ? "backoffice" : "client");
-
+    const containerId = route.portal;
     try {
-      if (isPayment && url.pathname.startsWith("/internal/payment/")) {
+      const namespace = namespaceFor(env, route.portal);
+      let forwarded = request;
+      if (route.pathname !== url.pathname) {
         const rewritten = new URL(request.url);
-        rewritten.pathname =
-          url.pathname.replace(/^\/internal\/payment/, "") || "/";
-        return await namespace.getByName(containerId).fetch(
-          new Request(rewritten.toString(), request)
-        );
+        rewritten.pathname = route.pathname;
+        forwarded = new Request(rewritten.toString(), request);
       }
-
-      return await namespace.getByName(containerId).fetch(request);
+      return await namespace.getByName(containerId).fetch(forwarded);
     } catch (error) {
       console.error(`PayKesho ${containerId} container request failed`, error);
       return Response.json({

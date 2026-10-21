@@ -1,0 +1,23 @@
+# Cloudflare Containers requires linux/amd64.
+FROM --platform=linux/amd64 maven:3.9.16-eclipse-temurin-17 AS build
+
+WORKDIR /app
+COPY . .
+
+# Build the PayKesho Merchant portal, served under /merchant.
+RUN mvn -B -ntp -pl webparent/merchant-portal -am clean package \
+    -DskipTests \
+    -Djacoco.skip=true
+
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-jammy
+
+WORKDIR /app
+COPY --from=build /app/webparent/merchant-portal/target/*.jar /app/app.jar
+
+ENV SPRING_PROFILES_ACTIVE="cloudflare"
+ENV SERVER_ADDRESS="0.0.0.0"
+
+RUN test -s /app/app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["/bin/sh", "-c", "/opt/java/openjdk/bin/java $JAVA_OPTS -Dserver.port=8080 -Dserver.address=0.0.0.0 -Dspring.profiles.active=cloudflare -jar /app/app.jar > /tmp/paykesho-startup.log 2>&1; code=$?; echo \"PayKesho Spring process exited with code $code\" >> /tmp/paykesho-startup.log; if [ \"$code\" -ne 0 ]; then /bin/sleep 3600; fi; exit \"$code\""]

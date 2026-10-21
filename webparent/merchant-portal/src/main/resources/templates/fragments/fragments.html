@@ -4,6 +4,9 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:th="http://www.thymeleaf.org">
 
 <head th:fragment="page_head(title, remove)" th:remove="${remove}">
+    <!-- Portals are mounted under context paths (/admin, /merchant, /employer); scripts build URLs from PK_CTX. -->
+    <meta name="pk-context-path" th:content="@{/}"/>
+    <script>window.PK_CTX = (document.querySelector('meta[name="pk-context-path"]') || {}).content || '/';</script>
     <meta charset="utf-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">

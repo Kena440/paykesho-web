@@ -173,7 +173,7 @@
             return;
         }
 
-        fetch('/clients/rest/voucher-totals?clientUuid=' + clientUuid, {
+        fetch(PK_CTX + 'clients/rest/voucher-totals?clientUuid=' + clientUuid, {
             method: 'POST'
         })
             .then(response => {
