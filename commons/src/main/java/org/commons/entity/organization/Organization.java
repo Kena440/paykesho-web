@@ -32,8 +32,11 @@ public class Organization extends IdBasedEntity {
     private OrganizationAdmin contactPerson;
     private boolean enabled;
     private boolean deleted;
-    private float longitude;
-    private float latitude;
+    // Wrapper types: these columns are nullable, and a primitive float made every
+    // query that loaded a record without coordinates fail. Accessors keep the
+    // original float signatures (0 when unset) for existing callers.
+    private Float longitude;
+    private Float latitude;
 
     @Column(length = 512)
     private String photos;
@@ -54,5 +57,21 @@ public class Organization extends IdBasedEntity {
             return "/images/default_image.png";
         }
         return this.photoPath;
+    }
+
+    public float getLongitude() {
+        return longitude == null ? 0f : longitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
+    }
+
+    public float getLatitude() {
+        return latitude == null ? 0f : latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
     }
 }
