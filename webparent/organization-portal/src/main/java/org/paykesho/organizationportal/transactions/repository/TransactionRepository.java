@@ -129,10 +129,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
                                                                 @Param("endDate") Date endDate);
 
     // Daily transaction trends
-    @Query("SELECT DATE(t.txnDate) as transactionDate, COUNT(t) as transactionCount, SUM(t.amount) as totalAmount " +
+    // cast(... as date) instead of the MySQL-only DATE() so this works on PostgreSQL.
+    @Query("SELECT cast(t.txnDate as date), COUNT(t), SUM(t.amount) " +
             "FROM Transaction t WHERE t.client.organization = :organization AND t.txnDate BETWEEN :startDate AND :endDate " +
-            "GROUP BY DATE(t.txnDate) " +
-            "ORDER BY transactionDate ASC")
+            "GROUP BY cast(t.txnDate as date) " +
+            "ORDER BY cast(t.txnDate as date) ASC")
     List<Object[]> getDailyTransactionTrend(@Param("organization") Organization organization,
                                             @Param("startDate") Date startDate,
                                             @Param("endDate") Date endDate);

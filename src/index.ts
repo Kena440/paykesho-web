@@ -27,10 +27,17 @@ export interface Env {
   FACEBOOK_CLIENT_ID?: string;
   FACEBOOK_CLIENT_SECRET?: string;
   PAYKESHO_OAUTH2_ENABLED?: string;
+  PAYKESHO_OAUTH2_EXCLUDE?: string;
 }
 
 function paykeshoEnv(env: Env, profile: string): Record<string, string> {
+  const optional: Record<string, string> = {};
+  // Set to "" alongside PAYKESHO_OAUTH2_ENABLED=true to turn Google/Facebook sign-in on.
+  if (env.PAYKESHO_OAUTH2_EXCLUDE !== undefined) {
+    optional.PAYKESHO_OAUTH2_EXCLUDE = env.PAYKESHO_OAUTH2_EXCLUDE;
+  }
   return {
+    ...optional,
     SPRING_PROFILES_ACTIVE: profile,
     JAVA_OPTS: "-Xmx512m -Xms128m -XX:MaxMetaspaceSize=192m",
     PAYKESHO_DB_URL: env.PAYKESHO_DB_URL,
