@@ -1,48 +1,65 @@
 # PayKesho Cloudflare deployment
 
-This branch adds a Cloudflare Workers + Containers deployment for the PayKesho client web portal.
-
 ## Architecture
 
-Browser -> Cloudflare Worker -> Cloudflare Container -> Spring Boot/Thymeleaf client portal -> Supabase PostgreSQL
+One site, one Worker, one Spring Boot container per portal, one database:
 
-Cloudflare Containers requires the Worker Paid plan. The production deployment command is `npx wrangler deploy`.
+| Path | Container | Spring context path |
+|---|---|---|
+| `/` (everything not below) | client portal | `/` |
+| `/admin/**` | back office | `/admin` |
+| `/merchant/**` | merchant portal | `/merchant` |
+| `/employer/**` | employer (organization) portal | `/employer` |
+| `/webhooks/lenco`, `/internal/payment/internal/v1/**` | payment service | `/` (prefix stripped) |
 
-## Required Worker secrets
+Every portal uses the Supabase PostgreSQL `app` schema (`currentSchema=app`).
+The routing table lives in `src/routing.ts` and is shared by the Worker and the
+CI router (`scripts/portal-router.mjs`). Legacy `/internal/payment/rest/api/**`
+endpoints are never routable.
 
-Set these with Wrangler or in Cloudflare Workers > Settings > Variables and Secrets:
+The Worker forwards the public host and scheme (`X-Forwarded-Host/Proto/Port`)
+so redirects and cookies use the real site address; each portal has its own
+session and remember-me cookie name (`PK_CLIENT_SESSION`, `PK_ADMIN_SESSION`,
+`PK_MERCHANT_SESSION`, `PK_EMPLOYER_SESSION`).
 
-- `PAYKESHO_DB_URL` - Supabase PostgreSQL JDBC connection string (use Session pooler/direct connection, port 5432, with `sslmode=require`)
-- `PAYKESHO_DB_USERNAME` - Supabase database username
-- `PAYKESHO_DB_PASSWORD` - Supabase database password
+Cloudflare Containers requires the Worker Paid plan. Deploy with `npx wrangler deploy`.
 
-Google and Facebook OAuth remain disabled in the Cloudflare profile until configured.
+## Worker secrets
+
+Required:
+
+- `PAYKESHO_DB_URL` - Supabase JDBC URL (Session pooler, port 5432, `sslmode=require`)
+- `PAYKESHO_DB_USERNAME`, `PAYKESHO_DB_PASSWORD`
+- `PAYKESHO_ADMIN_EMAIL`, `PAYKESHO_ADMIN_PASSWORD` - if no back-office user with
+  this email exists, one is created with the Admin role on start-up. An
+  existing user is never changed; sign-in always uses the stored password.
+
+Also passed through to the containers when set:
+
+- `REMEMBER_ME_KEY` - shared signing key for "remember me" cookies (without it
+  users are signed out whenever a container restarts)
+- `PAYKESHO_INTERNAL_TOKEN`, `LENCO_API_TOKEN`, `LENCO_ACCOUNT_ID`
+- Google/Facebook sign-in (off by default): `PAYKESHO_OAUTH2_ENABLED=true`,
+  `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `FACEBOOK_CLIENT_ID`,
+  `FACEBOOK_CLIENT_SECRET`, and `PAYKESHO_OAUTH2_EXCLUDE` set to an empty value.
 
 Do not commit these values.
 
-## Optional variables
+## Database
 
-- `NOTIFICATION_SERVICE_URL`
-- `FILE_SERVICE_URL`
-- `RATE_LIMITING_ENABLED` (defaults to `true`)
+Each portal keeps at most 4 connections and releases idle ones after 60
+seconds, because five applications share the Supabase pooler. Hibernate never
+changes the schema (`ddl-auto=none`); schema changes are Supabase migrations in
+`supabase/migrations`, applied before the release that needs them.
 
-## Local checks
+## Verification
 
-1. Install Node.js and Docker Desktop.
-2. Run `npm install`.
-3. Run `npm run typecheck`.
-4. Authenticate with Cloudflare using `npx wrangler login`.
-5. Set the required secrets.
-6. Run `npx wrangler deploy`.
-
-## Important database note
-
-The original PayKesho codebase was MySQL-based. This branch adds the PostgreSQL JDBC driver and a Cloudflare/Supabase Spring profile, but the Cloudflare profile now targets the Supabase PostgreSQL `app` schema. The `supabase/migrations/20260927140000_create_paykesho_app_schema.sql` migration creates that schema; Hibernate then creates/updates the mapped PayKesho tables on application startup.
-
-## Supabase connection
-
-Use the Supabase Session pooler on port `5432` for this persistent Spring/JPA container, or the direct connection when IPv6 is available. Do not use the transaction pooler on port `6543` for Hibernate/JPA.
+The **Portals integration** workflow builds every module, starts all five
+applications against Postgres loaded with the `app` schema snapshot
+(`supabase/local/app_schema_snapshot.sql`) plus pending migrations, routes them
+through the shared routing table, checks that every entity matches the schema,
+and signs in to each portal with Playwright (`e2e-tests/portals`).
 
 ## Production CI/CD
 
-Connect `Kena440/paykesho-web` to Cloudflare Workers Builds and use `master` as the production branch. The deploy command must be `npx wrangler deploy` so Cloudflare publishes the container image and rolls out the container, rather than using `wrangler versions upload`.
+Cloudflare Workers Builds deploys `master` with `npx wrangler deploy`.
