@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 
 // PAYKESHO REGISTRATION: an employee can only register against an employer on
 // the platform, with details that match that employer's staff list.
-// Staff-list entry seeded in fixtures.sql: Mary Banda / 222222/22/2 / 2000000002 / MAN-CI-002.
+// Staff-list entry seeded in fixtures.sql: Mary Banda / 222222/22/2 / 2000000002 / man number 1002.
 
 async function fillRegistration(page: Page, manNumber: string, email: string) {
   await page.goto('/clients/register');
@@ -25,7 +25,7 @@ async function fillRegistration(page: Page, manNumber: string, email: string) {
 }
 
 test('an employee whose details do not match the staff list cannot register', async ({ page }) => {
-  await fillRegistration(page, 'MAN-WRONG-999', 'mary.wrong@ci.paykesho.test');
+  await fillRegistration(page, '9999', 'mary.wrong@ci.paykesho.test');
   await expect(page.locator('body')).toContainText(/does not match|do not match/i);
   await page.goto('/login');
   await page.locator('input[name="email"]').fill('mary.wrong@ci.paykesho.test');
@@ -35,7 +35,7 @@ test('an employee whose details do not match the staff list cannot register', as
 });
 
 test('an employee on the staff list registers and can sign in', async ({ page }) => {
-  await fillRegistration(page, 'MAN-CI-002', 'mary@ci.paykesho.test');
+  await fillRegistration(page, '1002', 'mary@ci.paykesho.test');
   await expect(page.locator('body')).toContainText(/Registration successful/i, { timeout: 30_000 });
   await page.goto('/login');
   await page.locator('input[name="email"]').fill('mary@ci.paykesho.test');

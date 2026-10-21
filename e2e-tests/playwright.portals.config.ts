@@ -9,7 +9,7 @@ export default defineConfig({
   retries: 0,
   timeout: 90_000,
   expect: { timeout: 15_000 },
-  reporter: [['list'], ['html', { open: 'never', outputFolder: 'portals-report' }]],
+  reporter: [['list'], ['json', { outputFile: 'portals-results.json' }], ['html', { open: 'never', outputFolder: 'portals-report' }]],
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:8787',
     trace: 'retain-on-failure',

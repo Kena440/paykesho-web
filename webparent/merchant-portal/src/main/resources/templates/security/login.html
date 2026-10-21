@@ -204,7 +204,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.querySelector('form[th\\:action="@{/login}"]');
+    // th:action is gone after rendering, so find the form through its password field.
+    const loginForm = document.getElementById('password').form;
     const submitButton = loginForm.querySelector('button[type="submit"]');
     
     // Show loading state on form submission

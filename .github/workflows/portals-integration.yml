@@ -142,12 +142,12 @@ jobs:
           # diagnosed without downloading artifacts. GitHub keeps at most 10
           # notices per step: Playwright first, then the running portals.
           enc() { python3 -c 'import sys;d=sys.stdin.read()[-60000:];print(d.replace("%","%25").replace("\r","").replace("\n","%0A"))'; }
-          if [ -f e2e-tests/results.txt ]; then
-            echo "::notice title=playwright::$(grep -vE '^\s*$' e2e-tests/results.txt | tail -c 60000 | enc)"
+          if [ -f e2e-tests/portals-results.json ]; then
+            echo "::notice title=playwright::$(node scripts/summarize-playwright.mjs e2e-tests/portals-results.json | enc)"
           fi
           for f in logs/client-portal.log logs/backoffice.log logs/merchant-portal.log logs/organization-portal.log logs/payment-service.log; do
             [ -f "$f" ] || continue
-            body=$( { echo "-- root causes --"; grep -E "^Caused by|APPLICATION FAILED|Description:|Action:|ERROR" -A1 "$f" | cut -c1-500 | tail -30; echo "-- tail --"; tail -8 "$f" | cut -c1-300; } | enc)
+            body=$( { grep -E "^Caused by|APPLICATION FAILED|ERROR|WARN .*Error [0-9]{3}" "$f" | grep -v "BeanPropertyBindingResult" | cut -c1-260 | sort | uniq -c | sort -rn | head -14; } | enc)
             echo "::notice title=log $(basename $f)::$body"
           done
           for f in logs/schema-*.log; do
