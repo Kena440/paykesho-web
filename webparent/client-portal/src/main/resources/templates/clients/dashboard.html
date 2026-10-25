@@ -873,7 +873,7 @@
             },
 
             loadBalanceData: function () {
-                fetch('/api/client/balance')
+                fetch(PK_CTX + 'api/client/balance')
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -890,7 +890,7 @@
             },
 
             loadCreditScoreData: function () {
-                fetch('/api/client/credit-score')
+                fetch(PK_CTX + 'api/client/credit-score')
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);

@@ -27,6 +27,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @org.springframework.beans.factory.annotation.Value("${REMEMBER_ME_KEY:}")
     private String configuredRememberMeKey;
 
+    // Every portal shares one host, so each needs its own remember-me cookie name.
+    @org.springframework.beans.factory.annotation.Value("${paykesho.security.remember-me-cookie:pk_merchant_remember}")
+    private String rememberMeCookieName;
+
+    @org.springframework.beans.factory.annotation.Value("${paykesho.security.oauth2.enabled:false}")
+    private boolean oauth2Enabled;
+
     private String rememberMeKey() {
         if (configuredRememberMeKey != null && !configuredRememberMeKey.trim().isEmpty()) {
             return configuredRememberMeKey;
@@ -44,17 +51,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomLoginFailureHandler loginFailureHandler;
 
     private final RateLimitingFilter rateLimitingFilter;
+    private final PasswordEncoder passwordEncoder;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests(authz -> authz
                         .antMatchers("/forgot-password", "/forgot-password/captcha", "/reset-password", "/reset-password-action").permitAll()
+                        .antMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .antMatchers("/", "/account", "/assessors/update-account").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -65,14 +70,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .failureHandler(loginFailureHandler)
                         .permitAll()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
-                        .successHandler(oAuth2LoginSuccessHandler)
-                )
+                ;
+
+        // Google/Facebook sign-in is optional; enable with PAYKESHO_OAUTH2_ENABLED=true
+        // once the provider client IDs and secrets are configured.
+        if (oauth2Enabled) {
+            http.oauth2Login(oauth2 -> oauth2
+                    .loginPage("/login")
+                    .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                    .successHandler(oAuth2LoginSuccessHandler)
+            );
+        }
+
+        http
                 .logout(logout -> logout.permitAll())
                 .rememberMe(remember -> remember
                         .key(rememberMeKey())
+                        .rememberMeCookieName(rememberMeCookieName)
                         .tokenValiditySeconds(14 * 24 * 60 * 60)
                 )
                 .sessionManagement(session -> session
@@ -99,7 +113,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
 
         return authProvider;
     }

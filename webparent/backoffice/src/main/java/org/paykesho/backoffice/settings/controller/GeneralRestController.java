@@ -39,7 +39,7 @@ public class GeneralRestController {
                     merchant.setPhotoPath(fileAccessResponse.getFileUrl());
                 }
             }
-            items.add(new MapDataDto(merchant.getName(), merchant.getMerchantType().name(), merchant.getPhotoPath(), merchant.getLatitude(), merchant.getLongitude()));
+            items.add(new MapDataDto(merchant.getName(), (merchant.getMerchantType() == null ? "UNSPECIFIED" : merchant.getMerchantType().name()), merchant.getPhotoPath(), merchant.getLatitude(), merchant.getLongitude()));
         }
 
         List<Organization> organizations = organizationRepository.findOrganizationTypesEnabled(true);
@@ -52,7 +52,7 @@ public class GeneralRestController {
                     organization.setPhotoPath(fileAccessResponse.getFileUrl());
                 }
             }
-            items.add(new MapDataDto(organization.getName(), organization.getOrganizationType().name(), organization.getPhotoPath(), organization.getLatitude(), organization.getLongitude()));
+            items.add(new MapDataDto(organization.getName(), (organization.getOrganizationType() == null ? "UNSPECIFIED" : organization.getOrganizationType().name()), organization.getPhotoPath(), organization.getLatitude(), organization.getLongitude()));
         }
 
         return items;

@@ -13,6 +13,7 @@ import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.repository.ClientBalanceRepository;
 import org.paykesho.clientportal.clients.repository.ClientRepository;
 import org.paykesho.clientportal.clients.repository.EmployeeRecordRepository;
+import org.paykesho.clientportal.organizations.repository.OrganizationRepository;
 import org.paykesho.clientportal.config.Utility;
 import org.paykesho.clientportal.notification.general.NotificationClient;
 import org.paykesho.clientportal.settings.repository.CountryRepository;
@@ -36,6 +37,8 @@ public class ClientService {
 
     public static final int MAX_FAILED_ATTEMPTS = 3;
     private static final long LOCK_TIME_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+    @Autowired
+    private OrganizationRepository organizationRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -88,6 +91,28 @@ public class ClientService {
                 throw new RuntimeException("Invalid input: Malicious content detected", se);
             }
             
+            // Registration is only for employees of an employer on the platform whose
+            // details match that employer's staff list (PAYKESHO REGISTRATION, step 3 j-k).
+            // The registration page checks this before submitting; enforce it here too so
+            // a direct POST cannot bypass it.
+            Organization organization = client.getOrganization();
+            if (organization == null || organization.getId() == null) {
+                throw new RegistrationRejectedException("Please select your employer.");
+            }
+            organization = organizationRepository.findById(organization.getId()).orElse(null);
+            if (organization == null || !organization.isEnabled() || organization.isDeleted()) {
+                throw new RegistrationRejectedException("Your employer is not registered on Paykesho.");
+            }
+            client.setOrganization(organization);
+            String status = checkClientStatus(client.getName(), client.getNrc(), client.getTpin(), client.getManNumber(), organization);
+            if ("Duplicated".equals(status)) {
+                throw new RegistrationRejectedException("An account already exists for these employee details.");
+            }
+            if (!"OK".equals(status)) {
+                throw new RegistrationRejectedException(
+                    "Your details do not match your employer's staff list. Please check your name, NRC, TPIN and man number, or contact your employer.");
+            }
+
             encodePassword(client);
             client.setEnabled(true);
             client.setAccountNonLocked(true);
@@ -102,6 +127,9 @@ public class ClientService {
             
             // Send registration notifications
             sendRegistrationNotifications(savedClient);
+        } catch (RegistrationRejectedException ex) {
+            log.info("Client registration rejected: {}", ex.getMessage());
+            throw ex;
         } catch (Exception ex) {
             log.error("Error registering client with email {}: {}", client.getEmail(), ex.getMessage(), ex);
             throw new RuntimeException("Failed to register client", ex);

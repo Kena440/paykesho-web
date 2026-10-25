@@ -10,6 +10,9 @@ import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
+// Distinct bean name: transaction.repository.TransactionRepository is also a bean
+// named "transactionRepository", which stopped the payment service from starting.
+@org.springframework.stereotype.Repository("lencoTransactionRepository")
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
     Optional<Transaction> findByReference(String reference);
 

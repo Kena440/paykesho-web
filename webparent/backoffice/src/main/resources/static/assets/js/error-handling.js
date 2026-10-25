@@ -35,7 +35,7 @@ window.PaykeshoErrorHandler = {
     // Report error to server
     reportError: function (errorEntry) {
         try {
-            fetch('/api/errors/report', {
+            fetch((window.PK_CTX || '/') + 'api/errors/report', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

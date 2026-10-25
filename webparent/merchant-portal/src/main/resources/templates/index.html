@@ -807,7 +807,7 @@
         // Load transaction data with error handling
         loadTransactionData: function () {
             // Simulate API call - replace with actual endpoint
-            fetch('/api/transactions/summary')
+            fetch(PK_CTX + 'api/transactions/summary')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -826,7 +826,7 @@
         // Load merchant data with error handling
         loadMerchantData: function () {
             // Simulate API call - replace with actual endpoint
-            fetch('/api/merchant/info')
+            fetch(PK_CTX + 'api/merchant/info')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

@@ -1054,7 +1054,7 @@
         },
 
         loadVoucherData: function () {
-            fetch('/api/dashboard/vouchers')
+            fetch(PK_CTX + 'api/dashboard/vouchers')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1361,7 +1361,7 @@
                     lengthChange: false,
                     bFilter: false,
                     autoWidth: false,
-                    order: [[1, "desc"]]
+                    order: [ [1, "desc"] ]
                 });
             } else {
                 // Fallback if safeDataTable is not available
@@ -1371,7 +1371,7 @@
                     lengthChange: false,
                     bFilter: false,
                     autoWidth: false,
-                    order: [[1, "desc"]]
+                    order: [ [1, "desc"] ]
                 });
             }
             console.log('DataTable initialized successfully');
@@ -1676,7 +1676,7 @@
         function refreshClientData() {
             try {
                 safeAjaxCall({
-                    url: '/api/dashboard/clients',
+                    url: PK_CTX + 'api/dashboard/clients',
                     method: 'GET',
                     success: function (data) {
                         if (data) {
@@ -1701,7 +1701,7 @@
         function refreshVoucherData() {
             try {
                 safeAjaxCall({
-                    url: '/api/dashboard/vouchers',
+                    url: PK_CTX + 'api/dashboard/vouchers',
                     method: 'GET',
                     success: function (data) {
                         if (data) {

@@ -36,7 +36,7 @@
                                 <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
 
                                 <!-- Search Form -->
-                                <form method="get" action="/notifications/preferences" class="mb-4">
+                                <form method="get" th:action="@{/notifications/preferences}" class="mb-4">
                                     <div class="row">
                                         <div class="col-md-8">
                                             <label for="email">User Email</label>
@@ -79,7 +79,7 @@
                                             </td>
                                             <td th:text="${#temporals.format(pref.updatedAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
                                             <td>
-                                                <form method="post" action="/notifications/preferences/update" style="display: inline;">
+                                                <form method="post" th:action="@{/notifications/preferences/update}" style="display: inline;">
                                                     <input type="hidden" name="userEmail" th:value="${pref.userEmail}">
                                                     <input type="hidden" name="notificationType" th:value="${pref.notificationType}">
                                                     <input type="hidden" name="category" th:value="${pref.category}">

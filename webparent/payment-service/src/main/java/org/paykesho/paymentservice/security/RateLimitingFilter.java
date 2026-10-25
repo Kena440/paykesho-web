@@ -33,7 +33,8 @@ public class RateLimitingFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String clientIp = getClientIpAddress(httpRequest);
-        String requestPath = httpRequest.getRequestURI();
+        // Path inside this portal (portals are mounted under /admin, /merchant, /employer).
+        String requestPath = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
 
         // Skip rate limiting if disabled or for static resources
         if (!rateLimitingEnabled || isStaticResource(requestPath)) {
@@ -79,7 +80,7 @@ public class RateLimitingFilter implements Filter {
                 path.startsWith("/fonts/") ||
                 path.startsWith("/static/") ||
                 path.equals("/favicon.ico") ||
-                path.equals("/actuator/health") ||
+                path.startsWith("/actuator/health") ||
                 path.endsWith(".css") ||
                 path.endsWith(".js") ||
                 path.endsWith(".png") ||
