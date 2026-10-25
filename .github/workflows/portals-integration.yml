@@ -51,7 +51,7 @@ jobs:
           for db in paykesho paykesho_probe; do
             [ "$db" = paykesho ] || psql -d paykesho -c "create database $db"
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/local/app_schema_snapshot.sql
-            psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261021090000_app_settlement_payout_columns.sql
+            psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261025123506_app_settlement_payout_columns.sql
           done
           psql -d paykesho -v ON_ERROR_STOP=1 -q -f e2e-tests/portals/fixtures.sql
 
