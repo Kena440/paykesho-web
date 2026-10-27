@@ -95,3 +95,15 @@ test('dashboard data endpoints return the signed-in user\'s own data', async ({ 
   expect(summary.status()).toBe(200);
   expect(typeof (await summary.json()).totalTransactions).toBe('number');
 });
+
+test('the settlement API rejects calls without the internal token', async ({ request }) => {
+  const res = await request.post('/internal/payment/internal/v1/settlements', {
+    data: { amount: 10, reference: 'NO-TOKEN', payoutMethod: 'mobile-money' },
+  });
+  expect(res.status()).toBe(401);
+});
+
+test('the Lenco webhook rejects unsigned calls', async ({ request }) => {
+  const res = await request.post('/webhooks/lenco', { data: { event: 'transfer.successful', data: { reference: 'X' } } });
+  expect(res.status()).toBe(401);
+});

@@ -113,7 +113,15 @@ public class RepaymentsController {
     }
 
     @PostMapping("/save-schedule")
-    public String createRepaymentSchedule(RepaymentScheduleRequest request) throws PaykeshoError {
+    public String createRepaymentSchedule(@AuthenticationPrincipal OrganizationAdminUserDetails loggedInUser,
+                                          RepaymentScheduleRequest request) throws PaykeshoError {
+        // Only for the signed-in employer's own staff.
+        OrganizationAdmin organizationAdmin = organizationAdminService.getOrganizationAdminByEmail(loggedInUser.getOrganizationAdmin().getEmail());
+        Organization organization = organizationService.getOrganizationByOrganizationAdmin(organizationAdmin);
+        if (request.getClient() == null || request.getClient().getOrganization() == null || organization == null
+                || !organization.getId().equals(request.getClient().getOrganization().getId())) {
+            throw new PaykeshoError("Client not found.");
+        }
         repaymentService.createRepaymentSchedule(request);
         return "redirect:/repayments/schedules";
     }

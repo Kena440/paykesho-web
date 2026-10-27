@@ -542,7 +542,7 @@
         }
 
         function isValidPhone(phone) {
-            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+            const phoneRegex = /^\+?[0-9]{9,15}$/; // local (097...) or international (+260...)
             return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
         }
 
