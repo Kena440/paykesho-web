@@ -733,6 +733,33 @@
 </footer>
 
 <th:block th:fragment="js_code">
+    <!-- Result of the last action (flash attributes "message" / "error"), shown on every page that
+         does not already show it itself. "messageHtml" marks a message built with escaped values. -->
+    <div class="pk-flash" style="position: fixed; top: 4.5rem; left: 50%; transform: translateX(-50%); z-index: 1080; width: min(640px, calc(100% - 32px));"
+         th:if="${message != null or error != null}">
+        <div class="alert alert-success alert-dismissible shadow" role="status" th:if="${message != null}">
+            <div class="alert-message pk-flash-text" th:if="${messageHtml == true}" th:utext="${message}"></div>
+            <div class="alert-message pk-flash-text" th:unless="${messageHtml == true}" th:text="${message}"></div>
+            <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible shadow" role="alert" th:if="${error != null}">
+            <div class="alert-message pk-flash-text" th:text="${error}"></div>
+            <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+        </div>
+    </div>
+    <script>
+        (function () {
+            // Skip a message the page already shows in its own layout.
+            document.querySelectorAll('.pk-flash .alert').forEach(function (alert) {
+                var text = (alert.querySelector('.pk-flash-text') || alert).textContent.trim();
+                var flash = alert.closest('.pk-flash');
+                flash.style.display = 'none';
+                var shown = text && document.body.innerText.indexOf(text) !== -1;
+                flash.style.display = '';
+                if (shown) alert.remove();
+            });
+        })();
+    </script>
     <!-- JAVASCRIPT -->
     <script th:src="@{/assets/js/app.js}"></script>
     <script th:src="@{/assets/richTextEditor/jquery.richtext.min.js}"></script>

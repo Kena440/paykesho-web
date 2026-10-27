@@ -38,6 +38,12 @@ public class OrganizationAdminService {
     private final PasswordEncoder passwordEncoder;
     private final NotificationClient notificationClient;
 
+    // Welcome emails/SMS carry the new admin's password. Only queue them when the
+    // notification service is actually delivering; otherwise the password would sit
+    // in the queue table unsent and the back office shows it once instead.
+    @org.springframework.beans.factory.annotation.Value("${paykesho.notifications.delivery-enabled:false}")
+    private boolean notificationDeliveryEnabled;
+
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, organizationAdminRepository);
     }
@@ -203,7 +209,7 @@ public class OrganizationAdminService {
             }
 
             // Send notifications asynchronously and track success
-            boolean notificationsSent = sendWelcomeNotificationWithResult(savedOrganizationAdmin, securePassword, organization);
+            boolean notificationsSent = notificationDeliveryEnabled && sendWelcomeNotificationWithResult(savedOrganizationAdmin, securePassword, organization);
 
             return new AdminSaveResult(savedOrganizationAdmin, securePassword, notificationsSent);
         } else {
@@ -250,7 +256,7 @@ public class OrganizationAdminService {
         String specialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
 
         StringBuilder password = new StringBuilder();
-        Random random = new Random();
+        java.security.SecureRandom random = new java.security.SecureRandom();
 
         // Ensure at least one character from each category
         password.append(upperCase.charAt(random.nextInt(upperCase.length())));
@@ -488,7 +494,7 @@ public class OrganizationAdminService {
 
     private String generateTemporaryPassword() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-        Random random = new Random();
+        java.security.SecureRandom random = new java.security.SecureRandom();
         StringBuilder password = new StringBuilder();
 
         // Ensure at least one character from each category

@@ -56,16 +56,16 @@ public class MerchantAdminController {
 
                     // If notifications failed, include the password for manual sharing
                     if (!result.isNotificationsSent() && result.getPassword() != null) {
-                        message = "Merchant Admin created successfully: " + merchantAdmin.getFullName() +
-                                "<br><br><strong>⚠️ Notification Service Unavailable</strong><br>" +
-                                "The admin was created but welcome email/SMS could not be sent.<br>" +
-                                "<strong>Please share these credentials manually:</strong><br>" +
-                                "Email: " + merchantAdmin.getEmail() + "<br>" +
-                                "Password: " + result.getPassword() + "<br>" +
-                                "Login URL: https://merchant.paykesho.com/";
+                        message = "Merchant Admin created successfully: " + org.springframework.web.util.HtmlUtils.htmlEscape(String.valueOf(merchantAdmin.getFullName())) +
+                                "<br><br><strong>Share these sign-in details with the new admin</strong><br>" +
+                                "Welcome emails and SMS are not being sent yet, so pass these on securely. This is the only time the password is shown.<br>" +
+                                "Email: " + org.springframework.web.util.HtmlUtils.htmlEscape(String.valueOf(merchantAdmin.getEmail())) + "<br>" +
+                                "Password: <code>" + org.springframework.web.util.HtmlUtils.htmlEscape(result.getPassword()) + "</code><br>" +
+                                "Sign-in page: " + org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath().replacePath("/merchant/login").build().toUriString();
                     }
 
                     redirectAttributes.addFlashAttribute(Constants.MESSAGE, message);
+                    redirectAttributes.addFlashAttribute("messageHtml", true); // built above with escaped values
                 } else {
                     redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Merchant Admin updated successfully: " + merchantAdmin.getFullName());
                 }
