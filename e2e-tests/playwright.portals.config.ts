@@ -15,6 +15,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     navigationTimeout: 60_000,
+    actionTimeout: 20_000, // a click that cannot happen fails with a reason instead of a bare test timeout
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

@@ -54,6 +54,21 @@ public class ClientController {
 
     }
 
+    @GetMapping("/view/{uuid}")
+    public String viewClientPage(@PathVariable("uuid") String uuid,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            Client client = clientService.getByUuid(uuid);
+            model.addAttribute("customer", client);
+            model.addAttribute("pageTitle", "Client");
+            return "clients/client_view";
+        } catch (PaykeshoError paykeshoError) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, paykeshoError.getMessage());
+            return Constants.REDIRECT_CUSTOMERS;
+        }
+    }
+
     @GetMapping("/details/{uuid}")
     public String viewCustomer(@PathVariable("uuid") String uuid,
                                Model model,

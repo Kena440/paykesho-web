@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html data-bs-theme="light"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('My Account','none')"></head>
+<body>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>My Account</h3>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-12 col-xl-8">
+                        <div class="alert alert-success" role="status" th:if="${message != null}" th:text="${message}"></div>
+                        <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}"></div>
+
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Your details</h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-3">Name</dt>
+                                    <dd class="col-sm-9" th:text="${displayName}">-</dd>
+                                    <dt class="col-sm-3">Email</dt>
+                                    <dd class="col-sm-9" th:text="${email}">-</dd>
+                                </dl>
+                                <p class="text-muted small mt-3 mb-0">To change your name or email, contact PayKesho support.</p>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm" th:if="${canChangePassword}">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Change password</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" th:action="@{${passwordAction}}" autocomplete="off">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="currentPassword">Current password</label>
+                                        <input class="form-control" id="currentPassword" name="currentPassword"
+                                               type="password" required autocomplete="current-password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="newPassword">New password</label>
+                                        <input class="form-control" id="newPassword" name="newPassword" type="password"
+                                               minlength="8" maxlength="72" required autocomplete="new-password">
+                                        <div class="form-text">At least 8 characters.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="confirmPassword">Confirm new password</label>
+                                        <input class="form-control" id="confirmPassword" name="confirmPassword"
+                                               type="password" minlength="8" maxlength="72" required autocomplete="new-password">
+                                    </div>
+                                    <button class="btn btn-primary" type="submit">Change password</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="fragments/fragments :: js_code"></th:block>
+</body>
+</html>

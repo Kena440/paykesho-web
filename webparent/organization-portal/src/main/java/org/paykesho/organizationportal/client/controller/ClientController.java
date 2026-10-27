@@ -57,9 +57,9 @@ public class ClientController {
     }
 
     @GetMapping("/{uuid}/enabled/{status}")
-    public String updateClientEnabledStatus(@PathVariable(name = "uuid") String uuid, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+    public String updateClientEnabledStatus(@PathVariable(name = "uuid") String uuid, @PathVariable(name = "status") boolean enabled, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) throws PaykeshoError {
 
-        Client client = clientService.getByUuid(uuid);
+        Client client = ownClient(uuid, request);
         clientService.updateClientEnabledStatusByUuid(uuid, enabled);
         String status = enabled ? "enabled" : "has been disabled";
         String operationMSG = client.getFullName() + " has been " + status;
@@ -82,9 +82,10 @@ public class ClientController {
     }
 
     @GetMapping("/view/{uuid}")
-    public String viewClient(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
+    public String viewClient(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) throws PaykeshoError {
         try {
-            Client client = clientService.getByUuid(uuid);
+            Client client = ownClient(uuid, request);
+            model.addAttribute("pageTitle", "Employee");
             model.addAttribute("customer", client);
             return "clients/client_view";
         } catch (PaykeshoError paykeshoError) {
@@ -94,9 +95,9 @@ public class ClientController {
     }
 
     @GetMapping("/details/{uuid}")
-    public String viewClientDetails(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes) throws PaykeshoError {
+    public String viewClientDetails(@PathVariable("uuid") String uuid, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) throws PaykeshoError {
         try {
-            Client client = clientService.getByUuid(uuid);
+            Client client = ownClient(uuid, request);
             model.addAttribute("customer", client);
             return "clients/client_details_modal";
         } catch (PaykeshoError paykeshoError) {
@@ -106,14 +107,14 @@ public class ClientController {
     }
 
     @GetMapping("/edit/{uuid}")
-    public String editClient(@PathVariable(name = "uuid") String uuid, RedirectAttributes redirectAttributes, Model model) throws PaykeshoError {
+    public String editClient(@PathVariable(name = "uuid") String uuid, RedirectAttributes redirectAttributes, Model model, HttpServletRequest request) throws PaykeshoError {
         if (uuid == null || uuid.trim().isEmpty()) {
             return Constants.REDIRECT_CUSTOMERS;
         }
         String pageTitle = "Edit Client";
 
         try {
-            Client client = clientService.getByUuid(uuid);
+            Client client = ownClient(uuid, request);
             List<Country> countryList = clientService.countryList();
 
             model.addAttribute("client", client);
@@ -134,6 +135,12 @@ public class ClientController {
         OrganizationAdmin organizationAdmin = organizationAdminService.getAuthenticatedOrganizationAdmin(request);
         Organization organization = organizationService.getOrganizationByOrganizationAdmin(organizationAdmin);
 
+        // Only new clients can be saved here; an id in the form must not overwrite an existing client.
+        if (client.getId() != null) {
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Existing clients cannot be changed from this form.");
+            return Constants.REDIRECT_CUSTOMERS;
+        }
+
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_CLT");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
@@ -145,6 +152,22 @@ public class ClientController {
 
         redirectAttributes.addFlashAttribute(Constants.MESSAGE, "client Operation Successful: " + client.getFullName());
         return Constants.REDIRECT_CUSTOMERS;
+    }
+
+    /**
+     * The client with this uuid, only if they are an employee of the signed-in
+     * employer; otherwise "not found", so one employer cannot see or change
+     * another employer's staff.
+     */
+    private Client ownClient(String uuid, HttpServletRequest request) throws PaykeshoError {
+        Client client = clientService.getByUuid(uuid);
+        OrganizationAdmin organizationAdmin = organizationAdminService.getAuthenticatedOrganizationAdmin(request);
+        Organization organization = organizationService.getOrganizationByOrganizationAdmin(organizationAdmin);
+        if (client == null || organization == null || client.getOrganization() == null
+                || !organization.getId().equals(client.getOrganization().getId())) {
+            throw new PaykeshoError("Client not found.");
+        }
+        return client;
     }
 
     private void loadCurrencySetting(HttpServletRequest request) {

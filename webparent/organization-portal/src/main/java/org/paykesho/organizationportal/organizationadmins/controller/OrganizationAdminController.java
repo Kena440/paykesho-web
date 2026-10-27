@@ -66,16 +66,6 @@ public class OrganizationAdminController {
         }
     }
 
-    @PostMapping(value = "/organization-admins/update-account")
-    public String updateAccount(OrganizationAdmin assessor,
-                                RedirectAttributes redirectAttributes,
-                                HttpServletRequest request) {
-        organizationAdminService.updateOrganizationAdmin(assessor);
-        updateNameForAuthenticatedOrganizationAdmin(assessor, request);
-        redirectAttributes.addFlashAttribute("message", "Account update successful");
-
-        return "redirect:/";
-    }
 
     @GetMapping("/customers/verify")
     public String verifyOrganizationAdmin(@Param("code") String code, Model model) {
@@ -84,21 +74,6 @@ public class OrganizationAdminController {
         return "register/" + (verified ? "verify_success" : "verify_fail");
     }
 
-    @GetMapping("/account")
-    public String viewOrganizationAdminAccount(Model model,
-                                               HttpServletRequest httpServletRequest) {
-
-        String pageTitle = "My Account";
-        List<Country> countryList = organizationAdminService.countryList();
-
-        String email = Utility.getEKeshofAuthenticatedOrganizationAdmin(httpServletRequest);
-        OrganizationAdmin assessor = organizationAdminService.getOrganizationAdminByEmail(email);
-
-        model.addAttribute("pageTitle", pageTitle);
-        model.addAttribute("countryList", countryList);
-        model.addAttribute("customer", assessor);
-        return "admins/account";
-    }
 
     private void updateNameForAuthenticatedOrganizationAdmin(OrganizationAdmin assessor, HttpServletRequest request) {
         Object principal = request.getUserPrincipal();

@@ -48,6 +48,9 @@ test('client requests an advance with a payslip', async ({ page }) => {
 });
 
 test('back office opens the payslip and approves the advance', async ({ page }) => {
+  // The voucher table has many columns; on narrower screens the Actions column
+  // folds into an expandable row (DataTables responsive). Use a desktop width.
+  await page.setViewportSize({ width: 1920, height: 1080 });
   const errors = watchServerErrors(page);
   await signIn(page, backOffice);
   await page.goto('/admin/vouchers');

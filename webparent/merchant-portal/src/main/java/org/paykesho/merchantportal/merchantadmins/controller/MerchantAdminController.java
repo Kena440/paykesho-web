@@ -67,16 +67,6 @@ public class MerchantAdminController {
         }
     }
 
-    @PostMapping(value = "/cso-admins/update-account")
-    public String updateAccount(MerchantAdmin assessor,
-                                RedirectAttributes redirectAttributes,
-                                HttpServletRequest request) {
-        merchantAdminService.updateMerchantAdmin(assessor);
-        updateNameForAuthenticatedMerchantAdmin(assessor, request);
-        redirectAttributes.addFlashAttribute("message", "Account update successful");
-
-        return "redirect:/";
-    }
 
     @GetMapping("/customers/verify")
     public String verifyMerchantAdmin(@Param("code") String code, Model model) {
@@ -85,21 +75,6 @@ public class MerchantAdminController {
         return "register/" + (verified ? "verify_success" : "verify_fail");
     }
 
-    @GetMapping("/account")
-    public String viewMerchantAdminAccount(Model model,
-                                           HttpServletRequest httpServletRequest) {
-
-        String pageTitle = "My Account";
-        List<Country> countryList = merchantAdminService.countryList();
-
-        String email = Utility.getEKeshofAuthenticatedMerchantAdmin(httpServletRequest);
-        MerchantAdmin assessor = merchantAdminService.getMerchantAdminByEmail(email);
-
-        model.addAttribute("pageTitle", pageTitle);
-        model.addAttribute("countryList", countryList);
-        model.addAttribute("customer", assessor);
-        return "admins/account";
-    }
 
     private void updateNameForAuthenticatedMerchantAdmin(MerchantAdmin assessor, HttpServletRequest request) {
         Object principal = request.getUserPrincipal();

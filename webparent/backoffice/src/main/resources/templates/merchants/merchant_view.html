@@ -447,7 +447,7 @@
 </style>
 
 <script>
-    $(document).ready(function () {
+    document.addEventListener("DOMContentLoaded", function () { // jQuery loads with js_code below
         const form = $('#adminForm');
         const saveBtn = $('#saveAdminBtn');
         const saveBtnText = $('#saveBtnText');
@@ -632,6 +632,8 @@
 <footer th:replace="fragments/modal_fragment :: confirm_modal"></footer>
 <footer th:replace="fragments/fragments :: js_code"></footer>
 <script th:src="@{/assets/js/common_list.js}" type="text/javascript"></script>
+<link href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css" rel="stylesheet"/>
+<script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
 <script>
     moduleURL = "[[@{/merchants}]]";
     $(document).ready(function () {
@@ -650,7 +652,7 @@
 
     var marker = L.marker([$("#latitude").val(), $("#longitude").val()]).addTo(map);
 
-    L.Control.geocoder({
+    if (L.Control.geocoder) L.Control.geocoder({
         defaultMarkGeocode: false
     }).on('markgeocode', function (e) {
         var bbox = e.geocode.bbox;
