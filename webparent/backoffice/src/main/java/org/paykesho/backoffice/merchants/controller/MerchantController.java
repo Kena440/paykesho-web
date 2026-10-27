@@ -194,6 +194,18 @@ public class MerchantController {
         }
         String pageTitle = "View Merchant";
 
+        // Some save actions redirect here with the numeric id; use the uuid address.
+        if (uuid.matches("\\d{1,9}")) {
+            try {
+                Merchant byId = merchantService.getMerchantById(Integer.valueOf(uuid));
+                if (byId != null && byId.getUuid() != null) {
+                    return Constants.REDIRECT_MERCHANTS_VIEW + byId.getUuid();
+                }
+            } catch (PaykeshoError e) {
+                return Constants.REDIRECT_MERCHANTS;
+            }
+        }
+
         try {
 
             Merchant merchant = merchantService.getMerchantByUuid(uuid);

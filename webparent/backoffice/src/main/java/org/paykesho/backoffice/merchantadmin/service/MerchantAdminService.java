@@ -44,6 +44,10 @@ public class MerchantAdminService {
     @org.springframework.beans.factory.annotation.Value("${paykesho.notifications.delivery-enabled:false}")
     private boolean notificationDeliveryEnabled;
 
+    public boolean isNotificationDeliveryEnabled() {
+        return notificationDeliveryEnabled;
+    }
+
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, merchantAdminRepository);
     }
@@ -342,7 +346,7 @@ public class MerchantAdminService {
             merchantAdminRepository.save(merchantAdmin);
 
             // Send password reset notification
-            sendPasswordResetNotification(merchantAdmin, newPassword, merchant);
+            if (notificationDeliveryEnabled) sendPasswordResetNotification(merchantAdmin, newPassword, merchant);
 
             log.info("Password reset successful for merchant admin: {}", merchantAdmin.getEmail());
             return newPassword;

@@ -86,7 +86,7 @@ public class MerchantAdminController {
             redirectAttributes.addFlashAttribute("error", errorMessage);
         }
 
-        return Constants.REDIRECT_MERCHANTS_VIEW + (merchant != null ? merchant.getId() : "");
+        return Constants.REDIRECT_MERCHANTS_VIEW + (merchant != null ? merchant.getUuid() : "");
     }
 
     @PostMapping("/api/check-email-exists")
@@ -136,11 +136,16 @@ public class MerchantAdminController {
             }
 
             // Generate new temporary password and send email
-            memberAdminService.resetPassword(admin, merchant);
+            String newPassword = memberAdminService.resetPassword(admin, merchant);
 
             log.info("Password reset successful for merchant admin: {} ({})", admin.getFullName(), admin.getEmail());
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE,
-                    "Password reset successful! A new temporary password has been sent to " + admin.getEmail());
+            if (memberAdminService.isNotificationDeliveryEnabled()) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE,
+                        "Password reset successful! A new temporary password has been sent to " + admin.getEmail());
+            } else {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Password reset for " + org.springframework.web.util.HtmlUtils.htmlEscape(String.valueOf(admin.getEmail())) + ". Share the new password securely (this is the only time it is shown): <code>" + org.springframework.web.util.HtmlUtils.htmlEscape(newPassword) + "</code><br>Sign-in page: " + org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath().replacePath("/merchant/login").build().toUriString());
+                redirectAttributes.addFlashAttribute("messageHtml", true);
+            }
 
         } catch (Exception e) {
             log.error("Error resetting password for merchant admin UUID {}: {}", adminUuid, e.getMessage(), e);

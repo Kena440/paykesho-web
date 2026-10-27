@@ -183,7 +183,7 @@ public class OrganizationAdminController {
             }
 
             // Generate new temporary password and send email
-            organizationAdminService.resetPassword(admin, organization);
+            String newPassword = organizationAdminService.resetPassword(admin, organization);
 
             // CRASH POINT #6 FIX: Handle thread interruption gracefully
             try {
@@ -195,9 +195,14 @@ public class OrganizationAdminController {
             }
 
             log.info("Password reset successful for organization admin: {} ({})", admin.getFullName(), admin.getEmail());
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE,
-                    "Password reset successful! A new temporary password has been sent to " + admin.getEmail() +
-                            ". Please wait a moment before attempting to login.");
+            if (organizationAdminService.isNotificationDeliveryEnabled()) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE,
+                        "Password reset successful! A new temporary password has been sent to " + admin.getEmail() +
+                                ". Please wait a moment before attempting to login.");
+            } else {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Password reset for " + org.springframework.web.util.HtmlUtils.htmlEscape(String.valueOf(admin.getEmail())) + ". Share the new password securely (this is the only time it is shown): <code>" + org.springframework.web.util.HtmlUtils.htmlEscape(newPassword) + "</code><br>Sign-in page: " + org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath().replacePath("/employer/login").build().toUriString());
+                redirectAttributes.addFlashAttribute("messageHtml", true);
+            }
 
         } catch (IllegalArgumentException e) {
             log.error("Invalid argument during password reset for admin UUID {}: {}", adminUuid, e.getMessage());

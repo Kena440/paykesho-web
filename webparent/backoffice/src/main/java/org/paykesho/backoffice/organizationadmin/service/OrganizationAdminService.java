@@ -44,6 +44,10 @@ public class OrganizationAdminService {
     @org.springframework.beans.factory.annotation.Value("${paykesho.notifications.delivery-enabled:false}")
     private boolean notificationDeliveryEnabled;
 
+    public boolean isNotificationDeliveryEnabled() {
+        return notificationDeliveryEnabled;
+    }
+
     public void listByPage(int pageNum, PagingAndSortingHelper helper) throws PaykeshoError {
         helper.listEntities(pageNum, MEMBER_ADMINS_PER_PAGE, organizationAdminRepository);
     }
@@ -472,7 +476,7 @@ public class OrganizationAdminService {
 
             // CRASH POINT #7 & #8 FIX: Notification with enhanced error handling
             try {
-                sendPasswordResetNotification(organizationAdmin, newPassword, organization);
+                if (notificationDeliveryEnabled) sendPasswordResetNotification(organizationAdmin, newPassword, organization);
                 log.info("Password reset notification process completed for organization admin: {}", organizationAdmin.getEmail());
             } catch (Exception e) {
                 log.error("Failed to send password reset notification to {}: {}", organizationAdmin.getEmail(), e.getMessage());

@@ -550,7 +550,7 @@
             // This would typically make an AJAX call to check if email exists
             // For now, we'll simulate it
             $.ajax({
-                url: PK_CTX + 'api/check-email-exists',
+                url: PK_CTX + 'merchant-admin/api/check-email-exists',
                 method: 'POST',
                 data: {email: email},
                 success: function (response) {

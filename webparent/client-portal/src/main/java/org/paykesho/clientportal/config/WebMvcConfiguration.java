@@ -18,7 +18,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/api/**", "/transactions/**")
                 .excludePathPatterns("/actuator/**", "/health/**", "/login/**", "/logout/**", "/auth/**",
                                    "/css/**", "/js/**", "/images/**", "/assets/**",
-                                   "/forgot-password/**", "/reset-password/**");
+                                   "/forgot-password/**", "/reset-password/**",
+                                   // The payment endpoint keeps its own idempotency record for the
+                                   // same key; recording it here first made every payment look like a
+                                   // duplicate already in progress (HTTP 409).
+                                   "/transactions/confirm");
     }
 }
 
