@@ -1,11 +1,10 @@
-
-name: Publish Paykesho Container Images
+name: Publish PayKesho Container Image
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Unique image release tag"
+        description: "Unique image release tag, for example 2026-10-27-1"
         required: true
         type: string
 
@@ -18,7 +17,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Build and publish five images
+    name: Build and publish the shared PayKesho image
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -28,10 +27,10 @@ jobs:
       RELEASE_TAG: ${{ inputs.release_tag }}
 
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Validate release tag and Dockerfiles
+      - name: Validate release tag, Dockerfile, and credentials
         shell: bash
         run: |
           set -euo pipefail
@@ -41,19 +40,7 @@ jobs:
             exit 1
           fi
 
-          for file in \
-            Dockerfile.cloudflare \
-            Dockerfile.client.cloudflare \
-            Dockerfile.payment.cloudflare \
-            Dockerfile.merchant.cloudflare \
-            Dockerfile.employer.cloudflare
-          do
-            if [[ ! -f "$file" ]]; then
-              echo "Missing Dockerfile: $file"
-              exit 1
-            fi
-          done
-
+          test -f Dockerfile.cloudflare
           test -n "$CLOUDFLARE_ACCOUNT_ID"
           test -n "$CLOUDFLARE_API_TOKEN"
 
@@ -63,43 +50,21 @@ jobs:
       - name: Verify Cloudflare authentication
         run: npx --yes wrangler@4.142.0 whoami
 
-      - name: Build all five images
+      - name: Build shared PayKesho image
         shell: bash
         run: |
           set -euo pipefail
+          docker buildx build \
+            --file Dockerfile.cloudflare \
+            --tag "paykesho-platform:$RELEASE_TAG" \
+            --load \
+            .
 
-          while IFS='|' read -r image dockerfile; do
-            echo "Building ${image}:${RELEASE_TAG}"
-
-            docker buildx build \
-              --file "$dockerfile" \
-              --tag "${image}:${RELEASE_TAG}" \
-              --load \
-              .
-          done <<'IMAGES'
-          paykesho-web|Dockerfile.cloudflare
-          paykesho-client|Dockerfile.client.cloudflare
-          paykesho-payment|Dockerfile.payment.cloudflare
-          paykesho-merchant|Dockerfile.merchant.cloudflare
-          paykesho-employer|Dockerfile.employer.cloudflare
-          IMAGES
-
-      - name: Publish all five images
+      - name: Publish image to Cloudflare Containers registry
         shell: bash
         run: |
           set -euo pipefail
+          npx --yes wrangler@4.142.0 containers push "paykesho-platform:$RELEASE_TAG"
 
-          for image in \
-            paykesho-web \
-            paykesho-client \
-            paykesho-payment \
-            paykesho-merchant \
-            paykesho-employer
-          do
-            echo "Publishing ${image}:${RELEASE_TAG}"
-            npx --yes wrangler@4.142.0 containers push \
-              "${image}:${RELEASE_TAG}"
-          done
-
-      - name: List published images
+      - name: List images in Cloudflare registry
         run: npx --yes wrangler@4.142.0 containers images list
