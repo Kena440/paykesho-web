@@ -131,6 +131,19 @@ public class OrganizationController {
         }
         String pageTitle = "View Organization";
 
+        // Several save actions on this page redirect here with the numeric id;
+        // send those to the canonical uuid address so their flash message survives.
+        if (uuid.matches("\\d{1,9}")) {
+            try {
+                Organization byId = organizationService.getOrganizationById(Integer.valueOf(uuid));
+                if (byId != null && byId.getUuid() != null) {
+                    return Constants.REDIRECT_ORGANIZATIONS_VIEW + byId.getUuid();
+                }
+            } catch (PaykeshoError e) {
+                return Constants.REDIRECT_ORGANIZATIONS;
+            }
+        }
+
         try {
 
             Organization organization = organizationService.getOrganizationByUuid(uuid);

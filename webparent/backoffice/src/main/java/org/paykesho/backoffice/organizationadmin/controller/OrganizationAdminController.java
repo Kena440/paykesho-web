@@ -56,16 +56,16 @@ public class OrganizationAdminController {
 
                     // If notifications failed, include the password for manual sharing
                     if (!result.isNotificationsSent() && result.getPassword() != null) {
-                        message = "Organization Admin created successfully: " + organizationAdmin.getFullName() +
-                                "<br><br><strong>⚠️ Notification Service Unavailable</strong><br>" +
-                                "The admin was created but welcome email/SMS could not be sent.<br>" +
-                                "<strong>Please share these credentials manually:</strong><br>" +
-                                "Email: " + organizationAdmin.getEmail() + "<br>" +
-                                "Password: " + result.getPassword() + "<br>" +
-                                "Login URL: https://organization.paykesho.com/";
+                        message = "Organization Admin created successfully: " + org.springframework.web.util.HtmlUtils.htmlEscape(String.valueOf(organizationAdmin.getFullName())) +
+                                "<br><br><strong>Share these sign-in details with the new admin</strong><br>" +
+                                "Welcome emails and SMS are not being sent yet, so pass these on securely. This is the only time the password is shown.<br>" +
+                                "Email: " + org.springframework.web.util.HtmlUtils.htmlEscape(String.valueOf(organizationAdmin.getEmail())) + "<br>" +
+                                "Password: <code>" + org.springframework.web.util.HtmlUtils.htmlEscape(result.getPassword()) + "</code><br>" +
+                                "Sign-in page: " + org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath().replacePath("/employer/login").build().toUriString();
                     }
 
                     redirectAttributes.addFlashAttribute(Constants.MESSAGE, message);
+                    redirectAttributes.addFlashAttribute("messageHtml", true); // built above with escaped values
                 } else {
                     redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Organization Admin updated successfully: " + organizationAdmin.getFullName());
                 }
@@ -86,7 +86,7 @@ public class OrganizationAdminController {
             redirectAttributes.addFlashAttribute("error", errorMessage);
         }
 
-        return Constants.REDIRECT_ORGANIZATIONS_VIEW + (organization != null ? organization.getId() : "");
+        return Constants.REDIRECT_ORGANIZATIONS_VIEW + (organization != null ? organization.getUuid() : "");
     }
 
     @PostMapping("/api/check-email-exists")
@@ -183,7 +183,7 @@ public class OrganizationAdminController {
             }
 
             // Generate new temporary password and send email
-            organizationAdminService.resetPassword(admin, organization);
+            String newPassword = organizationAdminService.resetPassword(admin, organization);
 
             // CRASH POINT #6 FIX: Handle thread interruption gracefully
             try {
@@ -195,9 +195,14 @@ public class OrganizationAdminController {
             }
 
             log.info("Password reset successful for organization admin: {} ({})", admin.getFullName(), admin.getEmail());
-            redirectAttributes.addFlashAttribute(Constants.MESSAGE,
-                    "Password reset successful! A new temporary password has been sent to " + admin.getEmail() +
-                            ". Please wait a moment before attempting to login.");
+            if (organizationAdminService.isNotificationDeliveryEnabled()) {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE,
+                        "Password reset successful! A new temporary password has been sent to " + admin.getEmail() +
+                                ". Please wait a moment before attempting to login.");
+            } else {
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE, "Password reset for " + org.springframework.web.util.HtmlUtils.htmlEscape(String.valueOf(admin.getEmail())) + ". Share the new password securely (this is the only time it is shown): <code>" + org.springframework.web.util.HtmlUtils.htmlEscape(newPassword) + "</code><br>Sign-in page: " + org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath().replacePath("/employer/login").build().toUriString());
+                redirectAttributes.addFlashAttribute("messageHtml", true);
+            }
 
         } catch (IllegalArgumentException e) {
             log.error("Invalid argument during password reset for admin UUID {}: {}", adminUuid, e.getMessage());

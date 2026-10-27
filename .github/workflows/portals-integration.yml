@@ -10,7 +10,7 @@ on:
 jobs:
   portals:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 80
     services:
       postgres:
         image: postgres:16
@@ -52,13 +52,18 @@ jobs:
             [ "$db" = paykesho ] || psql -d paykesho -c "create database $db"
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/local/app_schema_snapshot.sql
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261025123506_app_settlement_payout_columns.sql
+            psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261027115438_app_file_uploads_content.sql
           done
           psql -d paykesho -v ON_ERROR_STOP=1 -q -f e2e-tests/portals/fixtures.sql
 
       - name: Build
         run: |
-          mvn -B -ntp -f commons/pom.xml install -DskipTests
-          mvn -B -ntp -f webparent/pom.xml -DskipTests package
+          set -o pipefail
+          enc() { python3 -c 'import sys;d=sys.stdin.read()[-60000:];print(d.replace("%","%25").replace("\r","").replace("\n","%0A"))'; }
+          if ! { mvn -B -ntp -f commons/pom.xml install && mvn -B -ntp -f webparent/pom.xml -DskipTests package; } 2>&1 | tee build.log; then
+            echo "::error title=build::$(grep -E '\[ERROR\]|FAIL|Tests run:.*Fail' build.log | grep -v 'Help 1' | head -40 | enc)"
+            exit 1
+          fi
           ls -la webparent/*/target/*.jar
 
       - name: Schema check (entities vs app schema)
@@ -103,6 +108,10 @@ jobs:
             jar=$(ls webparent/$1/target/*.jar | grep -v plain | head -1)
             nohup java $JAVA_OPTS -Dserver.port=$2 -Dspring.profiles.active=cloudflare -jar "$jar" > logs/$1.log 2>&1 &
           }
+          # Merchant settlement goes to a Lenco test double; no money moves.
+          nohup node scripts/lenco-stub.mjs > logs/lenco-stub.log 2>&1 &
+          export LENCO_API_BASE_URL=http://127.0.0.1:9099 LENCO_API_TOKEN=ci-stub-token LENCO_ACCOUNT_ID=ci-stub-account
+          export PAYMENT_SERVICE_URL=http://127.0.0.1:8787/internal/payment
           start client-portal 9001
           start backoffice 9002
           start merchant-portal 9003

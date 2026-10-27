@@ -202,7 +202,9 @@
         }
 
         // Handle form submission to populate hidden input
-        document.querySelector('form').addEventListener('submit', function (event) {
+        // The deductions form (the first form on the page is the sign-out form).
+        const deductionsForm = document.querySelector('form[action$="/repayments/save-payroll-deductions"]');
+        if (deductionsForm) deductionsForm.addEventListener('submit', function (event) {
             // Get all checked checkboxes
             const selectedCheckboxes = document.querySelectorAll('.selectedSchedule:checked');
 
@@ -220,10 +222,11 @@
         });
 
         // Handle "Select All" checkbox to toggle select/deselect all checkboxes
-        document.getElementById('selectAllSchedules').addEventListener('change', function () {
-            const checkboxes = document.querySelectorAll('.selectedSchedule');
-            checkboxes.forEach(function (checkbox) {
-                checkbox.checked = this.checked;
+        const selectAll = document.getElementById('selectAllSchedules');
+        if (selectAll) selectAll.addEventListener('change', function () {
+            const checked = this.checked;
+            document.querySelectorAll('.selectedSchedule').forEach(function (checkbox) {
+                checkbox.checked = checked;
             });
         });
 

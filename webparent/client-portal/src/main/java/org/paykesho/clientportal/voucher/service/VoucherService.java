@@ -46,8 +46,12 @@ public class VoucherService {
         List<Voucher> vouchers = getApprovedAndValidClientVouchers(client);
         BigDecimal totalBalance = BigDecimal.ZERO;
 
+        // What is left to spend: each voucher's remaining e-value, not its original
+        // amount (summing the original amount meant the balance never went down).
         for (Voucher voucher : vouchers) {
-            totalBalance = totalBalance.add(voucher.getAmount());
+            if (voucher.getAvailableAmount() != null) {
+                totalBalance = totalBalance.add(voucher.getAvailableAmount());
+            }
         }
 
         return totalBalance;

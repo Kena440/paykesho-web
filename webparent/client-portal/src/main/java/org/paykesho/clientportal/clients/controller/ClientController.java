@@ -189,28 +189,6 @@ public class ClientController {
         return "register/register_form";
     }
 
-    @PostMapping(value = "/update-account")
-    public String updateAccount(@Valid Client client, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-        try {
-            log.debug("Updating client account for email: {}", client.getEmail());
-
-            clientService.updateClient(client);
-            updateNameForAuthenticatedClient(client, request);
-            redirectAttributes.addFlashAttribute("message", "Account update successful");
-
-            log.debug("Successfully updated client account");
-            return "redirect:/";
-
-        } catch (Exception ex) {
-            log.error("Error updating client account: {}", ex.getMessage(), ex);
-            String errorMessage = "Account update failed. Please try again later.";
-            if (ex.getMessage() != null && ex.getMessage().contains("Malicious content detected")) {
-                errorMessage = "Invalid input detected. Please ensure all fields contain valid data.";
-            }
-            redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
-            return "redirect:/account";
-        }
-    }
 
     @GetMapping("/verify")
     public String verifyClient(@Param("code") String code, Model model) {
@@ -229,46 +207,6 @@ public class ClientController {
         }
     }
 
-    @GetMapping("/account")
-    public String viewClientAccount(Model model, HttpServletRequest httpServletRequest) {
-        try {
-            log.debug("Loading client account page");
-
-            String pageTitle = "My Account";
-            List<Country> countryList = null;
-            Client client = null;
-
-            try {
-                countryList = clientService.countryList();
-            } catch (Exception ex) {
-                log.warn("Failed to load country list: {}", ex.getMessage());
-            }
-
-            String email = Utility.getEKeshofAuthenticatedClient(httpServletRequest);
-            if (email != null) {
-                try {
-                    client = clientService.getClientByEmail(email);
-                } catch (Exception ex) {
-                    log.warn("Failed to get client by email: {}", ex.getMessage());
-                }
-            } else {
-                log.warn("No authenticated client found for account request");
-                model.addAttribute("errorMessage", "Authentication required. Please log in.");
-                return "security/login";
-            }
-
-            model.addAttribute("pageTitle", pageTitle);
-            model.addAttribute("countryList", countryList);
-            model.addAttribute("client", client);
-            log.debug("Successfully loaded client account page");
-            return "clients/account";
-
-        } catch (Exception ex) {
-            log.error("Error loading client account page: {}", ex.getMessage(), ex);
-            model.addAttribute("errorMessage", "Failed to load account page. Please try again later.");
-            return "error/500";
-        }
-    }
 
     private void updateNameForAuthenticatedClient(Client client, HttpServletRequest request) {
         Object principal = request.getUserPrincipal();

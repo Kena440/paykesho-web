@@ -1,49 +1,9 @@
-import { test, expect, Page, Response } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { portals, signIn, watchServerErrors } from './helpers';
 
 // Portal integration suite: every portal runs behind one origin (the Worker in
 // production, scripts/portal-router.mjs in CI) and shares one database.
 // Accounts come from e2e-tests/portals/fixtures.sql.
-const PASSWORD = process.env.PORTAL_TEST_PASSWORD || 'Portal-Test-2026!';
-
-type Portal = {
-  name: string;
-  base: string;          // context path, '' for the client portal
-  loginPath: string;
-  email: string;
-  landing: RegExp;       // where a successful sign-in lands
-};
-
-const portals: Portal[] = [
-  { name: 'client', base: '', loginPath: '/login', email: 'client@ci.paykesho.test', landing: /\/clients\/dashboard$/ },
-  { name: 'merchant', base: '/merchant', loginPath: '/merchant/login', email: 'merchant@ci.paykesho.test', landing: /\/merchant\/?$/ },
-  { name: 'employer', base: '/employer', loginPath: '/employer/login', email: 'employer@ci.paykesho.test', landing: /\/employer\/?$/ },
-  { name: 'back office', base: '/admin', loginPath: '/admin/login', email: 'admin@ci.paykesho.test', landing: /\/admin\/?$/ },
-];
-
-function watchServerErrors(page: Page): string[] {
-  const failures: string[] = [];
-  page.on('response', (r: Response) => {
-    const type = r.request().resourceType();
-    // Server errors anywhere, and missing endpoints behind the dashboards' own API calls.
-    if (r.status() >= 500 || (r.status() === 404 && (type === 'fetch' || type === 'xhr'))) {
-      failures.push(`${r.status()} ${r.request().method()} ${new URL(r.url()).pathname}`);
-    }
-  });
-  page.on('pageerror', (e) => failures.push(`page error: ${e.message}`));
-  return failures;
-}
-
-async function signIn(page: Page, p: Portal, password = PASSWORD) {
-  await page.goto(p.loginPath);
-  await page.locator('input[name="email"]').first().fill(p.email);
-  await page.locator('input[name="password"]').first().fill(password);
-  // Dashboards poll in the background, so wait for the sign-in POST and the
-  // page it leads to rather than for network idle.
-  const posted = page.waitForResponse((r) => r.request().method() === 'POST' && new URL(r.url()).pathname.endsWith('/login'));
-  await page.locator('form:has(input[name="password"]) [type="submit"]').first().click();
-  await posted;
-  await page.waitForLoadState('load');
-}
 
 for (const p of portals) {
   test.describe(`${p.name} portal`, () => {
@@ -134,4 +94,16 @@ test('dashboard data endpoints return the signed-in user\'s own data', async ({ 
   const summary = await page.request.get('/merchant/api/transactions/summary');
   expect(summary.status()).toBe(200);
   expect(typeof (await summary.json()).totalTransactions).toBe('number');
+});
+
+test('the settlement API rejects calls without the internal token', async ({ request }) => {
+  const res = await request.post('/internal/payment/internal/v1/settlements', {
+    data: { amount: 10, reference: 'NO-TOKEN', payoutMethod: 'mobile-money' },
+  });
+  expect(res.status()).toBe(401);
+});
+
+test('the Lenco webhook rejects unsigned calls', async ({ request }) => {
+  const res = await request.post('/webhooks/lenco', { data: { event: 'transfer.successful', data: { reference: 'X' } } });
+  expect(res.status()).toBe(401);
 });

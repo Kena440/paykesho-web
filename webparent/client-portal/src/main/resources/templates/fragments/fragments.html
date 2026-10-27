@@ -5,6 +5,54 @@
     <!-- Portals are mounted under context paths (/admin, /merchant, /employer); scripts build URLs from PK_CTX. -->
     <meta name="pk-context-path" th:content="@{/}"/>
     <script>window.PK_CTX = (document.querySelector('meta[name="pk-context-path"]') || {}).content || '/';</script>
+    <!-- CSRF token for script-initiated requests: every same-origin POST/PUT/PATCH/DELETE made with
+         fetch or XMLHttpRequest (including jQuery) carries it, so page scripts need not add it themselves. -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+    <script>
+        (function () {
+            function csrf() {
+                var t = document.querySelector('meta[name="_csrf"]'), h = document.querySelector('meta[name="_csrf_header"]');
+                return t && h ? {header: h.content, token: t.content} : null;
+            }
+            function needsToken(method, url) {
+                if (/^(GET|HEAD|OPTIONS|TRACE)$/i.test(method || 'GET')) return false;
+                try { return new URL(url, location.href).origin === location.origin; } catch (e) { return false; }
+            }
+            var open = XMLHttpRequest.prototype.open, send = XMLHttpRequest.prototype.send,
+                setHeader = XMLHttpRequest.prototype.setRequestHeader;
+            XMLHttpRequest.prototype.open = function (method, url) {
+                this._pkMethod = method; this._pkUrl = url; this._pkHeaders = {};
+                return open.apply(this, arguments);
+            };
+            XMLHttpRequest.prototype.setRequestHeader = function (name, value) {
+                if (this._pkHeaders) this._pkHeaders[String(name).toLowerCase()] = true;
+                return setHeader.apply(this, arguments);
+            };
+            XMLHttpRequest.prototype.send = function () {
+                var c = csrf();
+                if (c && needsToken(this._pkMethod, this._pkUrl) && !this._pkHeaders[c.header.toLowerCase()]) {
+                    setHeader.call(this, c.header, c.token);
+                }
+                return send.apply(this, arguments);
+            };
+            if (window.fetch) {
+                var nativeFetch = window.fetch;
+                window.fetch = function (input, init) {
+                    init = init || {};
+                    var method = init.method || (input && input.method) || 'GET';
+                    var url = typeof input === 'string' ? input : (input && input.url) || String(input);
+                    var c = csrf();
+                    if (c && needsToken(method, url)) {
+                        var headers = new Headers(init.headers || (input && input.headers) || {});
+                        if (!headers.has(c.header)) headers.set(c.header, c.token);
+                        init = Object.assign({}, init, {headers: headers});
+                    }
+                    return nativeFetch.call(this, input, init);
+                };
+            }
+        })();
+    </script>
     <meta charset="utf-8">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
@@ -201,12 +249,11 @@
                         sec:authentication="principal.username"></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a class='dropdown-item' th:href="@{/my-account}"><i class="align-middle me-1"
+                    <a class='dropdown-item' th:href="@{/clients/account}"><i class="align-middle me-1"
                                                                          data-lucide="user"></i> Profile</a>
                     <a class="dropdown-item" href="#"><i class="align-middle me-1" data-lucide="pie-chart"></i>
                         Analytics</a>
                     <div class="dropdown-divider"></div>
-                    <a class='dropdown-item' href='pages-settings.html'>Settings & Privacy</a>
                     <a class="dropdown-item" href="#">Help</a>
                     <form method="post" name="logoutForm" th:action="@{/logout}" style="display: inline;">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>

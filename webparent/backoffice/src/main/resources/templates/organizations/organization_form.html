@@ -178,6 +178,8 @@
     }
 </script>
 <script th:src="@{/assets/js/common_form.js}" type="text/javascript"></script>
+<link href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css" rel="stylesheet"/>
+<script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
 <script>
     // Initialize the Leaflet map
     var map = L.map('map').setView([-13.1189121, 28.5589884], 4.8); // Set map center and zoom level
@@ -216,7 +218,8 @@
     map.on('click', add_marker);
 
     // For geocoding functionality, you can add Leaflet geocoder or a plugin (like leaflet-control-geocoder)
-    L.Control.geocoder({
+    // Address search; skipped (rather than breaking the rest of the page) if the plugin did not load.
+    if (L.Control.geocoder) L.Control.geocoder({
         defaultMarkGeocode: false
     }).on('markgeocode', function (e) {
         var bbox = e.geocode.bbox;

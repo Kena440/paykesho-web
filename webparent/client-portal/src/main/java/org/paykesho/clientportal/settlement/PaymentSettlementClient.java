@@ -99,7 +99,10 @@ public class PaymentSettlementClient {
             return result == null
                     ? new SettlementClientResponse(false, "FAILED", "Empty response from settlement service.", null)
                     : result;
-        } catch (RestClientException e) {
+        } catch (RuntimeException e) {
+            // Includes RestClientException and unreadable replies. The ledger has already
+            // been debited and the payout may have gone out, so the outcome is uncertain:
+            // never report FAILED (which would refund the client) without reconciling.
             // The payment service may have accepted the request before the network
             // connection failed. Treat the outcome as uncertain rather than FAILED;
             // reconciliation will query Lenco and prevent an unsafe e-value refund.

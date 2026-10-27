@@ -20,9 +20,6 @@
                         <a class="btn btn-primary shadow-sm" th:href="@{/clients}">
                             <i class="align-middle" data-lucide="list">&nbsp;</i> All Clients
                         </a>
-                        <a class="btn btn-primary shadow-sm" th:href="@{/clients/initiate}">
-                            <i class="align-middle" data-lucide="list-plus">&nbsp;</i> Initiate
-                        </a>
                     </div>
                 </div>
                 <div class="row">
@@ -86,7 +83,7 @@
                                         <td>
                                             <span class="font-weight-normal"
                                                   th:if="${client?.clientBalance?.availableBalance != null}"
-                                                  th:replace="fragments/fragments :: format_currency(${client.clientBalance.availableBalance})"></span>
+                                                  th:replace="fragments/fragments :: format_currency(${client.clientBalance?.availableBalance ?: 0})"></span>
                                             <span class="text-muted"
                                                   th:unless="${client?.clientBalance?.availableBalance != null}">N/A</span>
                                         </td>

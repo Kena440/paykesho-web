@@ -89,7 +89,7 @@ public class VoucherController {
 
 
     @PostMapping("/save")
-    public String saveSubmittedRequest(VoucherRequestDto voucherRequestDto, @AuthenticationPrincipal ClientUserDetails loggedInUser, RedirectAttributes redirectAttributes, @RequestParam("payslip") MultipartFile multipartFile) {
+    public String saveSubmittedRequest(VoucherRequestDto voucherRequestDto, @AuthenticationPrincipal ClientUserDetails loggedInUser, RedirectAttributes redirectAttributes, @RequestParam(value = "payslip", required = false) MultipartFile multipartFile) {
 
         try {
             Client client = clientService.getClientByEmail(loggedInUser.getClient().getEmail());
@@ -116,27 +116,18 @@ public class VoucherController {
             voucher.setRepaymentAmount(totalRepaymentAmount);
             voucher.setRequestDate(new Date());
 
-            if (!multipartFile.isEmpty()) {
-                String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-
-                if (!isValidFileType(multipartFile)) {
-                    throw new PaykeshoError("Invalid file type uploaded.");
-                }
-
-                voucher.setPayslip(originalFileName);
-                FileUploadResponse uploadResponse = fileUploadService.uploadFile(multipartFile, FileType.payslip, 1, "Payslip file for " + voucher.getReference());
-
-                if (!uploadResponse.isStatus()) {
-                    throw new PaykeshoError("File upload failed.");
-                }
-
-                voucher.setRemoteFileId(uploadResponse.getFileId());
-                voucher.setPayslip(uploadResponse.getFilePath());
-                voucher.setPayslipPath(uploadResponse.getFilePath());
-            } else {
-                voucher.setPayslip(null);
-                voucher.setPayslipPath(null);
+            // A payslip is required: the back office checks it before approving the advance.
+            if (multipartFile == null || multipartFile.isEmpty()) {
+                throw new PaykeshoError("Please attach your latest payslip.");
             }
+            FileUploadResponse uploadResponse = fileUploadService.uploadOwnedFile(
+                    multipartFile, FileType.payslip, client.getUuid(), "Payslip for " + voucher.getReference());
+            if (!uploadResponse.isStatus()) {
+                throw new PaykeshoError(uploadResponse.getMessage());
+            }
+            voucher.setRemoteFileId(uploadResponse.getFileId());
+            voucher.setPayslip(uploadResponse.getFilePath());
+            voucher.setPayslipPath(uploadResponse.getFilePath());
 
             Voucher savedVoucher = voucherService.save(voucher);
 
@@ -154,11 +145,6 @@ public class VoucherController {
 
     private BigDecimal calculateTotalRepayment(Voucher voucher) {
         return org.commons.utils.MoneyMath.totalRepayment(voucher.getAmount(), voucher.getInterestPercent());
-    }
-
-    private boolean isValidFileType(MultipartFile file) {
-        String contentType = file.getContentType();
-        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/png") || contentType.equals("application/pdf"));
     }
 
 
