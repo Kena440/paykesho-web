@@ -104,9 +104,6 @@ public class OrganizationAdminService {
             String token = RandomString.make(30);
             String verificationCode = RandomString.make(64);
 
-            LOGGER.info("Generated password for new organization admin: {}", securePassword);
-            LOGGER.info("Generated token: {}", token);
-            LOGGER.info("Generated verification code: {}", verificationCode);
 
             String encodedPassword = passwordEncoder.encode(securePassword);
             organizationAdminInForm.setPassword(encodedPassword);
@@ -169,9 +166,6 @@ public class OrganizationAdminService {
             String token = RandomString.make(30);
             String verificationCode = RandomString.make(64);
 
-            LOGGER.info("Generated password for new organization admin: {}", securePassword);
-            LOGGER.info("Generated token: {}", token);
-            LOGGER.info("Generated verification code: {}", verificationCode);
 
             // Set admin properties
             organizationAdminInForm.setPassword(passwordEncoder.encode(securePassword));

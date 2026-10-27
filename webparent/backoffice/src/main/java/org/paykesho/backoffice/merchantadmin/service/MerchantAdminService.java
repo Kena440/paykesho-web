@@ -100,9 +100,6 @@ public class MerchantAdminService {
             String token = RandomString.make(30);
             String verificationCode = RandomString.make(64);
 
-            LOGGER.info("Generated password for new merchant admin: {}", securePassword);
-            LOGGER.info("Generated token: {}", token);
-            LOGGER.info("Generated verification code: {}", verificationCode);
 
             String encodedPassword = passwordEncoder.encode(securePassword);
             merchantAdmin.setPassword(encodedPassword);
@@ -165,15 +162,17 @@ public class MerchantAdminService {
             String token = RandomString.make(30);
             String verificationCode = RandomString.make(64);
 
-            LOGGER.info("Generated password for new merchant admin: {}", securePassword);
-            LOGGER.info("Generated token: {}", token);
-            LOGGER.info("Generated verification code: {}", verificationCode);
 
             // Set admin properties
             merchantAdmin.setPassword(passwordEncoder.encode(securePassword));
             merchantAdmin.setVerificationCode(verificationCode);
             merchantAdmin.setAuthenticationType(AuthenticationType.DATABASE);
             merchantAdmin.setResetPasswordToken(token);
+            // Created by PayKesho staff, so the account is usable straight away (as for employer admins).
+            merchantAdmin.setEnabled(true);
+            merchantAdmin.setAccountNonLocked(true);
+            merchantAdmin.setFailedAttempt(0);
+            if (merchantAdmin.getCreatedTime() == null) merchantAdmin.setCreatedTime(new java.util.Date());
             merchantAdmin.setFailedAttempt(0);
             merchantAdmin.setAccountNonLocked(true);
 
