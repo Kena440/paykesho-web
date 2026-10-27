@@ -10,7 +10,7 @@ on:
 jobs:
   portals:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 80
     services:
       postgres:
         image: postgres:16
@@ -103,6 +103,10 @@ jobs:
             jar=$(ls webparent/$1/target/*.jar | grep -v plain | head -1)
             nohup java $JAVA_OPTS -Dserver.port=$2 -Dspring.profiles.active=cloudflare -jar "$jar" > logs/$1.log 2>&1 &
           }
+          # Merchant settlement goes to a Lenco test double; no money moves.
+          nohup node scripts/lenco-stub.mjs > logs/lenco-stub.log 2>&1 &
+          export LENCO_API_BASE_URL=http://127.0.0.1:9099 LENCO_API_TOKEN=ci-stub-token LENCO_ACCOUNT_ID=ci-stub-account
+          export PAYMENT_SERVICE_URL=http://127.0.0.1:8787/internal/payment
           start client-portal 9001
           start backoffice 9002
           start merchant-portal 9003

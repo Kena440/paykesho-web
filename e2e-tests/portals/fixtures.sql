@@ -32,3 +32,8 @@ from app.organizations where name = 'XYZ Limited (CI)';
 insert into app.employee_records (uuid, name, nrc, tpin, man_number, organization_id, registration_date)
 select '00000000-0000-0000-0000-00000000e001', 'Mary Banda', '222222/22/2', '2000000002', '1002', id, now()
 from app.organizations where name = 'XYZ Limited (CI)';
+
+-- Merchant payout profile, so a client payment can settle (to the Lenco test
+-- double in CI: scripts/lenco-stub.mjs).
+update app.merchants set payout_method = 'mobile-money', payout_operator = 'airtel', payout_phone = '0970000002'
+where code = 'CIMERCH001';
