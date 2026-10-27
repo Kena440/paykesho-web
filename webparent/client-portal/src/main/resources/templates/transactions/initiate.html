@@ -449,7 +449,8 @@
                     merchantDetailsDiv.style.display = 'block';
                     amountSection.style.display = 'block';
                     submitSection && (submitSection.style.display = 'block');
-                    showNotification('Success', 'Merchant details loaded successfully!', 'success');
+                    // The merchant panel itself is the confirmation (number and name to check); no pop-up.
+                    document.getElementById('amount').focus();
                 } else {
                     showNotification('Error', 'Merchant not found or incomplete data.', 'error');
                 }
@@ -604,7 +605,8 @@
                 // Accept multiple success patterns
                 if (data.success === true || data.status === 'success' || data.paymentId || data.id) {
                     const settlementMessage = data.settled ? 'Merchant settlement confirmed.' : 'Payment recorded; merchant settlement is pending.';
-                    showNotification('Payment Successful', `<p><strong>K${data.amount || amount}</strong> paid to <strong>${data.merchant || 'merchant'}</strong>.</p><p>Reference: <strong>${data.transactionRef || 'N/A'}</strong></p><p>Remaining PayKesho balance: <strong>K${data.remainingBalance ?? '0.00'}</strong></p><p>${settlementMessage}</p>`, data.settled ? 'success' : 'info');
+                    const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+                    showNotification('Payment Successful', `<p><strong>K${esc(data.amount || amount)}</strong> paid to <strong>${esc(data.merchant || 'merchant')}</strong>.</p><p>Reference: <strong>${esc(data.transactionRef || 'N/A')}</strong></p><p>Remaining PayKesho balance: <strong>K${esc(data.remainingBalance ?? '0.00')}</strong></p><p>${esc(settlementMessage)}</p>`, data.settled ? 'success' : 'info');
                     paymentForm.reset();
                     paymentForm.classList.remove('was-validated');
                     merchantDetailsDiv.style.display = 'none';

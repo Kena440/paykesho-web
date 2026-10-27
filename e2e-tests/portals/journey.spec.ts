@@ -85,9 +85,8 @@ test('client sees the e-value and pays the merchant', async ({ page }) => {
   await page.locator('#merchantCode').fill('CIMERCH001');
   await expect(page.locator('#merchantName')).toHaveText('CI Grocers');
   await page.locator('#amount').fill(String(PURCHASE));
-  await page.locator('#submitPayment').click();
   const confirmed = page.waitForResponse((r) => new URL(r.url()).pathname === '/transactions/confirm');
-  await page.locator('.swal2-confirm').click();
+  await page.locator('#submitPayment').click();
   const res = await confirmed;
   const result = await res.json();
   expect(res.status(), JSON.stringify(result)).toBe(200);
