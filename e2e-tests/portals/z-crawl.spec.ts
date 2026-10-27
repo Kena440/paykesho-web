@@ -21,10 +21,10 @@ function ownsPath(p: Portal, pathname: string): boolean {
   return !/^\/(admin|merchant|employer|internal)(\/|$)/.test(pathname);
 }
 
-function normalise(href: string, origin: string): URL | null {
+function normalise(href: string, pageUrl: string): URL | null {
   try {
-    const u = new URL(href, origin);
-    if (u.origin !== origin) return null;
+    const u = new URL(href, pageUrl);
+    if (u.origin !== new URL(pageUrl).origin) return null;
     u.hash = '';
     return u;
   } catch {
@@ -99,6 +99,8 @@ for (const p of portals) {
       const body = (await page.locator('body').innerText().catch(() => '')).slice(0, 20000);
       const errorText = body.match(/Whitelabel Error Page|Internal Server Error|There was an unexpected error|Exception:|could not execute|No message available|Error saving|Something went wrong|null pointer|TemplateInputException|SpelEvaluationException/i);
       if (errorText) issues.push({ page: path, problem: `page shows error text: "${errorText[0]}"` });
+      const demo = body.match(/Lorem ipsum|Ashley Briggs|Carl Jenkins|Affiliate|John Doe|Restart server 12/);
+      if (demo) issues.push({ page: path, problem: `page shows template placeholder content: "${demo[0]}"` });
       const titleText = await page.title();
       if (/error/i.test(titleText)) issues.push({ page: path, problem: `page title is "${titleText}"` });
 

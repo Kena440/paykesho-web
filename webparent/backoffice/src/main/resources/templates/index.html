@@ -1246,17 +1246,18 @@
         .then(response => response.json())
         .then(mapData => {
 
+            const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
             mapData.forEach(function (location) {
-                var customIcon = L.icon({
-                    iconUrl: location.photoPath,
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10],
-                    popupAnchor: [0, -10]
-                });
-
-                L.marker([location.latitude, location.longitude], {icon: customIcon})
+                if (location.latitude == null || location.longitude == null) return;
+                // Stored logos are served by the back office (/admin/files/{id}); without one use the default pin.
+                var options = {};
+                if (location.photoPath) {
+                    var iconUrl = location.photoPath.charAt(0) === '/' ? PK_CTX + location.photoPath.slice(1) : location.photoPath;
+                    options.icon = L.icon({iconUrl: iconUrl, iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -10]});
+                }
+                L.marker([location.latitude, location.longitude], options)
                     .addTo(map)
-                    .bindPopup(`<b>${location.name}</b><br>Type: ${location.type}`);
+                    .bindPopup('<b>' + esc(location.name) + '</b><br>Type: ' + esc(location.type));
             });
         })
         .catch(error => console.error('Error fetching map data:', error));

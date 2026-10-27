@@ -268,7 +268,7 @@
         </div>
         
         <div class="error-actions">
-            <a th:href="${homeUrl ?: '/clients/dashboard'}" class="btn-error btn-primary-error">
+            <a th:href="@{${homeUrl ?: '/clients/dashboard'}}" class="btn-error btn-primary-error">
                 <i class="fas fa-home"></i>
                 <span th:text="${homeButtonText ?: 'Go to Dashboard'}">Go to Dashboard</span>
             </a>

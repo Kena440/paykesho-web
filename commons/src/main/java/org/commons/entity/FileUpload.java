@@ -1,9 +1,12 @@
 package org.commons.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.commons.enums.FileType;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -51,6 +54,18 @@ public class FileUpload {
     
     @Column(name = "remote_file_id")
     private Integer remoteFileId;
+
+    // The file itself, kept in the database (app schema: no API-role grants) so
+    // uploads survive container restarts and are only ever served through an
+    // authenticated portal endpoint. Never logged or compared.
+    @Type(type = "org.hibernate.type.BinaryType")
+    @Column(name = "content")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private byte[] content;
+
+    @Column(name = "sha256", length = 64)
+    private String sha256;
     
     @PrePersist
     protected void onCreate() {

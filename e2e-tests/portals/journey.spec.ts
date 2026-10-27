@@ -67,7 +67,7 @@ test('back office opens the payslip and approves the advance', async ({ page }) 
   await page.locator('.swal2-confirm').click();
   await page.waitForURL(/\/admin\/vouchers/);
   await expectNoErrorPage(page);
-  await expect(page.locator('body')).toContainText(new RegExp(`approved.*${voucherRef}`, 'i'));
+  await expect(page.locator('tr', { hasText: voucherRef })).toContainText('APPROVED');
   expect(errors).toEqual([]);
 });
 
