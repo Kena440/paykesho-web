@@ -261,7 +261,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Initialize DataTable for security findings with custom options
-        safeDataTable("#datatables-security", {
+        // The table is only rendered when there are findings.
+        if (document.querySelector("#datatables-security")) safeDataTable("#datatables-security", {
             order: [ [0, 'desc'], [1, 'desc'] ], // Sort by severity then date
             pageLength: 25
         });

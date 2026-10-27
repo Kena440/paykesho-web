@@ -332,7 +332,8 @@
     }
 
     // Modify the form submission listener to work with Bootstrap validation and file size check
-    document.querySelector('form').addEventListener('submit', function (event) {
+    // The advance request form (not the first form on the page, which is the sign-out form).
+    document.querySelector('form.needs-validation').addEventListener('submit', function (event) {
         if (!this.checkValidity() || !isFileValid) {
             event.preventDefault();
             event.stopPropagation();

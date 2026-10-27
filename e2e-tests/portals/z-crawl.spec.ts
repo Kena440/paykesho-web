@@ -11,8 +11,9 @@ import { signIn, portals, Portal } from './helpers';
 
 // Links that change state when followed. They are exercised by the journey spec
 // (with the confirmations a user sees) rather than clicked blindly here.
-const MUTATING = /\/(logout|delete|remove|disable|enable|approve|reject|adjust|deactivate|activate|toggle|toggle-status|reset-password|block|unlock|cancel|process-settlements|scan-now|fix-uuid|resolve|acknowledge|mark|update-status)(\/|$|\?)/i;
+const MUTATING = /\/(logout|delete|remove|disable|enable|enabled|approve|reject|adjust|deactivate|activate|toggle|toggle-status|reset-password|block|unlock|cancel|process-settlements|scan-now|fix-uuid|resolve|acknowledge|mark|update-status)(\/|$|\?)/i;
 const MAX_PAGES = 120;
+const MAX_CHECKED = 250; // pages plus links that turned out to be errors or downloads
 
 type Issue = { page: string; problem: string };
 
@@ -33,7 +34,7 @@ function normalise(href: string, pageUrl: string): URL | null {
 }
 
 async function contentType(request: APIRequestContext, url: string): Promise<{ status: number; type: string }> {
-  const r = await request.get(url, { maxRedirects: 5 });
+  const r = await request.get(url, { maxRedirects: 5, timeout: 30_000 });
   return { status: r.status(), type: r.headers()['content-type'] || '' };
 }
 
@@ -79,7 +80,8 @@ for (const p of portals) {
     const skipped = new Set<string>();
     const visited: string[] = [];
 
-    while (queue.length && visited.length < MAX_PAGES) {
+    let checked = 0;
+    while (queue.length && visited.length < MAX_PAGES && checked++ < MAX_CHECKED) {
       const path = queue.shift()!;
       current = path;
       const { status, type } = await contentType(page.request, origin + path);
@@ -88,7 +90,7 @@ for (const p of portals) {
         continue;
       }
       if (!type.includes('text/html')) continue; // downloads, images, JSON
-      await page.goto(path, { waitUntil: 'load' });
+      await page.goto(path, { waitUntil: 'load', timeout: 30_000 });
       visited.push(path);
       if (!ownsPath(p, new URL(page.url()).pathname) || new URL(page.url()).pathname === p.loginPath) {
         issues.push({ page: path, problem: `navigation ended at ${new URL(page.url()).pathname} (signed out or wrong portal)` });

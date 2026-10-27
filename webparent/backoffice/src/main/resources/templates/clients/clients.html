@@ -86,7 +86,7 @@
                                         <td>
                                             <span class="font-weight-normal"
                                                   th:if="${client?.clientBalance?.availableBalance != null}"
-                                                  th:replace="fragments/fragments :: format_currency(${client.clientBalance.availableBalance})"></span>
+                                                  th:replace="fragments/fragments :: format_currency(${client.clientBalance?.availableBalance ?: 0})"></span>
                                             <span class="text-muted"
                                                   th:unless="${client?.clientBalance?.availableBalance != null}">N/A</span>
                                         </td>

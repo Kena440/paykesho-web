@@ -67,7 +67,7 @@
                                             <div th:replace="fragments/fragments :: status(${client.enabled}, 'client', '/clients/' + ${client.uuid})"></div>
                                         </td>
                                         <td><span class="font-weight-normal"
-                                                  th:replace="fragments/fragments :: format_currency(${client.clientBalance.availableBalance})"></span>
+                                                  th:replace="fragments/fragments :: format_currency(${client.clientBalance?.availableBalance ?: 0})"></span>
                                         <td><span class="font-weight-normal">[[${client.clientType}]]</span></td>
                                     </tr>
 

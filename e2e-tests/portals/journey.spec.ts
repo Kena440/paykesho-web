@@ -36,7 +36,7 @@ test('client requests an advance with a payslip', async ({ page }) => {
   await page.locator('#reason').fill('Groceries before payday');
   await page.locator('#repaymentCycle').selectOption('1');
   await page.locator('#payslip').setInputFiles(PAYSLIP);
-  await page.locator('form button[type="submit"]').first().click();
+  await page.locator('form[enctype="multipart/form-data"] button[type="submit"]').click();
   await page.locator('.swal2-confirm').click();
   await page.waitForURL(/\/vouchers$/);
   const body = page.locator('body');
