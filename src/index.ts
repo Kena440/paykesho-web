@@ -1,6 +1,7 @@
 // PayKesho production deployment is managed by Cloudflare Workers Builds.
 import { DurableObject } from "cloudflare:workers";
 import { forwardedHeaders, resolveRoute, type PortalId } from "./routing";
+import { LENCO_TEST_PREFIX, handleLencoTest, lencoSettings } from "./lenco-test";
 
 export interface Env {
   PAYKESHO_WEB: DurableObjectNamespace<PaykeshoWebContainer>;
@@ -19,6 +20,8 @@ export interface Env {
   LENCO_API_BASE_URL?: string;
   LENCO_API_TOKEN: string;
   LENCO_ACCOUNT_ID: string;
+  // "true" during the testing stage: payouts go to the built-in Lenco test double (no money moves).
+  LENCO_TEST_MODE?: string;
   PAYKESHO_INTERNAL_TOKEN: string;
   PAYMENT_SERVICE_URL?: string;
   REMEMBER_ME_KEY?: string;
@@ -70,9 +73,13 @@ function backofficeEnv(env: Env): Record<string, string> {
 function paymentEnv(env: Env): Record<string, string> {
   return {
     ...paykeshoEnv(env, "cloudflare"),
-    LENCO_API_BASE_URL: env.LENCO_API_BASE_URL || "https://api.lenco.co/access/v2",
-    LENCO_API_TOKEN: env.LENCO_API_TOKEN || "",
-    LENCO_ACCOUNT_ID: env.LENCO_ACCOUNT_ID || ""
+    ...lencoSettings({
+      testMode: env.LENCO_TEST_MODE,
+      publicOrigin: new URL(env.PAYMENT_SERVICE_URL || "http://localhost:8787/internal/payment").origin,
+      baseUrl: env.LENCO_API_BASE_URL,
+      token: env.LENCO_API_TOKEN,
+      accountId: env.LENCO_ACCOUNT_ID
+    })
   };
 }
 
@@ -262,6 +269,9 @@ function namespaceFor(env: Env, portal: PortalId): DurableObjectNamespace<Paykes
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === LENCO_TEST_PREFIX || url.pathname.startsWith(LENCO_TEST_PREFIX + "/")) {
+      return handleLencoTest(request, env.LENCO_TEST_MODE);
+    }
     const route = resolveRoute(url.pathname);
     if (route.kind === "blocked") {
       return new Response("Not found", { status: 404, headers: { "cache-control": "no-store" } });

@@ -37,9 +37,13 @@ Testers can also create their own employers and merchants in the back office (be
 - After adding an admin, the back office shows the new admin's **password once**, with the sign-in link. Pass it on securely; email and SMS are not being sent yet. "Reset Password" works the same way.
 - Every user can change their own password under the profile menu → Profile (current password required).
 
-## Payments (Lenco) — read before testing payments
+## Payments (Lenco) — test mode, no money moves
 
-Production is configured with Lenco's **live** API address. A payment to a merchant **with a payout profile** would try to send real money through Lenco if a live key is set. Until Lenco's sandbox address and a sandbox key are configured (Cloudflare: `LENCO_API_BASE_URL`, `LENCO_API_TOKEN`, `LENCO_ACCOUNT_ID`), only pay the Demo Shop, which has no payout profile: the payment stops with "Merchant payout method is not configured" and the e-value is not spent.
+The live site runs with **Lenco test mode on** (Cloudflare variable `LENCO_TEST_MODE = "true"` in `wrangler.jsonc`). In test mode the payment service never talks to Lenco: merchant payouts go to a test double built into the site (`/internal/lenco-test`), which reports every transfer as successful. Balances, transactions and the merchant's "payment received" view all move; **no money leaves any account**, whatever payout number a merchant has.
+
+- Transactions settled in test mode carry a Lenco reference starting with `TEST-`.
+- The Demo Shop has a test payout profile (mobile money, number `260000000000`, which is not a real number) so payments to it complete. Set by `supabase/testing/demo_shop_test_payout.sql`.
+- Before real users or real money: set `LENCO_TEST_MODE` to `"false"`, set the real `LENCO_API_TOKEN` / `LENCO_ACCOUNT_ID`, remove the Demo Shop test payout profile and void or clear the `TEST-` transactions. That is a production decision for the product owner.
 
 ## Not in this test stage (known, not defects)
 

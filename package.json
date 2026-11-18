@@ -7,7 +7,8 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "build": "npm run typecheck"
+    "build": "npm run typecheck",
+    "test:worker": "node --experimental-strip-types --test scripts/lenco-test.test.mjs"
   },
   "dependencies": {
     "@cloudflare/containers": "0.3.7"
