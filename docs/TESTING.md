@@ -16,19 +16,20 @@ Use test data only. No real customer data, and no real money (see "Payments" bel
 - **Back office:** the administrator account (`admin@paykesho.com`, password held by Amukena).
 - **Employer portal:** "PayKesho Demo Employer (DEMO)" — sign in with the same email and password as the back office.
 - **Merchant portal:** "PayKesho Demo Shop", merchant code `M20261DEMO1` — same email and password.
-- **Client:** register at `/` → Register, choosing employer "PayKesho Demo Employer (DEMO)" and these staff-list details: name **Demo Employee**, NRC **999999/99/1**, TPIN **9000000001**, man number **DEMO-001**. Details that don't match the staff list are refused (by design).
+- **Client:** register at `/` → Register, choosing employer "PayKesho Demo Employer (DEMO)" and these staff-list details: first name **Demo**, last name **Employee** (middle name optional), NRC **999999/99/1**, TPIN **9000000001**, man number **DEMO-001**. Attach NRC front, NRC back and a payslip (PDF, PNG or JPEG, up to 5 MB each; selfie optional). Details that don't match the staff list are refused (by design).
 
 Testers can also create their own employers and merchants in the back office (below).
 
 ## Customer journey to test
 
-1. **Client registers** (as above) and signs in.
-2. **Client requests an advance** — Vouchers → Request: amount, reason, repayment period, and a payslip (PDF, PNG or JPEG, up to 1 MB). The cost (15% interest) and repayment dates are shown before submitting.
-3. **Back office reviews and approves** — `/admin` → Vouchers: open the payslip, then Approve. (On a narrow screen the Actions column folds into the row's "+" control.)
-4. **Client pays a merchant** — Pay: enter the merchant code (or scan the merchant's QR code), check the merchant's number and name, enter the amount, Pay Now. The result shows the reference and remaining balance; the dashboard balance goes down.
-5. **Merchant sees the payment** — `/merchant` → Transactions; the dashboard shows the merchant's QR code.
-6. **Employer sees the advance but not the purchases** — `/employer` → Vouchers / Clients.
-7. **Back office sees the payment and its settlement status** — `/admin` → Transactions.
+1. **Client registers** (as above). Signing in now says the registration is being reviewed.
+2. **Back office approves the registration** — `/admin` → Clients → KYC Review → Review: compare with the staff list, open the NRC and payslip, then Approve and activate (or Ask for more information / Reject with a reason). The client can then sign in.
+3. **Client requests an advance** — Vouchers → Request: amount, reason, repayment period, and a payslip (PDF, PNG or JPEG, up to 1 MB). The cost (15% interest) and repayment dates are shown before submitting.
+4. **Back office reviews and approves the advance** — `/admin` → Vouchers: open the payslip, then Approve. (On a narrow screen the Actions column folds into the row's "+" control.)
+5. **Client pays a merchant** — Pay: enter the merchant code (or scan the merchant's QR code), check the merchant's number and name, enter the amount, Pay Now. The result shows the reference and remaining balance; the dashboard balance goes down.
+6. **Merchant sees the payment** — `/merchant` → Transactions; the dashboard shows the merchant's QR code.
+7. **Employer sees the advance but not the purchases** — `/employer` → Vouchers / Clients.
+8. **Back office sees the payment and its settlement status** — `/admin` → Transactions.
 
 ## Onboarding a new employer or merchant (back office)
 
@@ -48,7 +49,7 @@ The live site runs with **Lenco test mode on** (Cloudflare variable `LENCO_TEST_
 ## Not in this test stage (known, not defects)
 
 - Email and SMS notifications are queued but not sent (the notification service is not deployed and no SMS provider is chosen). This includes "forgot password" emails.
-- New client accounts are active immediately; the spec's back-office KYC approval of registrations, NRC upload and first/middle/last-name fields are not built (decisions needed).
+- KYC review is manual: there is no automatic NRC, PEP/sanctions or credit-bureau check, and no selfie re-check on a new device yet.
 - No advance limit check (D-04); interest fixed at 15% (D-17); no transaction PIN.
 - Payroll deductions in the employer portal record repayments without matching them to money received — do not rely on them for testing repayments.
 - The Android app is not part of this stage (web only).

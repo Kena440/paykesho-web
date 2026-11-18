@@ -13,7 +13,7 @@
             <div class="container-fluid p-0">
                 <div class="row mb-2 mb-xl-3">
                     <div class="col-auto d-none d-sm-block">
-                        <h3>Registration: <span th:text="${application.fullName}"></span></h3>
+                        <h3>Registration: <span th:text="${kycApp.fullName}"></span></h3>
                     </div>
                     <div class="col-auto ms-auto text-end mt-n1">
                         <a class="btn btn-secondary shadow-sm" th:href="@{/kyc}">Back to queue</a>
@@ -26,16 +26,16 @@
                             <div class="card-header">
                                 <h5 class="card-title">Applicant</h5>
                                 <h6 class="card-subtitle text-muted">
-                                    Submitted <span th:text="${@kycDates.format(application.submittedAt)}"></span> ·
-                                    Status <span class="badge bg-secondary" id="kyc-status" th:text="${application.status}"></span>
+                                    Submitted <span th:text="${@kycDates.format(kycApp.submittedAt)}"></span> ·
+                                    Status <span class="badge bg-secondary" id="kyc-status" th:text="${kycApp.status}"></span>
                                 </h6>
                             </div>
                             <div class="card-body">
                                 <table class="table table-sm mb-0">
-                                    <tr><th>First name</th><td th:text="${application.firstName}"></td></tr>
-                                    <tr><th>Middle name</th><td th:text="${application.middleName}"></td></tr>
-                                    <tr><th>Last name</th><td th:text="${application.lastName}"></td></tr>
-                                    <tr><th>Address</th><td th:text="${application.fullAddress}"></td></tr>
+                                    <tr><th>First name</th><td th:text="${kycApp.firstName}"></td></tr>
+                                    <tr><th>Middle name</th><td th:text="${kycApp.middleName}"></td></tr>
+                                    <tr><th>Last name</th><td th:text="${kycApp.lastName}"></td></tr>
+                                    <tr><th>Address</th><td th:text="${kycApp.fullAddress}"></td></tr>
                                     <tr><th>NRC</th><td th:text="${client.nrc}"></td></tr>
                                     <tr><th>TPIN</th><td th:text="${client.tpin}"></td></tr>
                                     <tr><th>Man number</th><td th:text="${client.manNumber}"></td></tr>
@@ -43,11 +43,11 @@
                                     <tr><th>Email</th><td th:text="${client.email}"></td></tr>
                                     <tr><th>Net income</th><td th:text="${client.clientIncome}"></td></tr>
                                     <tr><th>Employer</th><td th:text="${client.organization?.name}"></td></tr>
-                                    <tr th:if="${application.decisionReason != null}">
-                                        <th>Reason / note</th><td th:text="${application.decisionReason}"></td>
+                                    <tr th:if="${kycApp.decisionReason != null}">
+                                        <th>Reason / note</th><td th:text="${kycApp.decisionReason}"></td>
                                     </tr>
-                                    <tr th:if="${application.reviewedAt != null}">
-                                        <th>Decided</th><td th:text="${@kycDates.format(application.reviewedAt)}"></td>
+                                    <tr th:if="${kycApp.reviewedAt != null}">
+                                        <th>Decided</th><td th:text="${@kycDates.format(kycApp.reviewedAt)}"></td>
                                     </tr>
                                 </table>
                             </div>
@@ -63,7 +63,7 @@
                                 </div>
                                 <table th:if="${staffRecord != null}" class="table table-sm mb-0" id="kyc-staff-record">
                                     <tr><th></th><th>Staff list</th><th>Registration</th></tr>
-                                    <tr th:with="ok=${staffRecord.name == client.name or staffRecord.name == application.firstName + ' ' + application.lastName}">
+                                    <tr th:with="ok=${staffRecord.name == client.name or staffRecord.name == kycApp.firstName + ' ' + kycApp.lastName}">
                                         <th>Name</th><td th:text="${staffRecord.name}"></td>
                                         <td th:text="${client.name}" th:class="${ok ? 'text-success' : 'text-danger'}"></td>
                                     </tr>
@@ -95,27 +95,27 @@
                             </div>
                         </div>
 
-                        <div class="card" th:if="${application.status.open}">
+                        <div class="card" th:if="${kycApp.status.open}">
                             <div class="card-header">
                                 <h5 class="card-title">Decision</h5>
                             </div>
                             <div class="card-body">
-                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${application.id} + '/start'}"
-                                      th:if="${application.status.name() == 'SUBMITTED'}">
+                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/start'}"
+                                      th:if="${kycApp.status.name() == 'SUBMITTED'}">
                                     <button class="btn btn-outline-secondary" id="kyc-start" type="submit">Mark as under review</button>
                                 </form>
-                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${application.id} + '/approve'}">
+                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/approve'}">
                                     <label class="form-label" for="note">Note (optional)</label>
                                     <input class="form-control mb-2" id="note" maxlength="1000" name="note" type="text">
                                     <button class="btn btn-success" id="kyc-approve" type="submit"
                                             onclick="return confirm('Approve this registration and activate the account?')">Approve and activate</button>
                                 </form>
-                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${application.id} + '/more-info'}">
+                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/more-info'}">
                                     <label class="form-label" for="moreInfoReason">What is needed</label>
                                     <input class="form-control mb-2" id="moreInfoReason" maxlength="1000" name="reason" required type="text">
                                     <button class="btn btn-warning" id="kyc-more-info" type="submit">Ask for more information</button>
                                 </form>
-                                <form method="post" th:action="@{'/kyc/' + ${application.id} + '/reject'}">
+                                <form method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/reject'}">
                                     <label class="form-label" for="rejectReason">Reason for rejection</label>
                                     <input class="form-control mb-2" id="rejectReason" maxlength="1000" name="reason" required type="text">
                                     <button class="btn btn-danger" id="kyc-reject" type="submit"

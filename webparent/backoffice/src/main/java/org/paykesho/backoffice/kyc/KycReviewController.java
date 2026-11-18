@@ -44,7 +44,7 @@ public class KycReviewController {
     public String view(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             ClientKycApplication application = kycReviewService.get(id);
-            model.addAttribute("application", application);
+            model.addAttribute("kycApp", application); // not "application": that name is Thymeleaf's servlet-context object
             model.addAttribute("client", application.getClient());
             model.addAttribute("documents", kycReviewService.documentsFor(id));
             model.addAttribute("staffRecord", kycReviewService.staffRecordFor(application.getClient()).orElse(null));

@@ -84,7 +84,8 @@ test('an employee on the staff list registers; sign-in waits for KYC review', as
 
   await trySignIn(page, MARY.email, MARY.password);
   await expect(page).toHaveURL((u) => u.pathname === '/login');
-  await expect(page.locator('body')).toContainText(/registration is being reviewed/i);
+  const shown = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+  expect(shown, `sign-in page shows: ${page.url()} ${shown.slice(0, 400)}`).toMatch(/registration is being reviewed/i);
 
   // Wrong password: no hint that the account exists.
   await trySignIn(page, MARY.email, 'Wrong-Password-1');
