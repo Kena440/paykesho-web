@@ -81,6 +81,26 @@ public class FileUploadService {
         return result;
     }
 
+    /**
+     * Stores file content that the caller has already checked with
+     * {@link StoredFiles#rejectionReason}. Returns the stored file's id.
+     */
+    public Long storeOwnedBytes(byte[] data, String originalName, FileType fileType, String ownerUuid, String description) {
+        String contentType = StoredFiles.detectContentType(data);
+        FileUpload stored = new FileUpload();
+        stored.setFileName(StoredFiles.safeFileName(originalName, contentType));
+        stored.setFileType(fileType);
+        stored.setFilePath("database");
+        stored.setUserUuid(ownerUuid);
+        stored.setDescription(description);
+        stored.setCreatedAt(LocalDateTime.now());
+        stored.setFileSize((long) data.length);
+        stored.setContentType(contentType);
+        stored.setContent(data);
+        stored.setSha256(StoredFiles.sha256Hex(data));
+        return fileUploadRepository.save(stored).getId();
+    }
+
     /** Kept for existing callers; prefer {@link #uploadOwnedFile} so the file has an owner. */
     public FileUploadResponse uploadFile(MultipartFile file, FileType fileType, int userId, String description) {
         return uploadOwnedFile(file, fileType, null, description);

@@ -76,6 +76,11 @@
                                         [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]!
                                     </div>
                                 </div>
+                                <div class="alert alert-warning" role="alert" th:if="${param.pending}">
+                                    <div class="alert-message">
+                                        Your registration is being reviewed. You can sign in once Paykesho approves it.
+                                    </div>
+                                </div>
                                 <div class="alert alert-success alert-dismissible" role="alert" th:if="${param.logout}">
                                     <button aria-label="Close" class="btn-close" data-bs-dismiss="alert"
                                             type="button"></button>

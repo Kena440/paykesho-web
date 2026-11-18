@@ -27,7 +27,8 @@ public class ClientRestController {
                                     @RequestParam("nrc") String nrc, 
                                     @RequestParam("tpin") String tpin, 
                                     @RequestParam("manNumber") String manNumber, 
-                                    @RequestParam("organizationUuid") String organizationUuid) {
+                                    @RequestParam("organizationUuid") String organizationUuid,
+                                    @RequestParam(value = "altName", required = false) String altName) {
         try {
             log.debug("Checking client status for name: {}, nrc: {}, organizationUuid: {}", name, nrc, organizationUuid);
 
@@ -57,7 +58,11 @@ public class ClientRestController {
                 return "Failed to retrieve organization";
             }
 
-            String result = clientService.checkClientStatus(name, nrc, tpin, manNumber, organization);
+            // altName: the name without the middle name, in case the staff list omits it.
+            java.util.List<String> names = new java.util.ArrayList<>();
+            names.add(name.trim());
+            if (altName != null && !altName.isBlank()) names.add(altName.trim());
+            String result = clientService.checkClientStatus(names, nrc, tpin, manNumber, organization);
             log.debug("Client status check result: {}", result);
             return result;
 

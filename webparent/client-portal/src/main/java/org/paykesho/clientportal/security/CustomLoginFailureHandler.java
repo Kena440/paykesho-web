@@ -4,7 +4,11 @@ package org.paykesho.clientportal.security;
 import org.commons.entity.client.Client;
 import org.paykesho.clientportal.clients.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.paykesho.clientportal.kyc.KycStatusService;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -19,6 +23,10 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
 
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private KycStatusService kycStatusService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -26,7 +34,18 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
         String email = request.getParameter("email");
         Client client = clientService.getClientByEmail(email);
 
-        if (client != null) {
+        if (client != null && !client.isEnabled()) {
+            // Only tell someone who knows the password that the account awaits KYC
+            // review, so the message does not reveal which e-mails are registered.
+            String password = request.getParameter("password");
+            String pending = kycStatusService.pendingMessage(client.getId());
+            if (pending != null && password != null && client.getPassword() != null
+                    && passwordEncoder.matches(password, client.getPassword())) {
+                exception = new DisabledException(pending);
+            } else {
+                exception = new BadCredentialsException("Bad credentials");
+            }
+        } else if (client != null) {
             if (client.isEnabled() && client.isAccountNonLocked()) {
                 if (client.getFailedAttempt() < ClientService.MAX_FAILED_ATTEMPTS - 1) {
                     clientService.increaseFailedAttempts(client);

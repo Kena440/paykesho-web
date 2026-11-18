@@ -43,7 +43,9 @@ public class Client extends IdBasedEntity {
     private String tpin;
     
     @NotBlank(message = "MAN number is required")
-    @Pattern(regexp = "^[0-9]{1,10}$", message = "MAN number must be numeric and up to 10 digits")
+    // Employers use letters, digits, '-' and '/' in man numbers (e.g. DEMO-001);
+    // it must match the employer's staff list exactly.
+    @Pattern(regexp = "^[A-Za-z0-9/-]{1,20}$", message = "MAN number may only contain letters, digits, '-' and '/' (up to 20)")
     @Column(name = "man_number", length = 128, nullable = false, unique = true)
     private String manNumber;
     

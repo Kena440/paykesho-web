@@ -85,6 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/forgot-password", "/forgot-password/captcha", "/reset-password").permitAll()
                         .antMatchers("/actuator/**").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
                         .antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
+                        .antMatchers("/kyc", "/kyc/**").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

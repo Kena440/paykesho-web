@@ -6,6 +6,7 @@ import org.commons.entity.settings.Setting;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.enums.Constants;
 import org.paykesho.backoffice.client.service.ClientService;
+import org.paykesho.backoffice.kyc.KycReviewService;
 import org.paykesho.backoffice.settings.service.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,8 @@ public class ClientController {
     private ClientService clientService;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private KycReviewService kycReviewService;
 
     @GetMapping("")
     public String showClients(Model model, HttpServletRequest request) {
@@ -46,6 +49,11 @@ public class ClientController {
                                               Model model) throws PaykeshoError {
 
         Client client = clientService.getByUuid(uuid);
+        if (enabled && kycReviewService.blocksActivation(client.getId())) {
+            redirectAttributes.addFlashAttribute("error",
+                    client.getFullName() + " cannot be enabled until their registration is approved in KYC Review.");
+            return Constants.REDIRECT_CUSTOMERS;
+        }
         clientService.updateCustomerEnabledStatusByUuid(uuid, enabled);
         String status = enabled ? "enabled" : "has been disabled";
         String operationMSG = client.getFullName() + " has been " + status;

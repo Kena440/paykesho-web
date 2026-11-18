@@ -6,7 +6,10 @@ import org.paykesho.clientportal.clients.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpSession;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,8 +36,15 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         Client assessor = clientService.getClientByEmail(email);
 
-        if (assessor == null) {
-            clientService.addNewClientUponOAuthLogin(name, email, countryCode, authenticationType);
+        if (assessor == null || !assessor.isEnabled()) {
+            // Google/Facebook sign-in is only for registered clients whose KYC
+            // review is approved; everyone else registers with employer details.
+            SecurityContextHolder.clearContext();
+            HttpSession session = request.getSession(false);
+            if (session != null) session.invalidate();
+            getRedirectStrategy().sendRedirect(request, response,
+                    assessor == null ? "/clients/register" : "/login?pending");
+            return;
         } else {
             oAuth2User.setFullName(assessor.getFullName());
             clientService.updateAuthenticationType(assessor, authenticationType);
