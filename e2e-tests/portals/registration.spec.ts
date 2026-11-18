@@ -46,6 +46,9 @@ async function trySignIn(page: Page, email: string, password: string) {
   const posted = page.waitForResponse((r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/login');
   await page.locator('form:has(input[name="password"]) [type="submit"]').first().click();
   await posted;
+  // The POST redirects to /login?error (refused) or the dashboard; wait for that
+  // page rather than reading the sign-in page that is still showing.
+  await page.waitForURL((u) => u.pathname !== '/login' || u.search !== '');
   await page.waitForLoadState('load');
 }
 
