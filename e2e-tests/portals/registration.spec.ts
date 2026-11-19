@@ -44,14 +44,21 @@ async function trySignIn(page: Page, email: string, password: string) {
   await page.locator('input[name="email"]').fill(email);
   await page.locator('input[name="password"]').fill(password);
   const posted = page.waitForResponse((r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/login');
+  const seen: string[] = [];
+  const onResp = (r: any) => seen.push(`${r.status()} ${r.request().method()} ${r.url().replace(/^https?:\/\/[^/]+/, '')}`);
+  const onFail = (r: any) => seen.push(`FAILED ${r.method()} ${r.url().replace(/^https?:\/\/[^/]+/, '')} ${r.failure()?.errorText}`);
+  page.on('response', onResp);
+  page.on('requestfailed', onFail);
   await page.locator('form:has(input[name="password"]) [type="submit"]').first().click();
   const resp = await posted;
   // The POST redirects to /login?error (refused) or the dashboard; wait for that
   // page rather than reading the sign-in page that is still showing.
   const location = resp.headers()['location'] || '';
   await page.waitForURL((u) => u.pathname !== '/login' || u.search !== '', { timeout: 20_000 }).catch((e) => {
-    throw new Error(`sign-in POST answered ${resp.status()} location=${location}; page now ${page.url()}: ${e.message.split('\n')[0]}`);
+    throw new Error(`sign-in POST answered ${resp.status()} location=${location}; page now ${page.url()}; seen: ${seen.filter((x) => !/\.(js|css|png|svg|woff2?|ico)(\?|$)/.test(x)).join(' | ')}`);
   });
+  page.off('response', onResp);
+  page.off('requestfailed', onFail);
   await page.waitForLoadState('load');
 }
 
