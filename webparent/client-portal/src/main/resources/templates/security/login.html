@@ -73,7 +73,12 @@
                                     </div>
                                     <div class="alert-message">
                                         <strong>Hello there!</strong>
-                                        [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]!
+                                        [[${session.SPRING_SECURITY_LAST_EXCEPTION?.message ?: 'Sign-in failed. Please check your email and password'}]]!
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning" role="alert" th:if="${param.pending}">
+                                    <div class="alert-message">
+                                        Your registration is being reviewed. You can sign in once Paykesho approves it.
                                     </div>
                                 </div>
                                 <div class="alert alert-success alert-dismissible" role="alert" th:if="${param.logout}">

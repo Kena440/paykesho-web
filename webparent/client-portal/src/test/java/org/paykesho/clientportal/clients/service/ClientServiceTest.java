@@ -17,7 +17,12 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.paykesho.clientportal.clients.repository.ClientBalanceRepository;
 import org.paykesho.clientportal.clients.repository.ClientRepository;
+import org.paykesho.clientportal.kyc.RegistrationKycForm;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import javax.validation.Validation;
+import java.util.Map;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -56,65 +61,26 @@ class ClientServiceTest extends BaseUnitTest {
                 .build();
     }
 
-    @Test
-    @DisplayName("Should register client successfully")
-    void testRegisterClient_Success() {
-        // Given
-        String encodedPassword = "$2a$10$encodedPasswordHash";
-        String verificationCode = "verification_code_12345";
+    // Registration (KYC flow) is covered end to end by e2e-tests/portals/registration.spec.ts:
+    // staff-list match, required documents, inactive account until back-office approval.
 
+    @Test
+    @DisplayName("Registration without an employer is refused before anything is saved")
+    void testRegisterClient_NoEmployer() {
+        RegistrationKycForm kyc = new RegistrationKycForm();
+        kyc.setFirstName("Test");
+        kyc.setLastName("User");
+        kyc.setHouseNumber("Plot 1");
+        kyc.setRoad("Main Road");
+        kyc.setArea("Lusaka");
+        testClient.setOrganization(null);
         try (MockedStatic<SecurityValidator> mockedSecurityValidator = mockStatic(SecurityValidator.class)) {
             mockedSecurityValidator.when(() -> SecurityValidator.validateAndSanitizeClient(any(Client.class))).thenAnswer(invocation -> null);
-            when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
-            when(clientBalanceRepository.getClientBalanceByClientId(anyInt())).thenReturn(null);
-            when(clientBalanceRepository.save(any(ClientBalance.class))).thenAnswer(invocation -> invocation.getArgument(0));
-            when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> {
-                Client client = invocation.getArgument(0);
-                client.setId(1);
-                return client;
-            });
+            ReflectionTestUtils.setField(clientService, "validator",
+                    Validation.buildDefaultValidatorFactory().getValidator());
 
-            // When
-            clientService.registerClient(testClient);
-
-            // Then
-            ArgumentCaptor<Client> clientCaptor = ArgumentCaptor.forClass(Client.class);
-            verify(clientRepository, times(1)).save(clientCaptor.capture());
-            Client savedClient = clientCaptor.getValue();
-
-            assertThat(savedClient.getPassword()).isEqualTo(encodedPassword);
-            assertThat(savedClient.isEnabled()).isTrue();
-            assertThat(savedClient.isAccountNonLocked()).isTrue();
-            assertThat(savedClient.getCreatedTime()).isNotNull();
-            assertThat(savedClient.getAuthenticationType()).isEqualTo(AuthenticationType.DATABASE);
-            assertThat(savedClient.getVerificationCode()).isNotNull();
-            assertThat(savedClient.getVerificationCode().length()).isGreaterThan(0);
-
-            // Verify balance was created
-            ArgumentCaptor<ClientBalance> balanceCaptor = ArgumentCaptor.forClass(ClientBalance.class);
-            verify(clientBalanceRepository, times(1)).save(balanceCaptor.capture());
-            ClientBalance savedBalance = balanceCaptor.getValue();
-            assertThat(savedBalance.getClient()).isNotNull();
-            assertThat(savedBalance.getCurrentBalance()).isEqualByComparingTo(BigDecimal.ZERO);
-            assertThat(savedBalance.getAvailableBalance()).isEqualByComparingTo(BigDecimal.ZERO);
-            assertThat(savedBalance.getHeldBalance()).isEqualByComparingTo(BigDecimal.ZERO);
-        }
-    }
-
-    @Test
-    @DisplayName("Should throw exception when security validation fails")
-    void testRegisterClient_SecurityValidationFailure() {
-        // Given
-        SecurityException securityException = new SecurityException("Malicious content detected");
-        try (MockedStatic<SecurityValidator> mockedSecurityValidator = mockStatic(SecurityValidator.class)) {
-            mockedSecurityValidator.when(() -> SecurityValidator.validateAndSanitizeClient(any(Client.class)))
-                    .thenThrow(securityException);
-
-            // When/Then
-            assertThatThrownBy(() -> clientService.registerClient(testClient))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("Failed to register client")
-                    .hasRootCause(securityException);
+            assertThatThrownBy(() -> clientService.registerClient(testClient, kyc, Map.of()))
+                    .isInstanceOf(RegistrationRejectedException.class);
 
             verify(clientRepository, never()).save(any());
             verify(clientBalanceRepository, never()).save(any());
@@ -122,77 +88,24 @@ class ClientServiceTest extends BaseUnitTest {
     }
 
     @Test
-    @DisplayName("Should encode password during registration")
-    void testRegisterClient_PasswordEncoding() {
-        // Given
-        String encodedPassword = "$2a$10$encodedPasswordHash";
-        try (MockedStatic<SecurityValidator> mockedSecurityValidator = mockStatic(SecurityValidator.class)) {
-            mockedSecurityValidator.when(() -> SecurityValidator.validateAndSanitizeClient(any(Client.class))).thenAnswer(invocation -> null);
-            when(passwordEncoder.encode("password123")).thenReturn(encodedPassword);
-            when(clientBalanceRepository.getClientBalanceByClientId(anyInt())).thenReturn(null);
-            when(clientBalanceRepository.save(any(ClientBalance.class))).thenAnswer(invocation -> invocation.getArgument(0));
-            when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> {
-                Client client = invocation.getArgument(0);
-                client.setId(1);
-                return client;
-            });
-
-            // When
-            clientService.registerClient(testClient);
-
-            // Then
-            verify(passwordEncoder, times(1)).encode("password123");
-            ArgumentCaptor<Client> clientCaptor = ArgumentCaptor.forClass(Client.class);
-            verify(clientRepository).save(clientCaptor.capture());
-            assertThat(clientCaptor.getValue().getPassword()).isEqualTo(encodedPassword);
-            assertThat(clientCaptor.getValue().getPassword()).isNotEqualTo("password123");
-        }
+    @DisplayName("Registration without first and last name is refused")
+    void testRegisterClient_NoName() {
+        assertThatThrownBy(() -> clientService.registerClient(testClient, new RegistrationKycForm(), Map.of()))
+                .isInstanceOf(RegistrationRejectedException.class)
+                .hasMessageContaining("first and last name");
+        verify(clientRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should not create balance if it already exists")
-    void testRegisterClient_BalanceAlreadyExists() {
-        // Given
-        String encodedPassword = "$2a$10$encodedPasswordHash";
-        ClientBalance existingBalance = new ClientBalance();
-        existingBalance.setId(1);
-        existingBalance.setClient(testClient);
-
-        try (MockedStatic<SecurityValidator> mockedSecurityValidator = mockStatic(SecurityValidator.class)) {
-            mockedSecurityValidator.when(() -> SecurityValidator.validateAndSanitizeClient(any(Client.class))).thenAnswer(invocation -> null);
-            when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
-            when(clientBalanceRepository.getClientBalanceByClientId(anyInt())).thenReturn(existingBalance);
-            when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> {
-                Client client = invocation.getArgument(0);
-                client.setId(1);
-                return client;
-            });
-
-            // When
-            clientService.registerClient(testClient);
-
-            // Then
-            verify(clientBalanceRepository, never()).save(any());
-        }
-    }
-
-    @Test
-    @DisplayName("Should handle repository save failure")
-    void testRegisterClient_RepositorySaveFailure() {
-        // Given
-        String encodedPassword = "$2a$10$encodedPasswordHash";
-        try (MockedStatic<SecurityValidator> mockedSecurityValidator = mockStatic(SecurityValidator.class)) {
-            mockedSecurityValidator.when(() -> SecurityValidator.validateAndSanitizeClient(any(Client.class))).thenAnswer(invocation -> null);
-            when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
-            when(clientRepository.save(any(Client.class))).thenThrow(new RuntimeException("Database error"));
-
-            // When/Then
-            assertThatThrownBy(() -> clientService.registerClient(testClient))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("Failed to register client");
-
-            verify(clientBalanceRepository, never()).save(any());
-        }
+    @DisplayName("Staff-list name candidates include the name without the middle name")
+    void testNameCandidates() {
+        RegistrationKycForm kyc = new RegistrationKycForm();
+        kyc.setFirstName(" Mary ");
+        kyc.setMiddleName("Chanda");
+        kyc.setLastName("Banda");
+        assertThat(ClientService.nameCandidates(kyc)).containsExactly("Mary Chanda Banda", "Mary Banda");
+        kyc.setMiddleName(null);
+        assertThat(ClientService.nameCandidates(kyc)).containsExactly("Mary Banda");
     }
 
     @Test

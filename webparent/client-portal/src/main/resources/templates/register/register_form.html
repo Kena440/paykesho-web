@@ -41,7 +41,7 @@
                                 </div>
                             </div>
                         </div>
-                        <form method="post"
+                        <form method="post" enctype="multipart/form-data"
                               onsubmit="return confirmSubmit(event, this)"
                               th:action="@{/clients/save-client}"
                               th:object="${client}">
@@ -60,11 +60,26 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label" data-bs-toggle="tooltip" for="name"
-                                               title="Enter your full name">Name</label>
-                                        <input autocomplete="name" class="form-control" id="name"
-                                               placeholder="Full Name"
-                                               required th:field="*{name}" type="text">
+                                        <label class="form-label" for="firstName">First Name</label>
+                                        <input autocomplete="given-name" class="form-control" id="firstName" maxlength="100"
+                                               name="firstName" placeholder="First Name" required
+                                               th:value="${kyc?.firstName}" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="middleName">Middle Name <span class="text-muted">(optional)</span></label>
+                                        <input autocomplete="additional-name" class="form-control" id="middleName" maxlength="100"
+                                               name="middleName" placeholder="Middle Name"
+                                               th:value="${kyc?.middleName}" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="lastName">Last Name</label>
+                                        <input autocomplete="family-name" class="form-control" id="lastName" maxlength="100"
+                                               name="lastName" placeholder="Last Name" required
+                                               th:value="${kyc?.lastName}" type="text">
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
@@ -124,13 +139,28 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-6">
+                                <div class="col-12 col-md-4">
                                     <div class="mb-3">
-                                        <label class="form-label" data-bs-toggle="tooltip" for="address"
-                                               title="Enter your current residential address">Address</label>
-                                        <input autocomplete="street-address" class="form-control" id="address"
-                                               placeholder="Address"
-                                               required th:field="*{address}" type="text">
+                                        <label class="form-label" for="houseNumber">House Number</label>
+                                        <input autocomplete="address-line1" class="form-control" id="houseNumber" maxlength="50"
+                                               name="houseNumber" placeholder="e.g. Plot 12" required
+                                               th:value="${kyc?.houseNumber}" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="road">Road</label>
+                                        <input autocomplete="address-line2" class="form-control" id="road" maxlength="45"
+                                               name="road" placeholder="e.g. Kabulonga Road" required
+                                               th:value="${kyc?.road}" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="area">Area</label>
+                                        <input autocomplete="address-level2" class="form-control" id="area" maxlength="45"
+                                               name="area" placeholder="e.g. Kabulonga, Lusaka" required
+                                               th:value="${kyc?.area}" type="text">
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
@@ -184,6 +214,38 @@
                                                maxlength="15"
                                                minlength="6" oninput="checkPasswordMatch(this)"
                                                placeholder="Confirm Password *" required type="password">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <h6 class="mt-2 mb-1">Documents</h6>
+                                    <p class="text-muted small mb-2">PDF, PNG or JPEG, up to 5 MB each. Paykesho reviews these before your account is activated.</p>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="nrcFront">NRC (front)</label>
+                                        <input accept="application/pdf,image/png,image/jpeg" class="form-control" id="nrcFront"
+                                               name="nrcFront" required type="file">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="nrcBack">NRC (back)</label>
+                                        <input accept="application/pdf,image/png,image/jpeg" class="form-control" id="nrcBack"
+                                               name="nrcBack" required type="file">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="payslip">Latest payslip</label>
+                                        <input accept="application/pdf,image/png,image/jpeg" class="form-control" id="payslip"
+                                               name="payslip" required type="file">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="selfie">Selfie <span class="text-muted">(optional, PNG or JPEG)</span></label>
+                                        <input accept="image/png,image/jpeg" capture="user" class="form-control" id="selfie"
+                                               name="selfie" type="file">
                                     </div>
                                 </div>
                                 <div class="col-12 d-flex justify-content-end gap-2 mt-3">
@@ -249,7 +311,18 @@
     }
 
     moduleURL = "[[@{/}]]";
-    MAX_FILE_SIZE = 502400; // 500KB
+    MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB, same limit as the server
+
+    function documentsTooLarge() {
+        const ids = ['nrcFront', 'nrcBack', 'payslip', 'selfie'];
+        for (const id of ids) {
+            const input = document.getElementById(id);
+            if (input && input.files.length && input.files[0].size > MAX_FILE_SIZE) {
+                return input.labels[0].innerText.replace(/\s*\(.*\)\s*$/, '');
+            }
+        }
+        return null;
+    }
 
     function showLoader() {
         document.getElementById('loaderOverlay').style.display = 'flex';
@@ -262,7 +335,11 @@
     function checkClientStatus(form) {
         showLoader();
         const url = "[[@{/clients/rest/check-client}]]";
-        const name = $("#name").val();
+        const first = $.trim($("#firstName").val());
+        const middle = $.trim($("#middleName").val());
+        const last = $.trim($("#lastName").val());
+        const name = [first, middle, last].filter(Boolean).join(" ");
+        const altName = middle ? first + " " + last : "";
         const nrc = $("#nrc").val();
         const tpin = $("#tpin").val();
         const manNumber = $("#manNumber").val();
@@ -274,6 +351,7 @@
             tpin: tpin,
             manNumber: manNumber,
             organizationUuid: organization,
+            altName: altName,
             _csrf: csrfValue
         };
 
@@ -318,6 +396,11 @@
 
     function confirmSubmit(event, form) {
         event.preventDefault();
+        const big = documentsTooLarge();
+        if (big) {
+            showWarningModal(big + " is larger than 5 MB. Please attach a smaller file.");
+            return false;
+        }
         Swal.fire({
             title: 'Submit Registration?',
             text: 'Please confirm your details before submitting.',

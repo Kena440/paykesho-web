@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html data-bs-theme="light"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('KYC Review','none')"></head>
+<body>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>Registration: <span th:text="${kycApp.fullName}"></span></h3>
+                    </div>
+                    <div class="col-auto ms-auto text-end mt-n1">
+                        <a class="btn btn-secondary shadow-sm" th:href="@{/kyc}">Back to queue</a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Applicant</h5>
+                                <h6 class="card-subtitle text-muted">
+                                    Submitted <span th:text="${@kycDates.format(kycApp.submittedAt)}"></span> ·
+                                    Status <span class="badge bg-secondary" id="kyc-status" th:text="${kycApp.status}"></span>
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm mb-0">
+                                    <tr><th>First name</th><td th:text="${kycApp.firstName}"></td></tr>
+                                    <tr><th>Middle name</th><td th:text="${kycApp.middleName}"></td></tr>
+                                    <tr><th>Last name</th><td th:text="${kycApp.lastName}"></td></tr>
+                                    <tr><th>Address</th><td th:text="${kycApp.fullAddress}"></td></tr>
+                                    <tr><th>NRC</th><td th:text="${client.nrc}"></td></tr>
+                                    <tr><th>TPIN</th><td th:text="${client.tpin}"></td></tr>
+                                    <tr><th>Man number</th><td th:text="${client.manNumber}"></td></tr>
+                                    <tr><th>Phone</th><td th:text="${client.phoneNumber}"></td></tr>
+                                    <tr><th>Email</th><td th:text="${client.email}"></td></tr>
+                                    <tr><th>Net income</th><td th:text="${client.clientIncome}"></td></tr>
+                                    <tr><th>Employer</th><td th:text="${client.organization?.name}"></td></tr>
+                                    <tr th:if="${kycApp.decisionReason != null}">
+                                        <th>Reason / note</th><td th:text="${kycApp.decisionReason}"></td>
+                                    </tr>
+                                    <tr th:if="${kycApp.reviewedAt != null}">
+                                        <th>Decided</th><td th:text="${@kycDates.format(kycApp.reviewedAt)}"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Employer staff list</h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${staffRecord == null}" class="alert alert-danger mb-0" role="alert">
+                                    <div class="alert-message">No staff-list entry with this NRC at the employer.</div>
+                                </div>
+                                <table th:if="${staffRecord != null}" class="table table-sm mb-0" id="kyc-staff-record">
+                                    <tr><th></th><th>Staff list</th><th>Registration</th></tr>
+                                    <tr th:with="ok=${staffRecord.name == client.name or staffRecord.name == kycApp.firstName + ' ' + kycApp.lastName}">
+                                        <th>Name</th><td th:text="${staffRecord.name}"></td>
+                                        <td th:text="${client.name}" th:class="${ok ? 'text-success' : 'text-danger'}"></td>
+                                    </tr>
+                                    <tr><th>NRC</th><td th:text="${staffRecord.nrc}"></td>
+                                        <td th:text="${client.nrc}" th:class="${staffRecord.nrc == client.nrc ? 'text-success' : 'text-danger'}"></td></tr>
+                                    <tr><th>TPIN</th><td th:text="${staffRecord.tpin}"></td>
+                                        <td th:text="${client.tpin}" th:class="${staffRecord.tpin == client.tpin ? 'text-success' : 'text-danger'}"></td></tr>
+                                    <tr><th>Man number</th><td th:text="${staffRecord.manNumber}"></td>
+                                        <td th:text="${client.manNumber}" th:class="${staffRecord.manNumber == client.manNumber ? 'text-success' : 'text-danger'}"></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Documents</h5>
+                                <h6 class="card-subtitle text-muted">Opens in a new tab. Check the NRC matches the details and the payslip is recent and from this employer.</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group" id="kyc-documents">
+                                    <li class="list-group-item d-flex justify-content-between" th:each="d : ${documents}">
+                                        <span th:text="${d.documentType.label}"></span>
+                                        <a rel="noopener" target="_blank" th:href="@{'/files/' + ${d.fileUploadId}}">Open</a>
+                                    </li>
+                                    <li class="list-group-item text-muted" th:if="${documents == null or documents.isEmpty()}">No documents attached.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card" th:if="${kycApp.status.open}">
+                            <div class="card-header">
+                                <h5 class="card-title">Decision</h5>
+                            </div>
+                            <div class="card-body">
+                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/start'}"
+                                      th:if="${kycApp.status.name() == 'SUBMITTED'}">
+                                    <button class="btn btn-outline-secondary" id="kyc-start" type="submit">Mark as under review</button>
+                                </form>
+                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/approve'}">
+                                    <label class="form-label" for="note">Note (optional)</label>
+                                    <input class="form-control mb-2" id="note" maxlength="1000" name="note" type="text">
+                                    <button class="btn btn-success" id="kyc-approve" type="submit"
+                                            onclick="return confirm('Approve this registration and activate the account?')">Approve and activate</button>
+                                </form>
+                                <form class="mb-3" method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/more-info'}">
+                                    <label class="form-label" for="moreInfoReason">What is needed</label>
+                                    <input class="form-control mb-2" id="moreInfoReason" maxlength="1000" name="reason" required type="text">
+                                    <button class="btn btn-warning" id="kyc-more-info" type="submit">Ask for more information</button>
+                                </form>
+                                <form method="post" th:action="@{'/kyc/' + ${kycApp.id} + '/reject'}">
+                                    <label class="form-label" for="rejectReason">Reason for rejection</label>
+                                    <input class="form-control mb-2" id="rejectReason" maxlength="1000" name="reason" required type="text">
+                                    <button class="btn btn-danger" id="kyc-reject" type="submit"
+                                            onclick="return confirm('Reject this registration?')">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+</body>
+</html>

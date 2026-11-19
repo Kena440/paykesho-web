@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html data-bs-theme="light"
+      data-layout="fluid" data-sidebar-behavior="sticky" data-sidebar-position="left" data-sidebar-theme="dark"
+      lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+<head th:replace="fragments/fragments :: page_head('KYC Review','none')"></head>
+<body>
+<div class="wrapper">
+    <nav th:replace="fragments/fragments :: sidebarMenu"></nav>
+    <div class="main">
+        <nav th:replace="fragments/fragments :: topbar"></nav>
+        <main class="content">
+            <div class="container-fluid p-0">
+                <div class="row mb-2 mb-xl-3">
+                    <div class="col-auto d-none d-sm-block">
+                        <h3>KYC Review</h3>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Waiting for review</h5>
+                        <h6 class="card-subtitle text-muted">New client registrations, oldest first. Accounts stay inactive until approved.</h6>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped w-100" id="kyc-open">
+                            <thead>
+                            <tr>
+                                <th>Submitted</th>
+                                <th>Name</th>
+                                <th>NRC</th>
+                                <th>Employer</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="a : ${openList}">
+                                <td th:text="${@kycDates.format(a.submittedAt)}"></td>
+                                <td th:text="${a.fullName}"></td>
+                                <td th:text="${a.client.nrc}"></td>
+                                <td th:text="${a.client.organization?.name}"></td>
+                                <td><span class="badge bg-warning text-dark" th:text="${a.status}"></span></td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-primary" th:href="@{'/kyc/' + ${a.id}}">Review</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${openList == null or openList.isEmpty()}">
+                                <td class="text-center text-muted py-4" colspan="6">No registrations waiting for review.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Recent decisions</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm w-100" id="kyc-decided">
+                            <thead>
+                            <tr>
+                                <th>Decided</th>
+                                <th>Name</th>
+                                <th>Employer</th>
+                                <th>Decision</th>
+                                <th>Reason / note</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="a : ${decidedList}">
+                                <td th:text="${@kycDates.format(a.reviewedAt)}"></td>
+                                <td th:text="${a.fullName}"></td>
+                                <td th:text="${a.client.organization?.name}"></td>
+                                <td>
+                                    <span th:class="${a.status.name() == 'APPROVED' ? 'badge bg-success' : 'badge bg-danger'}"
+                                          th:text="${a.status}"></span>
+                                </td>
+                                <td th:text="${a.decisionReason}"></td>
+                                <td class="text-end"><a th:href="@{'/kyc/' + ${a.id}}">View</a></td>
+                            </tr>
+                            <tr th:if="${decidedList == null or decidedList.isEmpty()}">
+                                <td class="text-center text-muted py-3" colspan="6">No decisions yet.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="fragments/fragments :: js_code"></footer>
+</body>
+</html>

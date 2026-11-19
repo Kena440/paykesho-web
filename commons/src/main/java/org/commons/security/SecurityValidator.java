@@ -51,7 +51,9 @@ public class SecurityValidator {
         }
         
         if (client.getManNumber() != null) {
-            client.setManNumber(InputSanitizer.sanitizeNumeric(client.getManNumber()));
+            // Man numbers can contain letters, '-' and '/' (e.g. DEMO-001); keep them so
+            // they still match the employer's staff list.
+            client.setManNumber(client.getManNumber().trim().replaceAll("[^A-Za-z0-9/-]", ""));
         }
     }
     
