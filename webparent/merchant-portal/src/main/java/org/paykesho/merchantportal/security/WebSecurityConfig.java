@@ -58,6 +58,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests(authz -> authz
+                        // Sign-in page with any query (?error, ?logout): formLogin().permitAll() only
+                        // permits the exact "/login", so "/login?error" bounced to a plain sign-in page.
+                        .antMatchers(org.springframework.http.HttpMethod.GET, "/login").permitAll()
                         .antMatchers("/forgot-password", "/forgot-password/captcha", "/reset-password", "/reset-password-action").permitAll()
                         .antMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .antMatchers("/", "/account", "/assessors/update-account").authenticated()
