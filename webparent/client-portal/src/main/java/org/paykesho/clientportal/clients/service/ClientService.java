@@ -543,7 +543,7 @@ public class ClientService {
 
     public String checkClientStatus(String name, String nrc, String tpin, String manNumber, Organization organization) {
         try {
-            log.debug("Checking client status for name: {}, nrc: {}, organization: {}", name, nrc, organization.getId());
+            log.debug("Checking employee eligibility for organization ID: {}", organization.getId());
             String resp = "";
 
             boolean clientExists = clientRepository.existsByNrcAndTpinAndManNumberAndOrganization(nrc, tpin, manNumber, organization);
@@ -563,7 +563,7 @@ public class ClientService {
             log.debug("Client status: {}", resp);
             return resp;
         } catch (Exception ex) {
-            log.error("Error checking client status for name: {}, nrc: {}: {}", name, nrc, ex.getMessage(), ex);
+            log.error("Employee eligibility check failed: {}", ex.getMessage());
             throw new RuntimeException("Failed to check client status", ex);
         }
     }
