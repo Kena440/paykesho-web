@@ -51,7 +51,7 @@ public class TransactionPinController {
         return me != null && me.getClient() != null && body != null
                 && body.get("password") != null
                 && passwordEncoder.matches(body.get("password"), me.getPassword())
-                && me.getClient().isEnabled();
+                && me.getClient().isEnabled() && me.getClient().isAccountNonLocked();
     }
 
     private ResponseEntity<?> unauthorized() {
