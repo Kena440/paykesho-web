@@ -78,7 +78,7 @@ class KycReviewServiceTest {
     @Test
     void approvalIsBlockedWhenRequiredDocumentsAreMissing() {
         ClientKycApplication app = application();
-        when(applications.findWithClient(42L)).thenReturn(Optional.of(app));
+        when(applications.findWithClientForUpdate(42L)).thenReturn(Optional.of(app));
         when(documents.findByKycApplicationIdOrderByIdAsc(42L)).thenReturn(List.of(document(KycDocumentType.NRC_FRONT)));
 
         assertThrows(PaykeshoError.class, () -> service.approve(42L, 9, null));
