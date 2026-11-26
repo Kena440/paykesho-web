@@ -80,11 +80,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests(authz -> authz
+                        // Sign-in page with any query (?error, ?logout): formLogin().permitAll() only
+                        // permits the exact "/login", so "/login?error" bounced to a plain sign-in page.
+                        .antMatchers(org.springframework.http.HttpMethod.GET, "/login").permitAll()
                         .antMatchers("/assessments/registration/**",
                                 "/assessments/generateQRCode", "/actuator/health",
                                 "/forgot-password", "/forgot-password/captcha", "/reset-password").permitAll()
                         .antMatchers("/actuator/**").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
                         .antMatchers("/facilities/save").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
+                        .antMatchers("/kyc", "/kyc/**").hasAnyAuthority(ROLE_ADMIN, ROLE_SUPERADMIN)
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

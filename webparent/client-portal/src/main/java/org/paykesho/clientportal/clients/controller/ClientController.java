@@ -1,5 +1,12 @@
 package org.paykesho.clientportal.clients.controller;
 
+import org.commons.enums.KycDocumentType;
+import org.paykesho.clientportal.kyc.RegistrationKycForm;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.EnumMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.commons.entity.client.Client;
@@ -157,22 +164,39 @@ public class ClientController {
         model.addAttribute("organizationList", organizationList);
         model.addAttribute("pageTitle", "Client Registration");
         model.addAttribute("client", client);
+        model.addAttribute("kyc", new RegistrationKycForm());
         return "register/register_form";
     }
 
     @PostMapping(value = "/save-client")
-    public String signUpClient(@Valid Client client, Model model, HttpServletRequest request) {
+    public String signUpClient(@ModelAttribute("client") Client client,
+                               @ModelAttribute("kyc") RegistrationKycForm kyc,
+                               @RequestParam(value = "nrcFront", required = false) MultipartFile nrcFront,
+                               @RequestParam(value = "nrcBack", required = false) MultipartFile nrcBack,
+                               @RequestParam(value = "payslip", required = false) MultipartFile payslip,
+                               @RequestParam(value = "selfie", required = false) MultipartFile selfie,
+                               Model model, HttpServletRequest request) {
         List<Organization> organizationList = organizationService.organizationListEnabled();
         model.addAttribute("organizationList", organizationList);
         model.addAttribute("pageTitle", "Client Registration");
+        Map<KycDocumentType, MultipartFile> documents = new EnumMap<>(KycDocumentType.class);
+        if (nrcFront != null) documents.put(KycDocumentType.NRC_FRONT, nrcFront);
+        if (nrcBack != null) documents.put(KycDocumentType.NRC_BACK, nrcBack);
+        if (payslip != null) documents.put(KycDocumentType.PAYSLIP, payslip);
+        if (selfie != null) documents.put(KycDocumentType.SELFIE, selfie);
         try {
-            clientService.registerClient(client);
-            // sendNotification(client, request);
-            model.addAttribute("client", new Client()); // clear form
-            model.addAttribute("successMessage", "Registration successful! Please check your email for verification.");
+            clientService.registerClient(client, kyc, documents);
+            Client cleared = new Client();
+            cleared.setClientType(ClientType.FORMAL);
+            model.addAttribute("client", cleared); // clear form
+            model.addAttribute("kyc", new RegistrationKycForm());
+            model.addAttribute("successMessage",
+                    "Registration received. Paykesho will review your details and documents, and you can sign in once your registration is approved.");
         } catch (Exception ex) {
-            log.error("Registration failed", ex); // log full stack trace
+            log.error("Registration failed: {}", ex.getMessage());
+            client.setPassword(null); // never echo the password back into the form
             model.addAttribute("client", client); // keep user input
+            model.addAttribute("kyc", kyc);
             String userMessage = "Registration failed. Please check your details and try again.";
             if (ex instanceof org.paykesho.clientportal.clients.service.RegistrationRejectedException) {
                 userMessage = ex.getMessage();

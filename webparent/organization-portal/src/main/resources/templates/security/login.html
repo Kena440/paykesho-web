@@ -64,7 +64,7 @@
                                     <i class="fas fa-fw fa-lock"></i>
                                 </div>
                                 <div class="alert-message">
-                                    <strong>Hello there!</strong> [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]!
+                                    <strong>Hello there!</strong> [[${session.SPRING_SECURITY_LAST_EXCEPTION?.message ?: 'Sign-in failed. Please check your email and password'}]]!
                                 </div>
                             </div>
                             <div class="alert alert-success alert-dismissible" role="alert" th:if="${param.logout}">

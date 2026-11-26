@@ -27,9 +27,10 @@ public class ClientRestController {
                                     @RequestParam("nrc") String nrc, 
                                     @RequestParam("tpin") String tpin, 
                                     @RequestParam("manNumber") String manNumber, 
-                                    @RequestParam("organizationUuid") String organizationUuid) {
+                                    @RequestParam("organizationUuid") String organizationUuid,
+                                    @RequestParam(value = "altName", required = false) String altName) {
         try {
-            log.debug("Checking client status for name: {}, nrc: {}, organizationUuid: {}", name, nrc, organizationUuid);
+            log.debug("Checking employee eligibility for organization UUID: {}", organizationUuid);
 
             // Validate required parameters
             if (name == null || name.trim().isEmpty()) {
@@ -53,16 +54,20 @@ public class ClientRestController {
                     return "Organization not found";
                 }
             } catch (Exception ex) {
-                log.error("Error retrieving organization with UUID {}: {}", organizationUuid, ex.getMessage(), ex);
+                log.error("Error retrieving employer record: {}", ex.getMessage());
                 return "Failed to retrieve organization";
             }
 
-            String result = clientService.checkClientStatus(name, nrc, tpin, manNumber, organization);
+            // altName: the name without the middle name, in case the staff list omits it.
+            java.util.List<String> names = new java.util.ArrayList<>();
+            names.add(name.trim());
+            if (altName != null && !altName.isBlank()) names.add(altName.trim());
+            String result = clientService.checkClientStatus(names, nrc, tpin, manNumber, organization);
             log.debug("Client status check result: {}", result);
             return result;
 
         } catch (Exception ex) {
-            log.error("Error checking client status for name: {}, nrc: {}: {}", name, nrc, ex.getMessage(), ex);
+            log.error("Employee eligibility check failed: {}", ex.getMessage());
             return "Failed to check client status";
         }
     }

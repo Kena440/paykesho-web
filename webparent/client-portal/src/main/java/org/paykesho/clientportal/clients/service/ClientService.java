@@ -22,7 +22,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.commons.entity.kyc.ClientKycApplication;
+import org.commons.entity.kyc.KycDocument;
+import org.commons.enums.FileType;
+import org.commons.enums.KycDocumentType;
+import org.commons.enums.KycStatus;
+import org.commons.utils.StoredFiles;
+import org.paykesho.clientportal.files.service.FileUploadService;
+import org.paykesho.clientportal.kyc.ClientKycApplicationRepository;
+import org.paykesho.clientportal.kyc.KycDocumentRepository;
+import org.paykesho.clientportal.kyc.KycStatusService;
+import org.paykesho.clientportal.kyc.RegistrationKycForm;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -53,6 +73,16 @@ public class ClientService {
     private ClientBalanceRepository clientBalanceRepository;
     @Autowired
     private NotificationClient notificationClient;
+    @Autowired
+    private ClientKycApplicationRepository kycApplicationRepository;
+    @Autowired
+    private KycDocumentRepository kycDocumentRepository;
+    @Autowired
+    private KycStatusService kycStatusService;
+    @Autowired
+    private FileUploadService fileUploadService;
+    @Autowired
+    private Validator validator;
 
     public List<Country> countryList() {
         try {
@@ -79,10 +109,17 @@ public class ClientService {
         }
     }
 
-    public void registerClient(Client client) {
+    /**
+     * Registers an employee for KYC review (PAYKESHO REGISTRATION). The account is
+     * created inactive with a KYC application and the uploaded documents; the
+     * back office approves it before the client can sign in.
+     */
+    public void registerClient(Client client, RegistrationKycForm kyc, Map<KycDocumentType, MultipartFile> documents) {
         try {
             log.debug("Registering new client with email: {}", client.getEmail());
-            
+
+            composeNameAndAddress(client, kyc);
+
             // SECURITY: Validate and sanitize all client input
             try {
                 SecurityValidator.validateAndSanitizeClient(client);
@@ -90,7 +127,11 @@ public class ClientService {
                 log.error("SECURITY VIOLATION during client registration: {}", se.getMessage());
                 throw new RuntimeException("Invalid input: Malicious content detected", se);
             }
-            
+            Set<ConstraintViolation<Client>> violations = validator.validate(client);
+            if (!violations.isEmpty()) {
+                throw new RegistrationRejectedException(violations.iterator().next().getMessage() + ".");
+            }
+
             // Registration is only for employees of an employer on the platform whose
             // details match that employer's staff list (PAYKESHO REGISTRATION, step 3 j-k).
             // The registration page checks this before submitting; enforce it here too so
@@ -104,7 +145,7 @@ public class ClientService {
                 throw new RegistrationRejectedException("Your employer is not registered on Paykesho.");
             }
             client.setOrganization(organization);
-            String status = checkClientStatus(client.getName(), client.getNrc(), client.getTpin(), client.getManNumber(), organization);
+            String status = checkClientStatus(nameCandidates(kyc), client.getNrc(), client.getTpin(), client.getManNumber(), organization);
             if ("Duplicated".equals(status)) {
                 throw new RegistrationRejectedException("An account already exists for these employee details.");
             }
@@ -112,9 +153,15 @@ public class ClientService {
                 throw new RegistrationRejectedException(
                     "Your details do not match your employer's staff list. Please check your name, NRC, TPIN and man number, or contact your employer.");
             }
+            if (clientRepository.findByEmail(client.getEmail()) != null) {
+                throw new RegistrationRejectedException("An account already exists for this email address.");
+            }
+
+            // Read and check every document before anything is saved.
+            Map<KycDocumentType, byte[]> files = readDocuments(documents);
 
             encodePassword(client);
-            client.setEnabled(true);
+            client.setEnabled(false); // activated by the back office after KYC review
             client.setAccountNonLocked(true);
             client.setCreatedTime(new Date());
             client.setAuthenticationType(AuthenticationType.DATABASE);
@@ -123,9 +170,32 @@ public class ClientService {
             client.setVerificationCode(randomCode);
             Client savedClient = clientRepository.save(client);
             createClientBalance(savedClient);
-            log.debug("Successfully registered client with ID: {}", savedClient.getId());
-            
-            // Send registration notifications
+
+            ClientKycApplication application = new ClientKycApplication();
+            application.setClient(savedClient);
+            application.setFirstName(kyc.getFirstName());
+            application.setMiddleName(kyc.getMiddleName());
+            application.setLastName(kyc.getLastName());
+            application.setHouseNumber(kyc.getHouseNumber());
+            application.setRoad(kyc.getRoad());
+            application.setArea(kyc.getArea());
+            application.setStatus(KycStatus.SUBMITTED);
+            application = kycApplicationRepository.save(application);
+
+            for (Map.Entry<KycDocumentType, byte[]> e : files.entrySet()) {
+                MultipartFile original = documents.get(e.getKey());
+                Long fileId = fileUploadService.storeOwnedBytes(e.getValue(), original.getOriginalFilename(),
+                        fileTypeFor(e.getKey()), savedClient.getUuid(), "KYC " + e.getKey().getLabel());
+                KycDocument doc = new KycDocument();
+                doc.setClientId(savedClient.getId());
+                doc.setKycApplicationId(application.getId());
+                doc.setDocumentType(e.getKey());
+                doc.setFileUploadId(fileId);
+                kycDocumentRepository.save(doc);
+            }
+            log.info("Client {} registered; KYC application {} submitted with {} documents",
+                    savedClient.getId(), application.getId(), files.size());
+
             sendRegistrationNotifications(savedClient);
         } catch (RegistrationRejectedException ex) {
             log.info("Client registration rejected: {}", ex.getMessage());
@@ -136,20 +206,108 @@ public class ClientService {
         }
     }
 
+    /** Documents required at registration; the selfie is optional. */
+    static final List<KycDocumentType> REQUIRED_DOCUMENTS =
+            List.of(KycDocumentType.NRC_FRONT, KycDocumentType.NRC_BACK, KycDocumentType.PAYSLIP);
+
+    private Map<KycDocumentType, byte[]> readDocuments(Map<KycDocumentType, MultipartFile> documents) {
+        Map<KycDocumentType, byte[]> files = new LinkedHashMap<>();
+        for (KycDocumentType type : KycDocumentType.values()) {
+            MultipartFile file = documents == null ? null : documents.get(type);
+            boolean present = file != null && !file.isEmpty();
+            if (!present) {
+                if (REQUIRED_DOCUMENTS.contains(type)) {
+                    throw new RegistrationRejectedException("Please attach your " + type.getLabel() + ".");
+                }
+                continue;
+            }
+            byte[] data;
+            try {
+                data = file.getBytes();
+            } catch (IOException e) {
+                throw new RegistrationRejectedException("Your " + type.getLabel() + " could not be read. Please try again.");
+            }
+            String problem = StoredFiles.rejectionReason(data, type == KycDocumentType.SELFIE);
+            if (problem != null) {
+                throw new RegistrationRejectedException(type.getLabel() + ": " + problem);
+            }
+            files.put(type, data);
+        }
+        return files;
+    }
+
+    private static FileType fileTypeFor(KycDocumentType type) {
+        switch (type) {
+            case PAYSLIP: return FileType.payslip;
+            case SELFIE: return FileType.selfie;
+            case NRC_FRONT:
+            case NRC_BACK: return FileType.nrc;
+            default: return FileType.photo;
+        }
+    }
+
+    private static String clean(String s) {
+        return s == null ? null : s.trim().replaceAll("\\s+", " ");
+    }
+
+    /** Name and address on the client record are composed from the KYC fields. */
+    private void composeNameAndAddress(Client client, RegistrationKycForm kyc) {
+        if (kyc == null) throw new RegistrationRejectedException("Please enter your name and address.");
+        kyc.setFirstName(clean(kyc.getFirstName()));
+        kyc.setMiddleName(clean(kyc.getMiddleName()));
+        kyc.setLastName(clean(kyc.getLastName()));
+        kyc.setHouseNumber(clean(kyc.getHouseNumber()));
+        kyc.setRoad(clean(kyc.getRoad()));
+        kyc.setArea(clean(kyc.getArea()));
+        if (isBlank(kyc.getFirstName()) || isBlank(kyc.getLastName())) {
+            throw new RegistrationRejectedException("Please enter your first and last name.");
+        }
+        if (isBlank(kyc.getHouseNumber()) || isBlank(kyc.getRoad()) || isBlank(kyc.getArea())) {
+            throw new RegistrationRejectedException("Please enter your house number, road and area.");
+        }
+        for (String part : new String[]{kyc.getFirstName(), kyc.getMiddleName(), kyc.getLastName()}) {
+            if (part != null && part.length() > 100) throw new RegistrationRejectedException("Each name must be at most 100 characters.");
+        }
+        if (kyc.getHouseNumber().length() > 50 || kyc.getRoad().length() > 45 || kyc.getArea().length() > 45) {
+            throw new RegistrationRejectedException("House number must be at most 50 characters, and road and area at most 45 each.");
+        }
+        List<String> names = nameCandidates(kyc);
+        client.setName(names.get(0));
+        client.setAddress(String.join(", ", kyc.getHouseNumber(), kyc.getRoad(), kyc.getArea()));
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isBlank();
+    }
+
+    /**
+     * Names that may appear on the employer's staff list: the full name, and the
+     * name without the middle name.
+     */
+    static List<String> nameCandidates(RegistrationKycForm kyc) {
+        List<String> names = new ArrayList<>();
+        String first = clean(kyc.getFirstName());
+        String middle = clean(kyc.getMiddleName());
+        String last = clean(kyc.getLastName());
+        if (!isBlank(middle)) names.add(first + " " + middle + " " + last);
+        names.add(first + " " + last);
+        return names;
+    }
+
     private void sendRegistrationNotifications(Client client) {
         try {
             String clientName = client.getName() != null ? client.getName() : "User";
             String emailMessage = String.format(
                 "<p>Welcome to Paykesho, %s!</p>" +
-                "<p>Your account has been successfully registered.</p>" +
+                "<p>We have received your registration and documents.</p>" +
                 "<p>Email: %s</p>" +
-                "<p>Please check your email for verification instructions.</p>" +
+                "<p>Paykesho will review them and let you know when you can sign in.</p>" +
                 "<br><p>Get lelo, Pay Kesho!</p>",
                 clientName, client.getEmail()
             );
             
             String smsMessage = String.format(
-                "Welcome to Paykesho, %s! Your account has been successfully registered. Email: %s. Please check your email for verification instructions.",
+                "Welcome to Paykesho, %s! We have received your registration (%s). We will let you know when it is approved and you can sign in.",
                 clientName, client.getEmail()
             );
             
@@ -195,7 +353,8 @@ public class ClientService {
         String paykeshoRef = paykeshoReferenceService.generateCode("ITEM_REQ_CLT");
         if (paykeshoRef == null) throw new PaykeshoError("FAILED_GEN_PAYKESHO_REF");
 
-        if (client == null || client.isEnabled()) {
+        if (client == null || client.isEnabled() || !kycStatusService.isCleared(client.getId())) {
+            // Accounts awaiting KYC review are activated by the back office, not the e-mail link.
             return false;
         } else {
             client.setCode(paykeshoRef);
@@ -247,18 +406,12 @@ public class ClientService {
     }
 
 
+    /**
+     * Accounts are only created through registration and KYC review; Google and
+     * Facebook sign-in is for existing, approved clients, so this refuses.
+     */
     public void addNewClientUponOAuthLogin(String name, String email, String countryCode, AuthenticationType authenticationType) {
-        Client client = new Client();
-        client.setEmail(email);
-        setName(name, client);
-
-        client.setName(name);
-        client.setEnabled(true);
-        client.setCreatedTime(new Date());
-        client.setAuthenticationType(authenticationType);
-        client.setPassword("");
-
-        clientRepository.save(client);
+        throw new RegistrationRejectedException("Please register with your employer details first.");
     }
 
     private void setName(String name, Client client) {
@@ -334,7 +487,9 @@ public class ClientService {
 
         client.setPassword(newPassword);
         client.setResetPasswordToken(null);
-        client.setEnabled(true); // Enable account after successful password reset
+        if (kycStatusService.isCleared(client.getId())) {
+            client.setEnabled(true); // Enable account after successful password reset
+        }
         encodePassword(client);
         clientRepository.save(client);
     }
@@ -377,9 +532,18 @@ public class ClientService {
         return false;
     }
 
+    public String checkClientStatus(List<String> names, String nrc, String tpin, String manNumber, Organization organization) {
+        String result = "Not Found";
+        for (String name : names) {
+            result = checkClientStatus(name, nrc, tpin, manNumber, organization);
+            if (!"Not Found".equals(result)) return result;
+        }
+        return result;
+    }
+
     public String checkClientStatus(String name, String nrc, String tpin, String manNumber, Organization organization) {
         try {
-            log.debug("Checking client status for name: {}, nrc: {}, organization: {}", name, nrc, organization.getId());
+            log.debug("Checking employee eligibility for organization ID: {}", organization.getId());
             String resp = "";
 
             boolean clientExists = clientRepository.existsByNrcAndTpinAndManNumberAndOrganization(nrc, tpin, manNumber, organization);
@@ -399,7 +563,7 @@ public class ClientService {
             log.debug("Client status: {}", resp);
             return resp;
         } catch (Exception ex) {
-            log.error("Error checking client status for name: {}, nrc: {}: {}", name, nrc, ex.getMessage(), ex);
+            log.error("Employee eligibility check failed: {}", ex.getMessage());
             throw new RuntimeException("Failed to check client status", ex);
         }
     }

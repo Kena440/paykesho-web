@@ -21,6 +21,20 @@ public enum FileType {
         public String defaultDescription() {
             return "photo";
         }
+    },
+
+    nrc {
+        @Override
+        public String defaultDescription() {
+            return "NRC";
+        }
+    },
+
+    selfie {
+        @Override
+        public String defaultDescription() {
+            return "selfie";
+        }
     };
 
     public abstract String defaultDescription();
