@@ -366,7 +366,7 @@
             showNotification('Error', 'PIN confirmation does not match.', 'error');
             return;
         }
-        if (!/^[0-9]{6}$/.test(newPin) || /^([0-9])\\1{5}$/.test(newPin) || newPin === '123456' || newPin === '654321') {
+        if (!/^[0-9]{6}$/.test(newPin) || /^([0-9])\1{5}$/.test(newPin) || newPin === '123456' || newPin === '654321') {
             showNotification('Error', 'Choose a six-digit PIN that is not an obvious sequence.', 'error');
             return;
         }
