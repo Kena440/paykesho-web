@@ -3,7 +3,6 @@ package org.paykesho.fileservice.security;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.mock.web.MockFilterChain;
 
@@ -11,9 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InternalFileServiceTokenFilterTest {
     private InternalFileServiceTokenFilter filter() {
-        InternalFileServiceTokenFilter filter = new InternalFileServiceTokenFilter("");
-        ReflectionTestUtils.setField(filter, "configuredToken", "secret-token");
-        return filter;
+        return new InternalFileServiceTokenFilter("secret-token");
     }
 
     @Test
