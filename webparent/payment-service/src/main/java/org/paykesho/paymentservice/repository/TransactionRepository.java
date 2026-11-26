@@ -20,5 +20,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select t from Transaction t where t.reference = :reference")
     Optional<Transaction> findByReferenceForUpdate(@Param("reference") String reference);
-    List<Transaction> findBySettlementStatus(String settlementStatus);\n    List<Transaction> findBySettlementStatusAndSettlementUpdatedAtBefore(String settlementStatus, java.util.Date cutoff, Pageable pageable);
+    List<Transaction> findBySettlementStatus(String settlementStatus);
+    List<Transaction> findBySettlementStatusAndSettlementUpdatedAtBefore(String settlementStatus, java.util.Date cutoff, Pageable pageable);
 }
