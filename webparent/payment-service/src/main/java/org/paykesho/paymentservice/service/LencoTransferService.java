@@ -12,6 +12,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.LinkedHashMap;
+import java.time.Duration;
+import io.netty.channel.ChannelOption;
+import reactor.netty.http.client.HttpClient;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import java.util.Map;
 
 @Slf4j
@@ -26,8 +30,12 @@ public class LencoTransferService {
             @Value("${lenco.api.base-url:https://api.lenco.co/access/v2}") String baseUrl,
             @Value("${lenco.api.token:}") String apiToken,
             @Value("${lenco.api.account-id:}") String accountId) {
+        HttpClient httpClient = HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .responseTimeout(Duration.ofSeconds(15));
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
@@ -37,18 +45,18 @@ public class LencoTransferService {
 
     public LencoSettlementResponse getStatus(String reference) {
         if (apiToken == null || apiToken.trim().isEmpty() || reference == null || reference.trim().isEmpty()) {
-            return new LencoSettlementResponse(false, "FAILED", "Lenco status lookup is not configured.", null);
+            return new LencoSettlementResponse(false, "UNKNOWN", "Lenco status lookup is not configured.", null);
         }
         try {
             JsonNode root = webClient.get()
-                    .uri("/transfers/status/" + reference)
+                    .uri(uriBuilder -> uriBuilder.path("/transfers/status/{reference}").build(reference))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken)
                     .retrieve()
                     .bodyToMono(JsonNode.class)
                     .block();
 
             JsonNode data = root == null ? null : root.path("data");
-            String status = data == null ? "FAILED" : data.path("status").asText("FAILED").toUpperCase();
+            String status = data == null ? "UNKNOWN" : data.path("status").asText("UNKNOWN").toUpperCase();
             String message = root == null ? "Empty response from Lenco." : root.path("message").asText("");
             String lencoReference = data == null ? null : data.path("lencoReference").asText(null);
             return new LencoSettlementResponse(
@@ -60,13 +68,17 @@ public class LencoTransferService {
         } catch (WebClientResponseException e) {
             log.warn("Lenco transfer status lookup failed for {}: {}", reference, e.getStatusCode());
             if (e.getStatusCode().value() == 401) {
-                return new LencoSettlementResponse(false, "FAILED", "Lenco authorization failed.", null);
+                return new LencoSettlementResponse(false, "UNKNOWN", "Lenco authorization failed.", null);
             }
             return new LencoSettlementResponse(true, "PENDING", "Status lookup temporarily unavailable.", null);
         } catch (Exception e) {
             log.warn("Unable to re-query Lenco transfer {}: {}", reference, e.getMessage());
             return new LencoSettlementResponse(true, "PENDING", "Status lookup temporarily unavailable.", null);
         }
+    }
+
+    public boolean isConfigured() {
+        return apiToken != null && !apiToken.trim().isEmpty() && accountId != null && !accountId.trim().isEmpty();
     }
 
     public LencoSettlementResponse initiate(LencoSettlementRequest request) {
