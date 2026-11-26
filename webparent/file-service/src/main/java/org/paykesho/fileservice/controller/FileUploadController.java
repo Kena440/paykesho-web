@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
-@CrossOrigin
 public class FileUploadController {
     
     private final FileStorageService fileStorageService;
