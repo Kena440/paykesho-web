@@ -16,6 +16,7 @@ class InternalNotificationTokenFilterTest {
     @Test
     void rejectsNotificationApiWithoutToken() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/notifications/queue/add");
+        request.setServletPath("/api/notifications/queue/add");
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
 
