@@ -25,6 +25,7 @@ class LencoWebhookEventServiceTest {
         String payload = "{\"event\":\"transfer.failed\",\"data\":{\"reference\":\"PK-123\",\"status\":\"failed\"}}";
         when(events.insertIfAbsent(eq("LENCO"), anyString(), eq("transfer.failed"), eq("PK-123"), anyString(), eq(true)))
                 .thenReturn(1, 0);
+        when(reconciliation.applyLencoResult("PK-123", "failed", "L-1", "declined")).thenReturn(true);
 
         assertTrue(service().accept(payload, "transfer.failed", "PK-123", "failed", "L-1", "declined"));
         assertTrue(service().accept(payload, "transfer.failed", "PK-123", "failed", "L-1", "declined"));
@@ -57,6 +58,7 @@ class LencoWebhookEventServiceTest {
         String payload = "{\"event\":\"transfer.successful\",\"data\":{\"reference\":\"PK-123\",\"status\":\"successful\",\"phone\":\"0977000000\",\"accountNumber\":\"123456789\"}}";
         when(events.insertIfAbsent(eq("LENCO"), anyString(), eq("transfer.successful"), eq("PK-123"), anyString(), eq(true)))
                 .thenReturn(1);
+        when(reconciliation.applyLencoResult("PK-123", "successful", "L-2", null)).thenReturn(true);
 
         assertTrue(service().accept(payload, "transfer.successful", "PK-123", "successful", "L-2", null));
 
