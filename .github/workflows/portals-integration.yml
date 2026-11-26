@@ -29,6 +29,7 @@ jobs:
       PAYKESHO_DB_PASSWORD: localdev
       PAYKESHO_DB_SSLMODE: disable
       RATE_LIMITING_ENABLED: 'false'
+      PAYKESHO_SETTLEMENT_RECONCILIATION_ENABLED: 'false'
       REMEMBER_ME_KEY: ci-only-remember-me-key
       PAYKESHO_INTERNAL_TOKEN: ci-only-internal-token
       JAVA_OPTS: -Xmx512m -Xms128m
