@@ -92,18 +92,46 @@ public class TransactionController {
             @RequestBody Map<String, String> requestBody,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
 
-        // Generate idempotency key if not provided (for backwards compatibility)
-        if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
-            idempotencyKey = idempotencyService.generateIdempotencyKey();
-            log.info("Generated idempotency key for transaction: {}", idempotencyKey);
+        // Money-moving requests must supply a stable idempotency key. Never generate
+        // one server-side: a retry with a new key could create a second payment.
+        if (idempotencyKey == null || idempotencyKey.trim().isEmpty()
+                || idempotencyKey.length() > 255) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", "A valid Idempotency-Key is required."));
+        }
+        idempotencyKey = idempotencyKey.trim();
+
+        String merchantCode = requestBody.get("merchantCode");
+        if (merchantCode == null || merchantCode.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", "Merchant code is required."));
+        }
+        merchantCode = merchantCode.trim();
+
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(requestBody.get("amount"));
+        } catch (NumberFormatException | NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format. Please enter a valid number."));
+        }
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Payment amount must be greater than zero."));
         }
 
-        // IDEMPOTENCY CHECK: Check if this transaction was already processed
+        String requestFingerprint = merchantCode + ":" + amount.stripTrailingZeros().toPlainString();
+        String userIdentifier = loggedInUser.getClient().getEmail();
+
+        // Bind a key to exactly one user and one normalized request. A reused key
+        // with a different payload must never be allowed to proceed.
         Optional<IdempotencyRecord> existingRecord = idempotencyService.checkIdempotency(idempotencyKey);
         if (existingRecord.isPresent()) {
             IdempotencyRecord record = existingRecord.get();
+            if (!userIdentifier.equals(record.getUserIdentifier())
+                    || !idempotencyService.validateRequestHash(record, requestFingerprint)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Collections.singletonMap("message", "This idempotency key is already bound to a different request."));
+            }
             if (record.isCompleted()) {
-                log.warn("Duplicate completed transaction attempt detected with idempotency key: {}", idempotencyKey);
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Collections.singletonMap("message", "Transaction already processed. Please check your transaction history."));
             }
@@ -115,31 +143,25 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Collections.singletonMap("message", "This payment attempt previously failed. Please start a new payment attempt."));
             }
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("message", "This payment key cannot be reused."));
         }
 
-        String merchantCode = requestBody.get("merchantCode");
-        BigDecimal amount;
-        try {
-            amount = new BigDecimal(requestBody.get("amount"));
-        } catch (NumberFormatException | NullPointerException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid amount format. Please enter a valid number."));
-        }
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Payment amount must be greater than zero."));
-        }
-
-        // Create idempotency record at START of processing
+        // Fail closed if the idempotency record cannot be created. The prior
+        // implementation swallowed persistence errors and continued to settlement.
         String finalIdempotencyKey = idempotencyKey;
         try {
             idempotencyService.createIdempotencyRecord(
                 finalIdempotencyKey,
                 "/transactions/confirm",
                 "POST",
-                merchantCode + ":" + amount,
-                loggedInUser.getClient().getEmail()
+                requestFingerprint,
+                userIdentifier
             );
         } catch (Exception e) {
-            log.error("Error creating idempotency record: {}", e.getMessage());
+            log.error("Unable to reserve payment idempotency key; refusing payment.");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Collections.singletonMap("message", "Payment could not be safely started. Please retry."));
         }
 
         try {
