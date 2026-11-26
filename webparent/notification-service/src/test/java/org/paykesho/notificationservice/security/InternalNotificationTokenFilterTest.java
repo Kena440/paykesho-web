@@ -4,16 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockFilterChain;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InternalNotificationTokenFilterTest {
     private InternalNotificationTokenFilter filter() {
-        InternalNotificationTokenFilter filter = new InternalNotificationTokenFilter("");
-        ReflectionTestUtils.setField(filter, "configuredToken", "secret-token");
-        return filter;
+        return new InternalNotificationTokenFilter("secret-token");
     }
 
     @Test
