@@ -41,7 +41,7 @@ public class StoredFileController {
                     if (sensitive && !reviewer) return ResponseEntity.<byte[]>notFound().build();
                     return inline(file);
                 })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.<byte[]>notFound().build());
     }
 
     private static ResponseEntity<byte[]> inline(FileUpload f) {
