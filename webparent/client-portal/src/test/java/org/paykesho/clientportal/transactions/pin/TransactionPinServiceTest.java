@@ -55,11 +55,11 @@ class TransactionPinServiceTest {
         when(repository.findByClientIdForUpdate(10)).thenReturn(Optional.of(row));
         TransactionPinService service = service();
 
-        assertEquals(TransactionPinService.Result.WRONG, service.verify(10, "111111"));
+        assertEquals(TransactionPinService.Result.WRONG, service.verify(10, "741852"));
         assertEquals(1, row.getFailedAttempts());
-        assertEquals(TransactionPinService.Result.WRONG, service.verify(10, "111111"));
+        assertEquals(TransactionPinService.Result.WRONG, service.verify(10, "741852"));
         assertEquals(2, row.getFailedAttempts());
-        assertEquals(TransactionPinService.Result.LOCKED, service.verify(10, "111111"));
+        assertEquals(TransactionPinService.Result.LOCKED, service.verify(10, "741852"));
         assertEquals(3, row.getFailedAttempts());
         assertNotNull(row.getLockedAt());
         assertEquals(TransactionPinService.Result.LOCKED, service.verify(10, "482951"));
