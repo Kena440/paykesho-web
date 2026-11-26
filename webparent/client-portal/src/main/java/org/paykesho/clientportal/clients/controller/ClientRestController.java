@@ -30,7 +30,7 @@ public class ClientRestController {
                                     @RequestParam("organizationUuid") String organizationUuid,
                                     @RequestParam(value = "altName", required = false) String altName) {
         try {
-            log.debug("Checking client status for name: {}, nrc: {}, organizationUuid: {}", name, nrc, organizationUuid);
+            log.debug("Checking employee eligibility for organization UUID: {}", organizationUuid);
 
             // Validate required parameters
             if (name == null || name.trim().isEmpty()) {
@@ -54,7 +54,7 @@ public class ClientRestController {
                     return "Organization not found";
                 }
             } catch (Exception ex) {
-                log.error("Error retrieving organization with UUID {}: {}", organizationUuid, ex.getMessage(), ex);
+                log.error("Error retrieving employer record: {}", ex.getMessage());
                 return "Failed to retrieve organization";
             }
 
@@ -67,7 +67,7 @@ public class ClientRestController {
             return result;
 
         } catch (Exception ex) {
-            log.error("Error checking client status for name: {}, nrc: {}: {}", name, nrc, ex.getMessage(), ex);
+            log.error("Employee eligibility check failed: {}", ex.getMessage());
             return "Failed to check client status";
         }
     }
