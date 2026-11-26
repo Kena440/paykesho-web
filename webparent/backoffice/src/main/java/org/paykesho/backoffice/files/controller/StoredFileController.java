@@ -7,6 +7,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +29,18 @@ public class StoredFileController {
     }
 
     @GetMapping("/files/{id}")
-    public ResponseEntity<byte[]> open(@PathVariable("id") long id) {
+    public ResponseEntity<byte[]> open(@PathVariable("id") long id, Authentication authentication) {
         return fileUploadService.findStoredFile(id)
-                .map(StoredFileController::inline)
+                .map(file -> {
+                    boolean reviewer = authentication != null && authentication.getAuthorities().stream()
+                            .anyMatch(a -> "Admin".equals(a.getAuthority()) || "SuperAdmin".equals(a.getAuthority()));
+                    boolean sensitive = file.getFileType() == org.commons.enums.FileType.nrc
+                            || file.getFileType() == org.commons.enums.FileType.selfie
+                            || file.getFileType() == org.commons.enums.FileType.payslip;
+                    // PII documents are restricted to the same roles that can review KYC.
+                    if (sensitive && !reviewer) return ResponseEntity.notFound().build();
+                    return inline(file);
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
