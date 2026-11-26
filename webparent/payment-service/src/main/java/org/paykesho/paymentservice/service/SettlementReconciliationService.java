@@ -20,15 +20,15 @@ public class SettlementReconciliationService {
     private final VoucherRepository voucherRepository;
 
     @Transactional
-    public void applyLencoResult(String reference, String status, String lencoReference, String reason) {
+    public boolean applyLencoResult(String reference, String status, String lencoReference, String reason) {
         if (reference == null || reference.trim().isEmpty()) {
-            return;
+            return false;
         }
 
         Transaction transaction = transactionRepository.findByReferenceForUpdate(reference).orElse(null);
         if (transaction == null) {
             log.warn("Received Lenco settlement event for unknown PayKesho reference {}", reference);
-            return;
+            return false;
         }
 
         String normalized = status == null ? "PENDING" : status.toUpperCase();
@@ -41,11 +41,11 @@ public class SettlementReconciliationService {
         // payment successful after the e-value has been released.
         if ("SUCCESSFUL".equals(current) && "FAILED".equals(normalized)) {
             log.warn("Ignoring late FAILED settlement event for already successful transaction {}", reference);
-            return;
+            return true;
         }
         if ("FAILED".equals(current) && "SUCCESSFUL".equals(normalized)) {
             log.error("Ignoring late SUCCESSFUL settlement event for already refunded transaction {}. Manual reconciliation required.", reference);
-            return;
+            return true;
         }
 
         if ("SUCCESSFUL".equals(normalized)) {
@@ -55,7 +55,7 @@ public class SettlementReconciliationService {
             transaction.setSettlementReason(null);
             transaction.setSettlementUpdatedAt(new Date());
             transactionRepository.save(transaction);
-            return;
+            return true;
         }
 
         if ("FAILED".equals(normalized)) {
@@ -78,7 +78,7 @@ public class SettlementReconciliationService {
             transaction.setSettlementReason(reason);
             transaction.setSettlementUpdatedAt(new Date());
             transactionRepository.save(transaction);
-            return;
+            return true;
         }
 
         transaction.setSettlementStatus("PENDING");
@@ -86,5 +86,6 @@ public class SettlementReconciliationService {
         transaction.setSettlementReason(reason);
         transaction.setSettlementUpdatedAt(new Date());
         transactionRepository.save(transaction);
+        return true;
     }
 }

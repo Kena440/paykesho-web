@@ -3,7 +3,7 @@ package org.paykesho.paymentservice.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.paykesho.paymentservice.service.SettlementReconciliationService;
+import org.paykesho.paymentservice.service.LencoWebhookEventService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ import java.security.NoSuchAlgorithmException;
 public class LencoWebhookController {
 
     private final ObjectMapper objectMapper;
-    private final SettlementReconciliationService reconciliationService;
+    private final LencoWebhookEventService eventService;
 
     @Value("${lenco.api.token:}")
     private String apiToken;
@@ -40,12 +40,14 @@ public class LencoWebhookController {
             JsonNode data = root.path("data");
 
             if ("transfer.successful".equals(event) || "transfer.failed".equals(event)) {
-                reconciliationService.applyLencoResult(
+                boolean processed = eventService.accept(
+                        payload, event,
                         data.path("reference").asText(null),
                         data.path("status").asText("PENDING"),
                         data.path("lencoReference").asText(null),
                         data.path("reasonForFailure").asText(null)
                 );
+                if (!processed) return ResponseEntity.status(503).build();
             }
 
             return ResponseEntity.ok().build();

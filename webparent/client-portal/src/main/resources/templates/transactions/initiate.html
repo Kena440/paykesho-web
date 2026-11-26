@@ -55,6 +55,7 @@
                                     <h5 class="card-title mb-0"><i class="align-middle me-1 text-primary"
                                                                    data-lucide="zap"></i> [[${pageTitle}]]</h5>
                                     <h6 class="card-subtitle text-muted">Make a quick payment with confidence.</h6>
+<button class="btn btn-sm btn-outline-primary mt-2" id="managePinButton" type="button">Set transaction PIN</button>
                                 </div>
                                 <div class="dropdown">
                                     <button aria-expanded="false" class="btn btn-link text-muted"
@@ -180,6 +181,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="transactionPin" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]{6}" placeholder="6-digit PIN" required type="password" autocomplete="off">
+                                                        <label for="transactionPin">Transaction PIN</label>
+                                                        <div class="invalid-feedback">Enter your six-digit transaction PIN.</div>
+                                                    </div>
                                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                                                         <button class="btn btn-success px-4" id="submitPayment"
                                                                 type="submit">
@@ -195,6 +201,43 @@
                         </div>
                     </div>
                 </div>
+                <!-- Transaction PIN setup/change modal -->
+                <div aria-hidden="true" aria-labelledby="pinModalLabel" class="modal fade" id="pinModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form id="pinForm" autocomplete="off">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="pinModalLabel">Transaction PIN</h5>
+                                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-muted small">A six-digit PIN is required to confirm payments. Re-enter your account password to set or change it.</p>
+                                    <div class="form-floating mb-3 d-none" id="currentPinGroup">
+                                        <input class="form-control" id="currentPin" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" type="password" autocomplete="off">
+                                        <label for="currentPin">Current transaction PIN</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="newPin" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]{6}" required type="password" autocomplete="new-password">
+                                        <label for="newPin">New six-digit PIN</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="confirmPin" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]{6}" required type="password" autocomplete="new-password">
+                                        <label for="confirmPin">Confirm PIN</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <input class="form-control" id="pinAccountPassword" required type="password" autocomplete="current-password">
+                                        <label for="pinAccountPassword">Account password</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                                    <button class="btn btn-primary" id="savePinButton" type="submit">Save PIN</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Modals for Help and FAQ -->
                 <div aria-hidden="true" aria-labelledby="helpModalLabel" class="modal fade" id="helpModal"
                      tabindex="-1">
@@ -285,6 +328,72 @@
 
     let html5QrCode = null;
     let merchantFetchTimeout = null;
+    let pinIsSet = false;
+    let pinModalMode = 'setup';
+
+    const pinModal = new bootstrap.Modal(document.getElementById('pinModal'));
+    const pinForm = document.getElementById('pinForm');
+    const currentPinGroup = document.getElementById('currentPinGroup');
+    const currentPinInput = document.getElementById('currentPin');
+
+    function refreshPinStatus() {
+        fetch(PK_CTX + 'transactions/pin/status')
+            .then(r => r.ok ? r.json() : Promise.reject(new Error('status unavailable')))
+            .then(data => {
+                pinIsSet = !!data.pinSet;
+                document.getElementById('managePinButton').textContent = pinIsSet ? 'Change transaction PIN' : 'Set transaction PIN';
+            })
+            .catch(() => {
+                document.getElementById('managePinButton').textContent = 'Manage transaction PIN';
+            });
+    }
+    refreshPinStatus();
+
+    document.getElementById('managePinButton').addEventListener('click', () => {
+        pinModalMode = pinIsSet ? 'change' : 'setup';
+        currentPinGroup.classList.toggle('d-none', pinModalMode !== 'change');
+        currentPinInput.required = pinModalMode === 'change';
+        document.getElementById('pinModalLabel').textContent = pinIsSet ? 'Change transaction PIN' : 'Set transaction PIN';
+        document.getElementById('savePinButton').textContent = pinIsSet ? 'Change PIN' : 'Save PIN';
+        pinForm.reset();
+        pinModal.show();
+    });
+
+    pinForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        const newPin = document.getElementById('newPin').value;
+        if (newPin !== document.getElementById('confirmPin').value) {
+            showNotification('Error', 'PIN confirmation does not match.', 'error');
+            return;
+        }
+        if (!/^[0-9]{6}$/.test(newPin) || /^([0-9])\1{5}$/.test(newPin) || newPin === '123456' || newPin === '654321') {
+            showNotification('Error', 'Choose a six-digit PIN that is not an obvious sequence.', 'error');
+            return;
+        }
+        const payload = {pin: newPin, newPin, password: document.getElementById('pinAccountPassword').value};
+        if (pinModalMode === 'change') payload.currentPin = currentPinInput.value;
+        showLoader();
+        try {
+            const response = await fetch(PK_CTX + 'transactions/pin/' + pinModalMode, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            hideLoader();
+            if (!response.ok) {
+                showNotification('PIN not saved', data.message || 'Unable to save PIN.', 'error');
+                return;
+            }
+            pinIsSet = true;
+            document.getElementById('managePinButton').textContent = 'Change transaction PIN';
+            pinModal.hide();
+            showNotification('Success', 'Transaction PIN saved.', 'success');
+        } catch (error) {
+            hideLoader();
+            showNotification('Error', 'Unable to save PIN. Check your connection and retry.', 'error');
+        }
+    });
 
     // Initialize tooltips
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -569,6 +678,11 @@
 
         const merchantCode = merchantCodeInput.value.trim();
         const amount = document.getElementById('amount').value.trim();
+        const pin = document.getElementById('transactionPin').value;
+        if (!/^[0-9]{6}$/.test(pin)) {
+            showNotification('Error', 'Enter your six-digit transaction PIN.', 'error');
+            return;
+        }
 
         if (!amount || amount <= 0) {
             showNotification('Error', 'Please enter a valid amount.', 'error');
@@ -585,7 +699,7 @@
                 'Content-Type': 'application/json',
                 'Idempotency-Key': idempotencyKey
             },
-            body: JSON.stringify({merchantCode, amount})
+            body: JSON.stringify({merchantCode, amount, pin})
         })
             .then(async response => {
                 hideLoader();

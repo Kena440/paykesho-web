@@ -2,6 +2,7 @@ package org.paykesho.notificationservice.config;
 
 import lombok.RequiredArgsConstructor;
 import org.paykesho.notificationservice.security.RateLimitingFilter;
+import org.paykesho.notificationservice.security.InternalNotificationTokenFilter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -30,14 +31,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private final RateLimitingFilter rateLimitingFilter;
+    private final InternalNotificationTokenFilter internalNotificationTokenFilter;
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(internalNotificationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests(authz -> authz
-                        .antMatchers("/api/notifications/**", "/actuator/health").permitAll()
+                        .antMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import javax.persistence.LockModeType;
 
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 // Distinct bean name: transaction.repository.TransactionRepository is also a bean
@@ -20,4 +21,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Query("select t from Transaction t where t.reference = :reference")
     Optional<Transaction> findByReferenceForUpdate(@Param("reference") String reference);
     List<Transaction> findBySettlementStatus(String settlementStatus);
+    List<Transaction> findBySettlementStatusAndSettlementUpdatedAtBefore(String settlementStatus, java.util.Date cutoff, Pageable pageable);
 }

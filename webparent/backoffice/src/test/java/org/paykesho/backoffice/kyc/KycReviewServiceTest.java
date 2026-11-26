@@ -78,7 +78,7 @@ class KycReviewServiceTest {
     @Test
     void approvalIsBlockedWhenRequiredDocumentsAreMissing() {
         ClientKycApplication app = application();
-        when(applications.findWithClient(42L)).thenReturn(Optional.of(app));
+        when(applications.findWithClientForUpdate(42L)).thenReturn(Optional.of(app));
         when(documents.findByKycApplicationIdOrderByIdAsc(42L)).thenReturn(List.of(document(KycDocumentType.NRC_FRONT)));
 
         assertThrows(PaykeshoError.class, () -> service.approve(42L, 9, null));
@@ -89,7 +89,7 @@ class KycReviewServiceTest {
     @Test
     void approvalIsBlockedWhenEmployerStaffRecordDoesNotMatch() {
         ClientKycApplication app = application();
-        when(applications.findWithClient(42L)).thenReturn(Optional.of(app));
+        when(applications.findWithClientForUpdate(42L)).thenReturn(Optional.of(app));
         when(documents.findByKycApplicationIdOrderByIdAsc(42L)).thenReturn(requiredDocuments());
         EmployeeRecord staff = matchingStaff();
         staff.setTpin("WRONG");
@@ -103,7 +103,7 @@ class KycReviewServiceTest {
     @Test
     void approvalActivatesOnlyWhenDocumentsAndStaffRecordMatch() throws Exception {
         ClientKycApplication app = application();
-        when(applications.findWithClient(42L)).thenReturn(Optional.of(app));
+        when(applications.findWithClientForUpdate(42L)).thenReturn(Optional.of(app));
         when(documents.findByKycApplicationIdOrderByIdAsc(42L)).thenReturn(requiredDocuments());
         when(employeeRecords.findByNrcAndOrganization(app.getClient().getNrc(), app.getClient().getOrganization())).thenReturn(matchingStaff());
         when(references.generateCode("ITEM_REQ_CLT")).thenReturn("CLT-0007");

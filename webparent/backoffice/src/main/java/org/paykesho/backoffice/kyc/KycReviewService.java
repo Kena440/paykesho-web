@@ -93,7 +93,7 @@ public class KycReviewService {
     }
 
     public ClientKycApplication markUnderReview(Long id, Integer reviewerId) throws PaykeshoError {
-        ClientKycApplication a = get(id);
+        ClientKycApplication a = getForUpdate(id);
         requireOpen(a);
         if (a.getStatus() == KycStatus.SUBMITTED) {
             a.setStatus(KycStatus.UNDER_REVIEW);
@@ -103,7 +103,7 @@ public class KycReviewService {
     }
 
     public ClientKycApplication approve(Long id, Integer reviewerId, String note) throws PaykeshoError {
-        ClientKycApplication a = get(id);
+        ClientKycApplication a = getForUpdate(id);
         requireOpen(a);
         requireReviewer(reviewerId);
         validateForApproval(a);
@@ -133,7 +133,7 @@ public class KycReviewService {
 
     /** Keeps the application open but records what is missing. */
     public ClientKycApplication requestMoreInfo(Long id, Integer reviewerId, String reason) throws PaykeshoError {
-        ClientKycApplication a = get(id);
+        ClientKycApplication a = getForUpdate(id);
         requireOpen(a);
         requireReviewer(reviewerId);
         String r = blankToNull(reason);
@@ -147,7 +147,7 @@ public class KycReviewService {
     }
 
     private ClientKycApplication close(Long id, Integer reviewerId, String reason, KycStatus status, String message) throws PaykeshoError {
-        ClientKycApplication a = get(id);
+        ClientKycApplication a = getForUpdate(id);
         requireOpen(a);
         requireReviewer(reviewerId);
         String r = blankToNull(reason);
@@ -183,6 +183,11 @@ public class KycReviewService {
                 || !java.util.Objects.equals(staff.getManNumber(), client.getManNumber())) {
             throw new PaykeshoError("Approval blocked: applicant details do not match the employer staff list. Resolve the mismatch before approval.");
         }
+    }
+
+    private ClientKycApplication getForUpdate(Long id) throws PaykeshoError {
+        return applications.findWithClientForUpdate(id)
+                .orElseThrow(() -> new PaykeshoError("Registration not found."));
     }
 
     private static void requireOpen(ClientKycApplication a) throws PaykeshoError {

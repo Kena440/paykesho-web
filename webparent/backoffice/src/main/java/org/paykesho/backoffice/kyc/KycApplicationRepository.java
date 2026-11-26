@@ -3,8 +3,10 @@ package org.paykesho.backoffice.kyc;
 import org.commons.entity.kyc.ClientKycApplication;
 import org.commons.enums.KycStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.persistence.LockModeType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,10 @@ public interface KycApplicationRepository extends JpaRepository<ClientKycApplica
 
     @Query("select a from ClientKycApplication a join fetch a.client c left join fetch c.organization where a.id = ?1")
     Optional<ClientKycApplication> findWithClient(Long id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select a from ClientKycApplication a join fetch a.client c where a.id = ?1")
+    Optional<ClientKycApplication> findWithClientForUpdate(Long id);
 
     Optional<ClientKycApplication> findFirstByClient_IdOrderBySubmittedAtDesc(Integer clientId);
 

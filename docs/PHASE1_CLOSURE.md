@@ -11,19 +11,19 @@ Phase 1 is not complete until each item is implemented, integrated, secured, tes
 
 | Workstream | Status | Evidence / next action |
 |---|---|---|
-| KYC registration + back-office review | Implemented, merged #36; follow-up compile fix in #39 | #39 includes KYC document-access compile fix. Portal/build CI passed on #39 head. Confirm KYC end-to-end journey in staging before release. |
+| KYC registration + back-office review | Implemented, merged #36; follow-up compile fix in #39; review-row locking in #42 | #39 includes KYC document-access compile fix. #42 adds pessimistic locking for decision transitions to prevent concurrent approvals/rejections. Targeted tests included in CI. |
 | Sensitive KYC document access | Implemented on #39 branch | NRC, selfie and payslip documents are reviewer-restricted; build/integration CI passed on #39 head. Review role authority mapping and test IDOR/access denial before release. |
 | Ledger table foundation | Present in #35 migration | Tables exist as schema foundation; no chart of accounts or posting semantics approved. |
 | Ledger journal integrity | Implemented on #39 branch | Deferred validation requires >=2 postings, debit=credit, single currency. SQL regression tests included; portal integration CI passed on #39 head. |
-| Ledger immutability | Existing #35 migration | Journal and posting UPDATE/DELETE are blocked; corrections require reversal journals. Verify tests include mutation denial. |
+| Ledger immutability | Implemented on PR #39; account attributes hardened in PR #42 | Journal/posting UPDATE/DELETE are blocked; account code/name/type/owner/currency become immutable once used. SQL tests exercise account-currency mutation denial and active toggle. |
 | Payment idempotency | Implemented on #39 branch | Caller-supplied key required; key bound to authenticated user + normalized merchant/amount; reservation failure fails closed. Build + portal integration CI passed. Need explicit concurrent-request and replay tests. |
-| KYC private document storage | Partial / not verified | Existing file upload storage path still needs audit for private storage, URL exposure, access controls, retention and short-lived access. |
-| Transaction PIN | Schema only | Implement service, hashing, verify, retry lockout, reset, authorization on payment/advance, and tests. |
+| KYC private document storage | Partially secured; legacy file service hardening in PR #42 | KYC documents use client-portal database storage with owner/reviewer access controls. Legacy file-service APIs now require the internal token; only logo GET paths remain public. Short-lived signed document URLs and retention policy are still not implemented; legacy service must not be deployed until that design is closed. |
+| Transaction PIN | In progress on PR #42 | PIN setup/change, BCrypt hashing, password re-authentication, 3-attempt lockout, payment confirmation enforcement, UI and unit tests. Recovery after lockout remains blocked pending verified recovery design. |
 | Trusted devices | Schema only | Implement registration, verification, revocation, session/device binding and abuse controls. |
 | Advance affordability/eligibility | Blocked by policy decision D-04 | No approved formula. Implement only after owner approval. |
 | Interest/fees/repayment calculation | Blocked by policy decision D-17 and other financial decisions | Existing 15% value is not treated as approved policy. No customer-facing price or financial posting semantics to be hard-coded. |
 | Ledger chart of accounts + posting rules | Blocked by owner approval | Design requires decisions on database of record, chart of accounts, posting semantics, fees, float/reserve, repayment, settlement and write-offs. |
-| Provider-event/webhook deduplication | Schema only / implementation not verified | Implement verified-signature handling, deduplication, replay protection, uncertain-outcome state and reconciliation tests. |
+| Provider-event/webhook deduplication | In progress on PR #42 | Signature verification already exists; PR #42 records verified, sanitized events using SHA-256 payload deduplication and processes settlement in the same transaction. Unknown references stay unprocessed and return 503 for provider retry. |
 | Reconciliation | Not implemented / not verified | Build provider-to-PayKesho transaction and ledger reconciliation with exception queue and audit trail. |
 | CI and staging | CI exists; staging not verified | CI is disposable test environment. Confirm actual staging environment, deployment version, secrets/config and service health. |
 | Release readiness | Not ready | Requires decision approvals, security review, tests, staging evidence, rollback plan and explicit release approval. |
@@ -33,7 +33,7 @@ Phase 1 is not complete until each item is implemented, integrated, secured, tes
 - PR #36 KYC merged to master: merge commit 5a8b6980b201c55b87381167876d29aa981fefb.
 - PR #37 KYC compile-fix CI failed on its isolated head.
 - PR #39 includes the compile fix plus ledger integrity migration/tests and payment idempotency fail-closed changes.
-- PR #39 head 97ec64ef5e6b24e20c70e5e831d1837663c531c6: Build Check passed; Portals Integration passed.
+- PR #39 head 97ec64ef5e6b24e20c70e5e831d1837663c531c6: Build Check passed; Portals Integration passed.\n- PR #42 is the PIN/account-hardening workstream; latest head is pending CI.
 - PR #38 head b9179b4e2979a3354881ee4714e7a20f6a649eda: Build Check passed; Portals Integration passed. Its changes are included in PR #39.
 - CI tests run against disposable PostgreSQL and Lenco test double; they do not prove production schema/deployment or real Lenco behavior.
 

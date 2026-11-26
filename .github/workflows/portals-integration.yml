@@ -29,6 +29,7 @@ jobs:
       PAYKESHO_DB_PASSWORD: localdev
       PAYKESHO_DB_SSLMODE: disable
       RATE_LIMITING_ENABLED: 'false'
+      PAYKESHO_SETTLEMENT_RECONCILIATION_ENABLED: 'false'
       REMEMBER_ME_KEY: ci-only-remember-me-key
       PAYKESHO_INTERNAL_TOKEN: ci-only-internal-token
       JAVA_OPTS: -Xmx512m -Xms128m
@@ -58,6 +59,7 @@ jobs:
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261027115438_app_file_uploads_content.sql
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261118224523_customer_journey_tables.sql
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261126040200_phase1_ledger_integrity.sql
+            psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261126062500_phase1_ledger_account_immutability.sql
           done
           psql -d paykesho_probe -v ON_ERROR_STOP=1 -q -f supabase/testing/test_ledger_integrity.sql
           psql -d paykesho -v ON_ERROR_STOP=1 -q -f e2e-tests/portals/fixtures.sql
