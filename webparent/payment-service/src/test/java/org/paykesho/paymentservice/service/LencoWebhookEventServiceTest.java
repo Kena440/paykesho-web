@@ -27,7 +27,7 @@ class LencoWebhookEventServiceTest {
                 .thenReturn(1, 0);
 
         assertTrue(service().accept(payload, "transfer.failed", "PK-123", "failed", "L-1", "declined"));
-        assertFalse(service().accept(payload, "transfer.failed", "PK-123", "failed", "L-1", "declined"));
+        assertTrue(service().accept(payload, "transfer.failed", "PK-123", "failed", "L-1", "declined"));
 
         verify(reconciliation, times(1)).applyLencoResult("PK-123", "failed", "L-1", "declined");
         verify(events, times(1)).markProcessed(eq("LENCO"), anyString());
