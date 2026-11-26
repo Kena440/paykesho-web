@@ -89,7 +89,7 @@ class KycReviewServiceTest {
     @Test
     void approvalIsBlockedWhenEmployerStaffRecordDoesNotMatch() {
         ClientKycApplication app = application();
-        when(applications.findWithClient(42L)).thenReturn(Optional.of(app));
+        when(applications.findWithClientForUpdate(42L)).thenReturn(Optional.of(app));
         when(documents.findByKycApplicationIdOrderByIdAsc(42L)).thenReturn(requiredDocuments());
         EmployeeRecord staff = matchingStaff();
         staff.setTpin("WRONG");
