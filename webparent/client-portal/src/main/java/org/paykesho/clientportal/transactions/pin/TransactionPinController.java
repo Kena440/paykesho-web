@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Collections;
 import java.util.Map;
@@ -31,8 +32,13 @@ public class TransactionPinController {
     @PostMapping("/setup")
     public ResponseEntity<?> setup(@AuthenticationPrincipal ClientUserDetails me, @RequestBody Map<String, String> body) {
         if (!reauthenticated(me, body)) return unauthorized();
-        TransactionPinService.Result result = pins.setup(me.getClient().getId(), body.get("pin"));
-        return respond(result);
+        try {
+            TransactionPinService.Result result = pins.setup(me.getClient().getId(), body.get("pin"));
+            return respond(result);
+        } catch (DataIntegrityViolationException duplicate) {
+            // Concurrent setup requests race on client_id's primary key; never overwrite.
+            return respond(TransactionPinService.Result.ALREADY_SET);
+        }
     }
 
     @PostMapping("/change")
