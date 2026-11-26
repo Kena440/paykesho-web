@@ -57,7 +57,9 @@ jobs:
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261025123506_app_settlement_payout_columns.sql
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261027115438_app_file_uploads_content.sql
             psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261118224523_customer_journey_tables.sql
+            psql -d $db -v ON_ERROR_STOP=1 -q -f supabase/migrations/20261126040200_phase1_ledger_integrity.sql
           done
+          psql -d paykesho_probe -v ON_ERROR_STOP=1 -q -f supabase/testing/test_ledger_integrity.sql
           psql -d paykesho -v ON_ERROR_STOP=1 -q -f e2e-tests/portals/fixtures.sql
 
       - name: Build
