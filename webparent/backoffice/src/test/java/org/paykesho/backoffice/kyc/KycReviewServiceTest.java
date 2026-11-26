@@ -103,7 +103,7 @@ class KycReviewServiceTest {
     @Test
     void approvalActivatesOnlyWhenDocumentsAndStaffRecordMatch() throws Exception {
         ClientKycApplication app = application();
-        when(applications.findWithClient(42L)).thenReturn(Optional.of(app));
+        when(applications.findWithClientForUpdate(42L)).thenReturn(Optional.of(app));
         when(documents.findByKycApplicationIdOrderByIdAsc(42L)).thenReturn(requiredDocuments());
         when(employeeRecords.findByNrcAndOrganization(app.getClient().getNrc(), app.getClient().getOrganization())).thenReturn(matchingStaff());
         when(references.generateCode("ITEM_REQ_CLT")).thenReturn("CLT-0007");
