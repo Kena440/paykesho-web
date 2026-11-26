@@ -40,13 +40,14 @@ public class LencoWebhookController {
             JsonNode data = root.path("data");
 
             if ("transfer.successful".equals(event) || "transfer.failed".equals(event)) {
-                eventService.accept(
+                boolean processed = eventService.accept(
                         payload, event,
                         data.path("reference").asText(null),
                         data.path("status").asText("PENDING"),
                         data.path("lencoReference").asText(null),
                         data.path("reasonForFailure").asText(null)
                 );
+                if (!processed) return ResponseEntity.status(503).build();
             }
 
             return ResponseEntity.ok().build();
