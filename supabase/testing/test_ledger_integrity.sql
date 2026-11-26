@@ -10,10 +10,10 @@ declare
   key text := 'ledger-test-' || gen_random_uuid()::text;
 begin
   insert into app.ledger_accounts(code,name,type,currency)
-    values ('TEST-ZMW-'||gen_random_uuid()::text,'Test ZMW','ASSET','ZMW')
+    values ('TZ-'||substr(gen_random_uuid()::text,1,16),'Test ZMW','ASSET','ZMW')
     returning id into a_zmw;
   insert into app.ledger_accounts(code,name,type,currency)
-    values ('TEST-USD-'||gen_random_uuid()::text,'Test USD','ASSET','USD')
+    values ('TU-'||substr(gen_random_uuid()::text,1,16),'Test USD','ASSET','USD')
     returning id into a_usd;
 
   -- A valid balanced journal must pass.
