@@ -16,6 +16,7 @@ class InternalFileServiceTokenFilterTest {
     @Test
     void rejectsPrivateFileAccessWithoutInternalToken() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/uploads/payslip/a.pdf");
+        request.setServletPath("/uploads/payslip/a.pdf");
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
 
@@ -28,6 +29,7 @@ class InternalFileServiceTokenFilterTest {
     @Test
     void allowsPublicLogoReadWithoutToken() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/uploads/logo/logo.png");
+        request.setServletPath("/uploads/logo/logo.png");
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
 
@@ -40,6 +42,7 @@ class InternalFileServiceTokenFilterTest {
     @Test
     void allowsInternalUploadWithValidToken() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/uploads-api");
+        request.setServletPath("/uploads-api");
         request.addHeader("X-PayKesho-Internal-Token", "secret-token");
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
