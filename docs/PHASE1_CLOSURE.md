@@ -11,7 +11,7 @@ Phase 1 is not complete until each item is implemented, integrated, secured, tes
 
 | Workstream | Status | Evidence / next action |
 |---|---|---|
-| KYC registration + back-office review | Implemented, merged #36; follow-up compile fix in #39 | #39 includes KYC document-access compile fix. Portal/build CI passed on #39 head. Confirm KYC end-to-end journey in staging before release. |
+| KYC registration + back-office review | Implemented, merged #36; follow-up compile fix in #39; review-row locking in #42 | #39 includes KYC document-access compile fix. #42 adds pessimistic locking for decision transitions to prevent concurrent approvals/rejections. Targeted tests included in CI. |
 | Sensitive KYC document access | Implemented on #39 branch | NRC, selfie and payslip documents are reviewer-restricted; build/integration CI passed on #39 head. Review role authority mapping and test IDOR/access denial before release. |
 | Ledger table foundation | Present in #35 migration | Tables exist as schema foundation; no chart of accounts or posting semantics approved. |
 | Ledger journal integrity | Implemented on #39 branch | Deferred validation requires >=2 postings, debit=credit, single currency. SQL regression tests included; portal integration CI passed on #39 head. |
