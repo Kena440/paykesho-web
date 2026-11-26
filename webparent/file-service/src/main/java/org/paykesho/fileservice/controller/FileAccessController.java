@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @RestController
 @Slf4j
-@CrossOrigin
 public class FileAccessController {
     
     private final FileStorageService fileStorageService;
