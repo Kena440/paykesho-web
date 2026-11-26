@@ -25,6 +25,7 @@ begin
   set constraints all immediate;
 
   -- Empty journal must be rejected.
+  set constraints all deferred;
   rejected := false;
   begin
     insert into app.journal_entries(reference,idempotency_key,event_type)
@@ -36,6 +37,7 @@ begin
   if not rejected then raise exception 'empty journal test failed'; end if;
 
   -- Unequal debits/credits must be rejected.
+  set constraints all deferred;
   rejected := false;
   begin
     insert into app.journal_entries(reference,idempotency_key,event_type)
@@ -50,6 +52,7 @@ begin
   if not rejected then raise exception 'unbalanced journal test failed'; end if;
 
   -- Mixed currency postings must be rejected even when amounts balance numerically.
+  set constraints all deferred;
   rejected := false;
   begin
     insert into app.journal_entries(reference,idempotency_key,event_type)
