@@ -71,4 +71,22 @@ class TransactionPinServiceTest {
         assertEquals(0, row.getFailedAttempts());
         assertNull(row.getLockedAt());
     }
+    @Test
+    void changePinRequiresOldPinAndReplacesHash() {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        ClientTransactionPin row = new ClientTransactionPin();
+        row.setClientId(10);
+        row.setPinHash(encoder.encode("482951"));
+        row.setFailedAttempts((short) 0);
+        when(repository.findByClientIdForUpdate(10)).thenReturn(Optional.of(row));
+        TransactionPinService service = new TransactionPinService(repository, encoder);
+
+        assertEquals(TransactionPinService.Result.SAME_PIN, service.change(10, "482951", "482951"));
+        assertEquals(TransactionPinService.Result.OK, service.change(10, "482951", "735194"));
+        assertTrue(encoder.matches("735194", row.getPinHash()));
+        assertFalse(encoder.matches("482951", row.getPinHash()));
+        assertEquals(TransactionPinService.Result.WRONG, service.verify(10, "482951"));
+        assertEquals(TransactionPinService.Result.OK, service.verify(10, "735194"));
+    }
+
 }
