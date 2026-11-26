@@ -24,6 +24,17 @@ begin
     values (j,a_zmw,'D',100.00),(j,a_zmw,'C',100.00);
   set constraints all immediate;
 
+  -- Account currency/type/ownership cannot be changed after use, but active status can.
+  rejected := false;
+  begin
+    update app.ledger_accounts set currency='USD' where id=a_zmw;
+  exception when others then
+    rejected := position('immutable after posting' in sqlerrm) > 0;
+  end;
+  if not rejected then raise exception 'posted-account currency mutation test failed'; end if;
+  update app.ledger_accounts set active=false where id=a_zmw;
+  update app.ledger_accounts set active=true where id=a_zmw;
+
   -- Empty journal must be rejected.
   set constraints all deferred;
   rejected := false;
