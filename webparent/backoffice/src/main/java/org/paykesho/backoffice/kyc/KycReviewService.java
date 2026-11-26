@@ -6,6 +6,7 @@ import org.commons.entity.client.EmployeeRecord;
 import org.commons.entity.kyc.ClientKycApplication;
 import org.commons.entity.kyc.KycDocument;
 import org.commons.enums.KycStatus;
+import org.commons.enums.KycDocumentType;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.backoffice.client.repository.ClientRepository;
 import org.paykesho.backoffice.notification.general.NotificationClient;
@@ -105,6 +106,7 @@ public class KycReviewService {
         ClientKycApplication a = get(id);
         requireOpen(a);
         requireReviewer(reviewerId);
+        validateForApproval(a);
         a.setStatus(KycStatus.APPROVED);
         a.setReviewedBy(reviewerId);
         a.setReviewedAt(Instant.now());
@@ -161,6 +163,26 @@ public class KycReviewService {
         log.info("KYC application {} {} by user {}", id, status, reviewerId);
         notify(client, message + r);
         return a;
+    }
+
+    /** Refuse activation unless required evidence is attached and staff-list details still match. */
+    private void validateForApproval(ClientKycApplication a) throws PaykeshoError {
+        Client client = a.getClient();
+        List<KycDocument> attached = documents.findByKycApplicationIdOrderByIdAsc(a.getId());
+        Set<KycDocumentType> types = EnumSet.noneOf(KycDocumentType.class);
+        for (KycDocument d : attached) types.add(d.getDocumentType());
+        if (!types.containsAll(EnumSet.of(KycDocumentType.NRC_FRONT, KycDocumentType.NRC_BACK, KycDocumentType.PAYSLIP))) {
+            throw new PaykeshoError("Approval blocked: the NRC front, NRC back and latest payslip must be attached.");
+        }
+        EmployeeRecord staff = staffRecordFor(client).orElseThrow(
+                () -> new PaykeshoError("Approval blocked: no employer staff-list record was found for this NRC."));
+        String expectedName = a.getFirstName() + " " + a.getLastName();
+        boolean nameMatches = staff.getName() != null && (staff.getName().equals(client.getName()) || staff.getName().equals(expectedName));
+        if (!nameMatches || !java.util.Objects.equals(staff.getNrc(), client.getNrc())
+                || !java.util.Objects.equals(staff.getTpin(), client.getTpin())
+                || !java.util.Objects.equals(staff.getManNumber(), client.getManNumber())) {
+            throw new PaykeshoError("Approval blocked: applicant details do not match the employer staff list. Resolve the mismatch before approval.");
+        }
     }
 
     private static void requireOpen(ClientKycApplication a) throws PaykeshoError {
