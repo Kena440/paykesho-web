@@ -5,8 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Lock;
 
-public interface ProviderEventRepository extends JpaRepository<ProviderEvent, Long> {
+import javax.persistence.LockModeType;
+import java.util.Optional;
+
+public interface ProviderEventRepository extends JpaRepository<ProviderEvent, Long> {\n    @Lock(LockModeType.PESSIMISTIC_WRITE)\n    Optional<ProviderEvent> findByProviderAndEventId(String provider, String eventId);
     @Modifying
     @Query(value = "insert into app.provider_events(provider,event_id,event_type,reference,payload,signature_valid) " +
             "values(:provider,:eventId,:eventType,:reference,cast(:payload as jsonb),:signatureValid) " +
