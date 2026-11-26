@@ -18,6 +18,7 @@ import org.paykesho.clientportal.transactions.service.TransactionsService;
 import org.paykesho.clientportal.utils.PaykeshoReferenceService;
 import org.paykesho.clientportal.voucher.service.VoucherService;
 import org.paykesho.clientportal.idempotency.service.IdempotencyService;
+import org.paykesho.clientportal.transactions.pin.TransactionPinService;
 import org.paykesho.clientportal.settlement.PaymentSettlementClient;
 import org.paykesho.clientportal.settlement.SettlementClientResponse;
 import org.commons.entity.IdempotencyRecord;
@@ -61,6 +62,8 @@ public class TransactionController {
     private NotificationClient notificationClient;
     @Autowired
     private IdempotencyService idempotencyService;
+    @Autowired
+    private TransactionPinService transactionPinService;
     @Autowired
     private PaymentSettlementClient paymentSettlementClient;
 
@@ -116,6 +119,21 @@ public class TransactionController {
         }
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Payment amount must be greater than zero."));
+        }
+
+        // Validate the transaction PIN before reserving a payment idempotency key.
+        // PIN attempts are persisted and locked after three failures.
+        TransactionPinService.Result pinResult = transactionPinService.verify(
+                loggedInUser.getClient().getId(), requestBody.get("pin"));
+        if (pinResult != TransactionPinService.Result.OK) {
+            HttpStatus pinStatus = pinResult == TransactionPinService.Result.NOT_SET ? HttpStatus.PRECONDITION_REQUIRED
+                    : pinResult == TransactionPinService.Result.LOCKED ? HttpStatus.LOCKED
+                    : pinResult == TransactionPinService.Result.WRONG ? HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST;
+            String pinMessage = pinResult == TransactionPinService.Result.NOT_SET ? "Set your transaction PIN before making payments."
+                    : pinResult == TransactionPinService.Result.LOCKED ? "Transaction PIN is locked. Account recovery is required."
+                    : pinResult == TransactionPinService.Result.WRONG ? "Incorrect transaction PIN."
+                    : "Enter a valid six-digit transaction PIN.";
+            return ResponseEntity.status(pinStatus).body(Collections.singletonMap("message", pinMessage));
         }
 
         String requestFingerprint = merchantCode + ":" + amount.stripTrailingZeros().toPlainString();
