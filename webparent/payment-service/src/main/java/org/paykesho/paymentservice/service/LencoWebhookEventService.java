@@ -34,13 +34,19 @@ public class LencoWebhookEventService {
         String sanitized = objectMapper.writeValueAsString(safePayload);
 
         int inserted = events.insertIfAbsent(PROVIDER, eventId, eventType, reference, sanitized, true);
-        if (inserted == 0) return false; // already received and processed, or concurrent delivery
-
-        if ("transfer.successful".equals(eventType) || "transfer.failed".equals(eventType)) {
-            reconciliationService.applyLencoResult(reference, status, lencoReference, reason);
+        if (inserted == 0) {
+            var existing = events.findByProviderAndEventId(PROVIDER, eventId).orElse(null);
+            if (existing == null || existing.getProcessedAt() != null) return false;
         }
-        events.markProcessed(PROVIDER, eventId);
-        return true;
+
+        boolean applied = true;
+        if ("transfer.successful".equals(eventType) || "transfer.failed".equals(eventType)) {
+            applied = reconciliationService.applyLencoResult(reference, status, lencoReference, reason);
+        }
+        // Unknown PayKesho references stay pending so a duplicate delivery can retry after
+        // the transaction record becomes available. Lenco still receives an HTTP 200 ack.
+        if (applied) events.markProcessed(PROVIDER, eventId);
+        return applied;
     }
 
     private static String sha256(String value) {
