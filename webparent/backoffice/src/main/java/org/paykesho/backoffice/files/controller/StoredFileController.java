@@ -38,7 +38,7 @@ public class StoredFileController {
                             || file.getFileType() == org.commons.enums.FileType.selfie
                             || file.getFileType() == org.commons.enums.FileType.payslip;
                     // PII documents are restricted to the same roles that can review KYC.
-                    if (sensitive && !reviewer) return ResponseEntity.notFound().build();
+                    if (sensitive && !reviewer) return ResponseEntity.<byte[]>notFound().build();
                     return inline(file);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
