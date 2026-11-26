@@ -17,7 +17,7 @@ jobs:
       - name: Commons (unit tests)
         run: mvn -B -f commons/pom.xml install
       - name: Phase 1 PIN and webhook regression tests
-        run: mvn -B -f webparent/pom.xml -pl client-portal,payment-service,backoffice -am -Dtest=TransactionPinServiceTest,TransactionControllerPinTest,LencoWebhookEventServiceTest,LencoWebhookControllerTest,KycReviewServiceTest -Dsurefire.failIfNoSpecifiedTests=false test
+        run: mvn -B -f webparent/pom.xml -pl client-portal,payment-service,backoffice -am -Dtest=TransactionPinServiceTest,TransactionControllerPinTest,LencoWebhookEventServiceTest,LencoWebhookControllerTest,SettlementStatusPollingServiceTest,KycReviewServiceTest -Dsurefire.failIfNoSpecifiedTests=false test
       - name: Services (compile)
         run: mvn -B -f webparent/pom.xml -DskipTests package
 
