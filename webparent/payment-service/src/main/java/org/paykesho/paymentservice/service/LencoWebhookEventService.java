@@ -36,7 +36,7 @@ public class LencoWebhookEventService {
         int inserted = events.insertIfAbsent(PROVIDER, eventId, eventType, reference, sanitized, true);
         if (inserted == 0) {
             var existing = events.findByProviderAndEventId(PROVIDER, eventId).orElse(null);
-            if (existing == null || existing.getProcessedAt() != null) return false;
+            if (existing == null || existing.getProcessedAt() != null) return true;
         }
 
         boolean applied = true;
