@@ -193,7 +193,7 @@ public class ClientController {
             model.addAttribute("successMessage",
                     "Registration received. Paykesho will review your details and documents, and you can sign in once your registration is approved.");
         } catch (Exception ex) {
-            log.error("Registration failed: {}", ex.getMessage());
+            log.error("Registration submission failed ({}).", ex.getClass().getSimpleName(), ex);
             client.setPassword(null); // never echo the password back into the form
             model.addAttribute("client", client); // keep user input
             model.addAttribute("kyc", kyc);
