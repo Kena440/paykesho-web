@@ -3,6 +3,7 @@ package org.paykesho.clientportal.clients.service;
 import org.commons.entity.client.Client;
 import org.commons.entity.client.ClientBalance;
 import org.commons.enums.AuthenticationType;
+import org.commons.enums.ClientType;
 import org.commons.security.SecurityValidator;
 import org.commons.test.BaseUnitTest;
 import org.commons.test.TestDataBuilders;
@@ -74,6 +75,7 @@ class ClientServiceTest extends BaseUnitTest {
         kyc.setRoad("Main Road");
         kyc.setArea("Lusaka");
         testClient.setOrganization(null);
+        testClient.setClientType(null);
         try (MockedStatic<SecurityValidator> mockedSecurityValidator = mockStatic(SecurityValidator.class)) {
             mockedSecurityValidator.when(() -> SecurityValidator.validateAndSanitizeClient(any(Client.class))).thenAnswer(invocation -> null);
             ReflectionTestUtils.setField(clientService, "validator",
@@ -81,6 +83,8 @@ class ClientServiceTest extends BaseUnitTest {
 
             assertThatThrownBy(() -> clientService.registerClient(testClient, kyc, Map.of()))
                     .isInstanceOf(RegistrationRejectedException.class);
+
+            assertThat(testClient.getClientType()).isEqualTo(ClientType.FORMAL);
 
             verify(clientRepository, never()).save(any());
             verify(clientBalanceRepository, never()).save(any());
