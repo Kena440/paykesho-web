@@ -8,6 +8,7 @@ import org.commons.entity.client.ClientBalance;
 import org.commons.entity.organization.Organization;
 import org.commons.entity.settings.Country;
 import org.commons.enums.AuthenticationType;
+import org.commons.enums.ClientType;
 import org.commons.security.SecurityValidator;
 import org.commons.utils.PaykeshoError;
 import org.paykesho.clientportal.clients.repository.ClientBalanceRepository;
@@ -118,6 +119,8 @@ public class ClientService {
         try {
             log.debug("Registering new client with email: {}", client.getEmail());
 
+            // Client type is system-controlled; the disabled form field is not submitted.
+            client.setClientType(ClientType.FORMAL);
             composeNameAndAddress(client, kyc);
 
             // SECURITY: Validate and sanitize all client input
